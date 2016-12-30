@@ -1,0 +1,521 @@
+﻿<Window x:Class="AccessBattleWpf.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:custom="clr-namespace:AccessBattleWpf"
+        xmlns:local="clr-namespace:AccessBattleWpf"
+        mc:Ignorable="d"
+        Title="MainWindow" Width="345" Height="548"
+        SizeChanged="Window_SizeChanged"
+        StateChanged="Window_StateChanged">
+    <Window.Resources>
+        <ResourceDictionary>
+            <!--<custom:StretchConverter x:Key="StretchConv1" StretchFactor="1.5"/>-->
+            <SolidColorBrush x:Key="MainFieldBorderColor" Color="OliveDrab"/>
+            <Style x:Key="MainField" TargetType="Border">
+                <Setter Property="BorderThickness" Value="2"/>
+                <Setter Property="CornerRadius" Value="2"/>
+                <Setter Property="BorderBrush" Value="{StaticResource MainFieldBorderColor}"/>
+                <Setter Property="Background" Value="#1F1F1F"/>
+                <Setter Property="Margin" Value="1" />
+            </Style>
+            <Thickness x:Key="BoardBorderThickness">4</Thickness>
+            <CornerRadius x:Key="BoardBorderCornerRadius">4</CornerRadius>
+            <GridLength x:Key="BoardBorderGridThickness">4</GridLength>
+            <StreamGeometry x:Key="ServerTextPath">M19,0L3,0 3,3 0,3 0,5 3,5 3,8 11,8 11,12 0,12 0,14 16,14 16,11 19,11 19,9 16,9 16,6 8,6 8,2 19,2z M43,0L26,0 26,3 24,3 24,11 26,11 26,14 43,14 43,12 31,12 31,8 40,8 40,6 31,6 31,2 43,2z M48,0L48,14 56,14 56,8 60,8 60,14 68,14 68,9 65,9 65,5 68,5 68,3 65,3 65,0z M56,6L60,6 60,2 56,2z M73,0L73,14 86,14 86,11 89,11 89,8 92,8 92,0 84,0 84,12 81,12 81,0z M115,0L98,0 98,3 96,3 96,11 98,11 98,14 115,14 115,12 103,12 103,8 112,8 112,6 103,6 103,2 115,2z M119,0L119,14 127,14 127,8 131,8 131,14 139,14 139,9 136,9 136,5 139,5 139,3 136,3 136,0z M127,6L131,6 131,2 127,2z</StreamGeometry>
+            <StreamGeometry x:Key="ExitPath">M5,26L0,26 0,35 5,35 5,34 1,34 1,31 5,31 5,30 1,30 1,27 5,27z M7,26L7,29 9,29 9,32 7,32 7,35 8,35 8,33 11,33 11,35 12,35 12,32 10,32 10,29 12,29 12,26 11,26 11,28 8,28 8,26z M14,26L14,27 16,27 16,34 14,34 14,35 19,35 19,34 17,34 17,27 19,27 19,26z M21,26L21,27 23,27 23,35 24,35 24,27 26,27 26,26z</StreamGeometry>
+            <StreamGeometry x:Key="DoorPath">M9,9L9,21 11,21 11,22 13,22 13,23 15,23 15,24 16,24 16,13 14,13 14,12 12,12 12,11 10,11 10,9z</StreamGeometry>
+            <StreamGeometry x:Key="DoorPath2">M9,9L19,9 19,21 9,21z</StreamGeometry>
+            <StreamGeometry x:Key="DoorArrowPath">M12,7L12,4 10,4 11,3 12,2 13,1 14,0 15,1 16,2 17,3 18,4 16,4 16,7z</StreamGeometry>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid Background="Black" Name="MainGrid">
+        <!--<custom:BoardCanvas/>-->
+        <Grid.RowDefinitions>
+            <RowDefinition Name="RowEdgeUpper" Height="0"/>
+            <RowDefinition Name="RowStackP1" />
+            <RowDefinition Name="RowBorderUpper" Height="{StaticResource BoardBorderGridThickness}"/>
+            <RowDefinition Name="RowServerP1"/>
+            <RowDefinition Name="Row8"/>
+            <RowDefinition Name="Row7"/>
+            <RowDefinition Name="Row6"/>
+            <RowDefinition Name="Row5"/>
+            <RowDefinition Name="Row4"/>
+            <RowDefinition Name="Row3"/>
+            <RowDefinition Name="Row2"/>
+            <RowDefinition Name="Row1"/>
+            <RowDefinition Name="RowServerP2" />
+            <RowDefinition Name="BorderLower" Height="{StaticResource BoardBorderGridThickness}"/>
+            <RowDefinition Name="RowStackP2" />
+            <RowDefinition Name="RowEdgeLower" Height="0"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Name="ColumnEdgeLeft" Width="0"/>
+            <ColumnDefinition Name="BorderLeft" Width="{StaticResource BoardBorderGridThickness}"/>
+            <ColumnDefinition Name="Column8"/>
+            <ColumnDefinition Name="Column7"/>
+            <ColumnDefinition Name="Column6"/>
+            <ColumnDefinition Name="Column5"/>
+            <ColumnDefinition Name="Column4"/>
+            <ColumnDefinition Name="Column3"/>
+            <ColumnDefinition Name="Column2"/>
+            <ColumnDefinition Name="Column1"/>
+            <ColumnDefinition Name="BorderRight" Width="{StaticResource BoardBorderGridThickness}"/>
+            <ColumnDefinition Name="ColumnEdgeRight" Width="0"/>
+        </Grid.ColumnDefinitions>
+
+        <Border 
+            BorderThickness="{DynamicResource BoardBorderThickness}" BorderBrush="White" CornerRadius="{DynamicResource BoardBorderCornerRadius}"
+            Grid.Row="2" Grid.RowSpan="12"
+            Grid.Column="1" Grid.ColumnSpan="10"/>
+
+        <Viewbox
+            Name="ViewBoxServerP1"
+            Grid.Row="3" Grid.Column="4" Grid.ColumnSpan="4"
+            Margin="0,3,0,15">
+            <Path RenderTransformOrigin="0.5,0.5"               
+                Margin="1"
+                Data="{DynamicResource ServerTextPath}" 
+                Stroke="Blue" StrokeThickness="1" Fill="White">
+                <Path.RenderTransform>
+                    <ScaleTransform ScaleX="-1" ScaleY="-1"/>
+                </Path.RenderTransform>
+            </Path>
+        </Viewbox>
+        <Viewbox 
+            Name="ViewBoxServerP2"
+            Grid.Row="12" Grid.Column="4" Grid.ColumnSpan="4"
+            Margin="0,15,0,3">
+            <Path                
+                    Margin="1"
+                    Data="{DynamicResource ServerTextPath}" 
+                    Stroke="Gold" StrokeThickness="1" Fill="White">
+            </Path>
+        </Viewbox>
+
+        <!--Row8-->
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="4" Grid.Column="2"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="4" Grid.Column="3"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="4" Grid.Column="4"/>
+
+        <Border
+            Name="Exit1P1"
+            Style="{StaticResource MainField}" VerticalAlignment="Bottom"            
+            Grid.Row="3" Grid.RowSpan="2" Grid.Column="5"
+            Height="50">
+            <Viewbox
+                Margin="1">
+                <Grid>
+                    <Path 
+                        Fill="Orange"
+                        Stroke="Orange" StrokeThickness="1"
+                        Data=
+                         "{DynamicResource ExitPath}"  />
+                    <Path 
+                        Fill="White"
+                        Stroke="White" StrokeThickness="1"
+                        Data=
+                         "{DynamicResource DoorPath}"  />
+                    <Path                         
+                        Stroke="White" StrokeThickness="1"
+                        Data=
+                         "{DynamicResource DoorPath2}"  />
+                    <Path 
+                        Fill="White"
+                        Stroke="White" StrokeThickness="1"
+                        Data=
+                         "{DynamicResource DoorArrowPath}"  />
+                </Grid>
+            </Viewbox>
+        </Border>
+        <Border
+            Name="Exit2P1"
+            Style="{StaticResource MainField}" VerticalAlignment="Bottom"            
+            Grid.Row="3" Grid.RowSpan="2" Grid.Column="6"
+            Height="50">
+            <Viewbox
+                Margin="1">
+                <Grid>
+                    <Path 
+                        Fill="Orange"
+                        Stroke="Orange" StrokeThickness="1"
+                        Data=
+                         "{DynamicResource ExitPath}"  />
+                    <Path 
+                        Fill="White"
+                        Stroke="White" StrokeThickness="1"
+                        Data=
+                         "{DynamicResource DoorPath}"  />
+                    <Path                         
+                        Stroke="White" StrokeThickness="1"
+                        Data=
+                         "{DynamicResource DoorPath2}"  />
+                    <Path 
+                        Fill="White"
+                        Stroke="White" StrokeThickness="1"
+                        Data=
+                         "{DynamicResource DoorArrowPath}"  />
+                </Grid>
+            </Viewbox>
+        </Border>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="4" Grid.Column="7"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="4" Grid.Column="8"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="4" Grid.Column="9"/>
+        <!--Row7-->
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="5" Grid.Column="2"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="5" Grid.Column="3"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="5" Grid.Column="4"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="5" Grid.Column="5"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="5" Grid.Column="6"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="5" Grid.Column="7"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="5" Grid.Column="8"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="5" Grid.Column="9"/>
+        <!--Row6-->
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="6" Grid.Column="2"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="6" Grid.Column="3"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="6" Grid.Column="4"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="6" Grid.Column="5"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="6" Grid.Column="6"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="6" Grid.Column="7"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="6" Grid.Column="8"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="6" Grid.Column="9"/>
+        <!--Row5-->
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="7" Grid.Column="2"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="7" Grid.Column="3"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="7" Grid.Column="4"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="7" Grid.Column="5"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="7" Grid.Column="6"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="7" Grid.Column="7"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="7" Grid.Column="8"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="7" Grid.Column="9"/>
+        <!--Row4-->
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="8" Grid.Column="2"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="8" Grid.Column="3"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="8" Grid.Column="4"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="8" Grid.Column="5"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="8" Grid.Column="6"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="8" Grid.Column="7"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="8" Grid.Column="8"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="8" Grid.Column="9"/>
+        <!--Row3-->
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="9" Grid.Column="2"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="9" Grid.Column="3"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="9" Grid.Column="4"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="9" Grid.Column="5"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="9" Grid.Column="6"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="9" Grid.Column="7"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="9" Grid.Column="8"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="9" Grid.Column="9"/>
+        <!--Row2-->
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="10" Grid.Column="2"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="10" Grid.Column="3"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="10" Grid.Column="4"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="10" Grid.Column="5"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="10" Grid.Column="6"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="10" Grid.Column="7"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="10" Grid.Column="8"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="10" Grid.Column="9"/>
+        <!--Row1-->
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="11" Grid.Column="2"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="11" Grid.Column="3"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="11" Grid.Column="4"/>
+
+        <Border
+            Name="Exit1P2"
+            Style="{StaticResource MainField}" VerticalAlignment="Top"            
+            Grid.Row="11" Grid.RowSpan="2" Grid.Column="5"
+            Height="50">
+            <Viewbox
+                Margin="1">
+                <Grid RenderTransformOrigin="0.5,0.5">
+                    <Path 
+                        Fill="Orange"
+                        Stroke="Orange" StrokeThickness="1"
+                        Data=
+                         "{DynamicResource ExitPath}"  />
+                    <Path 
+                        Fill="White"
+                        Stroke="White" StrokeThickness="1"
+                        Data=
+                         "{DynamicResource DoorPath}"  />
+                    <Path                         
+                        Stroke="White" StrokeThickness="1"
+                        Data=
+                         "{DynamicResource DoorPath2}"  />
+                    <Path 
+                        Fill="Orange"
+                        Stroke="Orange" StrokeThickness="1"
+                        Data=
+                         "{DynamicResource DoorArrowPath}"  />
+                    <Grid.RenderTransform>
+                        <ScaleTransform ScaleX="-1" ScaleY="-1" />
+                    </Grid.RenderTransform>
+                </Grid>
+            </Viewbox>
+        </Border>
+        <Border
+            Name="Exit2P2"
+            Style="{StaticResource MainField}" VerticalAlignment="Top"            
+            Grid.Row="11" Grid.RowSpan="2" Grid.Column="6"
+            Height="50">
+            <Viewbox
+                Margin="1">
+                <Grid RenderTransformOrigin="0.5,0.5">
+                    <Path 
+                        Fill="Orange"
+                        Stroke="Orange" StrokeThickness="1"
+                        Data=
+                         "{DynamicResource ExitPath}"  />
+                    <Path 
+                        Fill="White"
+                        Stroke="White" StrokeThickness="1"
+                        Data=
+                         "{DynamicResource DoorPath}"  />
+                    <Path                         
+                        Stroke="White" StrokeThickness="1"
+                        Data=
+                         "{DynamicResource DoorPath2}"  />
+                    <Path 
+                        Fill="Orange"
+                        Stroke="Orange" StrokeThickness="1"
+                        Data=
+                         "{DynamicResource DoorArrowPath}"  />
+                    <Grid.RenderTransform>
+                        <ScaleTransform ScaleX="-1" ScaleY="-1" />
+                    </Grid.RenderTransform>
+                </Grid>
+            </Viewbox>
+        </Border>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="11" Grid.Column="7"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="11" Grid.Column="8"/>
+        <Border
+            Style="{StaticResource MainField}"            
+            Grid.Row="11" Grid.Column="9"/>
+
+        <!--Stack-->
+        <Grid
+            Grid.Row="1" Grid.Column="7"
+            Grid.ColumnSpan="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <custom:VirusField RenderTransformOrigin="0.5,0.5"
+                x:Name="StackVirus4P1" Grid.Column="0">
+                <custom:VirusField.RenderTransform>
+                    <ScaleTransform ScaleX="-1" ScaleY="-1" />
+                </custom:VirusField.RenderTransform>
+            </custom:VirusField>
+            <custom:VirusField RenderTransformOrigin="0.5,0.5"
+                x:Name="StackVirus3P1" Grid.Column="1">
+                <custom:VirusField.RenderTransform>
+                    <ScaleTransform ScaleX="-1" ScaleY="-1" />
+                </custom:VirusField.RenderTransform>
+            </custom:VirusField>
+            <custom:VirusField RenderTransformOrigin="0.5,0.5"
+                x:Name="StackVirus2P1" Grid.Column="2">
+                <custom:VirusField.RenderTransform>
+                    <ScaleTransform ScaleX="-1" ScaleY="-1" />
+                </custom:VirusField.RenderTransform>
+            </custom:VirusField>
+            <custom:VirusField RenderTransformOrigin="0.5,0.5"
+                x:Name="StackVirus1P1" Grid.Column="3">
+                <custom:VirusField.RenderTransform>
+                    <ScaleTransform ScaleX="-1" ScaleY="-1" />
+                </custom:VirusField.RenderTransform>
+            </custom:VirusField>
+        </Grid>
+        <Grid
+            Grid.Row="1" Grid.Column="2"
+            Grid.ColumnSpan="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <custom:LinkField RenderTransformOrigin="0.5,0.5"
+                x:Name="StackLink4P1" Grid.Column="0">
+                <custom:LinkField.RenderTransform>
+                    <ScaleTransform ScaleX="-1" ScaleY="-1" />
+                </custom:LinkField.RenderTransform>
+            </custom:LinkField>
+            <custom:LinkField RenderTransformOrigin="0.5,0.5"
+                x:Name="StackLink3P1" Grid.Column="1">
+                <custom:LinkField.RenderTransform>
+                    <ScaleTransform ScaleX="-1" ScaleY="-1" />
+                </custom:LinkField.RenderTransform>
+            </custom:LinkField>
+            <custom:LinkField RenderTransformOrigin="0.5,0.5"
+                x:Name="StackLink2P1" Grid.Column="2">
+                <custom:LinkField.RenderTransform>
+                    <ScaleTransform ScaleX="-1" ScaleY="-1" />
+                </custom:LinkField.RenderTransform>
+            </custom:LinkField>
+            <custom:LinkField RenderTransformOrigin="0.5,0.5"
+                x:Name="StackLink1P1" Grid.Column="3">
+                <custom:LinkField.RenderTransform>
+                    <ScaleTransform ScaleX="-1" ScaleY="-1" />
+                </custom:LinkField.RenderTransform>
+            </custom:LinkField>
+        </Grid>
+        
+        <Grid
+            Grid.Row="14" Grid.Column="2"
+            Grid.ColumnSpan="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <custom:VirusField
+                x:Name="StackVirus1P2" Grid.Column="0"/>
+            <custom:VirusField
+                x:Name="StackVirus2P2" Grid.Column="1"/>
+            <custom:VirusField
+                x:Name="StackVirus3P2" Grid.Column="2"/>
+            <custom:VirusField
+                x:Name="StackVirus4P2" Grid.Column="3"/>
+        </Grid>
+        <Grid
+            Grid.Row="14" Grid.Column="7"
+            Grid.ColumnSpan="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <custom:LinkField
+                x:Name="StackLink1P2" Grid.Column="0"/>
+            <custom:LinkField
+                x:Name="StackLink2P2" Grid.Column="1"/>
+            <custom:LinkField
+                x:Name="StackLink3P2" Grid.Column="2"/>
+            <custom:LinkField
+                x:Name="StackLink4P2" Grid.Column="3"/>
+        </Grid>
+    </Grid>
+</Window>
