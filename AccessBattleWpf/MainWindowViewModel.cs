@@ -12,29 +12,16 @@ namespace AccessBattleWpf
     public class MainWindowViewModel : PropChangeNotifier
     {
         Game _game;
-
-        public event EventHandler StartingNewGame;
+        public Game Game { get {return _game;}}
 
         public MainWindowViewModel()
         {
             _game = new Game();
-            _game.PropertyChanged += Game_PropertyChanged;
-            // TODO: Ask for player name
+            _board = new Board();
         }
 
-        void Game_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            var justDoIt = string.IsNullOrEmpty(e.PropertyName);
-            if (justDoIt || e.PropertyName == "CurrentPhase")
-            {
-                StartNewGame();
-            }
-        }
+        Board _board;
+        public Board Board { get { return _board; } }
 
-        public void StartNewGame()
-        {
-            var handler = StartingNewGame;
-            if (handler != null) handler(this, EventArgs.Empty);
-        }
     }
 }

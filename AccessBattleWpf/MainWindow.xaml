@@ -75,45 +75,48 @@
             Grid.Column="1" Grid.ColumnSpan="10"/>
 
         <Viewbox
-            Name="ViewBoxServerP1"
+            Name="ViewBoxServerP2"
             Grid.Row="3" Grid.Column="4" Grid.ColumnSpan="4"
             Margin="0,3,0,15">
             <Path RenderTransformOrigin="0.5,0.5"               
                 Margin="1"
                 Data="{DynamicResource ServerTextPath}" 
-                Stroke="Blue" StrokeThickness="1" Fill="White">
+                Stroke="Gold" StrokeThickness="1" Fill="White">
                 <Path.RenderTransform>
                     <ScaleTransform ScaleX="-1" ScaleY="-1"/>
                 </Path.RenderTransform>
             </Path>
         </Viewbox>
         <Viewbox 
-            Name="ViewBoxServerP2"
+            Name="ViewBoxServerP1"
             Grid.Row="12" Grid.Column="4" Grid.ColumnSpan="4"
             Margin="0,15,0,3">
             <Path                
                     Margin="1"
                     Data="{DynamicResource ServerTextPath}" 
-                    Stroke="Gold" StrokeThickness="1" Fill="White">
+                    Stroke="Blue" StrokeThickness="1" Fill="White">
             </Path>
         </Viewbox>
 
         <!--Row8-->
-        <Border
+        <custom:CardField 
+            x:Name="A8"
             Style="{StaticResource MainField}" 
-            Background="{StaticResource Player1DeploymentLineColor}"
+            Background="{StaticResource Player2DeploymentLineColor}"
             Grid.Row="4" Grid.Column="2"/>
-        <Border
+        <custom:CardField
+            x:Name="B8"
             Style="{StaticResource MainField}"   
-            Background="{StaticResource Player1DeploymentLineColor}"
+            Background="{StaticResource Player2DeploymentLineColor}"
             Grid.Row="4" Grid.Column="3"/>
-        <Border
+        <custom:CardField
+            x:Name="C8"
             Style="{StaticResource MainField}" 
-            Background="{StaticResource Player1DeploymentLineColor}"
+            Background="{StaticResource Player2DeploymentLineColor}"
             Grid.Row="4" Grid.Column="4"/>
 
-        <Border
-            Name="Exit1P1"
+        <custom:CardField
+            x:Name="D8"
             Style="{StaticResource MainField}" VerticalAlignment="Bottom"            
             Grid.Row="3" Grid.RowSpan="2" Grid.Column="5"
             Height="50">
@@ -141,9 +144,9 @@
                          "{DynamicResource DoorArrowPath}"  />
                 </Grid>
             </Viewbox>
-        </Border>
-        <Border
-            Name="Exit2P1"
+        </custom:CardField>
+        <custom:CardField
+            x:Name="E8"
             Style="{StaticResource MainField}" VerticalAlignment="Bottom"            
             Grid.Row="3" Grid.RowSpan="2" Grid.Column="6"
             Height="50">
@@ -171,186 +174,240 @@
                          "{DynamicResource DoorArrowPath}"  />
                 </Grid>
             </Viewbox>
-        </Border>
-        <Border
+        </custom:CardField>
+        <custom:CardField
+            x:Name="F8"
             Style="{StaticResource MainField}"   
-            Background="{StaticResource Player1DeploymentLineColor}"
+            Background="{StaticResource Player2DeploymentLineColor}"
             Grid.Row="4" Grid.Column="7"/>
-        <Border
+        <custom:CardField
+            x:Name="G8"
             Style="{StaticResource MainField}"
-            Background="{StaticResource Player1DeploymentLineColor}"
+            Background="{StaticResource Player2DeploymentLineColor}"
             Grid.Row="4" Grid.Column="8"/>
-        <Border
+        <custom:CardField
+            x:Name="H8"
             Style="{StaticResource MainField}" 
-            Background="{StaticResource Player1DeploymentLineColor}"
+            Background="{StaticResource Player2DeploymentLineColor}"
             Grid.Row="4" Grid.Column="9"/>
         <!--Row7-->
-        <Border
+        <custom:CardField
+            x:Name="A7"
             Style="{StaticResource MainField}"            
             Grid.Row="5" Grid.Column="2"/>
-        <Border
+        <custom:CardField
+            x:Name="B7"
             Style="{StaticResource MainField}"            
             Grid.Row="5" Grid.Column="3"/>
-        <Border
+        <custom:CardField
+            x:Name="C7"
             Style="{StaticResource MainField}"            
             Grid.Row="5" Grid.Column="4"/>
-        <Border
+        <custom:CardField
+            x:Name="D7"
             Style="{StaticResource MainField}"  
-            Background="{StaticResource Player1DeploymentLineColor}"
+            Background="{StaticResource Player2DeploymentLineColor}"
             Grid.Row="5" Grid.Column="5"/>
-        <Border
+        <custom:CardField
+            x:Name="E7"
             Style="{StaticResource MainField}"   
-            Background="{StaticResource Player1DeploymentLineColor}"
+            Background="{StaticResource Player2DeploymentLineColor}"
             Grid.Row="5" Grid.Column="6"/>
-        <Border
+        <custom:CardField
+            x:Name="F7"
             Style="{StaticResource MainField}"            
             Grid.Row="5" Grid.Column="7"/>
-        <Border
+        <custom:CardField
+            x:Name="G7"
             Style="{StaticResource MainField}"            
             Grid.Row="5" Grid.Column="8"/>
-        <Border
+        <custom:CardField
+            x:Name="H7"
             Style="{StaticResource MainField}"            
             Grid.Row="5" Grid.Column="9"/>
         <!--Row6-->
-        <Border
+        <custom:CardField
+            x:Name="A6"
             Style="{StaticResource MainField}"            
             Grid.Row="6" Grid.Column="2"/>
-        <Border
+        <custom:CardField
+            x:Name="B6"
             Style="{StaticResource MainField}"            
             Grid.Row="6" Grid.Column="3"/>
-        <Border
+        <custom:CardField
+            x:Name="C6"
             Style="{StaticResource MainField}"            
             Grid.Row="6" Grid.Column="4"/>
-        <Border
+        <custom:CardField
+            x:Name="D6"
             Style="{StaticResource MainField}"            
             Grid.Row="6" Grid.Column="5"/>
-        <Border
+        <custom:CardField
+            x:Name="E6"
             Style="{StaticResource MainField}"            
             Grid.Row="6" Grid.Column="6"/>
-        <Border
+        <custom:CardField
+            x:Name="F6"
             Style="{StaticResource MainField}"            
             Grid.Row="6" Grid.Column="7"/>
-        <Border
+        <custom:CardField
+            x:Name="G6"
             Style="{StaticResource MainField}"            
             Grid.Row="6" Grid.Column="8"/>
-        <Border
+        <custom:CardField
+            x:Name="H6"
             Style="{StaticResource MainField}"            
             Grid.Row="6" Grid.Column="9"/>
         <!--Row5-->
-        <Border
+        <custom:CardField
+            x:Name="A5"
             Style="{StaticResource MainField}"            
             Grid.Row="7" Grid.Column="2"/>
-        <Border
+        <custom:CardField
+            x:Name="B5"
             Style="{StaticResource MainField}"            
             Grid.Row="7" Grid.Column="3"/>
-        <Border
+        <custom:CardField
+            x:Name="C5"
             Style="{StaticResource MainField}"            
             Grid.Row="7" Grid.Column="4"/>
-        <Border
+        <custom:CardField
+            x:Name="D5"
             Style="{StaticResource MainField}"            
             Grid.Row="7" Grid.Column="5"/>
-        <Border
+        <custom:CardField
+            x:Name="E5"
             Style="{StaticResource MainField}"            
             Grid.Row="7" Grid.Column="6"/>
-        <Border
+        <custom:CardField
+            x:Name="F5"
             Style="{StaticResource MainField}"            
             Grid.Row="7" Grid.Column="7"/>
-        <Border
+        <custom:CardField
+            x:Name="G5"
             Style="{StaticResource MainField}"            
             Grid.Row="7" Grid.Column="8"/>
-        <Border
+        <custom:CardField
+            x:Name="H5"
             Style="{StaticResource MainField}"            
             Grid.Row="7" Grid.Column="9"/>
         <!--Row4-->
-        <Border
+        <custom:CardField
+            x:Name="A4"
             Style="{StaticResource MainField}"            
             Grid.Row="8" Grid.Column="2"/>
-        <Border
+        <custom:CardField
+            x:Name="B4"
             Style="{StaticResource MainField}"            
             Grid.Row="8" Grid.Column="3"/>
-        <Border
+        <custom:CardField
+            x:Name="C4"
             Style="{StaticResource MainField}"            
             Grid.Row="8" Grid.Column="4"/>
-        <Border
+        <custom:CardField
+            x:Name="D4"
             Style="{StaticResource MainField}"            
             Grid.Row="8" Grid.Column="5"/>
-        <Border
+        <custom:CardField
+            x:Name="E4"
             Style="{StaticResource MainField}"            
             Grid.Row="8" Grid.Column="6"/>
-        <Border
+        <custom:CardField
+            x:Name="F4"
             Style="{StaticResource MainField}"            
             Grid.Row="8" Grid.Column="7"/>
-        <Border
+        <custom:CardField
+            x:Name="G4"
             Style="{StaticResource MainField}"            
             Grid.Row="8" Grid.Column="8"/>
-        <Border
+        <custom:CardField
+            x:Name="H4"
             Style="{StaticResource MainField}"            
             Grid.Row="8" Grid.Column="9"/>
         <!--Row3-->
-        <Border
+        <custom:CardField
+            x:Name="A3"
             Style="{StaticResource MainField}"            
             Grid.Row="9" Grid.Column="2"/>
-        <Border
+        <custom:CardField 
+            x:Name="B3"
             Style="{StaticResource MainField}"            
             Grid.Row="9" Grid.Column="3"/>
-        <Border
+        <custom:CardField
+            x:Name="C3"
             Style="{StaticResource MainField}"            
             Grid.Row="9" Grid.Column="4"/>
-        <Border
+        <custom:CardField
+            x:Name="D3"
             Style="{StaticResource MainField}"            
             Grid.Row="9" Grid.Column="5"/>
-        <Border
+        <custom:CardField
+            x:Name="E3"
             Style="{StaticResource MainField}"            
             Grid.Row="9" Grid.Column="6"/>
-        <Border
+        <custom:CardField
+            x:Name="F3"
             Style="{StaticResource MainField}"            
             Grid.Row="9" Grid.Column="7"/>
-        <Border
+        <custom:CardField
+            x:Name="G3"
             Style="{StaticResource MainField}"            
             Grid.Row="9" Grid.Column="8"/>
-        <Border
+        <custom:CardField
+            x:Name="H3"
             Style="{StaticResource MainField}"            
             Grid.Row="9" Grid.Column="9"/>
         <!--Row2-->
-        <Border
+        <custom:CardField
+            x:Name="A2"
             Style="{StaticResource MainField}"            
             Grid.Row="10" Grid.Column="2"/>
-        <Border
+        <custom:CardField
+            x:Name="B2"
             Style="{StaticResource MainField}"            
             Grid.Row="10" Grid.Column="3"/>
-        <Border
+        <custom:CardField
+            x:Name="C2"
             Style="{StaticResource MainField}"            
             Grid.Row="10" Grid.Column="4"/>
-        <Border
+        <custom:CardField
+            x:Name="D2"
             Style="{StaticResource MainField}" 
-            Background="{StaticResource Player2DeploymentLineColor}"
+            Background="{StaticResource Player1DeploymentLineColor}"
             Grid.Row="10" Grid.Column="5"/>
-        <Border
+        <custom:CardField
+            x:Name="E2"
             Style="{StaticResource MainField}" 
-            Background="{StaticResource Player2DeploymentLineColor}"
+            Background="{StaticResource Player1DeploymentLineColor}"
             Grid.Row="10" Grid.Column="6"/>
-        <Border
+        <custom:CardField
+            x:Name="F2"
             Style="{StaticResource MainField}"            
             Grid.Row="10" Grid.Column="7"/>
-        <Border
+        <custom:CardField
+            x:Name="G2"
             Style="{StaticResource MainField}"            
             Grid.Row="10" Grid.Column="8"/>
-        <Border
+        <custom:CardField
+            x:Name="H2"
             Style="{StaticResource MainField}"            
             Grid.Row="10" Grid.Column="9"/>
         <!--Row1-->
-        <Border
+        <custom:CardField 
+            x:Name="A1"
             Style="{StaticResource MainField}"            
-            Grid.Row="11" Grid.Column="2" Background="{StaticResource Player2DeploymentLineColor}"/>
-        <Border
+            Grid.Row="11" Grid.Column="2" Background="{StaticResource Player1DeploymentLineColor}"/>
+        <custom:CardField 
+            x:Name="B1"
             Style="{StaticResource MainField}"            
-            Grid.Row="11" Grid.Column="3" Background="{StaticResource Player2DeploymentLineColor}"/>
-        <Border
+            Grid.Row="11" Grid.Column="3" Background="{StaticResource Player1DeploymentLineColor}"/>
+        <custom:CardField
+            x:Name="C1"
             Style="{StaticResource MainField}"            
-            Grid.Row="11" Grid.Column="4" Background="{StaticResource Player2DeploymentLineColor}"/>
+            Grid.Row="11" Grid.Column="4" Background="{StaticResource Player1DeploymentLineColor}"/>
 
-        <Border
-            Name="Exit1P2"
+        <custom:CardField
+            x:Name="D1"
             Style="{StaticResource MainField}" VerticalAlignment="Top"            
             Grid.Row="11" Grid.RowSpan="2" Grid.Column="5"
             Height="50">
@@ -381,9 +438,9 @@
                     </Grid.RenderTransform>
                 </Grid>
             </Viewbox>
-        </Border>
-        <Border
-            Name="Exit2P2"
+        </custom:CardField>
+        <custom:CardField
+            x:Name="E1"
             Style="{StaticResource MainField}" VerticalAlignment="Top"            
             Grid.Row="11" Grid.RowSpan="2" Grid.Column="6"
             Height="50">
@@ -414,18 +471,21 @@
                     </Grid.RenderTransform>
                 </Grid>
             </Viewbox>
-        </Border>
-        <Border
+        </custom:CardField>
+        <custom:CardField
+            x:Name="F1"
             Style="{StaticResource MainField}"   
-            Background="{StaticResource Player2DeploymentLineColor}"
+            Background="{StaticResource Player1DeploymentLineColor}"
             Grid.Row="11" Grid.Column="7"/>
-        <Border
+        <custom:CardField
+            x:Name="G1"
             Style="{StaticResource MainField}"   
-            Background="{StaticResource Player2DeploymentLineColor}"
+            Background="{StaticResource Player1DeploymentLineColor}"
             Grid.Row="11" Grid.Column="8"/>
-        <Border
+        <custom:CardField
+            x:Name="H1"
             Style="{StaticResource MainField}" 
-            Background="{StaticResource Player2DeploymentLineColor}"
+            Background="{StaticResource Player1DeploymentLineColor}"
             Grid.Row="11" Grid.Column="9"/>
 
         <!--Stack-->

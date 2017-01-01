@@ -24,7 +24,7 @@
                 Text="Player Name:" Foreground="DarkGray" FontSize="16" Margin="5"
                 VerticalAlignment="Center" HorizontalAlignment="Right"
                 />
-            <TextBox
+            <TextBox Name="TextBoxPlayerName"
                 Grid.Column="1" Grid.Row="1" Background="Black" Foreground="White" Margin="5" FontSize="16"
                 VerticalAlignment="Center" HorizontalAlignment="Stretch"
                 />

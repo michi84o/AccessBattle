@@ -32,5 +32,11 @@ namespace AccessBattleWpf
             var handler = StartGameClicked;
             if (handler != null) handler(this, EventArgs.Empty);
         }
+
+        public string PlayerName
+        {
+            get { return TextBoxPlayerName.Text; }
+            set { TextBoxPlayerName.Text = value; }
+        }
     }
 }

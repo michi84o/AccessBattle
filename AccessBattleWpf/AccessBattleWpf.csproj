@@ -55,6 +55,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="CardField.cs" />
+    <Compile Include="ColorHelper.cs" />
     <Compile Include="LinkField.xaml.cs">
       <DependentUpon>LinkField.xaml</DependentUpon>
     </Compile>
