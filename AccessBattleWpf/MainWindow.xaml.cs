@@ -22,38 +22,68 @@ namespace AccessBattleWpf
     /// </summary>
     public partial class MainWindow : Window
     {
+        CenteredAdornerContainer _newGameAdorner;
+
         public MainWindow()
         {
             InitializeComponent();
+            ViewModel.StartingNewGame += ViewModel_StartingNewGame;
+            Loaded += MainWindow_Loaded;
         }
 
-        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            ViewModel.StartNewGame();
+        }
+
+        private void ViewModel_StartingNewGame(object sender, EventArgs e)
+        {
+            var adornerLayer = AdornerLayer.GetAdornerLayer(MainGrid);
+            if (adornerLayer == null)
+            {
+                MessageBox.Show("Error starting new game. Adorner layer is null!");
+                return;
+            }
+            if (_newGameAdorner == null)
+            {
+                _newGameAdorner = new CenteredAdornerContainer(MainGrid)
+                {
+                    Child = new NewGameAdornerControl()
+                };
+            }
+            adornerLayer.Add(_newGameAdorner);
+            InvalidateVisual();
+        }
+
+        void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             UpdateBoardLayout();
         }
 
-        private void Window_StateChanged(object sender, EventArgs e)
+        void Window_StateChanged(object sender, EventArgs e)
         {
             // Fix Maximize Window Glitch
             if (WindowState == WindowState.Normal)
-                (new Task(() => 
+#pragma warning disable CC0022 // Should dispose object
+                (new Task(() =>
                 {
                     Thread.Sleep(100);
-                    App.Current.Dispatcher.Invoke((Action)delegate () { Width += 1; }, null);
-                    App.Current.Dispatcher.Invoke((Action)delegate () { Width -= 1; }, null);
+                    Application.Current.Dispatcher.Invoke((Action)delegate () { Width += 1; }, null);
+                    Application.Current.Dispatcher.Invoke((Action)delegate () { Width -= 1; }, null);
                 })).Start();
+#pragma warning restore CC0022 // Should dispose object
         }
 
         void UpdateBoardLayout()
         {
-            double width = MainGrid.ActualWidth;
-            double height = MainGrid.ActualHeight;
+            var width = MainGrid.ActualWidth;
+            var height = MainGrid.ActualHeight;
             Title = "" + width + "x" + height;
             if (width < 1 || height < 1
                 /*|| width == double.NaN || height == double.NaN*/)
                 return; // TODO
-            double optimalHeight = width * 12 / 8;
-            double optimalWidth = height * 8 / 12;
+            var optimalHeight = width * 12 / 8;
+            var optimalWidth = height * 8 / 12;
             var zero = new Point();
             if (optimalHeight > height)
             {
@@ -69,7 +99,7 @@ namespace AccessBattleWpf
             ColumnEdgeRight.Width = new GridLength(zero.X);
             RowEdgeUpper.Height = new GridLength(zero.Y);
             RowEdgeLower.Height = new GridLength(zero.Y);
-            
+
             Exit1P1.Height = Row1.ActualHeight * 1.2;            
             Exit2P1.Height = Row1.ActualHeight * 1.2;
             Exit1P2.Height = Row1.ActualHeight * 1.2;

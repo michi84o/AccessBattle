@@ -4,15 +4,19 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:custom="clr-namespace:AccessBattleWpf"
-        xmlns:local="clr-namespace:AccessBattleWpf"
         mc:Ignorable="d"
-        Title="MainWindow" Width="345" Height="548"
+        Title="MainWindow" MinWidth="300"  Width="345" MinHeight="400" Height="548"
         SizeChanged="Window_SizeChanged"
         StateChanged="Window_StateChanged">
+    <Window.DataContext>
+        <custom:MainWindowViewModel x:Name="ViewModel" />
+    </Window.DataContext>
     <Window.Resources>
         <ResourceDictionary>
             <!--<custom:StretchConverter x:Key="StretchConv1" StretchFactor="1.5"/>-->
             <SolidColorBrush x:Key="MainFieldBorderColor" Color="OliveDrab"/>
+            <SolidColorBrush x:Key="Player2DeploymentLineColor" Color="#606015"/>
+            <SolidColorBrush x:Key="Player1DeploymentLineColor" Color="#151560"/>
             <Style x:Key="MainField" TargetType="Border">
                 <Setter Property="BorderThickness" Value="2"/>
                 <Setter Property="CornerRadius" Value="2"/>
@@ -96,13 +100,16 @@
 
         <!--Row8-->
         <Border
-            Style="{StaticResource MainField}"            
+            Style="{StaticResource MainField}" 
+            Background="{StaticResource Player1DeploymentLineColor}"
             Grid.Row="4" Grid.Column="2"/>
         <Border
-            Style="{StaticResource MainField}"            
+            Style="{StaticResource MainField}"   
+            Background="{StaticResource Player1DeploymentLineColor}"
             Grid.Row="4" Grid.Column="3"/>
         <Border
-            Style="{StaticResource MainField}"            
+            Style="{StaticResource MainField}" 
+            Background="{StaticResource Player1DeploymentLineColor}"
             Grid.Row="4" Grid.Column="4"/>
 
         <Border
@@ -111,7 +118,7 @@
             Grid.Row="3" Grid.RowSpan="2" Grid.Column="5"
             Height="50">
             <Viewbox
-                Margin="1">
+                Margin="2">
                 <Grid>
                     <Path 
                         Fill="Orange"
@@ -128,8 +135,8 @@
                         Data=
                          "{DynamicResource DoorPath2}"  />
                     <Path 
-                        Fill="White"
-                        Stroke="White" StrokeThickness="1"
+                        Fill="Orange"
+                        Stroke="Orange" StrokeThickness="1"
                         Data=
                          "{DynamicResource DoorArrowPath}"  />
                 </Grid>
@@ -141,7 +148,7 @@
             Grid.Row="3" Grid.RowSpan="2" Grid.Column="6"
             Height="50">
             <Viewbox
-                Margin="1">
+                Margin="2">
                 <Grid>
                     <Path 
                         Fill="Orange"
@@ -158,21 +165,24 @@
                         Data=
                          "{DynamicResource DoorPath2}"  />
                     <Path 
-                        Fill="White"
-                        Stroke="White" StrokeThickness="1"
+                        Fill="Orange"
+                        Stroke="Orange" StrokeThickness="1"
                         Data=
                          "{DynamicResource DoorArrowPath}"  />
                 </Grid>
             </Viewbox>
         </Border>
         <Border
-            Style="{StaticResource MainField}"            
+            Style="{StaticResource MainField}"   
+            Background="{StaticResource Player1DeploymentLineColor}"
             Grid.Row="4" Grid.Column="7"/>
         <Border
-            Style="{StaticResource MainField}"            
+            Style="{StaticResource MainField}"
+            Background="{StaticResource Player1DeploymentLineColor}"
             Grid.Row="4" Grid.Column="8"/>
         <Border
-            Style="{StaticResource MainField}"            
+            Style="{StaticResource MainField}" 
+            Background="{StaticResource Player1DeploymentLineColor}"
             Grid.Row="4" Grid.Column="9"/>
         <!--Row7-->
         <Border
@@ -185,10 +195,12 @@
             Style="{StaticResource MainField}"            
             Grid.Row="5" Grid.Column="4"/>
         <Border
-            Style="{StaticResource MainField}"            
+            Style="{StaticResource MainField}"  
+            Background="{StaticResource Player1DeploymentLineColor}"
             Grid.Row="5" Grid.Column="5"/>
         <Border
-            Style="{StaticResource MainField}"            
+            Style="{StaticResource MainField}"   
+            Background="{StaticResource Player1DeploymentLineColor}"
             Grid.Row="5" Grid.Column="6"/>
         <Border
             Style="{StaticResource MainField}"            
@@ -310,10 +322,12 @@
             Style="{StaticResource MainField}"            
             Grid.Row="10" Grid.Column="4"/>
         <Border
-            Style="{StaticResource MainField}"            
+            Style="{StaticResource MainField}" 
+            Background="{StaticResource Player2DeploymentLineColor}"
             Grid.Row="10" Grid.Column="5"/>
         <Border
-            Style="{StaticResource MainField}"            
+            Style="{StaticResource MainField}" 
+            Background="{StaticResource Player2DeploymentLineColor}"
             Grid.Row="10" Grid.Column="6"/>
         <Border
             Style="{StaticResource MainField}"            
@@ -327,13 +341,13 @@
         <!--Row1-->
         <Border
             Style="{StaticResource MainField}"            
-            Grid.Row="11" Grid.Column="2"/>
+            Grid.Row="11" Grid.Column="2" Background="{StaticResource Player2DeploymentLineColor}"/>
         <Border
             Style="{StaticResource MainField}"            
-            Grid.Row="11" Grid.Column="3"/>
+            Grid.Row="11" Grid.Column="3" Background="{StaticResource Player2DeploymentLineColor}"/>
         <Border
             Style="{StaticResource MainField}"            
-            Grid.Row="11" Grid.Column="4"/>
+            Grid.Row="11" Grid.Column="4" Background="{StaticResource Player2DeploymentLineColor}"/>
 
         <Border
             Name="Exit1P2"
@@ -341,7 +355,7 @@
             Grid.Row="11" Grid.RowSpan="2" Grid.Column="5"
             Height="50">
             <Viewbox
-                Margin="1">
+                Margin="2">
                 <Grid RenderTransformOrigin="0.5,0.5">
                     <Path 
                         Fill="Orange"
@@ -374,7 +388,7 @@
             Grid.Row="11" Grid.RowSpan="2" Grid.Column="6"
             Height="50">
             <Viewbox
-                Margin="1">
+                Margin="2">
                 <Grid RenderTransformOrigin="0.5,0.5">
                     <Path 
                         Fill="Orange"
@@ -402,13 +416,16 @@
             </Viewbox>
         </Border>
         <Border
-            Style="{StaticResource MainField}"            
+            Style="{StaticResource MainField}"   
+            Background="{StaticResource Player2DeploymentLineColor}"
             Grid.Row="11" Grid.Column="7"/>
         <Border
-            Style="{StaticResource MainField}"            
+            Style="{StaticResource MainField}"   
+            Background="{StaticResource Player2DeploymentLineColor}"
             Grid.Row="11" Grid.Column="8"/>
         <Border
-            Style="{StaticResource MainField}"            
+            Style="{StaticResource MainField}" 
+            Background="{StaticResource Player2DeploymentLineColor}"
             Grid.Row="11" Grid.Column="9"/>
 
         <!--Stack-->
