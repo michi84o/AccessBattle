@@ -37,31 +37,60 @@ namespace AccessBattleWpf
                 }
                 OnPropertyChanged("IsNewGamePopupVisible");
                 OnPropertyChanged("IsDeploymentPopupVisible");
+                OnPropertyChanged("IsDeployingLinkCard");
+                OnPropertyChanged("IsDeployingVirusCard");
             }
         }
 
         List<BoardField> Player1DeploymentFields;
         public void FieldClicked(BoardField field)
         {
-            if (_game.Phase == GamePhase.Deployment)
+            try
             {
-                if (field.IsHighlighted)
+                if (_game.Phase == GamePhase.Deployment)
                 {
-                    if (field.Card != null)
+                    if (field.IsHighlighted)
                     {
-                        // TODO: turn back card
-                        return;
+                        if (field.Card != null)
+                        {
+                            // TODO: turn back card
+                            return;
+                        }
+                        var nextDepField = _game.Board.Player1StackFields.FirstOrDefault(o => o.Card != null);
+                        if (nextDepField == null)
+                        {
+                            Trace.WriteLine("MainWindowViewModel FieldClicked nextDepField is null !!!!!!!!!!");
+                            _game.Phase = GamePhase.Player1Turn; // TODO: Random
+                            return;
+                        }
+                        field.Card = nextDepField.Card;
+                        nextDepField.Card = null;
                     }
-                    var nextDepField = _game.Board.Player1StackFields.FirstOrDefault(o => o.Card != null);
-                    if (nextDepField == null)
-                    {
-                        Trace.WriteLine("MainWindowViewModel FieldClicked nextDepField is null !!!!!!!!!!");
-                        _game.Phase = GamePhase.Player1Turn; // TODO: Random
-                        return;
-                    }
-                    field.Card = nextDepField.Card;
-                    nextDepField.Card = null;
                 }
+            }
+            finally
+            {
+                OnPropertyChanged("IsDeployingLinkCard");
+                OnPropertyChanged("IsDeployingVirusCard");
+            }
+        }
+
+        public bool IsDeployingLinkCard
+        {
+            get
+            {
+                if (_game.Phase != GamePhase.Deployment) return false;
+                var nextDep = _game.Board.Player1StackFields.FirstOrDefault(o => o.Card != null);
+                return nextDep != null && nextDep.Card != null && nextDep.Card is LinkCard;
+            }
+        }
+        public bool IsDeployingVirusCard
+        {
+            get
+            {
+                if (_game.Phase != GamePhase.Deployment) return false;
+                var nextDep = _game.Board.Player1StackFields.FirstOrDefault(o => o.Card != null);
+                return nextDep != null && nextDep.Card != null && nextDep.Card is VirusCard;
             }
         }
 

@@ -61,9 +61,6 @@
       <DependentUpon>DeploymentAdornerControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="IStackField.cs" />
-    <Compile Include="LinkCardControl.xaml.cs">
-      <DependentUpon>LinkCardControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="LinkField.xaml.cs">
       <DependentUpon>LinkField.xaml</DependentUpon>
     </Compile>
@@ -74,19 +71,12 @@
     </Compile>
     <Compile Include="RelayCommand.cs" />
     <Compile Include="StretchConverter.cs" />
-    <Compile Include="VirusCardControl.xaml.cs">
-      <DependentUpon>VirusCardControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="VirusField.xaml.cs">
       <DependentUpon>VirusField.xaml</DependentUpon>
     </Compile>
     <Compile Include="VisibilityBoolConverter.cs" />
     <Compile Include="WpfHelper.cs" />
     <Page Include="DeploymentAdornerControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="LinkCardControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -108,10 +98,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="NewGameAdornerControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="VirusCardControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

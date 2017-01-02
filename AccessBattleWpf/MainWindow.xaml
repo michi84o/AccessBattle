@@ -509,25 +509,25 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <custom:VirusField RenderTransformOrigin="0.5,0.5"
-                x:Name="StackVirus4P1" Grid.Column="0">
+                x:Name="StackVirus4P2" Grid.Column="0">
                 <custom:VirusField.RenderTransform>
                     <ScaleTransform ScaleX="-1" ScaleY="-1" />
                 </custom:VirusField.RenderTransform>
             </custom:VirusField>
             <custom:VirusField RenderTransformOrigin="0.5,0.5"
-                x:Name="StackVirus3P1" Grid.Column="1">
+                x:Name="StackVirus3P2" Grid.Column="1">
                 <custom:VirusField.RenderTransform>
                     <ScaleTransform ScaleX="-1" ScaleY="-1" />
                 </custom:VirusField.RenderTransform>
             </custom:VirusField>
             <custom:VirusField RenderTransformOrigin="0.5,0.5"
-                x:Name="StackVirus2P1" Grid.Column="2">
+                x:Name="StackVirus2P2" Grid.Column="2">
                 <custom:VirusField.RenderTransform>
                     <ScaleTransform ScaleX="-1" ScaleY="-1" />
                 </custom:VirusField.RenderTransform>
             </custom:VirusField>
             <custom:VirusField RenderTransformOrigin="0.5,0.5"
-                x:Name="StackVirus1P1" Grid.Column="3">
+                x:Name="StackVirus1P2" Grid.Column="3">
                 <custom:VirusField.RenderTransform>
                     <ScaleTransform ScaleX="-1" ScaleY="-1" />
                 </custom:VirusField.RenderTransform>
@@ -543,25 +543,25 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <custom:LinkField RenderTransformOrigin="0.5,0.5"
-                x:Name="StackLink4P1" Grid.Column="0">
+                x:Name="StackLink4P2" Grid.Column="0">
                 <custom:LinkField.RenderTransform>
                     <ScaleTransform ScaleX="-1" ScaleY="-1" />
                 </custom:LinkField.RenderTransform>
             </custom:LinkField>
             <custom:LinkField RenderTransformOrigin="0.5,0.5"
-                x:Name="StackLink3P1" Grid.Column="1">
+                x:Name="StackLink3P2" Grid.Column="1">
                 <custom:LinkField.RenderTransform>
                     <ScaleTransform ScaleX="-1" ScaleY="-1" />
                 </custom:LinkField.RenderTransform>
             </custom:LinkField>
             <custom:LinkField RenderTransformOrigin="0.5,0.5"
-                x:Name="StackLink2P1" Grid.Column="2">
+                x:Name="StackLink2P2" Grid.Column="2">
                 <custom:LinkField.RenderTransform>
                     <ScaleTransform ScaleX="-1" ScaleY="-1" />
                 </custom:LinkField.RenderTransform>
             </custom:LinkField>
             <custom:LinkField RenderTransformOrigin="0.5,0.5"
-                x:Name="StackLink1P1" Grid.Column="3">
+                x:Name="StackLink1P2" Grid.Column="3">
                 <custom:LinkField.RenderTransform>
                     <ScaleTransform ScaleX="-1" ScaleY="-1" />
                 </custom:LinkField.RenderTransform>
@@ -578,13 +578,13 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <custom:VirusField
-                x:Name="StackVirus1P2" Grid.Column="0"/>
+                x:Name="StackVirus1P1" Grid.Column="0"/>
             <custom:VirusField
-                x:Name="StackVirus2P2" Grid.Column="1"/>
+                x:Name="StackVirus2P1" Grid.Column="1"/>
             <custom:VirusField
-                x:Name="StackVirus3P2" Grid.Column="2"/>
+                x:Name="StackVirus3P1" Grid.Column="2"/>
             <custom:VirusField
-                x:Name="StackVirus4P2" Grid.Column="3"/>
+                x:Name="StackVirus4P1" Grid.Column="3"/>
         </Grid>
         <Grid
             Grid.Row="14" Grid.Column="7"
@@ -596,13 +596,13 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <custom:LinkField
-                x:Name="StackLink1P2" Grid.Column="0"/>
+                x:Name="StackLink1P1" Grid.Column="0"/>
             <custom:LinkField
-                x:Name="StackLink2P2" Grid.Column="1"/>
+                x:Name="StackLink2P1" Grid.Column="1"/>
             <custom:LinkField
-                x:Name="StackLink3P2" Grid.Column="2"/>
+                x:Name="StackLink3P1" Grid.Column="2"/>
             <custom:LinkField
-                x:Name="StackLink4P2" Grid.Column="3"/>
+                x:Name="StackLink4P1" Grid.Column="3"/>
         </Grid>
         <custom:NewGameAdornerControl
             Grid.Row="0" Grid.Column="0"
@@ -613,6 +613,8 @@
             Grid.Row="0" Grid.Column="0"
             Visibility="{Binding IsDeploymentPopupVisible, Converter={StaticResource VisBoolConv}, UpdateSourceTrigger=PropertyChanged}"
             Grid.RowSpan="10" Grid.ColumnSpan="12" Margin="0,0,0,5"
-            VerticalAlignment="Bottom" HorizontalAlignment="Center"/>
+            VerticalAlignment="Bottom" HorizontalAlignment="Center"
+            IsLinkBlinking="{Binding IsDeployingLinkCard}"
+            IsVirusBlinking="{Binding IsDeployingVirusCard}"/>
     </Grid>
 </Window>

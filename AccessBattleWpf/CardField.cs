@@ -119,8 +119,8 @@ namespace AccessBattleWpf
             // Draw stuff here
             // BAD !!! Removes ViewBox fromExit fields
             if (_field.Card == null) Child = null;
-            if (_field.Card is VirusCard) Child = new VirusCardControl();
-            if (_field.Card is LinkCard) Child = new LinkCardControl();
+            if (_field.Card is VirusCard) Child = new VirusField();
+            if (_field.Card is LinkCard) Child = new LinkField(); // TODO: Disable Scaling !!!!!!!!!!!
         }
 
         bool _initialized;
@@ -193,8 +193,10 @@ namespace AccessBattleWpf
             if (on)
                 _blinkStoryBoard.Begin(this, true);
             else
+            {
                 _blinkStoryBoard.Stop(this);
-            _blinkStoryBoard.Seek(TimeSpan.Zero);
+                _blinkStoryBoard.Seek(TimeSpan.Zero);
+            }
         }
     }
 }
