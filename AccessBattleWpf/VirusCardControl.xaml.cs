@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace AccessBattleWpf
 {
     /// <summary>
-    /// Interaction logic for NewGameAdornerControl.xaml
+    /// Interaction logic for VirusCardControl.xaml
     /// </summary>
-    public partial class NewGameAdornerControl : UserControl
+    public partial class VirusCardControl : UserControl
     {
-        public NewGameAdornerControl()
+        public VirusCardControl()
         {
             InitializeComponent();
         }

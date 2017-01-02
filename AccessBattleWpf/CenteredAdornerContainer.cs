@@ -19,6 +19,19 @@ namespace AccessBattleWpf
         {
         }
 
+        double _verticalRatio = .5;
+        public double VerticalRatio
+        {
+            get { return _verticalRatio; }
+            set
+            {
+                _verticalRatio = value;
+                if (_verticalRatio < 0) _verticalRatio = 0;
+                if (_verticalRatio > 1) _verticalRatio = 1;
+                InvalidateMeasure();
+            }
+        }
+
         protected override int VisualChildrenCount
         {
             get
@@ -60,7 +73,8 @@ namespace AccessBattleWpf
         {
             var p = new Point(
                 (finalSize.Width - _child.DesiredSize.Width) / 2,
-                (finalSize.Height - _child.DesiredSize.Height) / 2);
+                (finalSize.Height - _child.DesiredSize.Height) *_verticalRatio);            
+
             _child.Arrange(new Rect(p, _child.DesiredSize));
             return finalSize;
         }

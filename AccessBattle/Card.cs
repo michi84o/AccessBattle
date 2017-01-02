@@ -3,22 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace RaiNet
+namespace AccessBattle
 {
     public abstract class OnlineCard
     {
-        Player Owner { get; set; }
+        public Player Owner { get; set; }
         public bool IsFaceUp { get; set; }
-        bool HasBoost { get; set; }
-        BoardField Location { get; set; }
+        public bool HasBoost { get; set; }
+        public BoardField Location { get; set; }
     }
 
-    public class Virus : OnlineCard
+    public class VirusCard : OnlineCard
     {
 
     }
 
-    public class Link : OnlineCard
+    public class LinkCard : OnlineCard
     {
 
     }

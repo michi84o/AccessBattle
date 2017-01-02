@@ -1,0 +1,41 @@
+﻿<UserControl x:Class="AccessBattleWpf.DeploymentAdornerControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:AccessBattleWpf"
+             Width="280">
+    <Border Background="Black" BorderBrush="DarkGray" BorderThickness="3" CornerRadius="3">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock  
+                Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2"
+                Text="Deploy" Foreground="DarkGray" FontSize="32" HorizontalAlignment="Center" Margin="5"/>
+            <TextBlock  
+                Name="LinkText"
+                Grid.Column="0" Grid.Row="1"
+                Text="Link" Foreground="DarkGray" FontSize="32" HorizontalAlignment="Center" Margin="5,0,5,0">
+            </TextBlock>
+            <TextBlock  
+                Name="VirusText"
+                Grid.Column="1" Grid.Row="1"
+                Text="Virus" Foreground="DarkGray" FontSize="32" HorizontalAlignment="Center" Margin="5,0,5,0"/>
+            <TextBlock  
+                Name="LinkNumber"
+                Grid.Column="0" Grid.Row="2"
+                Text="4" Foreground="DarkGray" FontSize="40" HorizontalAlignment="Center"/>
+            <TextBlock  
+                Name="VirusNumber"
+                Grid.Column="1" Grid.Row="2"
+                Text="4" Foreground="DarkGray" FontSize="40" HorizontalAlignment="Center" />
+        </Grid>
+    </Border>
+</UserControl>

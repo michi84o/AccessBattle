@@ -14,6 +14,7 @@
     <Window.Resources>
         <ResourceDictionary>
             <!--<custom:StretchConverter x:Key="StretchConv1" StretchFactor="1.5"/>-->
+            <custom:VisibilityBoolConverter x:Key="VisBoolConv"/>
             <SolidColorBrush x:Key="MainFieldBorderColor" Color="OliveDrab"/>
             <SolidColorBrush x:Key="Player2DeploymentLineColor" Color="#606015"/>
             <SolidColorBrush x:Key="Player1DeploymentLineColor" Color="#151560"/>
@@ -31,11 +32,19 @@
             <StreamGeometry x:Key="ExitPath">M5,26L0,26 0,35 5,35 5,34 1,34 1,31 5,31 5,30 1,30 1,27 5,27z M7,26L7,29 9,29 9,32 7,32 7,35 8,35 8,33 11,33 11,35 12,35 12,32 10,32 10,29 12,29 12,26 11,26 11,28 8,28 8,26z M14,26L14,27 16,27 16,34 14,34 14,35 19,35 19,34 17,34 17,27 19,27 19,26z M21,26L21,27 23,27 23,35 24,35 24,27 26,27 26,26z</StreamGeometry>
             <StreamGeometry x:Key="DoorPath">M9,9L9,21 11,21 11,22 13,22 13,23 15,23 15,24 16,24 16,13 14,13 14,12 12,12 12,11 10,11 10,9z</StreamGeometry>
             <StreamGeometry x:Key="DoorPath2">M9,9L19,9 19,21 9,21z</StreamGeometry>
-            <StreamGeometry x:Key="DoorArrowPath">M12,7L12,4 10,4 11,3 12,2 13,1 14,0 15,1 16,2 17,3 18,4 16,4 16,7z</StreamGeometry>
+            <StreamGeometry x:Key="DoorArrowPath">
+                F1 M12,7 L12,5, 16,5 16,7 z                  
+                M14,4 h-4.5 M14,4 h4.5 
+                M14,3 h-3.5 M14,3 h3.5
+                M14,2 h-2.5 M14,2 h2.5
+                M14,1 h-1.5 M14,1 h1.5
+                M14,0 h-.5 M14,0 h.5
+            </StreamGeometry>
         </ResourceDictionary>
     </Window.Resources>
     <Grid Background="Black" Name="MainGrid">
         <!--<custom:BoardCanvas/>-->
+        <!--16 rows-->
         <Grid.RowDefinitions>
             <RowDefinition Name="RowEdgeUpper" Height="0"/>
             <RowDefinition Name="RowStackP1" />
@@ -54,6 +63,7 @@
             <RowDefinition Name="RowStackP2" />
             <RowDefinition Name="RowEdgeLower" Height="0"/>
         </Grid.RowDefinitions>
+        <!--12 Columns-->
         <Grid.ColumnDefinitions>
             <ColumnDefinition Name="ColumnEdgeLeft" Width="0"/>
             <ColumnDefinition Name="BorderLeft" Width="{StaticResource BoardBorderGridThickness}"/>
@@ -69,7 +79,7 @@
             <ColumnDefinition Name="ColumnEdgeRight" Width="0"/>
         </Grid.ColumnDefinitions>
 
-        <Border 
+        <Border Name="MainFieldBorder"
             BorderThickness="{DynamicResource BoardBorderThickness}" BorderBrush="White" CornerRadius="{DynamicResource BoardBorderCornerRadius}"
             Grid.Row="2" Grid.RowSpan="12"
             Grid.Column="1" Grid.ColumnSpan="10"/>
@@ -116,7 +126,7 @@
             Grid.Row="4" Grid.Column="4"/>
 
         <custom:CardField
-            x:Name="D8"
+            x:Name="D8" IsExitField="True"
             Style="{StaticResource MainField}" VerticalAlignment="Bottom"            
             Grid.Row="3" Grid.RowSpan="2" Grid.Column="5"
             Height="50">
@@ -127,26 +137,26 @@
                         Fill="Orange"
                         Stroke="Orange" StrokeThickness="1"
                         Data=
-                         "{DynamicResource ExitPath}"  />
+                         "{StaticResource ExitPath}"  />
                     <Path 
                         Fill="White"
                         Stroke="White" StrokeThickness="1"
                         Data=
-                         "{DynamicResource DoorPath}"  />
+                         "{StaticResource DoorPath}"  />
                     <Path                         
                         Stroke="White" StrokeThickness="1"
                         Data=
-                         "{DynamicResource DoorPath2}"  />
+                         "{StaticResource DoorPath2}"  />
                     <Path 
                         Fill="Orange"
                         Stroke="Orange" StrokeThickness="1"
                         Data=
-                         "{DynamicResource DoorArrowPath}"  />
+                         "{StaticResource DoorArrowPath}" />
                 </Grid>
             </Viewbox>
         </custom:CardField>
         <custom:CardField
-            x:Name="E8"
+            x:Name="E8" IsExitField="True"
             Style="{StaticResource MainField}" VerticalAlignment="Bottom"            
             Grid.Row="3" Grid.RowSpan="2" Grid.Column="6"
             Height="50">
@@ -157,21 +167,21 @@
                         Fill="Orange"
                         Stroke="Orange" StrokeThickness="1"
                         Data=
-                         "{DynamicResource ExitPath}"  />
+                         "{StaticResource ExitPath}"  />
                     <Path 
                         Fill="White"
                         Stroke="White" StrokeThickness="1"
                         Data=
-                         "{DynamicResource DoorPath}"  />
+                         "{StaticResource DoorPath}"  />
                     <Path                         
                         Stroke="White" StrokeThickness="1"
                         Data=
-                         "{DynamicResource DoorPath2}"  />
+                         "{StaticResource DoorPath2}"  />
                     <Path 
                         Fill="Orange"
                         Stroke="Orange" StrokeThickness="1"
                         Data=
-                         "{DynamicResource DoorArrowPath}"  />
+                         "{StaticResource DoorArrowPath}"  />
                 </Grid>
             </Viewbox>
         </custom:CardField>
@@ -407,7 +417,7 @@
             Grid.Row="11" Grid.Column="4" Background="{StaticResource Player1DeploymentLineColor}"/>
 
         <custom:CardField
-            x:Name="D1"
+            x:Name="D1" IsExitField="True"
             Style="{StaticResource MainField}" VerticalAlignment="Top"            
             Grid.Row="11" Grid.RowSpan="2" Grid.Column="5"
             Height="50">
@@ -418,21 +428,21 @@
                         Fill="Orange"
                         Stroke="Orange" StrokeThickness="1"
                         Data=
-                         "{DynamicResource ExitPath}"  />
+                         "{StaticResource ExitPath}"  />
                     <Path 
                         Fill="White"
                         Stroke="White" StrokeThickness="1"
                         Data=
-                         "{DynamicResource DoorPath}"  />
+                         "{StaticResource DoorPath}"  />
                     <Path                         
                         Stroke="White" StrokeThickness="1"
                         Data=
-                         "{DynamicResource DoorPath2}"  />
+                         "{StaticResource DoorPath2}"  />
                     <Path 
                         Fill="Orange"
                         Stroke="Orange" StrokeThickness="1"
                         Data=
-                         "{DynamicResource DoorArrowPath}"  />
+                         "{StaticResource DoorArrowPath}"  />
                     <Grid.RenderTransform>
                         <ScaleTransform ScaleX="-1" ScaleY="-1" />
                     </Grid.RenderTransform>
@@ -440,7 +450,7 @@
             </Viewbox>
         </custom:CardField>
         <custom:CardField
-            x:Name="E1"
+            x:Name="E1" IsExitField="True"
             Style="{StaticResource MainField}" VerticalAlignment="Top"            
             Grid.Row="11" Grid.RowSpan="2" Grid.Column="6"
             Height="50">
@@ -451,21 +461,21 @@
                         Fill="Orange"
                         Stroke="Orange" StrokeThickness="1"
                         Data=
-                         "{DynamicResource ExitPath}"  />
+                         "{StaticResource ExitPath}"  />
                     <Path 
                         Fill="White"
                         Stroke="White" StrokeThickness="1"
                         Data=
-                         "{DynamicResource DoorPath}"  />
+                         "{StaticResource DoorPath}"  />
                     <Path                         
                         Stroke="White" StrokeThickness="1"
                         Data=
-                         "{DynamicResource DoorPath2}"  />
+                         "{StaticResource DoorPath2}"  />
                     <Path 
                         Fill="Orange"
                         Stroke="Orange" StrokeThickness="1"
                         Data=
-                         "{DynamicResource DoorArrowPath}"  />
+                         "{StaticResource DoorArrowPath}"  />
                     <Grid.RenderTransform>
                         <ScaleTransform ScaleX="-1" ScaleY="-1" />
                     </Grid.RenderTransform>
@@ -594,5 +604,15 @@
             <custom:LinkField
                 x:Name="StackLink4P2" Grid.Column="3"/>
         </Grid>
+        <custom:NewGameAdornerControl
+            Grid.Row="0" Grid.Column="0"
+            Visibility="{Binding IsNewGamePopupVisible, Converter={StaticResource VisBoolConv}, UpdateSourceTrigger=PropertyChanged}"
+            Grid.RowSpan="16" Grid.ColumnSpan="12"
+            VerticalAlignment="Center" HorizontalAlignment="Center"/>
+        <custom:DeploymentAdornerControl
+            Grid.Row="0" Grid.Column="0"
+            Visibility="{Binding IsDeploymentPopupVisible, Converter={StaticResource VisBoolConv}, UpdateSourceTrigger=PropertyChanged}"
+            Grid.RowSpan="10" Grid.ColumnSpan="12" Margin="0,0,0,5"
+            VerticalAlignment="Bottom" HorizontalAlignment="Center"/>
     </Grid>
 </Window>

@@ -25,12 +25,14 @@
                 VerticalAlignment="Center" HorizontalAlignment="Right"
                 />
             <TextBox Name="TextBoxPlayerName"
+                Text="{Binding Path=Game.Player1.Name}"
                 Grid.Column="1" Grid.Row="1" Background="Black" Foreground="White" Margin="5" FontSize="16"
                 VerticalAlignment="Center" HorizontalAlignment="Stretch"
                 />
             <Button
                 Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="3" Margin="5"
-                FontSize="24" Content="ACCESS BATTLE!" Click="Button_Click"
+                FontSize="24" Content="ACCESS BATTLE!" Command="{Binding NewGamePopupAccessBattleCommand}"
+                Cursor="Hand"
                 />
         </Grid>
     </Border>

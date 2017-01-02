@@ -8,8 +8,8 @@ namespace AccessBattle
 {
     public class Vector
     {
-        int X;
-        int Y;
+        public int X;
+        public int Y;
         public Vector(int x, int y)
         {
             X = x;

@@ -3,11 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace RaiNet
+namespace AccessBattle
 {
-    public class Player
+    public class Player : PropChangeNotifier
     {
-        public string Name { get; set; }
+        string _name;
+        public string Name
+        {
+            get { return _name; }
+            set
+            {
+                if (_name == value) return;
+                _name = value;
+                OnPropertyChanged();
+            }
+        }
         public int Points { get; set; }
 
         public bool DidVirusCheck { get; set; }

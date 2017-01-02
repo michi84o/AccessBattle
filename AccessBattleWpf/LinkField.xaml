@@ -5,9 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:AccessBattleWpf"
              mc:Ignorable="d" 
-             d:DesignHeight="150" d:DesignWidth="150" Background="Black">
-    <Border 
-            Margin="1"
+             d:DesignHeight="150" d:DesignWidth="150" >
+    <local:CardField 
+            Margin="1" x:Name="CardField" Background="Black"
             BorderBrush="DarkGray" BorderThickness="2" CornerRadius="2">
         <Grid>
             <Grid.RowDefinitions>
@@ -23,5 +23,5 @@
                     Data="{StaticResource LinkPath}"/>
             </Viewbox>
         </Grid>
-    </Border>
+    </local:CardField>
 </UserControl>
