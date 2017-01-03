@@ -8,52 +8,112 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
 
 namespace AccessBattleWpf
 {
-    public class CardFieldClickedEventArgs : EventArgs
-    {
-        public BoardField Field { get; private set; }
-        public CardFieldClickedEventArgs(BoardField field)
-        {
-            Field = field;
-        }
-    }
-
-    public class CardField : Border
+    /// <summary>
+    /// Interaction logic for BoardFieldControl.xaml
+    /// </summary>
+    public partial class BoardFieldControl : Border
     {
         BoardField _field;
         Color _defaultBackground;
         Color _blinkTargetColor;
-        Storyboard _blinkStoryBoard;   
-        public bool IsExitField { get; set; }     
+        Storyboard _blinkStoryBoard;
+        public bool IsExitField { get; set; }
+        public bool IsStackField { get; set; }
 
-        public event EventHandler<CardFieldClickedEventArgs> Clicked;
+        // Todo: Resource
+        static SolidColorBrush EmptyMainBrush = new SolidColorBrush(Color.FromArgb(255, 0x1f, 0x1f, 0x1f));
 
-        public CardField() : base()
+        BoardFieldControlDisplayState _displayState;
+        public BoardFieldControlDisplayState DisplayState
         {
+            get { return _displayState; }
+            set
+            {
+                // Reset blinking and force rebuild of storyboard                  
+                IsBlinking = false;
+                _initialized = false;
+
+                if (_displayState == value) return;
+                _displayState = value;
+
+                // TODO: Databinding
+                LinkGrid.Visibility = Visibility.Collapsed;
+                VirusGrid.Visibility = Visibility.Collapsed;                
+                VirusPath.Stroke = Brushes.DarkGray;
+                VirusPath.Fill = Brushes.DarkGray;
+                LinkPath.Stroke = Brushes.DarkGray;
+                LinkPath.Fill = Brushes.DarkGray;
+                VirusText.Foreground = Brushes.DarkGray;
+                LinkText.Foreground = Brushes.DarkGray;
+
+                // TODO: Card and state should not be set separately
+                // Background Color
+                var playerBrush = EmptyMainBrush;
+                if (_field != null && _field.Card != null && _field.Card.Owner != null)
+                {
+                    if (_field.Card.Owner.PlayerNumber == 1) playerBrush = Brushes.Blue;
+                    else if (_field.Card.Owner.PlayerNumber == 2) playerBrush = Brushes.Gold;
+                }
+
+                switch (_displayState)
+                {
+                    case BoardFieldControlDisplayState.StackLinkEmpty:
+                        LinkGrid.Visibility = Visibility.Visible;
+                        Background = Brushes.Black;
+                        break;
+                    case BoardFieldControlDisplayState.StackVirusEmpty:
+                        VirusGrid.Visibility = Visibility.Visible;
+                        Background = Brushes.Black;
+                        break;                    
+                    case BoardFieldControlDisplayState.MainLink:
+                    case BoardFieldControlDisplayState.StackLink:
+                        LinkGrid.Visibility = Visibility.Visible;
+                        Background = playerBrush;
+                        LinkPath.Stroke = Brushes.White;
+                        LinkPath.Fill = Brushes.White;
+                        LinkText.Foreground = Brushes.White;
+                        break;
+                    case BoardFieldControlDisplayState.MainVirus:
+                    case BoardFieldControlDisplayState.StackVirus:
+                        VirusGrid.Visibility = Visibility.Visible;
+                        Background = playerBrush;
+                        VirusPath.Stroke = Brushes.White;
+                        VirusPath.Fill = Brushes.White;
+                        VirusText.Foreground = Brushes.White;
+                        break;
+                    case BoardFieldControlDisplayState.Empty:
+                        if (IsStackField) Background = Brushes.Black;
+                        else Background = EmptyMainBrush;
+                        break;
+                }
+
+                // TODO: Solve synchronization Issue
+                //IsBlinking = _field != null && _field.IsHighlighted;
+            }
+
+        }
+
+        public event EventHandler<BoardFieldClickedEventArgs> Clicked;
+
+        public BoardFieldControl()
+        {
+            InitializeComponent();
             MouseDown += CardField_MouseDown;
             MouseUp += CardField_MouseUp;
             MouseLeave += CardField_MouseLeave;
             Cursor = Cursors.Hand;
-
-            //var blinkDesc = DependencyPropertyDescriptor.FromProperty(IsBlinkingProperty, typeof(CardField));
-            //if (blinkDesc != null)
-            //{
-            //    // TODO: People keep telling this could be a memory leak
-            //    blinkDesc.AddValueChanged(this, (s, e) => 
-            //    {
-            //        if (IsBlinking != _isBlinking)
-            //        {
-            //            _isBlinking = IsBlinking;
-            //            Blink(_isBlinking);
-            //        }
-            //    });
-            //}
-
+            _displayState = BoardFieldControlDisplayState.Empty;
         }
 
         #region Mouse Events
@@ -70,7 +130,7 @@ namespace AccessBattleWpf
                 _clickStarted = false;
                 var handler = Clicked;
                 // Click makes only sense if _field is set
-                if (handler != null && _field != null) handler(this, new CardFieldClickedEventArgs(_field));
+                if (handler != null && _field != null) handler(this, new BoardFieldClickedEventArgs(_field));
             }
         }
 
@@ -118,9 +178,25 @@ namespace AccessBattleWpf
             if (IsExitField) return;
             // Draw stuff here
             // BAD !!! Removes ViewBox fromExit fields
-            if (_field.Card == null) Child = null;
-            if (_field.Card is VirusCard) Child = new VirusField();
-            if (_field.Card is LinkCard) Child = new LinkField(); // TODO: Disable Scaling !!!!!!!!!!!
+            if (_field.Card == null)
+            {
+                // TODO: Save info about stack panel type somewhere
+                if (IsStackField)
+                {
+                    if (DisplayState == BoardFieldControlDisplayState.StackLink) DisplayState = BoardFieldControlDisplayState.StackLinkEmpty;
+                    else if (DisplayState == BoardFieldControlDisplayState.StackVirus) DisplayState = BoardFieldControlDisplayState.StackVirusEmpty;
+                    else
+                    {
+                        Trace.WriteLine("ERROR! LOST INFO ABOUT STACK PANEL TYPE");
+                        DisplayState = BoardFieldControlDisplayState.Empty;
+                    }
+                }
+                else DisplayState = BoardFieldControlDisplayState.Empty;
+            }                
+            if (_field.Card is VirusCard)
+                DisplayState = IsStackField ? BoardFieldControlDisplayState.StackVirus : BoardFieldControlDisplayState.MainVirus;
+            if (_field.Card is LinkCard)
+                DisplayState = IsStackField ? BoardFieldControlDisplayState.StackLink : BoardFieldControlDisplayState.MainLink;
         }
 
         bool _initialized;
@@ -132,7 +208,7 @@ namespace AccessBattleWpf
             _defaultBackground = Color.FromArgb(255, backCol.R, backCol.G, backCol.B);
             // Overwrite Background because its instance is shared between other fields.
             Background = new SolidColorBrush(_defaultBackground);
-            
+
             byte r = _defaultBackground.R;
             byte g = _defaultBackground.G;
             byte b = _defaultBackground.B;

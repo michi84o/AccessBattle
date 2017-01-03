@@ -64,9 +64,9 @@ namespace AccessBattle
                 }
                 for (int i = 4; i < 8; ++i)
                 {
-                    LinkCards[i].Owner = Player1;
+                    LinkCards[i].Owner = Player2;
                     Board.Fields[i-4, 9].Card = LinkCards[i];
-                    VirusCards[i].Owner = Player1;
+                    VirusCards[i].Owner = Player2;
                     Board.Fields[i, 9].Card = VirusCards[i];
                 }
             }
@@ -80,8 +80,8 @@ namespace AccessBattle
 
         public Game()
         {
-            Player1 = new Player { Name = "Player 1" };
-            Player2 = new Player { Name = "Player 2" };
+            Player1 = new Player { Name = "Player 1" , PlayerNumber = 1 };
+            Player2 = new Player { Name = "Player 2" , PlayerNumber = 2 };
             Board = new Board();
             DeploymentState = new DeploymentState();
             for (int i=0; i<8; ++i)

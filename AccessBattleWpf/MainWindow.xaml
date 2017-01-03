@@ -18,7 +18,14 @@
             <SolidColorBrush x:Key="MainFieldBorderColor" Color="OliveDrab"/>
             <SolidColorBrush x:Key="Player2DeploymentLineColor" Color="#606015"/>
             <SolidColorBrush x:Key="Player1DeploymentLineColor" Color="#151560"/>
-            <Style x:Key="MainField" TargetType="Border">
+            <Style x:Key="StackField" TargetType="custom:BoardFieldControl">
+                <Setter Property="BorderThickness" Value="2"/>
+                <Setter Property="CornerRadius" Value="2"/>
+                <Setter Property="BorderBrush" Value="DarkGray"/>
+                <Setter Property="Background" Value="Black"/>
+                <Setter Property="Margin" Value="1" />
+            </Style>
+            <Style x:Key="MainField" TargetType="custom:BoardFieldControl">
                 <Setter Property="BorderThickness" Value="2"/>
                 <Setter Property="CornerRadius" Value="2"/>
                 <Setter Property="BorderBrush" Value="{StaticResource MainFieldBorderColor}"/>
@@ -109,24 +116,24 @@
         </Viewbox>
 
         <!--Row8-->
-        <custom:CardField 
+        <custom:BoardFieldControl 
             x:Name="A8"
             Style="{StaticResource MainField}" 
             Background="{StaticResource Player2DeploymentLineColor}"
             Grid.Row="4" Grid.Column="2"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="B8"
             Style="{StaticResource MainField}"   
             Background="{StaticResource Player2DeploymentLineColor}"
             Grid.Row="4" Grid.Column="3"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="C8"
             Style="{StaticResource MainField}" 
             Background="{StaticResource Player2DeploymentLineColor}"
             Grid.Row="4" Grid.Column="4"/>
 
-        <custom:CardField
-            x:Name="D8" IsExitField="True"
+        <custom:BoardFieldControl
+            x:Name="D8" 
             Style="{StaticResource MainField}" VerticalAlignment="Bottom"            
             Grid.Row="3" Grid.RowSpan="2" Grid.Column="5"
             Height="50">
@@ -154,9 +161,9 @@
                          "{StaticResource DoorArrowPath}" />
                 </Grid>
             </Viewbox>
-        </custom:CardField>
-        <custom:CardField
-            x:Name="E8" IsExitField="True"
+        </custom:BoardFieldControl>
+        <custom:BoardFieldControl
+            x:Name="E8"
             Style="{StaticResource MainField}" VerticalAlignment="Bottom"            
             Grid.Row="3" Grid.RowSpan="2" Grid.Column="6"
             Height="50">
@@ -184,240 +191,240 @@
                          "{StaticResource DoorArrowPath}"  />
                 </Grid>
             </Viewbox>
-        </custom:CardField>
-        <custom:CardField
+        </custom:BoardFieldControl>
+        <custom:BoardFieldControl
             x:Name="F8"
             Style="{StaticResource MainField}"   
             Background="{StaticResource Player2DeploymentLineColor}"
             Grid.Row="4" Grid.Column="7"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="G8"
             Style="{StaticResource MainField}"
             Background="{StaticResource Player2DeploymentLineColor}"
             Grid.Row="4" Grid.Column="8"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="H8"
             Style="{StaticResource MainField}" 
             Background="{StaticResource Player2DeploymentLineColor}"
             Grid.Row="4" Grid.Column="9"/>
         <!--Row7-->
-        <custom:CardField
-            x:Name="A7"
-            Style="{StaticResource MainField}"            
+        <custom:BoardFieldControl
+            x:Name="A7"            
+            Style="{StaticResource MainField}"
             Grid.Row="5" Grid.Column="2"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="B7"
             Style="{StaticResource MainField}"            
             Grid.Row="5" Grid.Column="3"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="C7"
             Style="{StaticResource MainField}"            
             Grid.Row="5" Grid.Column="4"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="D7"
             Style="{StaticResource MainField}"  
             Background="{StaticResource Player2DeploymentLineColor}"
             Grid.Row="5" Grid.Column="5"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="E7"
             Style="{StaticResource MainField}"   
             Background="{StaticResource Player2DeploymentLineColor}"
             Grid.Row="5" Grid.Column="6"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="F7"
             Style="{StaticResource MainField}"            
             Grid.Row="5" Grid.Column="7"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="G7"
             Style="{StaticResource MainField}"            
             Grid.Row="5" Grid.Column="8"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="H7"
             Style="{StaticResource MainField}"            
             Grid.Row="5" Grid.Column="9"/>
         <!--Row6-->
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="A6"
             Style="{StaticResource MainField}"            
             Grid.Row="6" Grid.Column="2"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="B6"
             Style="{StaticResource MainField}"            
             Grid.Row="6" Grid.Column="3"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="C6"
             Style="{StaticResource MainField}"            
             Grid.Row="6" Grid.Column="4"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="D6"
             Style="{StaticResource MainField}"            
             Grid.Row="6" Grid.Column="5"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="E6"
             Style="{StaticResource MainField}"            
             Grid.Row="6" Grid.Column="6"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="F6"
             Style="{StaticResource MainField}"            
             Grid.Row="6" Grid.Column="7"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="G6"
             Style="{StaticResource MainField}"            
             Grid.Row="6" Grid.Column="8"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="H6"
             Style="{StaticResource MainField}"            
             Grid.Row="6" Grid.Column="9"/>
         <!--Row5-->
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="A5"
             Style="{StaticResource MainField}"            
             Grid.Row="7" Grid.Column="2"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="B5"
             Style="{StaticResource MainField}"            
             Grid.Row="7" Grid.Column="3"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="C5"
             Style="{StaticResource MainField}"            
             Grid.Row="7" Grid.Column="4"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="D5"
             Style="{StaticResource MainField}"            
             Grid.Row="7" Grid.Column="5"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="E5"
             Style="{StaticResource MainField}"            
             Grid.Row="7" Grid.Column="6"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="F5"
             Style="{StaticResource MainField}"            
             Grid.Row="7" Grid.Column="7"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="G5"
             Style="{StaticResource MainField}"            
             Grid.Row="7" Grid.Column="8"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="H5"
             Style="{StaticResource MainField}"            
             Grid.Row="7" Grid.Column="9"/>
         <!--Row4-->
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="A4"
             Style="{StaticResource MainField}"            
             Grid.Row="8" Grid.Column="2"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="B4"
             Style="{StaticResource MainField}"            
             Grid.Row="8" Grid.Column="3"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="C4"
             Style="{StaticResource MainField}"            
             Grid.Row="8" Grid.Column="4"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="D4"
             Style="{StaticResource MainField}"            
             Grid.Row="8" Grid.Column="5"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="E4"
             Style="{StaticResource MainField}"            
             Grid.Row="8" Grid.Column="6"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="F4"
             Style="{StaticResource MainField}"            
             Grid.Row="8" Grid.Column="7"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="G4"
             Style="{StaticResource MainField}"            
             Grid.Row="8" Grid.Column="8"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="H4"
             Style="{StaticResource MainField}"            
             Grid.Row="8" Grid.Column="9"/>
         <!--Row3-->
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="A3"
             Style="{StaticResource MainField}"            
             Grid.Row="9" Grid.Column="2"/>
-        <custom:CardField 
+        <custom:BoardFieldControl 
             x:Name="B3"
             Style="{StaticResource MainField}"            
             Grid.Row="9" Grid.Column="3"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="C3"
             Style="{StaticResource MainField}"            
             Grid.Row="9" Grid.Column="4"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="D3"
             Style="{StaticResource MainField}"            
             Grid.Row="9" Grid.Column="5"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="E3"
             Style="{StaticResource MainField}"            
             Grid.Row="9" Grid.Column="6"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="F3"
             Style="{StaticResource MainField}"            
             Grid.Row="9" Grid.Column="7"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="G3"
             Style="{StaticResource MainField}"            
             Grid.Row="9" Grid.Column="8"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="H3"
             Style="{StaticResource MainField}"            
             Grid.Row="9" Grid.Column="9"/>
         <!--Row2-->
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="A2"
             Style="{StaticResource MainField}"            
             Grid.Row="10" Grid.Column="2"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="B2"
             Style="{StaticResource MainField}"            
             Grid.Row="10" Grid.Column="3"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="C2"
             Style="{StaticResource MainField}"            
             Grid.Row="10" Grid.Column="4"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="D2"
             Style="{StaticResource MainField}" 
             Background="{StaticResource Player1DeploymentLineColor}"
             Grid.Row="10" Grid.Column="5"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="E2"
             Style="{StaticResource MainField}" 
             Background="{StaticResource Player1DeploymentLineColor}"
             Grid.Row="10" Grid.Column="6"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="F2"
             Style="{StaticResource MainField}"            
             Grid.Row="10" Grid.Column="7"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="G2"
             Style="{StaticResource MainField}"            
             Grid.Row="10" Grid.Column="8"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="H2"
             Style="{StaticResource MainField}"            
             Grid.Row="10" Grid.Column="9"/>
         <!--Row1-->
-        <custom:CardField 
+        <custom:BoardFieldControl 
             x:Name="A1"
             Style="{StaticResource MainField}"            
             Grid.Row="11" Grid.Column="2" Background="{StaticResource Player1DeploymentLineColor}"/>
-        <custom:CardField 
+        <custom:BoardFieldControl 
             x:Name="B1"
             Style="{StaticResource MainField}"            
             Grid.Row="11" Grid.Column="3" Background="{StaticResource Player1DeploymentLineColor}"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="C1"
             Style="{StaticResource MainField}"            
             Grid.Row="11" Grid.Column="4" Background="{StaticResource Player1DeploymentLineColor}"/>
 
-        <custom:CardField
-            x:Name="D1" IsExitField="True"
+        <custom:BoardFieldControl
+            x:Name="D1" 
             Style="{StaticResource MainField}" VerticalAlignment="Top"            
             Grid.Row="11" Grid.RowSpan="2" Grid.Column="5"
             Height="50">
@@ -448,9 +455,9 @@
                     </Grid.RenderTransform>
                 </Grid>
             </Viewbox>
-        </custom:CardField>
-        <custom:CardField
-            x:Name="E1" IsExitField="True"
+        </custom:BoardFieldControl>
+        <custom:BoardFieldControl
+            x:Name="E1"
             Style="{StaticResource MainField}" VerticalAlignment="Top"            
             Grid.Row="11" Grid.RowSpan="2" Grid.Column="6"
             Height="50">
@@ -481,18 +488,18 @@
                     </Grid.RenderTransform>
                 </Grid>
             </Viewbox>
-        </custom:CardField>
-        <custom:CardField
+        </custom:BoardFieldControl>
+        <custom:BoardFieldControl
             x:Name="F1"
             Style="{StaticResource MainField}"   
             Background="{StaticResource Player1DeploymentLineColor}"
             Grid.Row="11" Grid.Column="7"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="G1"
             Style="{StaticResource MainField}"   
             Background="{StaticResource Player1DeploymentLineColor}"
             Grid.Row="11" Grid.Column="8"/>
-        <custom:CardField
+        <custom:BoardFieldControl
             x:Name="H1"
             Style="{StaticResource MainField}" 
             Background="{StaticResource Player1DeploymentLineColor}"
@@ -508,30 +515,34 @@
                 <ColumnDefinition/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <custom:VirusField RenderTransformOrigin="0.5,0.5"
-                x:Name="StackVirus4P2" Grid.Column="0">
-                <custom:VirusField.RenderTransform>
+            <custom:BoardFieldControl RenderTransformOrigin="0.5,0.5"
+                x:Name="StackVirus4P2" Grid.Column="0" Style="{StaticResource StackField}"
+                DisplayState="StackVirusEmpty"  IsStackField="True">
+                <custom:BoardFieldControl.RenderTransform>
                     <ScaleTransform ScaleX="-1" ScaleY="-1" />
-                </custom:VirusField.RenderTransform>
-            </custom:VirusField>
-            <custom:VirusField RenderTransformOrigin="0.5,0.5"
-                x:Name="StackVirus3P2" Grid.Column="1">
-                <custom:VirusField.RenderTransform>
+                </custom:BoardFieldControl.RenderTransform>
+            </custom:BoardFieldControl>
+            <custom:BoardFieldControl RenderTransformOrigin="0.5,0.5"
+                x:Name="StackVirus3P2" Grid.Column="1" Style="{StaticResource StackField}"
+                DisplayState="StackVirusEmpty"  IsStackField="True">
+                <custom:BoardFieldControl.RenderTransform>
                     <ScaleTransform ScaleX="-1" ScaleY="-1" />
-                </custom:VirusField.RenderTransform>
-            </custom:VirusField>
-            <custom:VirusField RenderTransformOrigin="0.5,0.5"
-                x:Name="StackVirus2P2" Grid.Column="2">
-                <custom:VirusField.RenderTransform>
+                </custom:BoardFieldControl.RenderTransform>
+            </custom:BoardFieldControl>
+            <custom:BoardFieldControl RenderTransformOrigin="0.5,0.5"
+                x:Name="StackVirus2P2" Grid.Column="2" Style="{StaticResource StackField}"
+                DisplayState="StackVirusEmpty"  IsStackField="True">
+                <custom:BoardFieldControl.RenderTransform>
                     <ScaleTransform ScaleX="-1" ScaleY="-1" />
-                </custom:VirusField.RenderTransform>
-            </custom:VirusField>
-            <custom:VirusField RenderTransformOrigin="0.5,0.5"
-                x:Name="StackVirus1P2" Grid.Column="3">
-                <custom:VirusField.RenderTransform>
+                </custom:BoardFieldControl.RenderTransform>
+            </custom:BoardFieldControl>
+            <custom:BoardFieldControl RenderTransformOrigin="0.5,0.5"
+                x:Name="StackVirus1P2" Grid.Column="3" Style="{StaticResource StackField}"
+                DisplayState="StackVirusEmpty"  IsStackField="True">
+                <custom:BoardFieldControl.RenderTransform>
                     <ScaleTransform ScaleX="-1" ScaleY="-1" />
-                </custom:VirusField.RenderTransform>
-            </custom:VirusField>
+                </custom:BoardFieldControl.RenderTransform>
+            </custom:BoardFieldControl>
         </Grid>
         <Grid
             Grid.Row="1" Grid.Column="2"
@@ -542,30 +553,34 @@
                 <ColumnDefinition/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <custom:LinkField RenderTransformOrigin="0.5,0.5"
-                x:Name="StackLink4P2" Grid.Column="0">
-                <custom:LinkField.RenderTransform>
+            <custom:BoardFieldControl RenderTransformOrigin="0.5,0.5"
+                x:Name="StackLink4P2" Grid.Column="0" Style="{StaticResource StackField}"
+                DisplayState="StackLinkEmpty"  IsStackField="True">
+                <custom:BoardFieldControl.RenderTransform>
                     <ScaleTransform ScaleX="-1" ScaleY="-1" />
-                </custom:LinkField.RenderTransform>
-            </custom:LinkField>
-            <custom:LinkField RenderTransformOrigin="0.5,0.5"
-                x:Name="StackLink3P2" Grid.Column="1">
-                <custom:LinkField.RenderTransform>
+                </custom:BoardFieldControl.RenderTransform>
+            </custom:BoardFieldControl>
+            <custom:BoardFieldControl RenderTransformOrigin="0.5,0.5"
+                x:Name="StackLink3P2" Grid.Column="1" Style="{StaticResource StackField}"
+                DisplayState="StackLinkEmpty"  IsStackField="True">
+                <custom:BoardFieldControl.RenderTransform>
                     <ScaleTransform ScaleX="-1" ScaleY="-1" />
-                </custom:LinkField.RenderTransform>
-            </custom:LinkField>
-            <custom:LinkField RenderTransformOrigin="0.5,0.5"
-                x:Name="StackLink2P2" Grid.Column="2">
-                <custom:LinkField.RenderTransform>
+                </custom:BoardFieldControl.RenderTransform>
+            </custom:BoardFieldControl>
+            <custom:BoardFieldControl RenderTransformOrigin="0.5,0.5"
+                x:Name="StackLink2P2" Grid.Column="2" Style="{StaticResource StackField}"
+                DisplayState="StackLinkEmpty"  IsStackField="True">
+                <custom:BoardFieldControl.RenderTransform>
                     <ScaleTransform ScaleX="-1" ScaleY="-1" />
-                </custom:LinkField.RenderTransform>
-            </custom:LinkField>
-            <custom:LinkField RenderTransformOrigin="0.5,0.5"
-                x:Name="StackLink1P2" Grid.Column="3">
-                <custom:LinkField.RenderTransform>
+                </custom:BoardFieldControl.RenderTransform>
+            </custom:BoardFieldControl>
+            <custom:BoardFieldControl RenderTransformOrigin="0.5,0.5"
+                x:Name="StackLink1P2" Grid.Column="3" Style="{StaticResource StackField}"
+                DisplayState="StackLinkEmpty"  IsStackField="True">
+                <custom:BoardFieldControl.RenderTransform>
                     <ScaleTransform ScaleX="-1" ScaleY="-1" />
-                </custom:LinkField.RenderTransform>
-            </custom:LinkField>
+                </custom:BoardFieldControl.RenderTransform>
+            </custom:BoardFieldControl>
         </Grid>
         
         <Grid
@@ -577,14 +592,18 @@
                 <ColumnDefinition/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <custom:VirusField
-                x:Name="StackVirus1P1" Grid.Column="0"/>
-            <custom:VirusField
-                x:Name="StackVirus2P1" Grid.Column="1"/>
-            <custom:VirusField
-                x:Name="StackVirus3P1" Grid.Column="2"/>
-            <custom:VirusField
-                x:Name="StackVirus4P1" Grid.Column="3"/>
+            <custom:BoardFieldControl
+                x:Name="StackVirus1P1" Grid.Column="0" Style="{StaticResource StackField}"
+                DisplayState="StackVirusEmpty"  IsStackField="True" />
+            <custom:BoardFieldControl
+                x:Name="StackVirus2P1" Grid.Column="1" Style="{StaticResource StackField}"
+                DisplayState="StackVirusEmpty"  IsStackField="True"/>
+            <custom:BoardFieldControl
+                x:Name="StackVirus3P1" Grid.Column="2" Style="{StaticResource StackField}"
+                DisplayState="StackVirusEmpty"  IsStackField="True"/>
+            <custom:BoardFieldControl
+                x:Name="StackVirus4P1" Grid.Column="3" Style="{StaticResource StackField}"
+                DisplayState="StackVirusEmpty"  IsStackField="True"/>
         </Grid>
         <Grid
             Grid.Row="14" Grid.Column="7"
@@ -595,14 +614,18 @@
                 <ColumnDefinition/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <custom:LinkField
-                x:Name="StackLink1P1" Grid.Column="0"/>
-            <custom:LinkField
-                x:Name="StackLink2P1" Grid.Column="1"/>
-            <custom:LinkField
-                x:Name="StackLink3P1" Grid.Column="2"/>
-            <custom:LinkField
-                x:Name="StackLink4P1" Grid.Column="3"/>
+            <custom:BoardFieldControl
+                x:Name="StackLink1P1" Grid.Column="0" Style="{StaticResource StackField}" 
+                DisplayState="StackLinkEmpty"  IsStackField="True"/>
+            <custom:BoardFieldControl
+                x:Name="StackLink2P1" Grid.Column="1" Style="{StaticResource StackField}"
+                DisplayState="StackLinkEmpty"  IsStackField="True"/>
+            <custom:BoardFieldControl
+                x:Name="StackLink3P1" Grid.Column="2" Style="{StaticResource StackField}"
+                DisplayState="StackLinkEmpty"  IsStackField="True"/>
+            <custom:BoardFieldControl
+                x:Name="StackLink4P1" Grid.Column="3" Style="{StaticResource StackField}"
+                DisplayState="StackLinkEmpty"  IsStackField="True"/>
         </Grid>
         <custom:NewGameAdornerControl
             Grid.Row="0" Grid.Column="0"

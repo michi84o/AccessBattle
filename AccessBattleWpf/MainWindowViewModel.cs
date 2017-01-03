@@ -10,6 +10,8 @@ using System.Diagnostics;
 
 namespace AccessBattleWpf
 {
+    // TODO: Make GameV variables globally accessible
+
     public class MainWindowViewModel : PropChangeNotifier
     {
         Game _game;

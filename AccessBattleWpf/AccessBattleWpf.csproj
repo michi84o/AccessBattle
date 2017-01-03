@@ -55,32 +55,29 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="CardField.cs" />
+    <Compile Include="BoardFieldControl.xaml.cs">
+      <DependentUpon>BoardFieldControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ColorHelper.cs" />
     <Compile Include="DeploymentAdornerControl.xaml.cs">
       <DependentUpon>DeploymentAdornerControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="IStackField.cs" />
-    <Compile Include="LinkField.xaml.cs">
-      <DependentUpon>LinkField.xaml</DependentUpon>
-    </Compile>
     <Compile Include="MainWindowViewModel.cs" />
     <Compile Include="CenteredAdornerContainer.cs" />
+    <Compile Include="Misc.cs" />
     <Compile Include="NewGameAdornerControl.xaml.cs">
       <DependentUpon>NewGameAdornerControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="RelayCommand.cs" />
     <Compile Include="StretchConverter.cs" />
-    <Compile Include="VirusField.xaml.cs">
-      <DependentUpon>VirusField.xaml</DependentUpon>
-    </Compile>
     <Compile Include="VisibilityBoolConverter.cs" />
     <Compile Include="WpfHelper.cs" />
-    <Page Include="DeploymentAdornerControl.xaml">
+    <Page Include="BoardFieldControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="LinkField.xaml">
+    <Page Include="DeploymentAdornerControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -98,10 +95,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="NewGameAdornerControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="VirusField.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
