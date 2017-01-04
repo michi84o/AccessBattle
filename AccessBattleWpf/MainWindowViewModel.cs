@@ -49,26 +49,26 @@ namespace AccessBattleWpf
         {
             try
             {
-                if (_game.Phase == GamePhase.Deployment)
-                {
-                    if (field.IsHighlighted)
-                    {
-                        if (field.Card != null)
-                        {
-                            // TODO: turn back card
-                            return;
-                        }
-                        var nextDepField = _game.Board.Player1StackFields.FirstOrDefault(o => o.Card != null);
-                        if (nextDepField == null)
-                        {
-                            Trace.WriteLine("MainWindowViewModel FieldClicked nextDepField is null !!!!!!!!!!");
-                            _game.Phase = GamePhase.Player1Turn; // TODO: Random
-                            return;
-                        }
-                        field.Card = nextDepField.Card;
-                        nextDepField.Card = null;
-                    }
-                }
+                //if (_game.Phase == GamePhase.Deployment)
+                //{
+                //    if (field.IsHighlighted)
+                //    {
+                //        if (field.Card != null)
+                //        {
+                //            // TODO: turn back card
+                //            return;
+                //        }
+                //        var nextDepField = _game.Board.Player1StackFields.FirstOrDefault(o => o.Card != null);
+                //        if (nextDepField == null)
+                //        {
+                //            Trace.WriteLine("MainWindowViewModel FieldClicked nextDepField is null!!!!!!!!!!");
+                //            //_game.Phase = GamePhase.Player1Turn; // TODO: Random
+                //            throw new Exception("MainWindowViewModel FieldClicked nextDepField is null!"); // TODO
+                //        }
+                //        field.Card = nextDepField.Card;
+                //        nextDepField.Card = null;
+                //    }
+                //}
             }
             finally
             {
@@ -83,7 +83,7 @@ namespace AccessBattleWpf
             {
                 if (_game.Phase != GamePhase.Deployment) return false;
                 var nextDep = _game.Board.Player1StackFields.FirstOrDefault(o => o.Card != null);
-                return nextDep != null && nextDep.Card != null && nextDep.Card is LinkCard;
+                return nextDep != null && nextDep.Card != null && nextDep.Card is OnlineCard && ((OnlineCard)nextDep.Card).Type == OnlineCardType.Link;
             }
         }
         public bool IsDeployingVirusCard
@@ -92,7 +92,7 @@ namespace AccessBattleWpf
             {
                 if (_game.Phase != GamePhase.Deployment) return false;
                 var nextDep = _game.Board.Player1StackFields.FirstOrDefault(o => o.Card != null);
-                return nextDep != null && nextDep.Card != null && nextDep.Card is VirusCard;
+                return nextDep != null && nextDep.Card != null && nextDep.Card is OnlineCard && ((OnlineCard)nextDep.Card).Type == OnlineCardType.Virus;
             }
         }
 
@@ -120,7 +120,7 @@ namespace AccessBattleWpf
 
         public bool CanNewGamePopupAccessBattleCommandExecute(object obj)
         {
-            return !string.IsNullOrEmpty(_game.Player1.Name);
+            return !string.IsNullOrEmpty(_game.Players[0].Name);
         }
 
     }

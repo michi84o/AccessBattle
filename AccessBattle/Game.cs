@@ -11,43 +11,34 @@ namespace AccessBattle
     {
         Init,
         Deployment,
-        Player1Turn,
-        Player2Turn,
+        PlayerTurns,
         GameOver
     }
 
     public class Game : PropChangeNotifier
     {
-        public Player Player1 { get; set; }
-        public Player Player2 { get; set; }
+        public Player[] Players { get; private set; }
+        int _currentPlayer;
+        public int CurrentPlayer
+        {
+            get { return _currentPlayer; }
+            set { SetProp(ref _currentPlayer, value); }
+        }
 
         public Board Board { get; private set; }
-
-        LinkCard[] LinkCards = new LinkCard[8];
-        VirusCard[] VirusCards = new VirusCard[8];
-
-        //public DeploymentState DeploymentState { get; private set; }
-
         GamePhase _phase;
         public GamePhase Phase
         {
             get { return _phase; }
             set
             {
-                if (value == _phase) return;
-                _phase = value;
-                OnPhaseChanged();
-                OnPropertyChanged();
+                if (SetProp(ref _phase, value))
+                    OnPhaseChanged();
             }
         }
 
         void OnPhaseChanged()
         {
-            // Reset states of fields
-            for (int x = 0; x < 8; ++x)
-                for (int y = 0; y < 10; ++y)
-                    Board.Fields[x, y].IsHighlighted = false;
-
             var phase = _phase;
             if (phase == GamePhase.Init)
             {
@@ -55,53 +46,34 @@ namespace AccessBattle
                     for (int y = 0; y < 10; ++y)
                         Board.Fields[x, y].Card = null;
                 // Give each player 8 cards on his stack
-                for (int i = 0; i < 4; ++i)
-                {
-                    LinkCards[i].Owner = Player1;
-                    Board.Fields[i, 8].Card = LinkCards[i]; // Location of card is auto updated
-                    VirusCards[i].Owner = Player1;
-                    Board.Fields[i + 4, 8].Card = VirusCards[i];
-                }
-                for (int i = 4; i < 8; ++i)
-                {
-                    LinkCards[i].Owner = Player2;
-                    Board.Fields[i-4, 9].Card = LinkCards[i];
-                    VirusCards[i].Owner = Player2;
-                    Board.Fields[i, 9].Card = VirusCards[i];
-                }
-            }
-
-            if (phase == GamePhase.Deployment)
-            {
-                foreach (var field in Board.Player1DeploymentFields)
-                    field.IsHighlighted = true;
+                for (int p = 0; p < 2; ++p)
+                    for (ushort i = 0; i < 4; ++i)
+                    {
+                        var pos = (ushort)(p * 8 + i);
+                        // TODO: Randomization to prevent cheating ??? 
+                        // Links
+                        Board.OnlineCards[pos].Owner = Players[p];
+                        Board.OnlineCards[pos].Type = OnlineCardType.Link;
+                        Board.PlaceCard(i, (ushort)(8 + p), Board.OnlineCards[pos]);
+                        // Viruses
+                        pos += 4;
+                        Board.OnlineCards[pos].Owner = Players[p];
+                        Board.OnlineCards[pos].Type = OnlineCardType.Virus;
+                        Board.PlaceCard((ushort)(i + 4), (ushort)(8 + p), Board.OnlineCards[pos]);
+                    }
             }
         }
 
         public Game()
         {
-            Player1 = new Player { Name = "Player 1" , PlayerNumber = 1 };
-            Player2 = new Player { Name = "Player 2" , PlayerNumber = 2 };
-            Board = new Board();
-            //DeploymentState = new DeploymentState();
-            for (int i = 0; i < 8; ++i)
+            Players = new Player[]
             {
-                LinkCards[i] = new LinkCard();
-                VirusCards[i] = new VirusCard();
-            }
-
+                new Player { Name = "Player 1" , PlayerNumber = 1 },
+                new Player { Name = "Player 2" , PlayerNumber = 2 }
+            };            
+            Board = new Board();
             Phase = GamePhase.Init;
             OnPhaseChanged();
         }
     }
-
-    //public class DeploymentState
-    //{
-    //    public List<OnlineCard> CardsToDeploy { get; private set; }
-
-    //    public DeploymentState()
-    //    {
-    //        CardsToDeploy = new List<OnlineCard>();
-    //    }
-    //}
 }

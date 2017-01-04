@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace AccessBattle
 {
-    public class Vector
+    public struct Vector
     {
-        public int X;
-        public int Y;
-        public Vector(int x, int y)
+        public readonly ushort X;
+        public readonly ushort Y;
+        public Vector(ushort x, ushort y)
         {
             X = x;
             Y = y;

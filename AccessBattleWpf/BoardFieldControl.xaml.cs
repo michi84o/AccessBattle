@@ -169,7 +169,7 @@ namespace AccessBattleWpf
             }
             else if (e.PropertyName == "IsHighlighted")
             {
-                IsBlinking = _field.IsHighlighted; // TODO: Could be done with dep-prop and databinding
+                //IsBlinking = _field.IsHighlighted; // TODO: Could be done with dep-prop and databinding
             }
         }
 
@@ -192,10 +192,11 @@ namespace AccessBattleWpf
                     }
                 }
                 else DisplayState = BoardFieldControlDisplayState.Empty;
+                return;
             }                
-            if (_field.Card is VirusCard)
+            if (_field.Card is OnlineCard && ((OnlineCard)_field.Card).Type == OnlineCardType.Virus)
                 DisplayState = IsStackField ? BoardFieldControlDisplayState.StackVirus : BoardFieldControlDisplayState.MainVirus;
-            if (_field.Card is LinkCard)
+            if (_field.Card is OnlineCard && ((OnlineCard)_field.Card).Type == OnlineCardType.Link)
                 DisplayState = IsStackField ? BoardFieldControlDisplayState.StackLink : BoardFieldControlDisplayState.MainLink;
         }
 

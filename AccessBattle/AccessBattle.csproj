@@ -44,7 +44,6 @@
     <Compile Include="Board.cs" />
     <Compile Include="Card.cs" />
     <Compile Include="Game.cs" />
-    <Compile Include="GameServer.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="PropChangeNotifier.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

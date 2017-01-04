@@ -5,22 +5,54 @@ using System.Text;
 
 namespace AccessBattle
 {
-    public abstract class OnlineCard
+    public abstract class Card : PropChangeNotifier
     {
-        public Player Owner { get; set; }
-        public bool IsFaceUp { get; set; }
-        public bool HasBoost { get; set; }
+        Player _owner;
+        public Player Owner
+        {
+            get { return _owner; }
+            set { SetProp(ref _owner, value); }
+        }
         public BoardField Location { get; set; }
     }
 
-    public class VirusCard : OnlineCard
+    public class OnlineCard : Card
+    {
+        bool _isFaceUp, _hasBoost;
+        OnlineCardType _type;
+
+        public bool IsFaceUp
+        {
+            get { return _isFaceUp; }
+            set { SetProp(ref _isFaceUp, value); }
+        }
+        public bool HasBoost
+        {
+            get { return _hasBoost; }
+            set { SetProp(ref _hasBoost, value); }
+        }
+
+        public OnlineCardType Type
+        {
+            get { return _type; }
+            set { SetProp(ref _type, value); }
+        }
+
+        public OnlineCard(OnlineCardType type = OnlineCardType.Unknown)
+        {
+            _type = type;
+        }
+    }
+
+    public enum OnlineCardType
+    {
+        Unknown,
+        Link,
+        Virus
+    }
+
+    public class FirewallCard : Card
     {
 
     }
-
-    public class LinkCard : OnlineCard
-    {
-
-    }
-
 }

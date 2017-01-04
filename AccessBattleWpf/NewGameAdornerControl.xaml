@@ -25,7 +25,7 @@
                 VerticalAlignment="Center" HorizontalAlignment="Right"
                 />
             <TextBox Name="TextBoxPlayerName"
-                Text="{Binding Path=Game.Player1.Name}"
+                Text="{Binding Path=Game.Players[0].Name}"
                 Grid.Column="1" Grid.Row="1" Background="Black" Foreground="White" Margin="5" FontSize="16"
                 VerticalAlignment="Center" HorizontalAlignment="Stretch"
                 />
