@@ -40,18 +40,18 @@ namespace AccessBattle
             return list;
         }
 
-        bool IsMoveAllowed(Player player, Vector position, Vector target)
-        {
+        //bool IsMoveAllowed(Player player, Vector position, Vector target)
+        //{
 
-            return false;
-        }
+        //    return false;
+        //}
 
-        bool Move(Player player, Vector position, Vector target)
-        {
-            if (!IsMoveAllowed(player, position, target))
-                return false;
-            return false;
-        }
+        //bool Move(Player player, Vector position, Vector target)
+        //{
+        //    if (!IsMoveAllowed(player, position, target))
+        //        return false;
+        //    return false;
+        //}
 
         BoardField[] _player1DeploymentFields;
         
@@ -78,10 +78,10 @@ namespace AccessBattle
             { Fields[0,8],Fields[1,8],Fields[2,8],Fields[3,8],Fields[4,8],Fields[5,8],Fields[6,8],Fields[7,8],  };
         }
 
-        public void DeployCard(OnlineCard card, Vector position)
-        {            
-            Fields[position.X, position.Y].Card = card;
-        }
+        //public void DeployCard(OnlineCard card, Vector position)
+        //{            
+        //    Fields[position.X, position.Y].Card = card;
+        //}
     }
 
     public class BoardField : PropChangeNotifier

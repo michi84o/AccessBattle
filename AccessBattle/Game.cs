@@ -26,7 +26,7 @@ namespace AccessBattle
         LinkCard[] LinkCards = new LinkCard[8];
         VirusCard[] VirusCards = new VirusCard[8];
 
-        public DeploymentState DeploymentState { get; private set; }
+        //public DeploymentState DeploymentState { get; private set; }
 
         GamePhase _phase;
         public GamePhase Phase
@@ -83,9 +83,9 @@ namespace AccessBattle
             Player1 = new Player { Name = "Player 1" , PlayerNumber = 1 };
             Player2 = new Player { Name = "Player 2" , PlayerNumber = 2 };
             Board = new Board();
-            DeploymentState = new DeploymentState();
-            for (int i=0; i<8; ++i)
-            {                
+            //DeploymentState = new DeploymentState();
+            for (int i = 0; i < 8; ++i)
+            {
                 LinkCards[i] = new LinkCard();
                 VirusCards[i] = new VirusCard();
             }
@@ -95,13 +95,13 @@ namespace AccessBattle
         }
     }
 
-    public class DeploymentState
-    {
-        public List<OnlineCard> CardsToDeploy { get; private set; }
+    //public class DeploymentState
+    //{
+    //    public List<OnlineCard> CardsToDeploy { get; private set; }
 
-        public DeploymentState()
-        {
-            CardsToDeploy = new List<OnlineCard>();
-        }
-    }
+    //    public DeploymentState()
+    //    {
+    //        CardsToDeploy = new List<OnlineCard>();
+    //    }
+    //}
 }
