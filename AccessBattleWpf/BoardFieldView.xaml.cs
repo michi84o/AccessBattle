@@ -128,6 +128,7 @@ namespace AccessBattleWpf
         #region Mouse Events
         private void CardField_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
         {
+            if (IsMouseCaptured) ReleaseMouseCapture();
             _clickStarted = false;
         }
 
@@ -157,7 +158,7 @@ namespace AccessBattleWpf
         MainWindowViewModel _context;
 
         // TODO: Possible MVVM pattern break?
-        public void Inititialize(BoardField field, Storyboard blinkStoryboard, FrameworkElement blinkStoryboardOwner)
+        public void Initialize(BoardField field, Storyboard blinkStoryboard, FrameworkElement blinkStoryboardOwner)
         {
             _blinkStoryboard = blinkStoryboard;
             _blinkStoryboardOwner = blinkStoryboardOwner;
@@ -173,7 +174,7 @@ namespace AccessBattleWpf
 
         void ViewModel_BlinkStateChanged(object sender, BlinkChangedEventArgs e)
         {
-            if (!e.Position.Equals(_field.Position)) return;
+            if (!e.ForceAll && !e.Position.Equals(_field.Position)) return;
             IsBlinking = _context.GetBlink(_field.Position);
         }
 
@@ -288,6 +289,7 @@ namespace AccessBattleWpf
             if (on)
             {
                 _blinkStoryboard.Children.Add(_blinkAnimation);
+                _isAnimationInStoryboard = true;
                 _blinkStoryboard.Begin(_blinkStoryboardOwner, true);
             }
             else

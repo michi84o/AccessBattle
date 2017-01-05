@@ -25,11 +25,12 @@ namespace AccessBattle
         public bool DidVirusCheck { get; set; }
         public bool Did404NotFound { get; set; }
 
-        public int PlayerNumber = 0;
+        public readonly int PlayerNumber = 0;
         public Socket Connection;
 
-        public Player()
+        public Player(int playerNumber)
         {
+            PlayerNumber = playerNumber;
         }
 
         ~Player()

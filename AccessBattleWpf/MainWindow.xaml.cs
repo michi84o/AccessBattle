@@ -51,11 +51,13 @@ namespace AccessBattleWpf
             {
                 for (int y = 0; y < 10; ++y)
                 {
-                    mainFields[x, y].Inititialize(ViewModel.Game.Board.Fields[x, y], _blinkStoryBoard, this);
+                    mainFields[x, y].Initialize(ViewModel.Game.Board.Fields[x, y], _blinkStoryBoard, this);
                     // Screw MVVM. Im not going to write 64+16 command bindings
                     mainFields[x, y].Clicked += (s,e) => ViewModel.FieldClicked(e.Field);
                 }
             }
+
+            DeploymentControl.Initialize(_blinkStoryBoard, this);
         }
 
         #region Manage Resizing

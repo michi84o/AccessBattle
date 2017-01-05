@@ -18,9 +18,9 @@ namespace AccessBattleWpf
     /// <summary>
     /// Interaction logic for NewGameAdornerControl.xaml
     /// </summary>
-    public partial class NewGameAdornerControl : UserControl
+    public partial class NewGameControl : UserControl
     {
-        public NewGameAdornerControl()
+        public NewGameControl()
         {
             InitializeComponent();
         }

@@ -59,15 +59,15 @@
       <DependentUpon>BoardFieldView.xaml</DependentUpon>
     </Compile>
     <Compile Include="ColorHelper.cs" />
-    <Compile Include="DeploymentAdornerControl.xaml.cs">
-      <DependentUpon>DeploymentAdornerControl.xaml</DependentUpon>
+    <Compile Include="DeploymentControl.xaml.cs">
+      <DependentUpon>DeploymentControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="IStackField.cs" />
     <Compile Include="MainWindowViewModel.cs" />
     <Compile Include="CenteredAdornerContainer.cs" />
     <Compile Include="Misc.cs" />
-    <Compile Include="NewGameAdornerControl.xaml.cs">
-      <DependentUpon>NewGameAdornerControl.xaml</DependentUpon>
+    <Compile Include="NewGameControl.xaml.cs">
+      <DependentUpon>NewGameControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="RelayCommand.cs" />
     <Compile Include="StretchConverter.cs" />
@@ -77,7 +77,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="DeploymentAdornerControl.xaml">
+    <Page Include="DeploymentControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -94,7 +94,7 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="NewGameAdornerControl.xaml">
+    <Page Include="NewGameControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

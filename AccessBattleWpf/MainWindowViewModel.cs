@@ -15,9 +15,11 @@ namespace AccessBattleWpf
     public class BlinkChangedEventArgs : EventArgs
     {
         public Vector Position { get; private set; }
-        public BlinkChangedEventArgs(Vector position)
+        public bool ForceAll { get; private set; }
+        public BlinkChangedEventArgs(Vector position, bool forceAll = false)
         {
             Position = position;
+            ForceAll = forceAll;
         }
     }
 
@@ -41,22 +43,28 @@ namespace AccessBattleWpf
         {
             if (e.PropertyName == "Phase")
             {
+                CurrentDeploymentType = OnlineCardType.Unknown;
+                ResetBlink();
                 switch (_game.Phase)
                 {
                     case GamePhase.Init:
                         break;
                     case GamePhase.Deployment:
                         // Empty deployment fields must be blinking
-                        foreach (var field in Game.Board.Player1DeploymentFields)
+                        foreach (var field in Game.Board.GetPlayerDeploymentFields(1))
                         {
                             SetBlink(field.Position, true);
                         }
+                        LinkCardsToDeploy = 4;
+                        VirusCardsToDeploy = 4;
+                        CurrentDeploymentType = OnlineCardType.Link;
+                        break;
+                    case GamePhase.PlayerTurns:
+
                         break;
                 }
                 OnPropertyChanged("IsNewGamePopupVisible");
                 OnPropertyChanged("IsDeploymentPopupVisible");
-                OnPropertyChanged("IsDeployingLinkCard");
-                OnPropertyChanged("IsDeployingVirusCard");
             }
         }
 
@@ -66,6 +74,16 @@ namespace AccessBattleWpf
 
             var num = (byte)(1 << position.X);
             return (_blinkMap[position.Y] & num) > 0;
+        }
+
+        void ResetBlink()
+        {
+            for (int i = 0; i < 10; ++i)
+            {
+                _blinkMap[i] = 0;
+            }
+            var handler = BlinkStateChanged;
+            if (handler != null) handler(this, new BlinkChangedEventArgs(new Vector(0, 0),true));
         }
 
         bool SetBlink(Vector position, bool isBlinking)
@@ -88,7 +106,25 @@ namespace AccessBattleWpf
         byte[] _blinkMap = new byte[10];
         public byte[] BlinkMap { get { return _blinkMap; } }
 
-        List<BoardField> Player1DeploymentFields;
+        OnlineCardType _currentDeploymentType;
+        public OnlineCardType CurrentDeploymentType
+        {
+            get { return _currentDeploymentType; }
+            set { SetProp(ref _currentDeploymentType, value);  }
+        }
+        int _linkCardsToDeploy;
+        public int LinkCardsToDeploy
+        {
+            get { return _linkCardsToDeploy; }
+            set { SetProp(ref _linkCardsToDeploy, value); }
+        }
+        int _virusCardsToDeploy;
+        public int VirusCardsToDeploy
+        {
+            get { return _virusCardsToDeploy; }
+            set { SetProp(ref _virusCardsToDeploy, value); }
+        }
+
         public void FieldClicked(BoardField field)
         {
             try
@@ -96,50 +132,39 @@ namespace AccessBattleWpf
                 Trace.WriteLine("Field clicked: " + field.Position.X + "," + field.Position.Y);
                 if (_game.Phase == GamePhase.Deployment)
                 {
+                    if (_game.Board.GetPlayerDeploymentFields(1).Contains(field))
+                    {
+                        var cardsOnStack = _game.Board.GetPlayerStackFields(1).FindAll(
+                                o => o.Card != null && o.Card is OnlineCard).ToList();
+                        BoardField fieldToMove = null;
+                        OnlineCardType type = OnlineCardType.Unknown;
+                        if (_currentDeploymentType == OnlineCardType.Link && LinkCardsToDeploy > 0)
+                        {   // Find next link card in stack
 
+                            fieldToMove = cardsOnStack.FirstOrDefault(o => ((OnlineCard)o.Card).Type == OnlineCardType.Link);
+                            type = OnlineCardType.Link;
+                        }
+                        else if (_currentDeploymentType == OnlineCardType.Virus && VirusCardsToDeploy > 0)
+                        {   // Find next virus card in stack
+                            fieldToMove = cardsOnStack.FirstOrDefault(o => ((OnlineCard)o.Card).Type == OnlineCardType.Virus);
+                            type = OnlineCardType.Virus;
+                        }
+                        if (fieldToMove != null)
+                        {
+                            if (_game.ExecuteCommand(_game.CreateMoveCommand(fieldToMove.Position, field.Position)))
+                            {
+                                if (type == OnlineCardType.Link) --LinkCardsToDeploy;
+                                if (type == OnlineCardType.Virus) --VirusCardsToDeploy;
+                            }
+                        }
+                        if (LinkCardsToDeploy == 0 && VirusCardsToDeploy == 0) _game.Phase = GamePhase.PlayerTurns;
+                    }
                 }
-                    //    if (field.IsHighlighted)
-                    //    {
-                    //        if (field.Card != null)
-                    //        {
-                    //            // TODO: turn back card
-                    //            return;
-                    //        }
-                    //        var nextDepField = _game.Board.Player1StackFields.FirstOrDefault(o => o.Card != null);
-                    //        if (nextDepField == null)
-                    //        {
-                    //            Trace.WriteLine("MainWindowViewModel FieldClicked nextDepField is null!!!!!!!!!!");
-                    //            //_game.Phase = GamePhase.Player1Turn; // TODO: Random
-                    //            throw new Exception("MainWindowViewModel FieldClicked nextDepField is null!"); // TODO
-                    //        }
-                    //        field.Card = nextDepField.Card;
-                    //        nextDepField.Card = null;
-                    //    }
-                    //}
-                }
+            }
             finally
             {
                 OnPropertyChanged("IsDeployingLinkCard");
                 OnPropertyChanged("IsDeployingVirusCard");
-            }
-        }
-
-        public bool IsDeployingLinkCard
-        {
-            get
-            {
-                if (_game.Phase != GamePhase.Deployment) return false;
-                var nextDep = _game.Board.Player1StackFields.FirstOrDefault(o => o.Card != null);
-                return nextDep != null && nextDep.Card != null && nextDep.Card is OnlineCard && ((OnlineCard)nextDep.Card).Type == OnlineCardType.Link;
-            }
-        }
-        public bool IsDeployingVirusCard
-        {
-            get
-            {
-                if (_game.Phase != GamePhase.Deployment) return false;
-                var nextDep = _game.Board.Player1StackFields.FirstOrDefault(o => o.Card != null);
-                return nextDep != null && nextDep.Card != null && nextDep.Card is OnlineCard && ((OnlineCard)nextDep.Card).Type == OnlineCardType.Virus;
             }
         }
 

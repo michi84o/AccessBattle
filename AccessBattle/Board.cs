@@ -34,14 +34,20 @@ namespace AccessBattle
 
         #region Little Helpers
         BoardField[] _player1DeploymentFields;
-        public List<BoardField> Player1DeploymentFields
+        BoardField[] _player2DeploymentFields;
+        public List<BoardField> GetPlayerDeploymentFields(int playerNumber)
         {
-            get { return _player1DeploymentFields.ToList(); }
+            if (playerNumber == 1) return _player1DeploymentFields.ToList();
+            if (playerNumber == 2) return _player2DeploymentFields.ToList();
+            return new List<BoardField>();
         }
         BoardField[] _player1StackFields; // First 4 are link fields
-        public List<BoardField> Player1StackFields
+        BoardField[] _player2StackFields; // First 4 are link fields
+        public List<BoardField> GetPlayerStackFields(int playerNumber)
         {
-            get { return _player1StackFields.ToList(); }
+            if (playerNumber == 1) return _player1StackFields.ToList();
+            if (playerNumber == 2) return _player2StackFields.ToList();
+            return new List<BoardField>();
         }
         #endregion
 
@@ -64,8 +70,13 @@ namespace AccessBattle
 
             _player1DeploymentFields = new BoardField[] 
             { Fields[0,0],Fields[1,0],Fields[2,0],Fields[3,1],Fields[4,1],Fields[5,0],Fields[6,0],Fields[7,0] };
+            _player2DeploymentFields = new BoardField[]
+            { Fields[0,7],Fields[1,7],Fields[2,7],Fields[3,6],Fields[4,6],Fields[5,7],Fields[6,7],Fields[7,7] };
+
             _player1StackFields = new BoardField[]
             { Fields[0,8],Fields[1,8],Fields[2,8],Fields[3,8],Fields[4,8],Fields[5,8],Fields[6,8],Fields[7,8] };
+            _player2StackFields = new BoardField[]
+            { Fields[0,9],Fields[1,9],Fields[2,9],Fields[3,9],Fields[4,9],Fields[5,9],Fields[6,9],Fields[7,9] };
         }
 
 

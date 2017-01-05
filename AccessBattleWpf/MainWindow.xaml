@@ -627,17 +627,17 @@
                 x:Name="StackLink4P1" Grid.Column="3" Style="{StaticResource StackField}"
                 DisplayState="StackLinkEmpty" />
         </Grid>
-        <custom:NewGameAdornerControl
+        <custom:NewGameControl
             Grid.Row="0" Grid.Column="0"
             Visibility="{Binding IsNewGamePopupVisible, Converter={StaticResource VisBoolConv}, UpdateSourceTrigger=PropertyChanged}"
             Grid.RowSpan="16" Grid.ColumnSpan="12"
             VerticalAlignment="Center" HorizontalAlignment="Center"/>
-        <custom:DeploymentAdornerControl
+        <custom:DeploymentControl
             Grid.Row="0" Grid.Column="0"
+            x:Name="DeploymentControl"
             Visibility="{Binding IsDeploymentPopupVisible, Converter={StaticResource VisBoolConv}, UpdateSourceTrigger=PropertyChanged}"
             Grid.RowSpan="10" Grid.ColumnSpan="12" Margin="0,0,0,5"
             VerticalAlignment="Bottom" HorizontalAlignment="Center"
-            IsLinkBlinking="{Binding IsDeployingLinkCard}"
-            IsVirusBlinking="{Binding IsDeployingVirusCard}"/>
+            CurrentDeploymentType="{Binding CurrentDeploymentType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
     </Grid>
 </Window>
