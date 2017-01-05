@@ -50,7 +50,13 @@ namespace AccessBattle
             Fields = new BoardField[8, 10];
             for (ushort x = 0; x < 8; ++x)
                 for (ushort y = 0; y < 10; ++y)
-                    Fields[x, y] = new BoardField(x,y);
+                {
+                    var type = BoardFieldType.Main;
+                    if (y > 7) type = BoardFieldType.Stack;
+                    else if ((x > 2 && x < 5) && (y == 0 && y == 7)) type = BoardFieldType.Exit;
+                    Fields[x, y] = new BoardField(x, y, type);
+                }
+                    
 
             OnlineCards = new List<OnlineCard>();
             for (int i = 0; i < 16; ++i)
@@ -89,9 +95,19 @@ namespace AccessBattle
             set { SetProp(ref _card, value); }
         }
 
-        public BoardField(ushort x, ushort y)
+        public BoardFieldType Type { get; private set; }
+
+        public BoardField(ushort x, ushort y, BoardFieldType type)
         {
             Position = new Vector(x,y);
+            Type = type;
         }
+    }
+
+    public enum BoardFieldType
+    {
+        Main,
+        Exit,
+        Stack
     }
 }

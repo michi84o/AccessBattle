@@ -17,6 +17,7 @@ using System.Windows.Shapes;
 using System.ComponentModel;
 using System.Globalization;
 using AccessBattle;
+using System.Windows.Media.Animation;
 
 namespace AccessBattleWpf
 {
@@ -25,12 +26,16 @@ namespace AccessBattleWpf
     /// </summary>
     public partial class MainWindow : Window
     {
-        BoardFieldControl[,] _mainFields;
+        Storyboard _blinkStoryBoard = new Storyboard
+        {
+            Duration = TimeSpan.FromSeconds(2),
+            RepeatBehavior = RepeatBehavior.Forever
+        };
 
         public MainWindow()
         {
             InitializeComponent();
-            _mainFields = new BoardFieldControl[,] // X,Y
+            var mainFields = new BoardFieldView[,] // X,Y
             {
                 // Ignore board orientation for stack fields. First 4 fields are links
                 { A1, A2, A3, A4, A5, A6, A7, A8, StackLink1P1, StackLink1P2 }, // 0,0=A1 / 0,7=A8
@@ -46,9 +51,9 @@ namespace AccessBattleWpf
             {
                 for (int y = 0; y < 10; ++y)
                 {
-                    _mainFields[x, y].SetBoardField(ViewModel.Game.Board.Fields[x, y]);
+                    mainFields[x, y].Inititialize(ViewModel.Game.Board.Fields[x, y], _blinkStoryBoard, this);
                     // Screw MVVM. Im not going to write 64+16 command bindings
-                    _mainFields[x, y].Clicked += (s,e) => ViewModel.FieldClicked(e.Field);
+                    mainFields[x, y].Clicked += (s,e) => ViewModel.FieldClicked(e.Field);
                 }
             }
         }

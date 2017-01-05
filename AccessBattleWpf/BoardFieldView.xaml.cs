@@ -22,27 +22,30 @@ namespace AccessBattleWpf
     /// <summary>
     /// Interaction logic for BoardFieldControl.xaml
     /// </summary>
-    public partial class BoardFieldControl : Border
+    public partial class BoardFieldView : Border
     {
         BoardField _field;
         Color _defaultBackground;
         Color _blinkTargetColor;
-        Storyboard _blinkStoryBoard;
-        public bool IsExitField { get; set; }
-        public bool IsStackField { get; set; }
+
+        Storyboard _blinkStoryboard;
+        ColorAnimation _blinkAnimation;
+        bool _isAnimationInStoryboard;
+        bool _isAnimationInitialized;
+        FrameworkElement _blinkStoryboardOwner;
 
         // Todo: Resource
         static SolidColorBrush EmptyMainBrush = new SolidColorBrush(Color.FromArgb(255, 0x1f, 0x1f, 0x1f));
 
-        BoardFieldControlDisplayState _displayState;
-        public BoardFieldControlDisplayState DisplayState
+        BoardFieldViewDisplayState _displayState;
+        public BoardFieldViewDisplayState DisplayState
         {
             get { return _displayState; }
             set
             {
                 // Reset blinking and force rebuild of storyboard                  
                 IsBlinking = false;
-                _initialized = false;
+                _isAnimationInitialized = false;
 
                 if (_displayState == value) return;
                 _displayState = value;
@@ -68,52 +71,58 @@ namespace AccessBattleWpf
 
                 switch (_displayState)
                 {
-                    case BoardFieldControlDisplayState.StackLinkEmpty:
+                    case BoardFieldViewDisplayState.StackLinkEmpty:
                         LinkGrid.Visibility = Visibility.Visible;
                         Background = Brushes.Black;
                         break;
-                    case BoardFieldControlDisplayState.StackVirusEmpty:
+                    case BoardFieldViewDisplayState.StackVirusEmpty:
                         VirusGrid.Visibility = Visibility.Visible;
                         Background = Brushes.Black;
                         break;                    
-                    case BoardFieldControlDisplayState.MainLink:
-                    case BoardFieldControlDisplayState.StackLink:
+                    case BoardFieldViewDisplayState.MainLink:
+                    case BoardFieldViewDisplayState.StackLink:
                         LinkGrid.Visibility = Visibility.Visible;
                         Background = playerBrush;
                         LinkPath.Stroke = Brushes.White;
                         LinkPath.Fill = Brushes.White;
                         LinkText.Foreground = Brushes.White;
                         break;
-                    case BoardFieldControlDisplayState.MainVirus:
-                    case BoardFieldControlDisplayState.StackVirus:
+                    case BoardFieldViewDisplayState.MainVirus:
+                    case BoardFieldViewDisplayState.StackVirus:
                         VirusGrid.Visibility = Visibility.Visible;
                         Background = playerBrush;
                         VirusPath.Stroke = Brushes.White;
                         VirusPath.Fill = Brushes.White;
                         VirusText.Foreground = Brushes.White;
                         break;
-                    case BoardFieldControlDisplayState.Empty:
-                        if (IsStackField) Background = Brushes.Black;
+                    case BoardFieldViewDisplayState.Empty:
+                        if (_field.Type == BoardFieldType.Stack) Background = Brushes.Black;
                         else Background = EmptyMainBrush;
                         break;
                 }
-
-                // TODO: Solve synchronization Issue
-                //IsBlinking = _field != null && _field.IsHighlighted;
             }
 
         }
 
         public event EventHandler<BoardFieldClickedEventArgs> Clicked;
 
-        public BoardFieldControl()
+        public BoardFieldView()
         {
             InitializeComponent();
             MouseDown += CardField_MouseDown;
             MouseUp += CardField_MouseUp;
             MouseLeave += CardField_MouseLeave;
             Cursor = Cursors.Hand;
-            _displayState = BoardFieldControlDisplayState.Empty;
+            _displayState = BoardFieldViewDisplayState.Empty;
+            var blinkDesk = DependencyPropertyDescriptor.FromProperty(
+                    IsBlinkingProperty, typeof(BoardFieldView));
+            if (blinkDesk != null)
+            {
+                blinkDesk.AddValueChanged(this, (s, e) =>
+                {
+                    Blink(IsBlinking);
+                });
+            }
         }
 
         #region Mouse Events
@@ -145,15 +154,27 @@ namespace AccessBattleWpf
         }
         #endregion
 
+        MainWindowViewModel _context;
+
         // TODO: Possible MVVM pattern break?
-        public void SetBoardField(BoardField field)
+        public void Inititialize(BoardField field, Storyboard blinkStoryboard, FrameworkElement blinkStoryboardOwner)
         {
+            _blinkStoryboard = blinkStoryboard;
+            _blinkStoryboardOwner = blinkStoryboardOwner;
+
             if (_field != null) return; // Can only be set once
             _field = field;
             if (_field == null) return;
+            _context = DataContext as MainWindowViewModel;
+            if (_context != null) WeakEventManager<MainWindowViewModel, BlinkChangedEventArgs>.AddHandler(_context, "BlinkStateChanged", ViewModel_BlinkStateChanged);
             WeakEventManager<BoardField, PropertyChangedEventArgs>.AddHandler(field, "PropertyChanged", Field_PropertyChanged);
             UpdateField();
-            Initialize();
+        }
+
+        void ViewModel_BlinkStateChanged(object sender, BlinkChangedEventArgs e)
+        {
+            if (!e.Position.Equals(_field.Position)) return;
+            IsBlinking = _context.GetBlink(_field.Position);
         }
 
         /// <summary>
@@ -167,44 +188,38 @@ namespace AccessBattleWpf
             {
                 UpdateField();
             }
-            else if (e.PropertyName == "IsHighlighted")
-            {
-                //IsBlinking = _field.IsHighlighted; // TODO: Could be done with dep-prop and databinding
-            }
         }
 
         void UpdateField()
-        {
-            if (IsExitField) return;
-            // Draw stuff here
-            // BAD !!! Removes ViewBox fromExit fields
+        {            
+            if (_field.Type == BoardFieldType.Exit) return;
             if (_field.Card == null)
             {
-                // TODO: Save info about stack panel type somewhere
-                if (IsStackField)
+                if (_field.Type == BoardFieldType.Stack)
                 {
-                    if (DisplayState == BoardFieldControlDisplayState.StackLink) DisplayState = BoardFieldControlDisplayState.StackLinkEmpty;
-                    else if (DisplayState == BoardFieldControlDisplayState.StackVirus) DisplayState = BoardFieldControlDisplayState.StackVirusEmpty;
+                    if (DisplayState == BoardFieldViewDisplayState.StackLink) DisplayState = BoardFieldViewDisplayState.StackLinkEmpty;
+                    else if (DisplayState == BoardFieldViewDisplayState.StackVirus) DisplayState = BoardFieldViewDisplayState.StackVirusEmpty;
                     else
                     {
                         Trace.WriteLine("ERROR! LOST INFO ABOUT STACK PANEL TYPE");
-                        DisplayState = BoardFieldControlDisplayState.Empty;
+                        DisplayState = BoardFieldViewDisplayState.Empty;
                     }
                 }
-                else DisplayState = BoardFieldControlDisplayState.Empty;
+                else DisplayState = BoardFieldViewDisplayState.Empty;
                 return;
             }                
             if (_field.Card is OnlineCard && ((OnlineCard)_field.Card).Type == OnlineCardType.Virus)
-                DisplayState = IsStackField ? BoardFieldControlDisplayState.StackVirus : BoardFieldControlDisplayState.MainVirus;
+                DisplayState = (_field.Type == BoardFieldType.Stack) ? BoardFieldViewDisplayState.StackVirus : BoardFieldViewDisplayState.MainVirus;
             if (_field.Card is OnlineCard && ((OnlineCard)_field.Card).Type == OnlineCardType.Link)
-                DisplayState = IsStackField ? BoardFieldControlDisplayState.StackLink : BoardFieldControlDisplayState.MainLink;
+                DisplayState = (_field.Type == BoardFieldType.Stack) ? BoardFieldViewDisplayState.StackLink : BoardFieldViewDisplayState.MainLink;
+
+            if (_context != null)
+                IsBlinking = _context.GetBlink(_field.Position);
         }
 
-        bool _initialized;
-        void Initialize()
-        {
-            if (_initialized) return;
-            _initialized = true;
+
+        void InitializeAnimation()
+        {            
             var backCol = ((SolidColorBrush)Background).Color;
             _defaultBackground = Color.FromArgb(255, backCol.R, backCol.G, backCol.B);
             // Overwrite Background because its instance is shared between other fields.
@@ -219,60 +234,67 @@ namespace AccessBattleWpf
             if (v < 0.95) v = .95; else v = .05;
             ColorHelper.HsvToRgb(h, s, v, out r, out g, out b);
             _blinkTargetColor = Color.FromArgb(255, r, g, b);
-
-            _blinkStoryBoard = new Storyboard
+            
+            _blinkAnimation = new ColorAnimation(_defaultBackground, _blinkTargetColor, TimeSpan.FromSeconds(1))
             {
-                Duration = TimeSpan.FromSeconds(2),
-                RepeatBehavior = RepeatBehavior.Forever
+                BeginTime = TimeSpan.FromSeconds(0),
+                AutoReverse = true,
             };
-
-            var animation1 = new ColorAnimation(_defaultBackground, _blinkTargetColor, TimeSpan.FromSeconds(1))
-            {
-                BeginTime = TimeSpan.FromSeconds(0)
-            };
-            Storyboard.SetTarget(animation1, this);
-            Storyboard.SetTargetProperty(animation1, new PropertyPath("Background.Color"));
-            _blinkStoryBoard.Children.Add(animation1);
-
-            var animation2 = new ColorAnimation(_blinkTargetColor, _defaultBackground, TimeSpan.FromSeconds(1))
-            {
-                BeginTime = TimeSpan.FromSeconds(1),
-            };
-            Storyboard.SetTarget(animation2, this);
-            Storyboard.SetTargetProperty(animation2, new PropertyPath("Background.Color"));
-            _blinkStoryBoard.Children.Add(animation2);
+            Storyboard.SetTarget(_blinkAnimation, this);
+            Storyboard.SetTargetProperty(_blinkAnimation, new PropertyPath("Background.Color"));
+            _isAnimationInitialized = true;
         }
 
-        //public static readonly DependencyProperty IsBlinkingProperty =
-        //        DependencyProperty.Register("IsBlinking", typeof(bool),
-        //        typeof(CardField), new FrameworkPropertyMetadata(false));
+        public static readonly DependencyProperty IsBlinkingProperty =
+                DependencyProperty.Register("IsBlinking", typeof(bool),
+                typeof(BoardFieldView), new FrameworkPropertyMetadata(false));
 
-        bool _isBlinking;
-        //public bool IsBlinking
-        //{
-        //    get { return (bool)GetValue(IsBlinkingProperty); }
-        //    set { SetValue(IsBlinkingProperty, value); }
-        //}
         public bool IsBlinking
         {
-            get { return _isBlinking; }
-            set
-            {
-                if (_isBlinking == value) return;
-                _isBlinking = value;
-                Blink(_isBlinking);
-            }
+            get { return (bool)GetValue(IsBlinkingProperty); }
+            set { SetValue(IsBlinkingProperty, value); }
         }
 
         void Blink(bool on = true)
         {
-            Initialize();
+            // Check if blinking is really necessary
+            if (_field.Type == BoardFieldType.Exit) return;
+
+            // Always stop the storyboard
+            // Check if it was running
+            bool storyboardWasRunning;
+            try
+            {
+                storyboardWasRunning = (_blinkStoryboard.GetCurrentState(_blinkStoryboardOwner) != ClockState.Stopped);
+            }
+#pragma warning disable CC0003 // Your catch maybe include some Exception
+            catch { storyboardWasRunning = false; }
+#pragma warning restore CC0003 // Your catch maybe include some Exception
+            if (storyboardWasRunning) _blinkStoryboard.Stop(_blinkStoryboardOwner);
+
+            // If our animation was active, remove it
+            if (_isAnimationInStoryboard && _blinkAnimation != null)
+            {
+                _blinkStoryboard.Children.Remove(_blinkAnimation);
+                _isAnimationInStoryboard = false;
+            }
+
+            // If Initialization is required, initialize
+            if (!_isAnimationInitialized || _blinkAnimation == null)
+            {
+                InitializeAnimation();
+            }
+
             if (on)
-                _blinkStoryBoard.Begin(this, true);
+            {
+                _blinkStoryboard.Children.Add(_blinkAnimation);
+                _blinkStoryboard.Begin(_blinkStoryboardOwner, true);
+            }
             else
             {
-                _blinkStoryBoard.Stop(this);
-                _blinkStoryBoard.Seek(TimeSpan.Zero);
+                // if storyboard was running, restart it
+                if (storyboardWasRunning && _blinkStoryboard.Children.Count > 0)
+                    _blinkStoryboard.Begin(_blinkStoryboardOwner, true);
             }
         }
     }

@@ -15,6 +15,16 @@ namespace AccessBattle
         GameOver
     }
 
+    public enum PlayerAction
+    {
+        SelectCard,
+        MoveSelectedCard,
+        TakeSelectedCard,
+        PlaceBoost,
+        TakeBoost,
+        Error404,
+    }
+
     public class Game : PropChangeNotifier
     {
         public Player[] Players { get; private set; }

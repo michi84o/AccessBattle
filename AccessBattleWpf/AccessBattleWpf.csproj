@@ -55,8 +55,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="BoardFieldControl.xaml.cs">
-      <DependentUpon>BoardFieldControl.xaml</DependentUpon>
+    <Compile Include="BoardFieldView.xaml.cs">
+      <DependentUpon>BoardFieldView.xaml</DependentUpon>
     </Compile>
     <Compile Include="ColorHelper.cs" />
     <Compile Include="DeploymentAdornerControl.xaml.cs">
@@ -73,7 +73,7 @@
     <Compile Include="StretchConverter.cs" />
     <Compile Include="VisibilityBoolConverter.cs" />
     <Compile Include="WpfHelper.cs" />
-    <Page Include="BoardFieldControl.xaml">
+    <Page Include="BoardFieldView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

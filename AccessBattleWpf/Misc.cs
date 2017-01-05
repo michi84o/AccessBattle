@@ -16,7 +16,7 @@ namespace AccessBattleWpf
         }
     }
 
-    public enum BoardFieldControlDisplayState
+    public enum BoardFieldViewDisplayState
     {
         Empty,
         MainVirus,

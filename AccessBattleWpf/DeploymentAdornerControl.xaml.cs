@@ -61,9 +61,9 @@ namespace AccessBattleWpf
             var from = Color.FromArgb(255, 10, 10, 10);
             var to = Colors.DarkGray;
             AddBlinkAnimationForTextBlock(LinkText, _linkStoryBoard, from, to);
-            AddBlinkAnimationForTextBlock(LinkNumber, _linkStoryBoard, from, to);
+            //AddBlinkAnimationForTextBlock(LinkNumber, _linkStoryBoard, from, to);
             AddBlinkAnimationForTextBlock(VirusText, _virusStoryBoard, from, to);
-            AddBlinkAnimationForTextBlock(VirusNumber, _virusStoryBoard, from, to);
+            //AddBlinkAnimationForTextBlock(VirusNumber, _virusStoryBoard, from, to);
 
             var blinkDesc = DependencyPropertyDescriptor.FromProperty(IsLinkBlinkingProperty, typeof(DeploymentAdornerControl));
             if (blinkDesc != null)
