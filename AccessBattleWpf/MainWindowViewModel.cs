@@ -83,7 +83,8 @@ namespace AccessBattleWpf
                 _blinkMap[i] = 0;
             }
             var handler = BlinkStateChanged;
-            if (handler != null) handler(this, new BlinkChangedEventArgs(new Vector(0, 0),true));
+            if (handler != null) handler(this, new BlinkChangedEventArgs(new Vector(0, 0), true));
+            if (handler != null) handler(this, new BlinkChangedEventArgs(new Vector(0, 0), true));
         }
 
         bool SetBlink(Vector position, bool isBlinking)
@@ -137,7 +138,7 @@ namespace AccessBattleWpf
                         var cardsOnStack = _game.Board.GetPlayerStackFields(1).FindAll(
                                 o => o.Card != null && o.Card is OnlineCard).ToList();
                         BoardField fieldToMove = null;
-                        OnlineCardType type = OnlineCardType.Unknown;
+                        var type = OnlineCardType.Unknown;
                         if (_currentDeploymentType == OnlineCardType.Link && LinkCardsToDeploy > 0)
                         {   // Find next link card in stack
 
@@ -157,7 +158,12 @@ namespace AccessBattleWpf
                                 if (type == OnlineCardType.Virus) --VirusCardsToDeploy;
                             }
                         }
-                        if (LinkCardsToDeploy == 0 && VirusCardsToDeploy == 0) _game.Phase = GamePhase.PlayerTurns;
+                        if (LinkCardsToDeploy == 0 && VirusCardsToDeploy > 0)
+                            CurrentDeploymentType = OnlineCardType.Virus;
+                        else if (LinkCardsToDeploy > 0 && VirusCardsToDeploy == 0)
+                            CurrentDeploymentType = OnlineCardType.Link;
+                        else if (LinkCardsToDeploy == 0 && VirusCardsToDeploy == 0)
+                            _game.Phase = GamePhase.PlayerTurns;
                     }
                 }
             }

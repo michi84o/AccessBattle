@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -28,11 +29,10 @@ namespace AccessBattleWpf
         Color _defaultBackground;
         Color _blinkTargetColor;
 
-        Storyboard _blinkStoryboard;
+        StoryboardAsyncWrapper _blinkStoryboard;
         ColorAnimation _blinkAnimation;
         bool _isAnimationInStoryboard;
         bool _isAnimationInitialized;
-        FrameworkElement _blinkStoryboardOwner;
 
         // Todo: Resource
         static SolidColorBrush EmptyMainBrush = new SolidColorBrush(Color.FromArgb(255, 0x1f, 0x1f, 0x1f));
@@ -158,11 +158,9 @@ namespace AccessBattleWpf
         MainWindowViewModel _context;
 
         // TODO: Possible MVVM pattern break?
-        public void Initialize(BoardField field, Storyboard blinkStoryboard, FrameworkElement blinkStoryboardOwner)
+        public void Initialize(BoardField field, StoryboardAsyncWrapper blinkStoryboard)
         {
             _blinkStoryboard = blinkStoryboard;
-            _blinkStoryboardOwner = blinkStoryboardOwner;
-
             if (_field != null) return; // Can only be set once
             _field = field;
             if (_field == null) return;
@@ -261,26 +259,8 @@ namespace AccessBattleWpf
             // Check if blinking is really necessary
             if (_field.Type == BoardFieldType.Exit) return;
 
-            // Always stop the storyboard
-            // Check if it was running
-            bool storyboardWasRunning;
-            try
-            {
-                storyboardWasRunning = (_blinkStoryboard.GetCurrentState(_blinkStoryboardOwner) != ClockState.Stopped);
-            }
-#pragma warning disable CC0003 // Your catch maybe include some Exception
-            catch { storyboardWasRunning = false; }
-#pragma warning restore CC0003 // Your catch maybe include some Exception
-            if (storyboardWasRunning) _blinkStoryboard.Stop(_blinkStoryboardOwner);
+            _blinkStoryboard.RemoveAnimation(_blinkAnimation);
 
-            // If our animation was active, remove it
-            if (_isAnimationInStoryboard && _blinkAnimation != null)
-            {
-                _blinkStoryboard.Children.Remove(_blinkAnimation);
-                _isAnimationInStoryboard = false;
-            }
-
-            // If Initialization is required, initialize
             if (!_isAnimationInitialized || _blinkAnimation == null)
             {
                 InitializeAnimation();
@@ -288,15 +268,7 @@ namespace AccessBattleWpf
 
             if (on)
             {
-                _blinkStoryboard.Children.Add(_blinkAnimation);
-                _isAnimationInStoryboard = true;
-                _blinkStoryboard.Begin(_blinkStoryboardOwner, true);
-            }
-            else
-            {
-                // if storyboard was running, restart it
-                if (storyboardWasRunning && _blinkStoryboard.Children.Count > 0)
-                    _blinkStoryboard.Begin(_blinkStoryboardOwner, true);
+                _blinkStoryboard.AddAnimation(_blinkAnimation);
             }
         }
     }

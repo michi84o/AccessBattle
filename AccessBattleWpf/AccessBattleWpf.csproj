@@ -55,6 +55,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AsyncStartingStoryboard.cs" />
     <Compile Include="BoardFieldView.xaml.cs">
       <DependentUpon>BoardFieldView.xaml</DependentUpon>
     </Compile>

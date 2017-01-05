@@ -122,36 +122,16 @@ namespace AccessBattleWpf
         }
 
         // TODO: Possible MVVM pattern break?
-        public void Initialize(Storyboard blinkStoryboard, FrameworkElement blinkStoryboardOwner)
+        public void Initialize(StoryboardAsyncWrapper blinkStoryboard)
         {
             _blinkStoryboard = blinkStoryboard;
-            _blinkStoryboardOwner = blinkStoryboardOwner;
         }
-        Storyboard _blinkStoryboard;
+        StoryboardAsyncWrapper _blinkStoryboard;
         ColorAnimation _blinkAnimation;
-        bool _isAnimationInStoryboard;
         // MainWindow Reference required to synchronize storyboard
-        FrameworkElement _blinkStoryboardOwner;
         void UpdateBlinkState()
         {
-            // Always stop the storyboard
-            // Check if it was running
-            bool storyboardWasRunning;
-            try
-            {
-                storyboardWasRunning = (_blinkStoryboard.GetCurrentState(_blinkStoryboardOwner) != ClockState.Stopped);
-            }
-#pragma warning disable CC0003 // Your catch maybe include some Exception
-            catch { storyboardWasRunning = false; }
-#pragma warning restore CC0003 // Your catch maybe include some Exception
-            if (storyboardWasRunning) _blinkStoryboard.Stop(_blinkStoryboardOwner);
-
-            // If our animation was active, remove it
-            if (_isAnimationInStoryboard && _blinkAnimation != null)
-            {
-                _blinkStoryboard.Children.Remove(_blinkAnimation);
-                _isAnimationInStoryboard = false;
-            }
+            _blinkStoryboard.RemoveAnimation(_blinkAnimation);
 
             if (CurrentDeploymentType != OnlineCardType.Unknown)
             {
@@ -166,17 +146,9 @@ namespace AccessBattleWpf
                 else
                     Storyboard.SetTarget(_blinkAnimation, VirusText);
                 Storyboard.SetTargetProperty(_blinkAnimation, new PropertyPath("Foreground.Color"));
-                _blinkStoryboard.Children.Add(_blinkAnimation);
-                _isAnimationInStoryboard = true;
-                _blinkStoryboard.Begin(_blinkStoryboardOwner, true);
-            }
-            else
-            {
-                // if storyboard was running, restart it
-                if (storyboardWasRunning && _blinkStoryboard.Children.Count > 0)
-                    _blinkStoryboard.Begin(_blinkStoryboardOwner, true);
-            }
 
+                _blinkStoryboard.AddAnimation(_blinkAnimation);
+            }
         }        
     }
 }

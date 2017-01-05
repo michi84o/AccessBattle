@@ -26,15 +26,18 @@ namespace AccessBattleWpf
     /// </summary>
     public partial class MainWindow : Window
     {
-        Storyboard _blinkStoryBoard = new Storyboard
-        {
-            Duration = TimeSpan.FromSeconds(2),
-            RepeatBehavior = RepeatBehavior.Forever
-        };
+        StoryboardAsyncWrapper _blinkStoryBoard;
 
         public MainWindow()
         {
             InitializeComponent();
+            _blinkStoryBoard = new StoryboardAsyncWrapper(
+            new Storyboard
+            {
+                Duration = TimeSpan.FromSeconds(2),
+                RepeatBehavior = RepeatBehavior.Forever
+            }, this);
+
             var mainFields = new BoardFieldView[,] // X,Y
             {
                 // Ignore board orientation for stack fields. First 4 fields are links
@@ -51,13 +54,13 @@ namespace AccessBattleWpf
             {
                 for (int y = 0; y < 10; ++y)
                 {
-                    mainFields[x, y].Initialize(ViewModel.Game.Board.Fields[x, y], _blinkStoryBoard, this);
+                    mainFields[x, y].Initialize(ViewModel.Game.Board.Fields[x, y], _blinkStoryBoard);
                     // Screw MVVM. Im not going to write 64+16 command bindings
                     mainFields[x, y].Clicked += (s,e) => ViewModel.FieldClicked(e.Field);
                 }
             }
 
-            DeploymentControl.Initialize(_blinkStoryBoard, this);
+            DeploymentControl.Initialize(_blinkStoryBoard);
         }
 
         #region Manage Resizing
@@ -74,7 +77,7 @@ namespace AccessBattleWpf
             // Several Resizes are required to fix
             if (WindowState == WindowState.Normal)
             {
-                for (int i = 0; i < 8; ++i)
+                for (int i = 0; i < 4; ++i)
                 {
                     Application.Current.Dispatcher.BeginInvoke((Action)delegate () { Width += 5; }, null);
                     Application.Current.Dispatcher.BeginInvoke((Action)delegate () { Width -= 5; }, null);
