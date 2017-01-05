@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Animation;
 
+// WPF ist just stupid for not letting me use the same snimation clock for all controls
+// This is a workaround to synchronize the blinking of all fields.
+
 namespace AccessBattleWpf
 {
 #pragma warning disable CC0022 // Should dispose object

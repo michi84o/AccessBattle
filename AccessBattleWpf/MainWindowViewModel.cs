@@ -135,13 +135,35 @@ namespace AccessBattleWpf
                 {
                     if (_game.Board.GetPlayerDeploymentFields(1).Contains(field))
                     {
+                        OnlineCardType type = OnlineCardType.Unknown;
+
+                        // Check if field already contains a card:
+                        if (field.Card != null)
+                        {
+                            // Put card back
+                            var stackfields = _game.Board.GetPlayerStackFields(1);
+                            type = ((OnlineCard)field.Card).Type;
+                            int startIndex = 0;
+                            if (type == OnlineCardType.Virus) startIndex = 4;
+                            for (int i = startIndex; i < stackfields.Count; ++i)
+                            {
+                                if (stackfields[i].Card == null)
+                                {
+                                    if (_game.ExecuteCommand(_game.CreateMoveCommand(field.Position, stackfields[i].Position)))
+                                    {
+                                        if (type == OnlineCardType.Link) ++LinkCardsToDeploy;
+                                        if (type == OnlineCardType.Virus) ++VirusCardsToDeploy;
+                                    }
+                                    return;
+                                }
+                            }
+                        }
+
                         var cardsOnStack = _game.Board.GetPlayerStackFields(1).FindAll(
                                 o => o.Card != null && o.Card is OnlineCard).ToList();
                         BoardField fieldToMove = null;
-                        var type = OnlineCardType.Unknown;
                         if (_currentDeploymentType == OnlineCardType.Link && LinkCardsToDeploy > 0)
                         {   // Find next link card in stack
-
                             fieldToMove = cardsOnStack.FirstOrDefault(o => ((OnlineCard)o.Card).Type == OnlineCardType.Link);
                             type = OnlineCardType.Link;
                         }

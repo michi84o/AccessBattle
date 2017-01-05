@@ -123,11 +123,16 @@ namespace AccessBattle
                     var card1 = field1.Card;
                     if (card1 == null || card1.Owner.PlayerNumber != CurrentPlayer)
                     {
-                        Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! Player '"+ CurrentPlayer +"' cannot move cards of his opponent.");
+                        if (card1 == null)
+                            Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! First field has no card to move.");
+                        else 
+                            Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! Player '"+ CurrentPlayer +"' cannot move cards of his opponent.");
                         return false;
                     }
+
                     if (field1.Type == BoardFieldType.Stack)
                     {
+                        // Moving cards from Stack is only allowed during deployment
                         if ( _phase != GamePhase.Deployment)
                         {
                             Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! Card can only be moved from stack during deployment phase");
@@ -143,11 +148,43 @@ namespace AccessBattle
                         field2.Card = field1.Card;
                         field1.Card = null;
                         field2.Card.Location = field2;
+                        return true;
+                    }
+                    if (field1.Type == BoardFieldType.Main)
+                    {
+                        // Putting card back to stack is allowed during deployment or when card is claimed
+                        if (field2.Type == BoardFieldType.Stack)
+                        {
+                            if (_phase == GamePhase.Deployment)
+                            {
+                                // Source field must be a deployment field
+                                if (field2.Card != null || !Board.GetPlayerDeploymentFields(CurrentPlayer).Contains(field1))
+                                {
+                                    Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! Source card is not on deployment field");
+                                    return false;
+                                }
+                                field2.Card = field1.Card;
+                                field1.Card = null;
+                                field2.Card.Location = field2;
+                                return true;
+                            }
+                            else
+                            {
+                                // TODO: Card claimed
+                            }
+                        }
+                    }
+                    if (field1.Type == BoardFieldType.Exit)
+                    {
+                        // Cards are never stored on an exit field
+                        Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! Exit field cannot contain cards");
+                        return false;
                     }
                 }
             }
-
-            return true;
+            Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid!");
+            return false;
         }
+
     }
 }

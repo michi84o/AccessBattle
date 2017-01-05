@@ -26,8 +26,10 @@ namespace AccessBattleWpf
     public partial class BoardFieldView : Border
     {
         BoardField _field;
-        Color _defaultBackground;
+        Color _primaryBackground;
         Color _blinkTargetColor;
+
+        public SolidColorBrush DefaultBackground { get; set; }
 
         StoryboardAsyncWrapper _blinkStoryboard;
         ColorAnimation _blinkAnimation;
@@ -35,7 +37,7 @@ namespace AccessBattleWpf
         bool _isAnimationInitialized;
 
         // Todo: Resource
-        static SolidColorBrush EmptyMainBrush = new SolidColorBrush(Color.FromArgb(255, 0x1f, 0x1f, 0x1f));
+        //static SolidColorBrush EmptyMainBrush = new SolidColorBrush();
 
         BoardFieldViewDisplayState _displayState;
         public BoardFieldViewDisplayState DisplayState
@@ -43,7 +45,7 @@ namespace AccessBattleWpf
             get { return _displayState; }
             set
             {
-                // Reset blinking and force rebuild of storyboard                  
+                // Reset blinking and force rebuild of storyboard
                 IsBlinking = false;
                 _isAnimationInitialized = false;
 
@@ -52,7 +54,7 @@ namespace AccessBattleWpf
 
                 // TODO: Databinding
                 LinkGrid.Visibility = Visibility.Collapsed;
-                VirusGrid.Visibility = Visibility.Collapsed;                
+                VirusGrid.Visibility = Visibility.Collapsed;
                 VirusPath.Stroke = Brushes.DarkGray;
                 VirusPath.Fill = Brushes.DarkGray;
                 LinkPath.Stroke = Brushes.DarkGray;
@@ -62,7 +64,7 @@ namespace AccessBattleWpf
 
                 // TODO: Card and state should not be set separately
                 // Background Color
-                var playerBrush = EmptyMainBrush;
+                var playerBrush = DefaultBackground;
                 if (_field != null && _field.Card != null && _field.Card.Owner != null)
                 {
                     if (_field.Card.Owner.PlayerNumber == 1) playerBrush = Brushes.Blue;
@@ -97,7 +99,7 @@ namespace AccessBattleWpf
                         break;
                     case BoardFieldViewDisplayState.Empty:
                         if (_field.Type == BoardFieldType.Stack) Background = Brushes.Black;
-                        else Background = EmptyMainBrush;
+                        else Background = DefaultBackground;
                         break;
                 }
             }
@@ -109,6 +111,7 @@ namespace AccessBattleWpf
         public BoardFieldView()
         {
             InitializeComponent();
+            DefaultBackground = new SolidColorBrush(Color.FromArgb(255, 0x1f, 0x1f, 0x1f));
             MouseDown += CardField_MouseDown;
             MouseUp += CardField_MouseUp;
             MouseLeave += CardField_MouseLeave;
@@ -161,6 +164,12 @@ namespace AccessBattleWpf
         public void Initialize(BoardField field, StoryboardAsyncWrapper blinkStoryboard)
         {
             _blinkStoryboard = blinkStoryboard;
+            var b = Background as SolidColorBrush;
+            if (b != null)
+            {
+                DefaultBackground = new SolidColorBrush(Color.FromArgb(255,
+                    b.Color.R, b.Color.G, b.Color.B));
+            }
             if (_field != null) return; // Can only be set once
             _field = field;
             if (_field == null) return;
@@ -204,7 +213,10 @@ namespace AccessBattleWpf
                         DisplayState = BoardFieldViewDisplayState.Empty;
                     }
                 }
-                else DisplayState = BoardFieldViewDisplayState.Empty;
+                else
+                    DisplayState = BoardFieldViewDisplayState.Empty;
+                if (_context != null)
+                    IsBlinking = _context.GetBlink(_field.Position);
                 return;
             }                
             if (_field.Card is OnlineCard && ((OnlineCard)_field.Card).Type == OnlineCardType.Virus)
@@ -220,21 +232,21 @@ namespace AccessBattleWpf
         void InitializeAnimation()
         {            
             var backCol = ((SolidColorBrush)Background).Color;
-            _defaultBackground = Color.FromArgb(255, backCol.R, backCol.G, backCol.B);
+            _primaryBackground = Color.FromArgb(255, backCol.R, backCol.G, backCol.B);
             // Overwrite Background because its instance is shared between other fields.
-            Background = new SolidColorBrush(_defaultBackground);
+            Background = new SolidColorBrush(_primaryBackground);
 
-            byte r = _defaultBackground.R;
-            byte g = _defaultBackground.G;
-            byte b = _defaultBackground.B;
+            byte r = _primaryBackground.R;
+            byte g = _primaryBackground.G;
+            byte b = _primaryBackground.B;
             double h, s, v;
             ColorHelper.RgbToHsv(r, g, b, out h, out s, out v);
-            if (s > 0.15) s = .15; else s = .85;
+            if (s > 0.15) s = .15; else if (s>0.01) s = .85;
             if (v < 0.95) v = .95; else v = .05;
             ColorHelper.HsvToRgb(h, s, v, out r, out g, out b);
             _blinkTargetColor = Color.FromArgb(255, r, g, b);
             
-            _blinkAnimation = new ColorAnimation(_defaultBackground, _blinkTargetColor, TimeSpan.FromSeconds(1))
+            _blinkAnimation = new ColorAnimation(_primaryBackground, _blinkTargetColor, TimeSpan.FromSeconds(1))
             {
                 BeginTime = TimeSpan.FromSeconds(0),
                 AutoReverse = true,
