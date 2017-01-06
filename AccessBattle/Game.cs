@@ -43,8 +43,12 @@ namespace AccessBattle
             get { return _phase; }
             set
             {
-                if (SetProp(ref _phase, value))
-                    OnPhaseChanged();
+                if (_phase != value)
+                {
+                    _phase = value;
+                    OnPhaseChanged(); // Should be done before event fires
+                    OnPropertyChanged();
+                }
             }
         }
 
@@ -76,6 +80,13 @@ namespace AccessBattle
             else if (phase == GamePhase.Deployment)
             {
                 CurrentPlayer = 1; // UI can start deployment commands
+            }
+            else if (phase == GamePhase.PlayerTurns)
+            {
+                // TODO: Random
+                /* var rnd = new Random(Guid.NewGuid().GetHashCode());
+                CurrentPlayer = rnd.Next(1, 3); */
+                CurrentPlayer = 1;
             }
         }
 

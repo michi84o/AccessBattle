@@ -42,6 +42,13 @@ namespace AccessBattle
         {
             _type = type;
         }
+
+        public static OnlineCardType GetCardType(Card card)
+        {
+            var c = card as OnlineCard;
+            if (c == null) return OnlineCardType.Unknown;
+            return c.Type;
+        }
     }
 
     public enum OnlineCardType

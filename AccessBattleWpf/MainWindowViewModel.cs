@@ -27,6 +27,7 @@ namespace AccessBattleWpf
     {
         Game _game;
         public Game Game { get {return _game;}}
+        GameAI _gameAI;     
 
         bool _designerMode;
 
@@ -35,6 +36,11 @@ namespace AccessBattleWpf
         public MainWindowViewModel()
         {
             _game = new Game();
+
+            // TODO: Not on network game
+            // Or use this interface for the server
+            _gameAI = new GameAI(_game);
+
             _game.PropertyChanged += Game_PropertyChanged;
             _designerMode = WpfHelper.IsInDesignerMode;
         }
@@ -60,10 +66,21 @@ namespace AccessBattleWpf
                         CurrentDeploymentType = OnlineCardType.Link;
                         break;
                     case GamePhase.PlayerTurns:
-
+                        // TODO: Decide which player starts
+                        Game.CurrentPlayer = 1;
                         break;
                 }
                 OnPropertyChanged("IsNewGamePopupVisible");
+                OnPropertyChanged("IsDeploymentPopupVisible");
+            }
+            else if (e.PropertyName == "CurrentPlayer")
+            {
+                OnPropertyChanged("IsWaitingForPlayer2");
+                // TODO Server P2 move
+                if (_game.CurrentPlayer == 2 && _gameAI != null)
+                {
+                    _gameAI.PlayTurn();
+                }
                 OnPropertyChanged("IsDeploymentPopupVisible");
             }
         }
@@ -126,17 +143,19 @@ namespace AccessBattleWpf
             set { SetProp(ref _virusCardsToDeploy, value); }
         }
 
-        public void FieldClicked(BoardField field)
+        BoardField _currentlySelectedField;
+
+        public async void FieldClicked(BoardField field)
         {
             try
             {
                 Trace.WriteLine("Field clicked: " + field.Position.X + "," + field.Position.Y);
+                #region Deployment
                 if (_game.Phase == GamePhase.Deployment)
                 {
                     if (_game.Board.GetPlayerDeploymentFields(1).Contains(field))
                     {
-                        OnlineCardType type = OnlineCardType.Unknown;
-
+                        var type = OnlineCardType.Unknown;
                         // Check if field already contains a card:
                         if (field.Card != null)
                         {
@@ -185,15 +204,58 @@ namespace AccessBattleWpf
                         else if (LinkCardsToDeploy > 0 && VirusCardsToDeploy == 0)
                             CurrentDeploymentType = OnlineCardType.Link;
                         else if (LinkCardsToDeploy == 0 && VirusCardsToDeploy == 0)
-                            _game.Phase = GamePhase.PlayerTurns;
+                        {
+                            _game.CurrentPlayer = 2;
+                        }
                     }
                 }
+                #endregion
+                #region Deployment
+                else if (_game.Phase == GamePhase.PlayerTurns)
+                {
+                    if (_game.CurrentPlayer != 1) return;
+                    if (_currentlySelectedField == null)
+                    {
+                        if (field.Card != null && field.Card.Owner.PlayerNumber == _game.CurrentPlayer)
+                        {
+                            // TODO Check if field is firewall
+                            // If yes ask player if it should be removed
+                            _currentlySelectedField = field;
+                            SetBlink(field.Position, true);
+                            // TODO: Highlight all fields that card can be moved to
+
+                            // TODO: If Online card, show Boost option
+                        }
+                    }
+                    else if (_currentlySelectedField == field)
+                    {
+                        _currentlySelectedField = null;
+                        SetBlink(field.Position, false);
+                    }
+                    else
+                    {
+                        // Move currently selected card if field empty
+                        if (_game.ExecuteCommand(_game.CreateMoveCommand(
+                            _currentlySelectedField.Position, field.Position)))
+                        {
+                            // TODO?                            
+                        }
+                        SetBlink(field.Position, false);
+                        _currentlySelectedField = null;
+                    }
+                }
+                #endregion
             }
             finally
             {
                 OnPropertyChanged("IsDeployingLinkCard");
                 OnPropertyChanged("IsDeployingVirusCard");
             }
+        }
+
+        public bool IsWaitingForPlayer2
+        {
+            get { return _game.CurrentPlayer == 2; }
         }
 
         public bool IsNewGamePopupVisible
@@ -203,7 +265,7 @@ namespace AccessBattleWpf
 
         public bool IsDeploymentPopupVisible
         {
-            get { return !_designerMode && _game.Phase == GamePhase.Deployment; }
+            get { return !_designerMode && _game.Phase == GamePhase.Deployment && _game.CurrentPlayer == 1; }
         }
 
         public RelayCommand NewGamePopupAccessBattleCommand
