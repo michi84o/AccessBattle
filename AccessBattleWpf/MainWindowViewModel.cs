@@ -69,9 +69,13 @@ namespace AccessBattleWpf
                         // TODO: Decide which player starts
                         Game.CurrentPlayer = 1;
                         break;
+                    case GamePhase.GameOver:
+                        OnPropertyChanged("PlayerWinMessage"); 
+                        break;
                 }
                 OnPropertyChanged("IsNewGamePopupVisible");
                 OnPropertyChanged("IsDeploymentPopupVisible");
+                OnPropertyChanged("IsGameOverPopupVisible");
             }
             else if (e.PropertyName == "CurrentPlayer")
             {
@@ -237,15 +241,13 @@ namespace AccessBattleWpf
                     }
                     else
                     {
-                        // Move currently selected card if field empty
-                        if (_game.ExecuteCommand(_game.CreateMoveCommand(
-                            _currentlySelectedField.Position, field.Position)))
-                        {
-                            if (_game.GetTargetFields(_currentlySelectedField).Contains(field))
-                                _game.ExecuteCommand(_game.CreateMoveCommand(_currentlySelectedField.Position, field.Position));
-                        }
+                        // Move currently selected card if possible
+                        var success = _game.ExecuteCommand(_game.CreateMoveCommand(
+                            _currentlySelectedField.Position, field.Position));
                         ResetBlink();
                         _currentlySelectedField = null;
+                        if (success)
+                            _game.CurrentPlayer = 2;
                     }
                 }
                 #endregion
@@ -257,9 +259,27 @@ namespace AccessBattleWpf
             }
         }
 
-        public bool IsWaitingForPlayer2
+        public string PlayerWinMessage
         {
-            get { return _game.CurrentPlayer == 2; }
+            get
+            {
+                if (_game.WinningPlayer < 1 || _game.WinningPlayer > 2)
+                    return "???";
+
+                var playerName = _game.Players[_game.WinningPlayer - 1].Name;
+                if (playerName.Length > 69) playerName = playerName.Substring(0, 69);
+                return playerName + " WIN";
+            }
+        }
+
+        public bool IsGameOverPopupVisible
+        {
+            get { return _game.Phase == GamePhase.GameOver; }
+        }
+
+        public bool IsWaitingForPlayer2 // TODO: Animate Opacity via storyboard and double animation
+        {
+            get { return _game.CurrentPlayer == 2 && _game.Phase == GamePhase.Deployment; } // TODO: Also show in Turn phase when playing online
         }
 
         public bool IsNewGamePopupVisible

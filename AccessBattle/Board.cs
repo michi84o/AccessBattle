@@ -8,14 +8,14 @@ namespace AccessBattle
     /// <summary>
     /// Board is 8x8 using Chess notation 
     /// as base for position indexes
-    ///   a b ... g h
-    /// 8             8  7
-    /// 7             7  6
-    /// ...         ...
-    /// 2             2  1
-    /// 1             1  0
-    ///   a b ... g h
-    ///   0 1     6 7
+    ///   a b c d e f g h
+    /// 8                 8  7
+    /// 7                 7  6
+    /// ...               ...
+    /// 2                 2  1
+    /// 1                 1  0
+    ///   a b c d e f g h
+    ///   0 1 2 3 4 5 6 7
     /// 
     /// X is horizontal, Y is vertical
     /// (0,0) is a1, (7,7) is h8

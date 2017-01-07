@@ -196,11 +196,17 @@ namespace AccessBattleWpf
             {
                 UpdateField();
             }
+            // TODO: Update Background if Owner of card changes
         }
 
         void UpdateField()
-        {            
-            if (_field.Type == BoardFieldType.Exit) return;
+        {
+            if (_field.Type == BoardFieldType.Exit)
+            {
+                if (_context != null)
+                    IsBlinking = _context.GetBlink(_field.Position);
+                return;
+            }
             if (_field.Card == null)
             {
                 if (_field.Type == BoardFieldType.Stack)
@@ -269,7 +275,7 @@ namespace AccessBattleWpf
         void Blink(bool on = true)
         {
             // Check if blinking is really necessary
-            if (_field.Type == BoardFieldType.Exit) return;
+            //if (_field.Type == BoardFieldType.Exit) return;
 
             _blinkStoryboard.RemoveAnimation(_blinkAnimation);
 

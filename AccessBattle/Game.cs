@@ -36,11 +36,11 @@ namespace AccessBattle
             set { SetProp(ref _currentPlayer, value); }
         }
 
-        bool? _currentPlayerWon;
-        public bool? CurrentPlayerWon
+        int _winningPlayer;
+        public int WinningPlayer
         {
-            get { return _currentPlayerWon; }
-            set { SetProp(ref _currentPlayerWon, value); }
+            get { return _winningPlayer; }
+            set { SetProp(ref _winningPlayer, value); }
         }
 
         public Board Board { get; private set; }
@@ -64,7 +64,7 @@ namespace AccessBattle
             var phase = _phase;
             if (phase == GamePhase.Init)
             {
-                _currentPlayerWon = null;
+                _winningPlayer = 0;
                 for (int x = 0; x < 8; ++x)
                     for (int y = 0; y < 10; ++y)
                         Board.Fields[x, y].Card = null;
@@ -105,7 +105,7 @@ namespace AccessBattle
                 new Player(1) { Name = "Player 1"  },
                 new Player(2) { Name = "Player 2"  }
             };
-            _currentPlayerWon = null;
+            _winningPlayer = 0;
             Board = new Board();
             Phase = GamePhase.Init;
             OnPhaseChanged();
@@ -140,14 +140,23 @@ namespace AccessBattle
                     stackpos = i;
                     break;
                 }
+                if (stackpos == -1) // Happens when card.IsFaceUp and card is virus and link stack is full
+                {
+                    for (int i = 4; i < stacks.Count; ++i)
+                    {
+                        if (stacks[i].Card != null) continue;
+                        stackpos = i;
+                        break;
+                    }
+                }
             }
             // stackpos must have a value by now or stack is full. 
             // Stack can never be full. If more than 6 cards are on the stack, the game is over
             stacks[stackpos].Card = card;
             card.Location.Card = null;
             card.Location = stacks[stackpos];
-            if (CurrentPlayer > 0)
-                card.Owner = Players[CurrentPlayer-1];
+            //if (CurrentPlayer > 0)
+            //    card.Owner = Players[CurrentPlayer-1]; // TODO: Color does not update with this code
             // Check if player won or lost
             int linkCount = 0;
             int virusCount = 0;
@@ -161,12 +170,12 @@ namespace AccessBattle
             }
             if (virusCount >= 4)
             {
-                CurrentPlayerWon = false;
+                _winningPlayer = _currentPlayer == 1 ? 2 : 1;
                 Phase = GamePhase.GameOver;
             }
             if (linkCount >= 4)
             {
-                CurrentPlayerWon = true;
+                _winningPlayer = _currentPlayer == 1 ? 1 : 2;
                 Phase = GamePhase.GameOver;
             }
         }
@@ -249,8 +258,8 @@ namespace AccessBattle
                                 // Currently not valid. Game will do that automatically
                             }
                         }
-                        // Default movement: Main-Main
-                        else if (field2.Type == BoardFieldType.Main)
+                        // Default movement: Main-Main or exit
+                        else if (field2.Type == BoardFieldType.Main || field2.Type == BoardFieldType.Exit)
                         {
                             // GetTargetFields already does some rule checks
                             if (GetTargetFields(field1).Contains(field2))
@@ -267,6 +276,11 @@ namespace AccessBattle
                                     // Reveal card
                                     card.IsFaceUp = true;
                                     PlaceCardOnStack(card);
+                                }
+                                if (field2.Type == BoardFieldType.Exit)
+                                {
+                                    PlaceCardOnStack(field1.Card as OnlineCard);
+                                    return true;
                                 }
                                 field2.Card = field1.Card;
                                 field1.Card = null;
@@ -319,8 +333,8 @@ namespace AccessBattle
                 if (fs[i].Type == BoardFieldType.Exit)
                 {
                     // Exit field is allowed, but only your own one
-                    if (CurrentPlayer == 1 && field.Position.Y == 0) continue;
-                    if (CurrentPlayer == 2 && field.Position.Y == 7) continue;
+                    if (CurrentPlayer == 1 && fs[i].Position.Y == 0) continue;
+                    if (CurrentPlayer == 2 && fs[i].Position.Y == 7) continue;
                 }
                 fields.Add(fs[i]);
             }
@@ -354,8 +368,8 @@ namespace AccessBattle
                         if (fs[i].Type == BoardFieldType.Exit)
                         {
                             // Exit field is allowed, but only your own one
-                            if (CurrentPlayer == 1 && field.Position.Y == 0) continue;
-                            if (CurrentPlayer == 2 && field.Position.Y == 7) continue;
+                            if (CurrentPlayer == 1 && fs[i].Position.Y == 0) continue;
+                            if (CurrentPlayer == 2 && fs[i].Position.Y == 7) continue;
                         }
                         additionalfields.Add(fs[i]);
                     }

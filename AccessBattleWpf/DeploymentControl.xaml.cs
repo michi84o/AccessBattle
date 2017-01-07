@@ -35,6 +35,7 @@ namespace AccessBattleWpf
         }
 
         #region Mouse Events
+        // TODO: Style so that a button can be used
 
         bool _linkClickStarted;
 

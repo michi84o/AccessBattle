@@ -120,5 +120,33 @@ namespace AccessBattleWpf
         }
 
         #endregion
+
+
+        #region TODO
+        // TODO: Style so that a button with command  can be used
+        bool _gameOverClickStarted;
+        private void GameOverMessage_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (IsMouseCaptured) ReleaseMouseCapture(); // Solves problems with Window not closing after click
+            _gameOverClickStarted = false;
+        }
+
+        private void GameOverMessage_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (CaptureMouse())
+            {
+                _gameOverClickStarted = true;
+            }
+        }
+
+        private void GameOverMessage_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (IsMouseCaptured) ReleaseMouseCapture();
+            if (_gameOverClickStarted)
+            {
+                ViewModel.Game.Phase = GamePhase.Init;
+            }
+        }
+        #endregion
     }
 }

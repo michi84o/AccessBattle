@@ -640,7 +640,7 @@
             VerticalAlignment="Bottom" HorizontalAlignment="Center"
             CurrentDeploymentType="{Binding CurrentDeploymentType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
         <Grid
-            Opacity=".6"
+            Opacity=".8"
             Grid.Row="0" Grid.Column="0"
             Visibility="{Binding IsWaitingForPlayer2, Converter={StaticResource VisBoolConv}, UpdateSourceTrigger=PropertyChanged}"
             Grid.RowSpan="16" Grid.ColumnSpan="12" Margin="0,0,0,5"
@@ -654,6 +654,35 @@
                     Foreground="DarkGray" FontSize="24" HorizontalAlignment="Center" Margin="5,0,5,0">
                 </TextBlock>
                 </Border>
+        </Grid>
+        <Grid
+            Grid.Row="0" Grid.Column="0"
+            Visibility="{Binding IsGameOverPopupVisible, Converter={StaticResource VisBoolConv}, UpdateSourceTrigger=PropertyChanged}"
+            Grid.RowSpan="16" Grid.ColumnSpan="12" Margin="0,0,0,0"
+            VerticalAlignment="Center" HorizontalAlignment="Center"
+             >
+            <Border MaxWidth="280"
+                BorderThickness="2" BorderBrush="DarkGray" Margin="2"
+                Background="Black"
+                Name="GameOverMessage"
+                MouseLeave="GameOverMessage_MouseLeave"
+                MouseDown="GameOverMessage_MouseDown"
+                MouseUp="GameOverMessage_MouseUp">
+                <Grid HorizontalAlignment="Center">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0"
+                        Text="GAME OVER"  TextAlignment="Center"
+                        Foreground="DarkGray" FontSize="24" HorizontalAlignment="Center" Margin="5,0,5,0">
+                    </TextBlock>
+                    <TextBlock Grid.Row="1" TextWrapping="Wrap"
+                        Text="{Binding PlayerWinMessage}"  TextAlignment="Center"
+                        Foreground="DarkGray" FontSize="24" HorizontalAlignment="Center" Margin="5,0,5,0">
+                    </TextBlock>
+                </Grid>
+            </Border>
         </Grid>
     </Grid>
 </Window>
