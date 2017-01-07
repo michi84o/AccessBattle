@@ -9,8 +9,8 @@ namespace AccessBattleWpf
 {
     public class BoardFieldClickedEventArgs : EventArgs
     {
-        public BoardField Field { get; private set; }
-        public BoardFieldClickedEventArgs(BoardField field)
+        public BoardFieldViewModel Field { get; private set; }
+        public BoardFieldClickedEventArgs(BoardFieldViewModel field)
         {
             Field = field;
         }

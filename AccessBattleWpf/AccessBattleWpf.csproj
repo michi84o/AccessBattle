@@ -55,10 +55,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="AsyncStartingStoryboard.cs" />
+    <Compile Include="StoryboardAsyncWrapper.cs" />
     <Compile Include="BoardFieldView.xaml.cs">
       <DependentUpon>BoardFieldView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="BoardFieldViewModel.cs" />
     <Compile Include="ColorHelper.cs" />
     <Compile Include="DeploymentControl.xaml.cs">
       <DependentUpon>DeploymentControl.xaml</DependentUpon>

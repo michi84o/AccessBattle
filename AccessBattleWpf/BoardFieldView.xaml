@@ -8,56 +8,97 @@
     mc:Ignorable="d" 
     d:DesignHeight="64" d:DesignWidth="64">
     <Grid>
-        <!-- Add all possible states and just switch visibility -->
-        <Grid 
-            Name="LinkGrid" Visibility="Collapsed">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="3*"/>
-                <RowDefinition Height="1*"/>
-            </Grid.RowDefinitions>
-            <Viewbox Margin="2" Grid.Row="0">
-                <Path Name="LinkPath"
-                    Margin="1"
-                    Fill="DarkGray"
-                    Stroke="DarkGray" StrokeThickness="1"
-                    Data="{StaticResource LinkPath}"/>
-            </Viewbox>
-            <Viewbox Grid.Row="1">
-                <TextBlock 
-                    Name ="LinkText"
-                    Grid.Row="1"
-                    FontFamily="./ExternalResources/#Silkscreen"
-                    FontSize="10" Foreground="DarkGray"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    Text="Link"/>
-            </Viewbox>
+        <Grid Name="CardGrid">
+            <!-- Add all possible states and just switch visibility -->
+            <Grid 
+                Name="LinkGrid" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="3*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+                <Viewbox Margin="2" Grid.Row="0">
+                    <Path Name="LinkPath"
+                        Margin="1"
+                        Fill="DarkGray"
+                        Stroke="DarkGray" StrokeThickness="1"
+                        Data="{StaticResource LinkPath}"/>
+                </Viewbox>
+                <Viewbox Grid.Row="1">
+                    <TextBlock 
+                        Name ="LinkText"
+                        Grid.Row="1"
+                        FontFamily="./ExternalResources/#Silkscreen"
+                        FontSize="10" Foreground="DarkGray"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Text="LINK"/>
+                </Viewbox>
+            </Grid>
+            <Grid 
+                Name="VirusGrid" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="3*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+                <Viewbox Margin="2" Grid.Row="0">
+                    <Path
+                        Name="VirusPath"
+                        Margin="1"
+                        Fill="DarkGray"
+                        Stroke="DarkGray" StrokeThickness="1"
+                        Data="{StaticResource VirusPath}"/>
+                </Viewbox>
+                <Viewbox Grid.Row="1">
+                    <TextBlock 
+                        Name="VirusText"
+                        Grid.Row="1"
+                        FontFamily="./ExternalResources/#Silkscreen"
+                        FontSize="10" Foreground="DarkGray"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Text="VIRUS"/>
+                </Viewbox>
+            </Grid>
         </Grid>
-        <Grid 
-            Name="VirusGrid" Visibility="Collapsed">
+        <Grid
+            Name="LineBoostGrid"
+            Visibility="Collapsed"
+            Opacity="0"
+            >
             <Grid.RowDefinitions>
-                <RowDefinition Height="3*"/>
                 <RowDefinition Height="1*"/>
+                <RowDefinition Height=".6*"/>
             </Grid.RowDefinitions>
             <Viewbox Margin="2" Grid.Row="0">
                 <Path
-                    Name="VirusPath"
+                    Name="LineBoostPath"
                     Margin="1"
-                    Fill="DarkGray"
-                    Stroke="DarkGray" StrokeThickness="1"
-                    Data="{StaticResource VirusPath}"/>
+                    Fill="White"
+                    Stroke="White" StrokeThickness="1"
+                    Data="{StaticResource LineBoostPath}"/>
             </Viewbox>
-            <Viewbox Grid.Row="1">
-                <TextBlock 
-                    Name="VirusText"
-                    Grid.Row="1"
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Viewbox >
+                    <TextBlock Margin="-1"
                     FontFamily="./ExternalResources/#Silkscreen"
-                    FontSize="10" Foreground="DarkGray"
+                    FontSize="10" Foreground="White"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
-                    Text="Virus"/>
-            </Viewbox>
+                    Text="LINE" />
+                </Viewbox>
+                <Viewbox  Grid.Row="2">
+                    <TextBlock Margin="-1"
+                    FontFamily="./ExternalResources/#Silkscreen"
+                    FontSize="10" Foreground="White"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Text="BOOST" />
+                </Viewbox>
+            </Grid>
         </Grid>
-        
     </Grid>
 </Border>

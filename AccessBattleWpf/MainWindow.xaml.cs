@@ -27,16 +27,23 @@ namespace AccessBattleWpf
     public partial class MainWindow : Window
     {
         StoryboardAsyncWrapper _blinkStoryBoard;
+        StoryboardAsyncWrapper _lineBoostStoryBoard;
 
         public MainWindow()
         {
             InitializeComponent();
             _blinkStoryBoard = new StoryboardAsyncWrapper(
-            new Storyboard
-            {
-                Duration = TimeSpan.FromSeconds(2),
-                RepeatBehavior = RepeatBehavior.Forever
-            }, this);
+                new Storyboard
+                {
+                    Duration = TimeSpan.FromSeconds(2),
+                    RepeatBehavior = RepeatBehavior.Forever
+                }, this);
+            _lineBoostStoryBoard = new StoryboardAsyncWrapper(
+                new Storyboard
+                {
+                    Duration = TimeSpan.FromSeconds(6),
+                    RepeatBehavior = RepeatBehavior.Forever
+                }, this);
 
             var mainFields = new BoardFieldView[,] // X,Y
             {
@@ -54,7 +61,7 @@ namespace AccessBattleWpf
             {
                 for (int y = 0; y < 10; ++y)
                 {
-                    mainFields[x, y].Initialize(ViewModel.Game.Board.Fields[x, y], _blinkStoryBoard);
+                    mainFields[x, y].Initialize(new BoardFieldViewModel(ViewModel.Game.Board.Fields[x, y]), _blinkStoryBoard, _lineBoostStoryBoard);
                     // Screw MVVM. Im not going to write 64+16 command bindings
                     mainFields[x, y].Clicked += (s,e) => ViewModel.FieldClicked(e.Field);
                 }

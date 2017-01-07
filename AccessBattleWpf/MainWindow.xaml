@@ -667,7 +667,8 @@
                 Name="GameOverMessage"
                 MouseLeave="GameOverMessage_MouseLeave"
                 MouseDown="GameOverMessage_MouseDown"
-                MouseUp="GameOverMessage_MouseUp">
+                MouseUp="GameOverMessage_MouseUp"
+                Cursor="Hand">
                 <Grid HorizontalAlignment="Center">
                     <Grid.RowDefinitions>
                         <RowDefinition/>
@@ -684,5 +685,49 @@
                 </Grid>
             </Border>
         </Grid>
+        <Border
+            Grid.Row="12" Grid.Column="2"
+            BorderBrush="White" Margin="1"
+            BorderThickness="2" CornerRadius="2"
+            Background="#1F1F1F">
+            <Grid
+            Name="LineBoostGrid"
+            >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height=".6*"/>
+                </Grid.RowDefinitions>
+                <Viewbox Margin="2" Grid.Row="0">
+                    <Path
+                    Name="LineBoostPath"
+                    Margin="1"
+                    Fill="White"
+                    Stroke="White" StrokeThickness="1"
+                    Data="{StaticResource LineBoostPath}"/>
+                </Viewbox>
+                <Grid Grid.Row="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Viewbox >
+                        <TextBlock Margin="-1"
+                    FontFamily="./ExternalResources/#Silkscreen"
+                    FontSize="10" Foreground="White"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Text="LINE" />
+                    </Viewbox>
+                    <Viewbox  Grid.Row="2">
+                        <TextBlock Margin="-1"
+                    FontFamily="./ExternalResources/#Silkscreen"
+                    FontSize="10" Foreground="White"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Text="BOOST" />
+                    </Viewbox>
+                </Grid>
+            </Grid>
+        </Border>
     </Grid>
 </Window>

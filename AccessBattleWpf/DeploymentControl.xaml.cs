@@ -19,7 +19,7 @@ using System.Windows.Shapes;
 namespace AccessBattleWpf
 {
     /// <summary>
-    /// Interaction logic for DeploymentAdornerControl.xaml
+    /// Interaction logic for DeploymentControl.xaml
     /// </summary>
     public partial class DeploymentControl : UserControl
     {

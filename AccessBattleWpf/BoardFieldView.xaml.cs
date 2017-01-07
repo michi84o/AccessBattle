@@ -25,13 +25,22 @@ namespace AccessBattleWpf
     /// </summary>
     public partial class BoardFieldView : Border
     {
-        BoardField _field;
+        BoardFieldViewModel _field;
         Color _primaryBackground;
         Color _blinkTargetColor;
+
+        //Storyboard _lineBoostStoryBoard = new Storyboard()
+        //{
+        //    Duration = TimeSpan.FromSeconds(6),
+        //    RepeatBehavior = RepeatBehavior.Forever
+        //};
+        bool _lineBoostAnimationStarted;
+        List<Timeline> _lineBoostAnimations = new List<Timeline>();
 
         public SolidColorBrush DefaultBackground { get; set; }
 
         StoryboardAsyncWrapper _blinkStoryboard;
+        StoryboardAsyncWrapper _lineBoostStoryboard;
         ColorAnimation _blinkAnimation;
         bool _isAnimationInStoryboard;
         bool _isAnimationInitialized;
@@ -161,9 +170,10 @@ namespace AccessBattleWpf
         MainWindowViewModel _context;
 
         // TODO: Possible MVVM pattern break?
-        public void Initialize(BoardField field, StoryboardAsyncWrapper blinkStoryboard)
+        public void Initialize(BoardFieldViewModel field, StoryboardAsyncWrapper blinkStoryboard, StoryboardAsyncWrapper lineBoostStoryboard)
         {
             _blinkStoryboard = blinkStoryboard;
+            _lineBoostStoryboard = lineBoostStoryboard;
             var b = Background as SolidColorBrush;
             if (b != null)
             {
@@ -175,7 +185,35 @@ namespace AccessBattleWpf
             if (_field == null) return;
             _context = DataContext as MainWindowViewModel;
             if (_context != null) WeakEventManager<MainWindowViewModel, BlinkChangedEventArgs>.AddHandler(_context, "BlinkStateChanged", ViewModel_BlinkStateChanged);
-            WeakEventManager<BoardField, PropertyChangedEventArgs>.AddHandler(field, "PropertyChanged", Field_PropertyChanged);
+            WeakEventManager<BoardFieldViewModel, PropertyChangedEventArgs>.AddHandler(field, "PropertyChanged", Field_PropertyChanged);
+            WeakEventManager<BoardFieldViewModel, EventArgs>.AddHandler(field, "CardChanged", Field_CardChanged);
+
+            // Setup LineBoost Animation
+            var anim1 = new DoubleAnimation(1, 0, TimeSpan.FromSeconds(1)) { BeginTime = TimeSpan.FromSeconds(0) };
+            var anim2 = new DoubleAnimation(0, 1, TimeSpan.FromSeconds(1)) { BeginTime = TimeSpan.FromSeconds(2) };
+            Storyboard.SetTarget(anim1, CardGrid);
+            Storyboard.SetTargetProperty(anim1, new PropertyPath("Opacity"));
+            Storyboard.SetTarget(anim2, CardGrid);
+            Storyboard.SetTargetProperty(anim2, new PropertyPath("Opacity"));
+            //_lineBoostStoryBoard.Children.Add(anim1);
+            //_lineBoostStoryBoard.Children.Add(anim2);
+
+            // Setup LineBoost Animation
+            var anim3 = new DoubleAnimation(0, 1, TimeSpan.FromSeconds(1)) { BeginTime = TimeSpan.FromSeconds(0) };
+            var anim4 = new DoubleAnimation(1, 0, TimeSpan.FromSeconds(1)) { BeginTime = TimeSpan.FromSeconds(2) };
+            Storyboard.SetTarget(anim3, LineBoostGrid);
+            Storyboard.SetTargetProperty(anim3, new PropertyPath("Opacity"));
+            Storyboard.SetTarget(anim4, LineBoostGrid);
+            Storyboard.SetTargetProperty(anim4, new PropertyPath("Opacity"));
+            //_lineBoostStoryBoard.Children.Add(anim3);
+            //_lineBoostStoryBoard.Children.Add(anim4);
+
+            _lineBoostAnimations.Add(anim1);
+            _lineBoostAnimations.Add(anim2);
+            _lineBoostAnimations.Add(anim3);
+            _lineBoostAnimations.Add(anim4);
+
+
             UpdateField();
         }
 
@@ -183,6 +221,11 @@ namespace AccessBattleWpf
         {
             if (!e.ForceAll && !e.Position.Equals(_field.Position)) return;
             IsBlinking = _context.GetBlink(_field.Position);
+        }
+
+        void Field_CardChanged(object sender, EventArgs e)
+        {
+            UpdateField();
         }
 
         /// <summary>
@@ -201,6 +244,8 @@ namespace AccessBattleWpf
 
         void UpdateField()
         {
+            UpdateLineBoostAnimation();
+
             if (_field.Type == BoardFieldType.Exit)
             {
                 if (_context != null)
@@ -233,7 +278,6 @@ namespace AccessBattleWpf
             if (_context != null)
                 IsBlinking = _context.GetBlink(_field.Position);
         }
-
 
         void InitializeAnimation()
         {            
@@ -288,6 +332,36 @@ namespace AccessBattleWpf
             {
                 _blinkStoryboard.AddAnimation(_blinkAnimation);
             }
+        }
+
+        
+        void UpdateLineBoostAnimation()
+        {
+            bool shouldAnimate =
+                _field.Card != null &&
+                _field.Card is OnlineCard &&
+                ((OnlineCard)_field.Card).HasBoost && 
+                _field.Type == BoardFieldType.Main;
+
+            if (_lineBoostAnimationStarted == shouldAnimate) return;
+
+            if (_lineBoostAnimationStarted)
+            {
+                LineBoostGrid.Visibility = Visibility.Collapsed;
+                //_lineBoostStoryBoard.Stop(this);
+                foreach (var tl in _lineBoostAnimations)
+                    _lineBoostStoryboard.RemoveAnimation(tl);
+                _lineBoostAnimationStarted = false;
+            }
+            else
+            {
+                LineBoostGrid.Visibility = Visibility.Visible;
+                //_lineBoostStoryBoard.Begin(this, true);
+                foreach (var tl in _lineBoostAnimations)
+                    _lineBoostStoryboard.AddAnimation(tl);
+                _lineBoostAnimationStarted = true;
+            }
+
         }
     }
 }

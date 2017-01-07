@@ -104,13 +104,19 @@ namespace AccessBattleWpf
 
         public void AddAnimation(Timeline timeline)
         {
-            _manageList.Add(new ManageItem(timeline, ManageAction.Add));
+            lock (_manageList)
+            {
+                _manageList.Add(new ManageItem(timeline, ManageAction.Add));
+            }
             _managerTask = _managerTask.ContinueWith((o) => Manage());
         }
 
         public void RemoveAnimation(Timeline timeline)
         {
-            _manageList.Add(new ManageItem(timeline, ManageAction.Remove));
+            lock (_manageList)
+            {
+                _manageList.Add(new ManageItem(timeline, ManageAction.Remove));
+            }
             _managerTask = _managerTask.ContinueWith((o) => Manage());
         }
 

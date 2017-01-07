@@ -147,9 +147,9 @@ namespace AccessBattleWpf
             set { SetProp(ref _virusCardsToDeploy, value); }
         }
 
-        BoardField _currentlySelectedField;
+        BoardFieldViewModel _currentlySelectedField;
 
-        public async void FieldClicked(BoardField field)
+        public async void FieldClicked(BoardFieldViewModel field)
         {
             try
             {
@@ -157,7 +157,7 @@ namespace AccessBattleWpf
                 #region Deployment
                 if (_game.Phase == GamePhase.Deployment)
                 {
-                    if (_game.Board.GetPlayerDeploymentFields(1).Contains(field))
+                    if (_game.Board.GetPlayerDeploymentFields(1).Contains(field.Field))
                     {
                         var type = OnlineCardType.Unknown;
                         // Check if field already contains a card:
@@ -227,7 +227,7 @@ namespace AccessBattleWpf
                             _currentlySelectedField = field;
                             SetBlink(field.Position, true);
                             // Highlight all fields that card can be moved to
-                            foreach (var f in _game.GetTargetFields(field))
+                            foreach (var f in _game.GetTargetFields(field.Field))
                             {
                                 SetBlink(f.Position, true);
                             }
