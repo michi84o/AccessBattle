@@ -36,6 +36,13 @@ namespace AccessBattle
             set { SetProp(ref _currentPlayer, value); }
         }
 
+        bool? _currentPlayerWon;
+        public bool? CurrentPlayerWon
+        {
+            get { return _currentPlayerWon; }
+            set { SetProp(ref _currentPlayerWon, value); }
+        }
+
         public Board Board { get; private set; }
         GamePhase _phase;
         public GamePhase Phase
@@ -57,6 +64,7 @@ namespace AccessBattle
             var phase = _phase;
             if (phase == GamePhase.Init)
             {
+                _currentPlayerWon = null;
                 for (int x = 0; x < 8; ++x)
                     for (int y = 0; y < 10; ++y)
                         Board.Fields[x, y].Card = null;
@@ -96,7 +104,8 @@ namespace AccessBattle
             {
                 new Player(1) { Name = "Player 1"  },
                 new Player(2) { Name = "Player 2"  }
-            };            
+            };
+            _currentPlayerWon = null;
             Board = new Board();
             Phase = GamePhase.Init;
             OnPhaseChanged();
@@ -105,6 +114,61 @@ namespace AccessBattle
         public string CreateMoveCommand(Vector pos1, Vector pos2)
         {
             return string.Format("mv {0},{1},{2},{3}", pos1.X, pos1.Y, pos2.X, pos2.Y);
+        }
+
+        void PlaceCardOnStack(OnlineCard card)
+        {
+            if (card == null) return;
+            var stacks = Board.GetPlayerStackFields(CurrentPlayer);
+            // First 4 fields are reserved for link cards, others for viruses
+            // If a card is not revealed it is treated as a link card            
+            int stackpos = -1;
+            if (card.IsFaceUp && card.Type == OnlineCardType.Virus)
+            {
+                for (int i = 4; i < stacks.Count; ++i)
+                {
+                    if (stacks[i].Card != null) continue;
+                    stackpos = i;
+                    break;
+                }
+            }
+            if (stackpos == -1)
+            {
+                for (int i = 0; i < 4 && i < stacks.Count; ++i)
+                {
+                    if (stacks[i].Card != null) continue;
+                    stackpos = i;
+                    break;
+                }
+            }
+            // stackpos must have a value by now or stack is full. 
+            // Stack can never be full. If more than 6 cards are on the stack, the game is over
+            stacks[stackpos].Card = card;
+            card.Location.Card = null;
+            card.Location = stacks[stackpos];
+            if (CurrentPlayer > 0)
+                card.Owner = Players[CurrentPlayer-1];
+            // Check if player won or lost
+            int linkCount = 0;
+            int virusCount = 0;
+            foreach (var field in stacks)
+            {
+                var c = field.Card as OnlineCard;
+                if (c == null) continue;
+                if (c.Type == OnlineCardType.Link) ++linkCount;
+                if (c.Type == OnlineCardType.Virus) ++virusCount;
+                // TODO: Network Clients can have unknown cards. Make sure to reveal them first
+            }
+            if (virusCount >= 4)
+            {
+                CurrentPlayerWon = false;
+                Phase = GamePhase.GameOver;
+            }
+            if (linkCount >= 4)
+            {
+                CurrentPlayerWon = true;
+                Phase = GamePhase.GameOver;
+            }
         }
 
         public bool ExecuteCommand(string command)
@@ -181,7 +245,33 @@ namespace AccessBattle
                             }
                             else
                             {
-                                // TODO: Card claimed
+                                // Card claimed
+                                // Currently not valid. Game will do that automatically
+                            }
+                        }
+                        // Default movement: Main-Main
+                        else if (field2.Type == BoardFieldType.Main)
+                        {
+                            // GetTargetFields already does some rule checks
+                            if (GetTargetFields(field1).Contains(field2))
+                            {
+                                // Check if opponents card is claimed
+                                if (field2.Card != null)
+                                {
+                                    var card = field2.Card as OnlineCard;
+                                    if (card == null || card.Owner.PlayerNumber == CurrentPlayer)
+                                    {
+                                        Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! Can only jump onto Online cards of opponent");
+                                        return false;
+                                    }
+                                    // Reveal card
+                                    card.IsFaceUp = true;
+                                    PlaceCardOnStack(card);
+                                }
+                                field2.Card = field1.Card;
+                                field1.Card = null;
+                                field2.Card.Location = field2;
+                                return true;
                             }
                         }
                     }
@@ -197,5 +287,88 @@ namespace AccessBattle
             return false;
         }
 
+        public List<BoardField> GetTargetFields(BoardField field)
+        {
+            var fields = new List<BoardField>();
+            if (field == null || field.Card == null || field.Card.Owner.PlayerNumber != CurrentPlayer)
+                return fields;
+
+            var card = field.Card as OnlineCard;
+            if (card == null) return fields; // Firewall
+
+            var p = field.Position;
+
+            // without boost there are 4 possible locations
+            var fs = new BoardField[4];
+            if (p.Y > 0 && p.Y <= 7) // Down
+                fs[0] = Board.Fields[p.X, p.Y - 1];
+            if (p.Y >= 0 && p.Y < 7) // Up
+                fs[1] = Board.Fields[p.X, p.Y + 1];
+            if (p.X > 0 && p.X <= 7 && p.Y <= 7) // Left;  Mask out stack fields
+                fs[2] = Board.Fields[p.X - 1, p.Y];
+            if (p.X >= 0 && p.X < 7 && p.Y <= 7) // Right
+                fs[3] = Board.Fields[p.X + 1, p.Y];
+
+            // Moves on opponents cards are allowed, move on own card not
+            for (int i = 0; i < 4; ++i)
+            {
+                if (fs[i] == null) continue;
+                if (fs[i].Card != null && fs[i].Card.Owner.PlayerNumber == CurrentPlayer) continue;
+                if (fs[i].Card != null && !(fs[i].Card is OnlineCard)) continue; // Can only jump on online cards
+                if (fs[i].Type == BoardFieldType.Stack) continue;
+                if (fs[i].Type == BoardFieldType.Exit)
+                {
+                    // Exit field is allowed, but only your own one
+                    if (CurrentPlayer == 1 && field.Position.Y == 0) continue;
+                    if (CurrentPlayer == 2 && field.Position.Y == 7) continue;
+                }
+                fields.Add(fs[i]);
+            }
+
+            // Boost can add additional fields
+            if (card.HasBoost)
+            {
+                // The same checks as above apply for all fields
+                var additionalfields = new List<BoardField>();
+                foreach (var f in fields)
+                {
+                    // Ignore field if it it an exit field or has an opponents card
+                    if (f.Card != null || f.Type == BoardFieldType.Exit) continue;
+
+                    fs = new BoardField[4];
+                    p = f.Position;
+                    if (p.Y > 0 && p.Y <= 7)
+                        fs[0] = Board.Fields[p.X, p.Y - 1];
+                    if (p.Y >= 0 && p.Y < 7)
+                        fs[1] = Board.Fields[p.X, p.Y + 1];
+                    if (p.X > 0 && p.X <= 7 && p.Y <= 7) // No Stack fields!
+                        fs[2] = Board.Fields[p.X - 1, p.Y];
+                    if (p.X >= 0 && p.X < 7 && p.Y <= 7) // No Stack fields!
+                        fs[3] = Board.Fields[p.X + 1, p.Y];
+
+                    for (int i = 0; i < 4; ++i)
+                    {
+                        if (fs[i] == null) continue;
+                        if (fs[i].Card != null && fs[i].Card.Owner.PlayerNumber == CurrentPlayer) continue;
+                        if (fs[i].Type == BoardFieldType.Stack) continue;
+                        if (fs[i].Type == BoardFieldType.Exit)
+                        {
+                            // Exit field is allowed, but only your own one
+                            if (CurrentPlayer == 1 && field.Position.Y == 0) continue;
+                            if (CurrentPlayer == 2 && field.Position.Y == 7) continue;
+                        }
+                        additionalfields.Add(fs[i]);
+                    }
+                }
+
+                foreach (var f in additionalfields)
+                {
+                    if (!fields.Contains(f))
+                        fields.Add(f);
+                }
+            }
+
+            return fields;
+        }
     }
 }

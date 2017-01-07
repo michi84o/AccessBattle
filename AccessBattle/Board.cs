@@ -7,14 +7,15 @@ namespace AccessBattle
 {
     /// <summary>
     /// Board is 8x8 using Chess notation 
-    /// as base for positions
+    /// as base for position indexes
     ///   a b ... g h
-    /// 8             8
-    /// 7             7
+    /// 8             8  7
+    /// 7             7  6
     /// ...         ...
-    /// 2             2
-    /// 1             1
+    /// 2             2  1
+    /// 1             1  0
     ///   a b ... g h
+    ///   0 1     6 7
     /// 
     /// X is horizontal, Y is vertical
     /// (0,0) is a1, (7,7) is h8
@@ -59,7 +60,7 @@ namespace AccessBattle
                 {
                     var type = BoardFieldType.Main;
                     if (y > 7) type = BoardFieldType.Stack;
-                    else if ((x > 2 && x < 5) && (y == 0 && y == 7)) type = BoardFieldType.Exit;
+                    else if ((x > 2 && x < 5) && (y == 0 || y == 7)) type = BoardFieldType.Exit;
                     Fields[x, y] = new BoardField(x, y, type);
                 }
                     

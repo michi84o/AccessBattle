@@ -210,7 +210,7 @@ namespace AccessBattleWpf
                     }
                 }
                 #endregion
-                #region Deployment
+                #region PlayerTurns
                 else if (_game.Phase == GamePhase.PlayerTurns)
                 {
                     if (_game.CurrentPlayer != 1) return;
@@ -222,15 +222,18 @@ namespace AccessBattleWpf
                             // If yes ask player if it should be removed
                             _currentlySelectedField = field;
                             SetBlink(field.Position, true);
-                            // TODO: Highlight all fields that card can be moved to
-
+                            // Highlight all fields that card can be moved to
+                            foreach (var f in _game.GetTargetFields(field))
+                            {
+                                SetBlink(f.Position, true);
+                            }
                             // TODO: If Online card, show Boost option
                         }
                     }
                     else if (_currentlySelectedField == field)
                     {
                         _currentlySelectedField = null;
-                        SetBlink(field.Position, false);
+                        ResetBlink();
                     }
                     else
                     {
@@ -238,9 +241,10 @@ namespace AccessBattleWpf
                         if (_game.ExecuteCommand(_game.CreateMoveCommand(
                             _currentlySelectedField.Position, field.Position)))
                         {
-                            // TODO?                            
+                            if (_game.GetTargetFields(_currentlySelectedField).Contains(field))
+                                _game.ExecuteCommand(_game.CreateMoveCommand(_currentlySelectedField.Position, field.Position));
                         }
-                        SetBlink(field.Position, false);
+                        ResetBlink();
                         _currentlySelectedField = null;
                     }
                 }
