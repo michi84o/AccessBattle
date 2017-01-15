@@ -5,14 +5,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:custom="clr-namespace:AccessBattleWpf"
         mc:Ignorable="d"
-        Title="MainWindow" MinWidth="300"  Width="345" MinHeight="400" Height="548"
-        SizeChanged="Window_SizeChanged"
-        StateChanged="Window_StateChanged">
+        MinWidth="310" MinHeight="480"
+        Width="424" Height="646"
+        Title="MainWindow"
+        Background="Black">
     <Window.DataContext>
         <custom:MainWindowViewModel x:Name="ViewModel" />
     </Window.DataContext>
     <Window.Resources>
         <ResourceDictionary>
+            <GridLength x:Key="FieldDim">50</GridLength>
             <!--<custom:StretchConverter x:Key="StretchConv1" StretchFactor="1.5"/>-->
             <custom:VisibilityBoolConverter x:Key="VisBoolConv"/>
             <SolidColorBrush x:Key="MainFieldBorderColor" Color="OliveDrab"/>
@@ -30,7 +32,7 @@
                 <Setter Property="CornerRadius" Value="2"/>
                 <Setter Property="BorderBrush" Value="{StaticResource MainFieldBorderColor}"/>
                 <Setter Property="Background" Value="#1F1F1F"/>
-                <Setter Property="Margin" Value="1" />
+                <Setter Property="Margin" Value="1"/>
             </Style>
             <Thickness x:Key="BoardBorderThickness">4</Thickness>
             <CornerRadius x:Key="BoardBorderCornerRadius">4</CornerRadius>
@@ -49,39 +51,41 @@
             </StreamGeometry>
         </ResourceDictionary>
     </Window.Resources>
-    <Grid Background="Black" Name="MainGrid">
+    <Viewbox Name="MainViewBox" Stretch="Uniform">
+    <Grid 
+        Background="Black" Name="MainGrid">
         <!--<custom:BoardCanvas/>-->
         <!--16 rows-->
         <Grid.RowDefinitions>
             <RowDefinition Name="RowEdgeUpper" Height="0"/>
-            <RowDefinition Name="RowStackP1" />
+            <RowDefinition Name="RowStackP1" Height="{StaticResource FieldDim}" />
             <RowDefinition Name="RowBorderUpper" Height="{StaticResource BoardBorderGridThickness}"/>
-            <RowDefinition Name="RowServerP1"/>
-            <RowDefinition Name="Row8"/>
-            <RowDefinition Name="Row7"/>
-            <RowDefinition Name="Row6"/>
-            <RowDefinition Name="Row5"/>
-            <RowDefinition Name="Row4"/>
-            <RowDefinition Name="Row3"/>
-            <RowDefinition Name="Row2"/>
-            <RowDefinition Name="Row1"/>
-            <RowDefinition Name="RowServerP2" />
+            <RowDefinition Name="RowServerP1" Height="{StaticResource FieldDim}"/>
+            <RowDefinition Name="Row8" Height="{StaticResource FieldDim}"/>
+            <RowDefinition Name="Row7" Height="{StaticResource FieldDim}" />
+            <RowDefinition Name="Row6" Height="{StaticResource FieldDim}"/>
+            <RowDefinition Name="Row5" Height="{StaticResource FieldDim}"/>
+            <RowDefinition Name="Row4" Height="{StaticResource FieldDim}"/>
+            <RowDefinition Name="Row3" Height="{StaticResource FieldDim}"/>
+            <RowDefinition Name="Row2" Height="{StaticResource FieldDim}"/>
+            <RowDefinition Name="Row1" Height="{StaticResource FieldDim}"/>
+            <RowDefinition Name="RowServerP2" Height="{StaticResource FieldDim}" />
             <RowDefinition Name="BorderLower" Height="{StaticResource BoardBorderGridThickness}"/>
-            <RowDefinition Name="RowStackP2" />
+            <RowDefinition Name="RowStackP2" Height="{StaticResource FieldDim}" />
             <RowDefinition Name="RowEdgeLower" Height="0"/>
         </Grid.RowDefinitions>
         <!--12 Columns-->
         <Grid.ColumnDefinitions>
             <ColumnDefinition Name="ColumnEdgeLeft" Width="0"/>
             <ColumnDefinition Name="BorderLeft" Width="{StaticResource BoardBorderGridThickness}"/>
-            <ColumnDefinition Name="Column8"/>
-            <ColumnDefinition Name="Column7"/>
-            <ColumnDefinition Name="Column6"/>
-            <ColumnDefinition Name="Column5"/>
-            <ColumnDefinition Name="Column4"/>
-            <ColumnDefinition Name="Column3"/>
-            <ColumnDefinition Name="Column2"/>
-            <ColumnDefinition Name="Column1"/>
+            <ColumnDefinition Name="Column8" Width="{StaticResource FieldDim}"/>
+            <ColumnDefinition Name="Column7" Width="{StaticResource FieldDim}"/>
+            <ColumnDefinition Name="Column6" Width="{StaticResource FieldDim}"/>
+            <ColumnDefinition Name="Column5" Width="{StaticResource FieldDim}"/>
+            <ColumnDefinition Name="Column4" Width="{StaticResource FieldDim}"/>
+            <ColumnDefinition Name="Column3" Width="{StaticResource FieldDim}"/>
+            <ColumnDefinition Name="Column2" Width="{StaticResource FieldDim}"/>
+            <ColumnDefinition Name="Column1" Width="{StaticResource FieldDim}"/>
             <ColumnDefinition Name="BorderRight" Width="{StaticResource BoardBorderGridThickness}"/>
             <ColumnDefinition Name="ColumnEdgeRight" Width="0"/>
         </Grid.ColumnDefinitions>
@@ -136,7 +140,7 @@
             x:Name="D8" 
             Style="{StaticResource MainField}" VerticalAlignment="Bottom"            
             Grid.Row="3" Grid.RowSpan="2" Grid.Column="5"
-            Height="50">
+            Height="60">
             <Viewbox
                 Margin="2">
                 <Grid>
@@ -166,7 +170,7 @@
             x:Name="E8"
             Style="{StaticResource MainField}" VerticalAlignment="Bottom"            
             Grid.Row="3" Grid.RowSpan="2" Grid.Column="6"
-            Height="50">
+            Height="60">
             <Viewbox
                 Margin="2">
                 <Grid>
@@ -427,7 +431,7 @@
             x:Name="D1" 
             Style="{StaticResource MainField}" VerticalAlignment="Top"            
             Grid.Row="11" Grid.RowSpan="2" Grid.Column="5"
-            Height="50">
+            Height="60">
             <Viewbox
                 Margin="2">
                 <Grid RenderTransformOrigin="0.5,0.5">
@@ -460,7 +464,7 @@
             x:Name="E1"
             Style="{StaticResource MainField}" VerticalAlignment="Top"            
             Grid.Row="11" Grid.RowSpan="2" Grid.Column="6"
-            Height="50">
+            Height="60">
             <Viewbox
                 Margin="2">
                 <Grid RenderTransformOrigin="0.5,0.5">
@@ -640,7 +644,7 @@
             VerticalAlignment="Bottom" HorizontalAlignment="Center"
             CurrentDeploymentType="{Binding CurrentDeploymentType, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
         <Grid
-            Opacity=".8"
+            Opacity=".6"
             Grid.Row="0" Grid.Column="0"
             Visibility="{Binding IsWaitingForPlayer2, Converter={StaticResource VisBoolConv}, UpdateSourceTrigger=PropertyChanged}"
             Grid.RowSpan="16" Grid.ColumnSpan="12" Margin="0,0,0,5"
@@ -650,8 +654,8 @@
                 BorderThickness="2" BorderBrush="DarkGray" Margin="2"
                 Background="Black" >
                 <TextBlock  
-                    Text="Waiting&#x0a; for Player 2"  TextAlignment="Center"
-                    Foreground="DarkGray" FontSize="24" HorizontalAlignment="Center" Margin="5,0,5,0">
+                    Text="Waiting&#x0a; for Opponent"  TextAlignment="Center"
+                    Foreground="DarkGray" FontSize="26" HorizontalAlignment="Center" Margin="5,0,5,0">
                 </TextBlock>
                 </Border>
         </Grid>
@@ -661,7 +665,7 @@
             Grid.RowSpan="16" Grid.ColumnSpan="12" Margin="0,0,0,0"
             VerticalAlignment="Center" HorizontalAlignment="Center"
              >
-            <Border MaxWidth="280"
+            <Border MaxWidth="400"
                 BorderThickness="2" BorderBrush="DarkGray" Margin="2"
                 Background="Black"
                 Name="GameOverMessage"
@@ -676,18 +680,18 @@
                     </Grid.RowDefinitions>
                     <TextBlock Grid.Row="0"
                         Text="GAME OVER"  TextAlignment="Center"
-                        Foreground="DarkGray" FontSize="24" HorizontalAlignment="Center" Margin="5,0,5,0">
+                        Foreground="DarkGray" FontSize="36" HorizontalAlignment="Center" Margin="5,0,5,0">
                     </TextBlock>
                     <TextBlock Grid.Row="1" TextWrapping="Wrap"
                         Text="{Binding PlayerWinMessage}"  TextAlignment="Center"
-                        Foreground="DarkGray" FontSize="24" HorizontalAlignment="Center" Margin="5,0,5,0">
+                        Foreground="DarkGray" FontSize="26" HorizontalAlignment="Center" Margin="5,0,5,0">
                     </TextBlock>
                 </Grid>
             </Border>
         </Grid>
         <Grid
             Grid.Row="12" Grid.Column="4" Grid.ColumnSpan="4"
-            Background="Black">
+            Background="Black" Visibility="Collapsed">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
@@ -716,4 +720,5 @@
         </Grid>
   
     </Grid>
+    </Viewbox>
 </Window>

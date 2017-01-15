@@ -80,65 +80,6 @@ namespace AccessBattleWpf
             DeploymentControl.Initialize(_blinkStoryBoard);
         }
 
-        #region Manage Resizing
-
-        void Window_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            UpdateBoardLayout();
-        }
-
-        void Window_StateChanged(object sender, EventArgs e)
-        {
-            // Fix Maximize Window Glitch (not fully fixed)
-            // Width was not updated correctly and UpdateBoardLayout() got not final call
-            // Several Resizes are required to fix
-            if (WindowState == WindowState.Normal)
-            {
-                for (int i = 0; i < 4; ++i)
-                {
-                    Application.Current.Dispatcher.BeginInvoke((Action)delegate () { Width += 5; }, null);
-                    Application.Current.Dispatcher.BeginInvoke((Action)delegate () { Width -= 5; }, null);
-                }
-            }
-        }
-
-        void UpdateBoardLayout()
-        {
-            var width = MainGrid.ActualWidth;
-            var height = MainGrid.ActualHeight;
-            Title = "" + width + "x" + height;
-            if (width < 1 || height < 1
-                /*|| width == double.NaN || height == double.NaN*/)
-                return; // TODO
-            var optimalHeight = width * 12 / 8;
-            var optimalWidth = height * 8 / 12;
-            var zero = new Point();
-            if (optimalHeight > height)
-            {
-                zero.X = (width - optimalWidth) / 2;
-                zero.Y = 0;
-            }
-            else
-            {
-                zero.X = 0;
-                zero.Y = (height - optimalHeight) / 2;
-            }
-            ColumnEdgeLeft.Width = new GridLength(zero.X);
-            ColumnEdgeRight.Width = new GridLength(zero.X);
-            RowEdgeUpper.Height = new GridLength(zero.Y);
-            RowEdgeLower.Height = new GridLength(zero.Y);
-
-            D8.Height = Row1.ActualHeight * 1.2;            
-            E8.Height = Row1.ActualHeight * 1.2;
-            D1.Height = Row1.ActualHeight * 1.2;
-            E1.Height = Row1.ActualHeight * 1.2;
-            ViewBoxServerP1.Margin = new Thickness(0,Row1.ActualHeight*0.2 + 1,0,1);
-            ViewBoxServerP2.Margin = new Thickness(0, 1, 0, Row1.ActualHeight * 0.2 + 1);
-        }
-
-        #endregion
-
-
         #region TODO
         // TODO: Style so that a button with command  can be used
         bool _gameOverClickStarted;

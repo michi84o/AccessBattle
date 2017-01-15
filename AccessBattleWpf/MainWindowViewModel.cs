@@ -318,7 +318,7 @@ namespace AccessBattleWpf
                     return "???";
 
                 var playerName = _game.Players[_game.WinningPlayer - 1].Name;
-                if (playerName.Length > 69) playerName = playerName.Substring(0, 69);
+                if (playerName.Length > 160) playerName = playerName.Substring(0, 160);
                 return playerName + " WIN";
             }
         }
