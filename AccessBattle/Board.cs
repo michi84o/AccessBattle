@@ -26,6 +26,10 @@ namespace AccessBattle
     /// Board orientation is ignored
     /// Player1: Fields (0,8) - (7,8)
     /// Player2: Fields (0,9) - (7,9)
+    /// 
+    /// Additional fields: Mainly for UI use
+    /// Player1 Boost Button: Field (0,10)
+    /// Player1 Firewall Button: Field (1,10)
     /// </summary>
     public class Board : PropChangeNotifier
     {
@@ -54,7 +58,7 @@ namespace AccessBattle
 
         public Board()
         {
-            Fields = new BoardField[8, 10];
+            Fields = new BoardField[8, 11];
             for (ushort x = 0; x < 8; ++x)
                 for (ushort y = 0; y < 10; ++y)
                 {
@@ -63,8 +67,13 @@ namespace AccessBattle
                     else if ((x > 2 && x < 5) && (y == 0 || y == 7)) type = BoardFieldType.Exit;
                     Fields[x, y] = new BoardField(x, y, type);
                 }
-                    
 
+            // Place fields for extension row
+            Fields[0, 10] = new BoardField(0, 10, BoardFieldType.LineBoost);
+            Fields[1, 10] = new BoardField(1, 10, BoardFieldType.Firewall);
+            for (ushort x = 2; x < 8; ++x)
+                Fields[x, 10] = new BoardField(x, 10, BoardFieldType.Undefined);
+            
             OnlineCards = new List<OnlineCard>();
             for (int i = 0; i < 16; ++i)
                 OnlineCards.Add(new OnlineCard());
@@ -118,8 +127,11 @@ namespace AccessBattle
 
     public enum BoardFieldType
     {
+        Undefined,
         Main,
         Exit,
-        Stack
+        Stack,
+        LineBoost,
+        Firewall,        
     }
 }

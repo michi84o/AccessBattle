@@ -29,5 +29,7 @@ namespace AccessBattleWpf
         StackLinkEmpty,
         StackVirus,
         StackLink,
+        LineBoost, // Use only for line boost selection field
+        Firewall // Use only for firewall selection field
     }
 }

@@ -19,6 +19,11 @@ using System.Globalization;
 using AccessBattle;
 using System.Windows.Media.Animation;
 
+// TODO: Make board fixed size and put it in a ViewBox to auto-zoom
+// TODO: Own cards blink when clicked while they are on opponents stack
+
+// TODO: Middle of stack area: Show Popup Menu for placing boost or firewall
+
 namespace AccessBattleWpf
 {
     /// <summary>
@@ -66,6 +71,11 @@ namespace AccessBattleWpf
                     mainFields[x, y].Clicked += (s,e) => ViewModel.FieldClicked(e.Field);
                 }
             }
+
+            LineBoostField.Initialize(new BoardFieldViewModel(ViewModel.Game.Board.Fields[0, 10]), _blinkStoryBoard, _lineBoostStoryBoard);
+            LineBoostField.Clicked += (s, e) => ViewModel.FieldClicked(e.Field);
+            FirewallField.Initialize(new BoardFieldViewModel(ViewModel.Game.Board.Fields[1, 10]), _blinkStoryBoard, _lineBoostStoryBoard);
+            FirewallField.Clicked += (s, e) => ViewModel.FieldClicked(e.Field);
 
             DeploymentControl.Initialize(_blinkStoryBoard);
         }

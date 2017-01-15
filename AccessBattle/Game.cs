@@ -26,6 +26,9 @@ namespace AccessBattle
         Error404,
     }
 
+    // TODO: Link card must perform infiltration in a separate turn
+    //       after it enters the exit field
+
     public class Game : PropChangeNotifier
     {
         public Player[] Players { get; private set; }
@@ -116,6 +119,11 @@ namespace AccessBattle
             return string.Format("mv {0},{1},{2},{3}", pos1.X, pos1.Y, pos2.X, pos2.Y);
         }
 
+        public string CreateSetBoostCommand(Vector pos, bool setBoost)
+        {
+            return string.Format("bs {0},{1},{2}", pos.X, pos.Y, setBoost ? 1 : 0);
+        }
+
         void PlaceCardOnStack(OnlineCard card)
         {
             if (card == null) return;
@@ -180,6 +188,14 @@ namespace AccessBattle
             }
         }
 
+        /// <summary>
+        /// Command   Syntax             Example
+        /// -------------------------------------------
+        /// Move      mv x1,y1,x2,y2     mv 0,0,1,0
+        /// Boost     bs x1,y1,e         bs 0,0,1
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
         public bool ExecuteCommand(string command)
         {
             if (string.IsNullOrEmpty(command)) return false;
@@ -200,7 +216,11 @@ namespace AccessBattle
                     uint.TryParse(split[3], out y2))
                 {
                     // Check range
-                    if (x1 > 7 || x2 > 7 || y1 > 9 || y2 > 9) return false;
+                    if (x1 > 7 || x2 > 7 || y1 > 9 || y2 > 9)
+                    {
+                        Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! Out of range.");
+                        return false;
+                    }
                     // Check if move is allowed
                     var field1 = Board.Fields[x1, y1];
                     var field2 = Board.Fields[x2, y2];
@@ -209,15 +229,15 @@ namespace AccessBattle
                     {
                         if (card1 == null)
                             Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! First field has no card to move.");
-                        else 
-                            Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! Player '"+ CurrentPlayer +"' cannot move cards of his opponent.");
+                        else
+                            Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! Player '" + CurrentPlayer + "' cannot move cards of his opponent.");
                         return false;
                     }
 
                     if (field1.Type == BoardFieldType.Stack)
                     {
                         // Moving cards from Stack is only allowed during deployment
-                        if ( _phase != GamePhase.Deployment)
+                        if (_phase != GamePhase.Deployment)
                         {
                             Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! Card can only be moved from stack during deployment phase");
                             return false;
@@ -270,12 +290,14 @@ namespace AccessBattle
                                     var card = field2.Card as OnlineCard;
                                     if (card == null || card.Owner.PlayerNumber == CurrentPlayer)
                                     {
-                                        Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! Can only jump onto Online cards of opponent");
+                                        Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! Can only jump onto online cards of opponent");
                                         return false;
                                     }
                                     // Reveal card
                                     card.IsFaceUp = true;
                                     PlaceCardOnStack(card);
+                                    // Remove boost if applied
+                                    if (card.HasBoost) card.HasBoost = false;
                                 }
                                 if (field2.Type == BoardFieldType.Exit)
                                 {
@@ -297,6 +319,71 @@ namespace AccessBattle
                     }
                 }
             }
+            else if (command.StartsWith("bs ", StringComparison.InvariantCulture) && command.Length > 3)
+            {
+                command = command.Substring(3);
+                split = command.Split(new[] { ',' });
+                if (split.Length != 3) return false;
+                uint x1, y1, enabled;
+                if (uint.TryParse(split[0], out x1) &&
+                    uint.TryParse(split[1], out y1) &&
+                    uint.TryParse(split[2], out enabled))
+                {
+                    // Check range
+                    if (x1 > 7 || y1 > 9 || enabled > 1)
+                    {
+                        Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! Out of range.");
+                        return false;
+                    }
+                    var field1 = Board.Fields[x1, y1];
+                    var card1 = field1.Card;
+                    if (card1 == null || card1.Owner.PlayerNumber != CurrentPlayer)
+                    {
+                        Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! Boost can only be placed on own cards.");
+                        return false;
+                    }
+
+                    // Check if boost is already used
+                    var boostedCard = Board.OnlineCards.FirstOrDefault(
+                        card => card.HasBoost && card.Owner.PlayerNumber == CurrentPlayer);
+                    if (enabled == 1)
+                    {
+                        if (boostedCard != null)
+                        {
+                            Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! Boost is already placed.");
+                            return false;
+                        }
+                        else
+                        {
+                            // Place boost
+                            if (card1 is OnlineCard)
+                            {
+                                ((OnlineCard)card1).HasBoost = true;
+                                return true;
+                            }
+                            else
+                            {
+                                Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! Target is not an online card.");
+                                return false;
+                            }
+                        }
+                    }
+                    else if (enabled == 0)
+                    {
+                        if (boostedCard == card1)
+                        {
+                            boostedCard.HasBoost = false;
+                            return true;
+                        }
+                        else
+                        {
+                            Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! Target has no boost.");
+                            return false;
+                        }
+                    }
+                }
+            }
+
             Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid!");
             return false;
         }

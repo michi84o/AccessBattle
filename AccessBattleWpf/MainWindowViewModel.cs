@@ -51,6 +51,7 @@ namespace AccessBattleWpf
             {
                 CurrentDeploymentType = OnlineCardType.Unknown;
                 ResetBlink();
+                _isLineBoostP1Selected = false;
                 switch (_game.Phase)
                 {
                     case GamePhase.Init:
@@ -99,7 +100,7 @@ namespace AccessBattleWpf
 
         void ResetBlink()
         {
-            for (int i = 0; i < 10; ++i)
+            for (int i = 0; i < 11; ++i)
             {
                 _blinkMap[i] = 0;
             }
@@ -111,8 +112,8 @@ namespace AccessBattleWpf
         bool SetBlink(Vector position, bool isBlinking)
         {
             // horizontal: always 8 fields -> 1 byte
-            // vertical: 10 fields: -> array index
-            if (position.X > 7 || position.Y > 9) return false;
+            // vertical: 11 fields: -> array index
+            if (position.X > 7 || position.Y > 10) return false;
             if (GetBlink(position) == isBlinking) return true; // Nothing to do
 
             // Some bit magic. From good old atmega8 µC programming
@@ -125,7 +126,7 @@ namespace AccessBattleWpf
             return true;
         }
 
-        byte[] _blinkMap = new byte[10];
+        byte[] _blinkMap = new byte[11];
         public byte[] BlinkMap { get { return _blinkMap; } }
 
         OnlineCardType _currentDeploymentType;
@@ -148,8 +149,9 @@ namespace AccessBattleWpf
         }
 
         BoardFieldViewModel _currentlySelectedField;
+        bool _isLineBoostP1Selected;
 
-        public async void FieldClicked(BoardFieldViewModel field)
+        public void FieldClicked(BoardFieldViewModel field)
         {
             try
             {
@@ -224,6 +226,18 @@ namespace AccessBattleWpf
                         {
                             // TODO Check if field is firewall
                             // If yes ask player if it should be removed
+
+                            // Check if Boost should be placed
+                            if (_isLineBoostP1Selected)
+                            {
+                                if (_game.ExecuteCommand(
+                                    _game.CreateSetBoostCommand(field.Position, true)))
+                                {
+                                    _game.CurrentPlayer = 2;
+                                }
+                                return;
+                            }
+
                             _currentlySelectedField = field;
                             SetBlink(field.Position, true);
                             // Highlight all fields that card can be moved to
@@ -231,7 +245,44 @@ namespace AccessBattleWpf
                             {
                                 SetBlink(f.Position, true);
                             }
-                            // TODO: If Online card, show Boost option
+                            // TODO: If Online card, show Boost option ??? 
+                        }
+                        else if (field.Position.Y == 10)
+                        {
+                            // Extension fields
+                            if (field.Position.X == 0)
+                            {
+                                // Line Boost field clicked
+                                // Check if a card already has a line boost
+                                var boostedCard = Game.Board.OnlineCards.FirstOrDefault(card => card.HasBoost && card.Owner.PlayerNumber == _game.CurrentPlayer);
+                                if (boostedCard != null)
+                                {
+                                    // TODO: Signal Main Window to show popup that asks player to remove boost
+                                    boostedCard.HasBoost = false;
+                                    _game.CurrentPlayer = 2;
+                                    return;
+                                }
+                                // No boosted cared
+                                if (_isLineBoostP1Selected)
+                                {
+                                    ResetBlink();
+                                    _isLineBoostP1Selected = false;                                    
+                                }
+                                else
+                                {
+                                    SetBlink(field.Position, true);
+                                    _isLineBoostP1Selected = true;
+                                    // Let all Player cards on the field blink
+                                    var allPlayerCardsOnField = 
+                                        Game.Board.OnlineCards.FindAll(card =>
+                                        card.Owner.PlayerNumber == _game.CurrentPlayer &&
+                                        card.Location.Position.Y < 8);
+                                    foreach (var card in allPlayerCardsOnField)
+                                    {
+                                        SetBlink(card.Location.Position, true);
+                                    }
+                                }
+                            }
                         }
                     }
                     else if (_currentlySelectedField == field)

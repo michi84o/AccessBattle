@@ -110,10 +110,24 @@ namespace AccessBattleWpf
                         if (_field.Type == BoardFieldType.Stack) Background = Brushes.Black;
                         else Background = DefaultBackground;
                         break;
+                    case BoardFieldViewDisplayState.LineBoost:
+                        LineBoostGrid.Visibility = Visibility.Visible;
+                        LineBoostGrid.Opacity = 1;
+                        break;
+                    case BoardFieldViewDisplayState.Firewall:
+                        FirewallGrid.Visibility = Visibility.Visible;
+                        break;
                 }
             }
-
         }
+
+        ///// <summary>
+        ///// Only used for Line Boost or Firewall field
+        ///// </summary>
+        //public bool IsSelected
+        //{
+        //    get; set;
+        //}
 
         public event EventHandler<BoardFieldClickedEventArgs> Clicked;
 
