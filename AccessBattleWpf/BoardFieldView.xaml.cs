@@ -48,6 +48,26 @@ namespace AccessBattleWpf
         // Todo: Resource
         //static SolidColorBrush EmptyMainBrush = new SolidColorBrush();
 
+        bool _flipped;
+        public bool Flipped
+        {
+            get { return _flipped; }
+            set
+            {
+                _flipped = value;
+                if (_flipped)
+                {
+                    ExitTransform.ScaleX = -1;
+                    ExitTransform.ScaleY = -1;
+                }
+                else
+                {
+                    ExitTransform.ScaleX = 1;
+                    ExitTransform.ScaleY = 1;
+                }
+            }
+        }
+
         BoardFieldViewDisplayState _displayState;
         public BoardFieldViewDisplayState DisplayState
         {
@@ -62,12 +82,13 @@ namespace AccessBattleWpf
                 _displayState = value;
 
                 // TODO: Databinding
-                LinkGrid.Visibility = Visibility.Collapsed;
-                VirusGrid.Visibility = Visibility.Collapsed;
-                VirusCheckGrid.Visibility = Visibility.Collapsed;
-                FirewallGrid.Visibility = Visibility.Collapsed;
-                NotFound404Grid.Visibility = Visibility.Collapsed;
-                LineBoostGrid.Visibility = Visibility.Collapsed;
+                LinkGrid.Visibility = Visibility.Hidden;
+                VirusGrid.Visibility = Visibility.Hidden;
+                VirusCheckGrid.Visibility = Visibility.Hidden;
+                FirewallGrid.Visibility = Visibility.Hidden;
+                NotFound404Grid.Visibility = Visibility.Hidden;
+                LineBoostGrid.Visibility = Visibility.Hidden;
+                ExitBox.Visibility = Visibility.Hidden;
                 VirusPath.Stroke = Brushes.DarkGray;
                 VirusPath.Fill = Brushes.DarkGray;
                 LinkPath.Stroke = Brushes.DarkGray;
@@ -126,6 +147,9 @@ namespace AccessBattleWpf
                         break;
                     case BoardFieldViewDisplayState.NotFound404:
                         NotFound404Grid.Visibility = Visibility.Visible;
+                        break;
+                    case BoardFieldViewDisplayState.ExitEmpty:
+                        ExitBox.Visibility = Visibility.Visible;
                         break;
                 }
             }
@@ -207,6 +231,22 @@ namespace AccessBattleWpf
             if (_field != null) return; // Can only be set once
             _field = field;
             if (_field == null) return;
+
+            //if (_field.Type == BoardFieldType.Exit)
+            //{
+            //    if (_field.Position.Y == 0)
+            //    {
+            //        ExitTransform.ScaleX = -1;
+            //        ExitTransform.ScaleY = -1;
+            //    }
+            //    //if (_field.Position.Y == 7)
+            //    //{
+            //    //    ExitTransform.ScaleX = 1;
+            //    //    ExitTransform.ScaleY = 1;
+            //    //}
+            //}
+
+
             _context = DataContext as MainWindowViewModel;
             if (_context != null) WeakEventManager<MainWindowViewModel, BlinkChangedEventArgs>.AddHandler(_context, "BlinkStateChanged", ViewModel_BlinkStateChanged);
             WeakEventManager<BoardFieldViewModel, PropertyChangedEventArgs>.AddHandler(field, "PropertyChanged", Field_PropertyChanged);
@@ -272,10 +312,17 @@ namespace AccessBattleWpf
                 UpdateLineBoostAnimation();
                 if (_field.Type == BoardFieldType.Exit)
                 {
+                    if (_field.Card == null)
+                        ExitBox.Visibility = Visibility.Visible;
+                    else
+                        ExitBox.Visibility = Visibility.Hidden;
+
                     if (_context != null)
                         IsBlinking = _context.GetBlink(_field.Position);
                     return;
                 }
+                else { ExitBox.Visibility = Visibility.Hidden; }
+
                 if (_field.Card == null)
                 {
                     if (_field.Type == BoardFieldType.Stack)
@@ -371,7 +418,7 @@ namespace AccessBattleWpf
 
             if (_lineBoostAnimationStarted)
             {
-                LineBoostGrid.Visibility = Visibility.Collapsed;
+                LineBoostGrid.Visibility = Visibility.Hidden;
                 //_lineBoostStoryBoard.Stop(this);
                 foreach (var tl in _lineBoostAnimations)
                     _lineBoostStoryboard.RemoveAnimation(tl);

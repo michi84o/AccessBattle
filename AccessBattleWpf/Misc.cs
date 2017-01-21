@@ -33,5 +33,10 @@ namespace AccessBattleWpf
         Firewall, // Use only for firewall selection field
         VirusCheck, // Use only for firewall selection field
         NotFound404, // Use only for firewall selection field
+        ExitEmpty,
+        ExitVirus,
+        ExitLink,
+        ExitVirusBoosted,
+        ExitLinkBoosted,
     }
 }

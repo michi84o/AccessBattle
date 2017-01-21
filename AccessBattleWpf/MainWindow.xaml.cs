@@ -33,6 +33,8 @@ namespace AccessBattleWpf
     {
         StoryboardAsyncWrapper _blinkStoryBoard;
         StoryboardAsyncWrapper _lineBoostStoryBoard;
+        Storyboard _buttonPanelStoryboardFadeIn = new Storyboard();
+        Storyboard _buttonPanelStoryboardFadeOut = new Storyboard();
 
         public MainWindow()
         {
@@ -82,6 +84,44 @@ namespace AccessBattleWpf
             NotFound404Field.Clicked += (s, e) => ViewModel.FieldClicked(e.Field);
 
             DeploymentControl.Initialize(_blinkStoryBoard);
+
+            var fadeIn = new DoubleAnimation(0, 1, TimeSpan.FromSeconds(.5)) { BeginTime = TimeSpan.FromSeconds(0) };
+            var fadeOut = new DoubleAnimation(1, 0, TimeSpan.FromSeconds(.5)) { BeginTime = TimeSpan.FromSeconds(0) };
+            Storyboard.SetTarget(fadeIn, P1ButtonPanel);
+            Storyboard.SetTargetProperty(fadeIn, new PropertyPath("Opacity"));
+            Storyboard.SetTarget(fadeOut, P1ButtonPanel);
+            Storyboard.SetTargetProperty(fadeOut, new PropertyPath("Opacity"));
+            _buttonPanelStoryboardFadeIn.Children.Add(fadeIn);
+            _buttonPanelStoryboardFadeOut.Children.Add(fadeOut);
+
+            WeakEventManager<Game, PropertyChangedEventArgs>.AddHandler(ViewModel.Game, "PropertyChanged", Game_PropertyChanged);
+        }
+
+        void Game_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "Phase" || e.PropertyName == "CurrentPlayer")
+            {
+                if (_showingP1Buttons)
+                {
+                    if (ViewModel.Game.CurrentPlayer != 1 || ViewModel.Game.Phase != GamePhase.PlayerTurns)
+                    {
+                        HideP1ButtonPanel();
+                    }
+                }
+            }
+        }
+
+        void ShowP1ButtonPanel()
+        {
+            if (ViewModel.Game.CurrentPlayer != 1 || ViewModel.Game.Phase != GamePhase.PlayerTurns) return;
+            _showingP1Buttons = true;
+            _buttonPanelStoryboardFadeIn.Begin(P1ButtonPanel);
+        }
+
+        void HideP1ButtonPanel()
+        {
+            _showingP1Buttons = false;
+            _buttonPanelStoryboardFadeOut.Begin(P1ButtonPanel);
         }
 
         #region TODO
@@ -89,13 +129,13 @@ namespace AccessBattleWpf
         bool _gameOverClickStarted;
         private void GameOverMessage_MouseLeave(object sender, MouseEventArgs e)
         {
-            if (IsMouseCaptured) ReleaseMouseCapture(); // Solves problems with Window not closing after click
+            if (GameOverMessage.IsMouseCaptured) GameOverMessage.ReleaseMouseCapture(); // Solves problems with Window not closing after click
             _gameOverClickStarted = false;
         }
 
         private void GameOverMessage_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (CaptureMouse())
+            if (GameOverMessage.CaptureMouse())
             {
                 _gameOverClickStarted = true;
             }
@@ -103,10 +143,45 @@ namespace AccessBattleWpf
 
         private void GameOverMessage_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            if (IsMouseCaptured) ReleaseMouseCapture();
+            if (GameOverMessage.IsMouseCaptured) GameOverMessage.ReleaseMouseCapture();
             if (_gameOverClickStarted)
             {
                 ViewModel.Game.Phase = GamePhase.Init;
+            }
+        }
+        #endregion
+
+        #region Actions
+        bool _actionsClickStarted;
+        bool _showingP1Buttons;
+        Brush _darkBrush = new SolidColorBrush(Color.FromArgb(0xff, 0x60, 0x60, 0x60));
+        private void P1ActionsField_MouseEnter(object sender, MouseEventArgs e)
+        {
+            P1ActionsField.Background = _darkBrush;
+        }
+
+        private void P1ActionsField_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (P1ActionsField.IsMouseCaptured) P1ActionsField.ReleaseMouseCapture();
+            if (_actionsClickStarted)
+            {
+                if (_showingP1Buttons)
+                    HideP1ButtonPanel();
+                else
+                    ShowP1ButtonPanel();
+            }
+        }
+
+        private void P1ActionsField_MouseLeave(object sender, MouseEventArgs e)
+        {
+            P1ActionsField.Background = Brushes.Black;
+        }
+
+        private void P1ActionsField_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (P1ActionsField.CaptureMouse())
+            {
+                _actionsClickStarted = true;
             }
         }
         #endregion

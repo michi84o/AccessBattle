@@ -66,7 +66,8 @@ namespace AccessBattle
                 {
                     var type = BoardFieldType.Main;
                     if (y > 7) type = BoardFieldType.Stack;
-                    else if ((x > 2 && x < 5) && (y == 0 || y == 7)) type = BoardFieldType.Exit;
+                    else if ((x > 2 && x < 5) && (y == 0 || y == 7))
+                        type = BoardFieldType.Exit;
                     Fields[x, y] = new BoardField(x, y, type);
                 }
 

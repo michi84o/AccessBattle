@@ -8,6 +8,26 @@
     mc:Ignorable="d" 
     d:DesignHeight="64" d:DesignWidth="64">
     <Grid>
+        <Viewbox Margin="2" Visibility="Collapsed" x:Name="ExitBox" >
+            <Grid RenderTransformOrigin="0.5,0.5">
+                <Path 
+                    Fill="Orange" Stroke="Orange" StrokeThickness="1"
+                    Data="{StaticResource ExitPath}"  />
+                <Path
+                    Fill="White" Stroke="White" StrokeThickness="1"
+                    Data="{StaticResource DoorPath}"  />
+                <Path                         
+                    Stroke="White" StrokeThickness="1"
+                    Data="{StaticResource DoorPath2}"  />
+                <Path 
+                    Fill="Orange" Stroke="Orange" StrokeThickness="1"
+                    Data="{StaticResource DoorArrowPath}" />
+                <Grid.RenderTransform>
+                    <ScaleTransform x:Name="ExitTransform" ScaleX="1" ScaleY="1" />
+                </Grid.RenderTransform>
+            </Grid>
+        </Viewbox>
+
         <Grid Name="CardGrid">
             <!-- Add all possible states and just switch visibility -->
             <Grid 
@@ -63,42 +83,35 @@
         <Grid
             Name="LineBoostGrid"
             Visibility="Collapsed"
-            Opacity="0"
-            >
+            Opacity="0">
             <Grid.RowDefinitions>
-                <RowDefinition Height="1*"/>
-                <RowDefinition Height=".6*"/>
+                <RowDefinition Height=".8*"/>
+                <RowDefinition Height=".1*"/>
+                <RowDefinition Height=".3*"/>
             </Grid.RowDefinitions>
-            <Viewbox Margin="2" Grid.Row="0">
+            <Viewbox Margin="2" Grid.Row="0" Grid.RowSpan="2" >
                 <Path
-                    Name="LineBoostPath"
                     Margin="1"
                     Fill="White"
                     Stroke="White" StrokeThickness="1"
                     Data="{StaticResource LineBoostPath}"/>
             </Viewbox>
-            <Grid Grid.Row="1">
-                <Grid.RowDefinitions>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                <Viewbox >
-                    <TextBlock Margin="-1"
+            <Viewbox Grid.Row="1" Grid.RowSpan="2" VerticalAlignment="Top">
+                <TextBlock Margin="0"
                     FontFamily="./ExternalResources/#Silkscreen"
                     FontSize="10" Foreground="White"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
-                    Text="LINE" />
-                </Viewbox>
-                <Viewbox  Grid.Row="2">
-                    <TextBlock Margin="-1"
+                    Text="  Line      " TextAlignment="Center" />
+            </Viewbox>
+            <Viewbox Grid.Row="2" VerticalAlignment="Bottom">
+                <TextBlock Margin="0"
                     FontFamily="./ExternalResources/#Silkscreen"
                     FontSize="10" Foreground="White"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
-                    Text="BOOST" />
-                </Viewbox>
-            </Grid>
+                    Text="    Boost  " TextAlignment="Center" />
+            </Viewbox>
         </Grid>
         <Grid
             Name="FirewallGrid"
