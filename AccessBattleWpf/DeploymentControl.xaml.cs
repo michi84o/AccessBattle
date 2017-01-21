@@ -43,6 +43,7 @@ namespace AccessBattleWpf
         {
             if (IsMouseCaptured) ReleaseMouseCapture(); // Solves problems with Window not closing after click
             _linkClickStarted = false;
+            LinkField.Background = Brushes.Transparent;
         }
 
         private void LinkField_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -69,6 +70,7 @@ namespace AccessBattleWpf
         {
             if (IsMouseCaptured) ReleaseMouseCapture();
             _virusClickStarted = false;
+            VirusField.Background = Brushes.Transparent;
         }
 
         private void VirusField_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -89,6 +91,18 @@ namespace AccessBattleWpf
             }
 
         }
+
+        Brush _darkBrush = new SolidColorBrush(Color.FromArgb(0xff, 0x60, 0x60, 0x60));
+        private void LinkField_MouseEnter(object sender, MouseEventArgs e)
+        {
+            LinkField.Background = _darkBrush;
+        }
+
+        private void VirusField_MouseEnter(object sender, MouseEventArgs e)
+        {
+            VirusField.Background = _darkBrush;
+        }
+
         #endregion
 
         //public static readonly DependencyProperty LinkCardsToDeployProperty =
@@ -150,6 +164,8 @@ namespace AccessBattleWpf
 
                 _blinkStoryboard.AddAnimation(_blinkAnimation);
             }
-        }        
+        }
+
+
     }
 }

@@ -18,6 +18,18 @@
             M20,20 L 20,23 23,23 23,20 z M20,8 L20,11 23,11 23,8 z 
             M12,12 L 12,19 19,19 19,12z
         </StreamGeometry>
+        <StreamGeometry x:Key="VirusCheckPath">
+            M0,0 L 3,0 3,3 0,3 z M4,4 L 7,4 7,7 4,7 z
+            M0,12 L7,12 7,15 0,15 z M4,20 L 7,20 7,23 4,23 z
+            M0,24 L3,24 3,27 0,27 z
+            M12,4 L 12,27 19,27 19,24 15,24 15,7 19,7 19,4 z
+            M20,8 L 20,23 23,23 23,19 28,19 28,24 24,24 24,27 28,27
+            28,31 31,31 31,19 35,19 35,12 23,12 23,8 z
+        </StreamGeometry>
+        <StreamGeometry x:Key="NotFound404Path">
+            M0,0 L 0,7 7,7 7,3 24,3 24,12 12,12 12,23 19,23 19,15 31,15 31,0z
+            M12,28 L 12,35 19,35 19,28z
+        </StreamGeometry>
 
         <Style TargetType="{x:Type TextBlock}">
             <Setter Property="FontFamily" Value="./ExternalResources/#Silkscreen" />

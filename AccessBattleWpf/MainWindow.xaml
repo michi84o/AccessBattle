@@ -689,36 +689,49 @@
                 </Grid>
             </Border>
         </Grid>
-        <Grid
+            <Grid
             Grid.Row="12" Grid.Column="4" Grid.ColumnSpan="4"
-            Background="Black" Visibility="Collapsed">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
-            <Border
-                BorderBrush="White" BorderThickness="2" CornerRadius="2"
-                Grid.ColumnSpan="4" Grid.Column="0"
-                Background="Black">
-            </Border>
-            <custom:BoardFieldView
-                x:Name="LineBoostField"
-                Grid.Column="2"
-                Style="{StaticResource MainField}"
-                BorderBrush="White"
-                DisplayState="LineBoost">
-            </custom:BoardFieldView>
-            <custom:BoardFieldView
-               Grid.Column="1"
-                x:Name="FirewallField"            
-                Style="{StaticResource MainField}"
-                BorderBrush="White"
-                DisplayState="Firewall">
-            </custom:BoardFieldView>
+            Background="Black" Visibility="Visible">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Border
+                    BorderBrush="White" BorderThickness="2" CornerRadius="2"
+                    Grid.ColumnSpan="4" Grid.Column="0" Margin="-4"
+                    Background="Black">
+                </Border>
+                <custom:BoardFieldView
+                    x:Name="VirusCheckField"
+                    Grid.Column="0"
+                    Style="{StaticResource MainField}"
+                    BorderBrush="White"
+                    DisplayState="VirusCheck">
+                </custom:BoardFieldView>
+                <custom:BoardFieldView
+                    Grid.Column="1"
+                    x:Name="FirewallField"            
+                    Style="{StaticResource MainField}"
+                    BorderBrush="White"
+                    DisplayState="Firewall">
+                </custom:BoardFieldView>
+                <custom:BoardFieldView
+                    x:Name="LineBoostField"
+                    Grid.Column="2"
+                    Style="{StaticResource MainField}"
+                    BorderBrush="White"
+                    DisplayState="LineBoost">
+                </custom:BoardFieldView>
+                <custom:BoardFieldView
+                    x:Name="NotFound404Field"
+                    Grid.Column="3"
+                    Style="{StaticResource MainField}"
+                    BorderBrush="White"
+                    DisplayState="NotFound404">
+                </custom:BoardFieldView>
+            </Grid>
         </Grid>
-  
-    </Grid>
     </Viewbox>
 </Window>

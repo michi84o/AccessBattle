@@ -30,6 +30,8 @@ namespace AccessBattle
     /// Additional fields: Mainly for UI use
     /// Player1 Boost Button: Field (0,10)
     /// Player1 Firewall Button: Field (1,10)
+    /// Player1 Virus Check: Field (2,10)
+    /// Player1 Error 404: Field (3,10)
     /// </summary>
     public class Board : PropChangeNotifier
     {

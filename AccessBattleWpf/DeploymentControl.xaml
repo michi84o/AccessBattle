@@ -20,24 +20,28 @@
                 Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2"
                 Text="Deploy" Foreground="DarkGray" FontSize="32" HorizontalAlignment="Center" Margin="5"/>
             <Border
+                x:Name="LinkField"
                 Grid.Column="0" Grid.Row="1"
                 BorderThickness="2" BorderBrush="DarkGray" Margin="2"
                 Background="Black" Cursor="Hand"
                 MouseDown="LinkField_MouseDown"
                 MouseUp="LinkField_MouseUp"
-                MouseLeave="LinkField_MouseLeave">
+                MouseLeave="LinkField_MouseLeave"
+                MouseEnter="LinkField_MouseEnter">
                 <TextBlock  
-                Name="LinkText"
-                Text="Link" Foreground="DarkGray" FontSize="32" HorizontalAlignment="Center" Margin="5,0,5,0">
+                    Name="LinkText"
+                    Text="Link" Foreground="DarkGray" FontSize="32" HorizontalAlignment="Center" Margin="5,0,5,0">
                 </TextBlock>
             </Border>
             <Border
+                x:Name="VirusField"
                 Grid.Column="1" Grid.Row="1"
                 BorderThickness="2" BorderBrush="DarkGray" Margin="2"
                 Background="Black" Cursor="Hand"
                 MouseDown="VirusField_MouseDown"
                 MouseUp="VirusField_MouseUp"
-                MouseLeave="VirusField_MouseLeave">
+                MouseLeave="VirusField_MouseLeave"
+                MouseEnter="VirusField_MouseEnter">
             <TextBlock  
                 Name="VirusText"
                 

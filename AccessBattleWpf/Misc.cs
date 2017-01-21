@@ -30,6 +30,8 @@ namespace AccessBattleWpf
         StackVirus,
         StackLink,
         LineBoost, // Use only for line boost selection field
-        Firewall // Use only for firewall selection field
+        Firewall, // Use only for firewall selection field
+        VirusCheck, // Use only for firewall selection field
+        NotFound404, // Use only for firewall selection field
     }
 }

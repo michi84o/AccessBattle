@@ -123,5 +123,69 @@
                     Text="Firewall" />
             </Viewbox>
         </Grid>
+        <Grid
+            Name="VirusCheckGrid"
+            Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height=".8*"/>
+                <RowDefinition Height=".1*"/>
+                <RowDefinition Height=".3*"/>
+            </Grid.RowDefinitions>
+            <Viewbox Margin="2" Grid.Row="0" Grid.RowSpan="2">
+                <Path
+                    Margin="1"
+                    Fill="White"
+                    Stroke="White" StrokeThickness="1"
+                    Data="{StaticResource VirusCheckPath}"/>
+            </Viewbox>
+            <Viewbox Grid.Row="1" VerticalAlignment="Top" Grid.RowSpan="2">
+                <TextBlock Margin="0"
+                    FontFamily="./ExternalResources/#Silkscreen"
+                    FontSize="10" Foreground="White"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Text=" Virus     " />
+            </Viewbox>
+            <Viewbox Grid.Row="2" VerticalAlignment="Bottom">
+                <TextBlock Margin="0"
+                    FontFamily="./ExternalResources/#Silkscreen"
+                    FontSize="10" Foreground="White"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Text="    Check  " />
+            </Viewbox>
+        </Grid>
+        <Grid
+            Name="NotFound404Grid"
+            Visibility="Collapsed">
+            <Grid.RowDefinitions>
+                <RowDefinition Height=".8*"/>
+                <RowDefinition Height=".1*"/>
+                <RowDefinition Height=".3*"/>
+            </Grid.RowDefinitions>
+            <Viewbox Margin="2" Grid.Row="0" Grid.RowSpan="2" >
+                <Path
+                    Margin="1"
+                    Fill="White"
+                    Stroke="White" StrokeThickness="1"
+                    Data="{StaticResource NotFound404Path}"/>
+            </Viewbox>
+            <Viewbox Grid.Row="1" Grid.RowSpan="2" VerticalAlignment="Top">
+                <TextBlock Margin="0"
+                    FontFamily="./ExternalResources/#Silkscreen"
+                    FontSize="10" Foreground="White"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Text="    404    " TextAlignment="Center" />
+            </Viewbox>
+            <Viewbox Grid.Row="2" VerticalAlignment="Bottom">
+                <TextBlock Margin="0"
+                    FontFamily="./ExternalResources/#Silkscreen"
+                    FontSize="10" Foreground="White"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Text="Not Found" TextAlignment="Center" />
+            </Viewbox>
+        </Grid>
     </Grid>
 </Border>

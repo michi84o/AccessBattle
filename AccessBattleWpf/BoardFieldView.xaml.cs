@@ -64,6 +64,10 @@ namespace AccessBattleWpf
                 // TODO: Databinding
                 LinkGrid.Visibility = Visibility.Collapsed;
                 VirusGrid.Visibility = Visibility.Collapsed;
+                VirusCheckGrid.Visibility = Visibility.Collapsed;
+                FirewallGrid.Visibility = Visibility.Collapsed;
+                NotFound404Grid.Visibility = Visibility.Collapsed;
+                LineBoostGrid.Visibility = Visibility.Collapsed;
                 VirusPath.Stroke = Brushes.DarkGray;
                 VirusPath.Fill = Brushes.DarkGray;
                 LinkPath.Stroke = Brushes.DarkGray;
@@ -116,6 +120,12 @@ namespace AccessBattleWpf
                         break;
                     case BoardFieldViewDisplayState.Firewall:
                         FirewallGrid.Visibility = Visibility.Visible;
+                        break;
+                    case BoardFieldViewDisplayState.VirusCheck:
+                        VirusCheckGrid.Visibility = Visibility.Visible;
+                        break;
+                    case BoardFieldViewDisplayState.NotFound404:
+                        NotFound404Grid.Visibility = Visibility.Visible;
                         break;
                 }
             }
@@ -227,7 +237,6 @@ namespace AccessBattleWpf
             _lineBoostAnimations.Add(anim3);
             _lineBoostAnimations.Add(anim4);
 
-
             UpdateField();
         }
 
@@ -258,37 +267,38 @@ namespace AccessBattleWpf
 
         void UpdateField()
         {
-            UpdateLineBoostAnimation();
-
-            if (_field.Type == BoardFieldType.Exit)
+            if (_field.Position.Y < 10)
             {
-                if (_context != null)
-                    IsBlinking = _context.GetBlink(_field.Position);
-                return;
-            }
-            if (_field.Card == null)
-            {
-                if (_field.Type == BoardFieldType.Stack)
+                UpdateLineBoostAnimation();
+                if (_field.Type == BoardFieldType.Exit)
                 {
-                    if (DisplayState == BoardFieldViewDisplayState.StackLink) DisplayState = BoardFieldViewDisplayState.StackLinkEmpty;
-                    else if (DisplayState == BoardFieldViewDisplayState.StackVirus) DisplayState = BoardFieldViewDisplayState.StackVirusEmpty;
-                    else
-                    {
-                        Trace.WriteLine("ERROR! LOST INFO ABOUT STACK PANEL TYPE");
-                        DisplayState = BoardFieldViewDisplayState.Empty;
-                    }
+                    if (_context != null)
+                        IsBlinking = _context.GetBlink(_field.Position);
+                    return;
                 }
-                else
-                    DisplayState = BoardFieldViewDisplayState.Empty;
-                if (_context != null)
-                    IsBlinking = _context.GetBlink(_field.Position);
-                return;
-            }                
-            if (_field.Card is OnlineCard && ((OnlineCard)_field.Card).Type == OnlineCardType.Virus)
-                DisplayState = (_field.Type == BoardFieldType.Stack) ? BoardFieldViewDisplayState.StackVirus : BoardFieldViewDisplayState.MainVirus;
-            if (_field.Card is OnlineCard && ((OnlineCard)_field.Card).Type == OnlineCardType.Link)
-                DisplayState = (_field.Type == BoardFieldType.Stack) ? BoardFieldViewDisplayState.StackLink : BoardFieldViewDisplayState.MainLink;
-
+                if (_field.Card == null)
+                {
+                    if (_field.Type == BoardFieldType.Stack)
+                    {
+                        if (DisplayState == BoardFieldViewDisplayState.StackLink) DisplayState = BoardFieldViewDisplayState.StackLinkEmpty;
+                        else if (DisplayState == BoardFieldViewDisplayState.StackVirus) DisplayState = BoardFieldViewDisplayState.StackVirusEmpty;
+                        else
+                        {
+                            Trace.WriteLine("ERROR! LOST INFO ABOUT STACK PANEL TYPE");
+                            DisplayState = BoardFieldViewDisplayState.Empty;
+                        }
+                    }
+                    else
+                        DisplayState = BoardFieldViewDisplayState.Empty;
+                    if (_context != null)
+                        IsBlinking = _context.GetBlink(_field.Position);
+                    return;
+                }
+                if (_field.Card is OnlineCard && ((OnlineCard)_field.Card).Type == OnlineCardType.Virus)
+                    DisplayState = (_field.Type == BoardFieldType.Stack) ? BoardFieldViewDisplayState.StackVirus : BoardFieldViewDisplayState.MainVirus;
+                if (_field.Card is OnlineCard && ((OnlineCard)_field.Card).Type == OnlineCardType.Link)
+                    DisplayState = (_field.Type == BoardFieldType.Stack) ? BoardFieldViewDisplayState.StackLink : BoardFieldViewDisplayState.MainLink;
+            }
             if (_context != null)
                 IsBlinking = _context.GetBlink(_field.Position);
         }

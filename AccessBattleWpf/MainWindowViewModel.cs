@@ -92,7 +92,7 @@ namespace AccessBattleWpf
 
         public bool GetBlink(Vector position)
         {
-            if (position.X > 7 || position.Y > 9) return false;
+            if (position.X > 7 || position.Y > 10) return false;
 
             var num = (byte)(1 << position.X);
             return (_blinkMap[position.Y] & num) > 0;

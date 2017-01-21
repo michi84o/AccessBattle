@@ -76,6 +76,10 @@ namespace AccessBattleWpf
             LineBoostField.Clicked += (s, e) => ViewModel.FieldClicked(e.Field);
             FirewallField.Initialize(new BoardFieldViewModel(ViewModel.Game.Board.Fields[1, 10]), _blinkStoryBoard, _lineBoostStoryBoard);
             FirewallField.Clicked += (s, e) => ViewModel.FieldClicked(e.Field);
+            VirusCheckField.Initialize(new BoardFieldViewModel(ViewModel.Game.Board.Fields[2, 10]), _blinkStoryBoard, _lineBoostStoryBoard);
+            VirusCheckField.Clicked += (s, e) => ViewModel.FieldClicked(e.Field);
+            NotFound404Field.Initialize(new BoardFieldViewModel(ViewModel.Game.Board.Fields[3, 10]), _blinkStoryBoard, _lineBoostStoryBoard);
+            NotFound404Field.Clicked += (s, e) => ViewModel.FieldClicked(e.Field);
 
             DeploymentControl.Initialize(_blinkStoryBoard);
         }
