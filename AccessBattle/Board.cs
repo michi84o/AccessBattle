@@ -32,6 +32,8 @@ namespace AccessBattle
     /// Player1 Firewall Button: Field (1,10)
     /// Player1 Virus Check: Field (2,10)
     /// Player1 Error 404: Field (3,10)
+    /// Player1 Server Area : Field (4,10)
+    /// Player2 Server Area : Field (5,10)
     /// </summary>
     public class Board : PropChangeNotifier
     {
@@ -74,6 +76,10 @@ namespace AccessBattle
             // Place fields for extension row
             Fields[0, 10] = new BoardField(0, 10, BoardFieldType.LineBoost);
             Fields[1, 10] = new BoardField(1, 10, BoardFieldType.Firewall);
+            Fields[2, 10] = new BoardField(2, 10, BoardFieldType.VirusCheck);
+            Fields[3, 10] = new BoardField(3, 10, BoardFieldType.Error404);
+            Fields[4, 10] = new BoardField(3, 10, BoardFieldType.ServerArea);
+            Fields[5, 10] = new BoardField(3, 10, BoardFieldType.ServerArea);
             for (ushort x = 2; x < 8; ++x)
                 Fields[x, 10] = new BoardField(x, 10, BoardFieldType.Undefined);
             
@@ -92,7 +98,7 @@ namespace AccessBattle
             { Fields[0,9],Fields[1,9],Fields[2,9],Fields[3,9],Fields[4,9],Fields[5,9],Fields[6,9],Fields[7,9] };
         }
 
-
+        // TODO: Use Game class for deployment
         public bool PlaceCard(ushort x, ushort y, Card card)
         {
             if (x > 7 || y > 9 || card == null)
@@ -135,6 +141,9 @@ namespace AccessBattle
         Exit,
         Stack,
         LineBoost,
-        Firewall,        
+        Firewall,
+        Error404,
+        VirusCheck,
+        ServerArea    
     }
 }

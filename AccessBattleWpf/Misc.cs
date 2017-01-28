@@ -20,9 +20,9 @@ namespace AccessBattleWpf
     {
         Empty,
         MainVirus,
-        MainVirusBoosted,      
+        //MainVirusBoosted,      
         MainLink,
-        MainLinkBoosted,
+        //MainLinkBoosted,
         MainFirewall,
         MainFlipped,      
         StackVirusEmpty, // Stack fields show always symbol
@@ -36,7 +36,7 @@ namespace AccessBattleWpf
         ExitEmpty,
         ExitVirus,
         ExitLink,
-        ExitVirusBoosted,
-        ExitLinkBoosted,
+        //ExitVirusBoosted,
+        //ExitLinkBoosted,
     }
 }

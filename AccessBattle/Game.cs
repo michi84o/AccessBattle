@@ -254,7 +254,7 @@ namespace AccessBattle
                         field2.Card.Location = field2;
                         return true;
                     }
-                    if (field1.Type == BoardFieldType.Main)
+                    if (field1.Type == BoardFieldType.Main || field1.Type == BoardFieldType.Exit)
                     {
                         // Putting card back to stack is allowed during deployment or when card is claimed
                         if (field2.Type == BoardFieldType.Stack)
@@ -299,11 +299,12 @@ namespace AccessBattle
                                     // Remove boost if applied
                                     if (card.HasBoost) card.HasBoost = false;
                                 }
-                                if (field2.Type == BoardFieldType.Exit)
-                                {
-                                    PlaceCardOnStack(field1.Card as OnlineCard);
-                                    return true;
-                                }
+                                // TODO: 
+                                //if (field2.Type == BoardFieldType.Exit)
+                                //{
+                                //    PlaceCardOnStack(field1.Card as OnlineCard);
+                                //    return true;
+                                //}
                                 field2.Card = field1.Card;
                                 field1.Card = null;
                                 field2.Card.Location = field2;
@@ -311,12 +312,12 @@ namespace AccessBattle
                             }
                         }
                     }
-                    if (field1.Type == BoardFieldType.Exit)
-                    {
-                        // Cards are never stored on an exit field
-                        Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! Exit field cannot contain cards");
-                        return false;
-                    }
+                    //if (field1.Type == BoardFieldType.Exit)
+                    //{
+                    //    // Cards are never stored on an exit field
+                    //    Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! Exit field cannot contain cards");
+                    //    return false;
+                    //}
                 }
             }
             else if (command.StartsWith("bs ", StringComparison.InvariantCulture) && command.Length > 3)
@@ -403,12 +404,26 @@ namespace AccessBattle
             var fs = new BoardField[4];
             if (p.Y > 0 && p.Y <= 7) // Down
                 fs[0] = Board.Fields[p.X, p.Y - 1];
+            else
+            {
+                // Special case for exit fields:
+                if (p.Y == 0 && field.Type == BoardFieldType.Exit && CurrentPlayer == 2)
+                    fs[1] = Board.Fields[4, 10];
+            }
+
             if (p.Y >= 0 && p.Y < 7) // Up
                 fs[1] = Board.Fields[p.X, p.Y + 1];
+            else
+            {
+                // Special case for exit fields:
+                if (p.Y == 7 && field.Type == BoardFieldType.Exit && CurrentPlayer == 1)
+                    fs[1] = Board.Fields[5, 10];
+            }
+
             if (p.X > 0 && p.X <= 7 && p.Y <= 7) // Left;  Mask out stack fields
                 fs[2] = Board.Fields[p.X - 1, p.Y];
             if (p.X >= 0 && p.X < 7 && p.Y <= 7) // Right
-                fs[3] = Board.Fields[p.X + 1, p.Y];
+                fs[3] = Board.Fields[p.X + 1, p.Y];            
 
             // Moves on opponents cards are allowed, move on own card not
             for (int i = 0; i < 4; ++i)
@@ -419,7 +434,7 @@ namespace AccessBattle
                 if (fs[i].Type == BoardFieldType.Stack) continue;
                 if (fs[i].Type == BoardFieldType.Exit)
                 {
-                    // Exit field is allowed, but only your own one
+                    // Exit field is allowed, but only your opponents
                     if (CurrentPlayer == 1 && fs[i].Position.Y == 0) continue;
                     if (CurrentPlayer == 2 && fs[i].Position.Y == 7) continue;
                 }
@@ -440,8 +455,22 @@ namespace AccessBattle
                     p = f.Position;
                     if (p.Y > 0 && p.Y <= 7)
                         fs[0] = Board.Fields[p.X, p.Y - 1];
+                    else
+                    {
+                        // Special case for exit fields:
+                        if (p.Y == 0 && f.Type == BoardFieldType.Exit && CurrentPlayer == 2)
+                            fs[1] = Board.Fields[4, 10];
+                    }
+
                     if (p.Y >= 0 && p.Y < 7)
                         fs[1] = Board.Fields[p.X, p.Y + 1];
+                    else
+                    {
+                        // Special case for exit fields:
+                        if (p.Y == 7 && field.Type == BoardFieldType.Exit && CurrentPlayer == 1)
+                            fs[1] = Board.Fields[5, 10];
+                    }
+
                     if (p.X > 0 && p.X <= 7 && p.Y <= 7) // No Stack fields!
                         fs[2] = Board.Fields[p.X - 1, p.Y];
                     if (p.X >= 0 && p.X < 7 && p.Y <= 7) // No Stack fields!
@@ -454,7 +483,7 @@ namespace AccessBattle
                         if (fs[i].Type == BoardFieldType.Stack) continue;
                         if (fs[i].Type == BoardFieldType.Exit)
                         {
-                            // Exit field is allowed, but only your own one
+                            // Exit field is allowed, but only your opponents
                             if (CurrentPlayer == 1 && fs[i].Position.Y == 0) continue;
                             if (CurrentPlayer == 2 && fs[i].Position.Y == 7) continue;
                         }

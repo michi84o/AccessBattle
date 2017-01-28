@@ -81,77 +81,85 @@ namespace AccessBattleWpf
                 if (_displayState == value) return;
                 _displayState = value;
 
-                // TODO: Databinding
-                LinkGrid.Visibility = Visibility.Hidden;
-                VirusGrid.Visibility = Visibility.Hidden;
-                VirusCheckGrid.Visibility = Visibility.Hidden;
-                FirewallGrid.Visibility = Visibility.Hidden;
-                NotFound404Grid.Visibility = Visibility.Hidden;
-                LineBoostGrid.Visibility = Visibility.Hidden;
-                ExitBox.Visibility = Visibility.Hidden;
-                VirusPath.Stroke = Brushes.DarkGray;
-                VirusPath.Fill = Brushes.DarkGray;
-                LinkPath.Stroke = Brushes.DarkGray;
-                LinkPath.Fill = Brushes.DarkGray;
-                VirusText.Foreground = Brushes.DarkGray;
-                LinkText.Foreground = Brushes.DarkGray;
+                UpdateDisplayState();
+            }
+        }
 
-                // TODO: Card and state should not be set separately
-                // Background Color
-                var playerBrush = DefaultBackground;
-                if (_field != null && _field.Card != null && _field.Card.Owner != null)
-                {
-                    if (_field.Card.Owner.PlayerNumber == 1) playerBrush = Brushes.Blue;
-                    else if (_field.Card.Owner.PlayerNumber == 2) playerBrush = Brushes.Gold;
-                }
+        void UpdateDisplayState()
+        {
+            // TODO: Databinding
+            LinkGrid.Visibility = Visibility.Hidden;
+            VirusGrid.Visibility = Visibility.Hidden;
+            VirusCheckGrid.Visibility = Visibility.Hidden;
+            FirewallGrid.Visibility = Visibility.Hidden;
+            NotFound404Grid.Visibility = Visibility.Hidden;
+            LineBoostGrid.Visibility = Visibility.Hidden;
+            ExitBox.Visibility = Visibility.Hidden;
+            VirusPath.Stroke = Brushes.DarkGray;
+            VirusPath.Fill = Brushes.DarkGray;
+            LinkPath.Stroke = Brushes.DarkGray;
+            LinkPath.Fill = Brushes.DarkGray;
+            VirusText.Foreground = Brushes.DarkGray;
+            LinkText.Foreground = Brushes.DarkGray;
 
-                switch (_displayState)
-                {
-                    case BoardFieldViewDisplayState.StackLinkEmpty:
-                        LinkGrid.Visibility = Visibility.Visible;
-                        Background = Brushes.Black;
-                        break;
-                    case BoardFieldViewDisplayState.StackVirusEmpty:
-                        VirusGrid.Visibility = Visibility.Visible;
-                        Background = Brushes.Black;
-                        break;                    
-                    case BoardFieldViewDisplayState.MainLink:
-                    case BoardFieldViewDisplayState.StackLink:
-                        LinkGrid.Visibility = Visibility.Visible;
-                        Background = playerBrush;
-                        LinkPath.Stroke = Brushes.White;
-                        LinkPath.Fill = Brushes.White;
-                        LinkText.Foreground = Brushes.White;
-                        break;
-                    case BoardFieldViewDisplayState.MainVirus:
-                    case BoardFieldViewDisplayState.StackVirus:
-                        VirusGrid.Visibility = Visibility.Visible;
-                        Background = playerBrush;
-                        VirusPath.Stroke = Brushes.White;
-                        VirusPath.Fill = Brushes.White;
-                        VirusText.Foreground = Brushes.White;
-                        break;
-                    case BoardFieldViewDisplayState.Empty:
-                        if (_field.Type == BoardFieldType.Stack) Background = Brushes.Black;
-                        else Background = DefaultBackground;
-                        break;
-                    case BoardFieldViewDisplayState.LineBoost:
-                        LineBoostGrid.Visibility = Visibility.Visible;
-                        LineBoostGrid.Opacity = 1;
-                        break;
-                    case BoardFieldViewDisplayState.Firewall:
-                        FirewallGrid.Visibility = Visibility.Visible;
-                        break;
-                    case BoardFieldViewDisplayState.VirusCheck:
-                        VirusCheckGrid.Visibility = Visibility.Visible;
-                        break;
-                    case BoardFieldViewDisplayState.NotFound404:
-                        NotFound404Grid.Visibility = Visibility.Visible;
-                        break;
-                    case BoardFieldViewDisplayState.ExitEmpty:
-                        ExitBox.Visibility = Visibility.Visible;
-                        break;
-                }
+            // TODO: Card and state should not be set separately
+            // Background Color
+            var playerBrush = DefaultBackground;
+            if (_field != null && _field.Card != null && _field.Card.Owner != null)
+            {
+                if (_field.Card.Owner.PlayerNumber == 1) playerBrush = Brushes.Blue;
+                else if (_field.Card.Owner.PlayerNumber == 2) playerBrush = Brushes.Gold;
+            }
+
+            switch (_displayState)
+            {
+                case BoardFieldViewDisplayState.StackLinkEmpty:
+                    LinkGrid.Visibility = Visibility.Visible;
+                    Background = Brushes.Black;
+                    break;
+                case BoardFieldViewDisplayState.StackVirusEmpty:
+                    VirusGrid.Visibility = Visibility.Visible;
+                    Background = Brushes.Black;
+                    break;
+                case BoardFieldViewDisplayState.MainLink:
+                case BoardFieldViewDisplayState.StackLink:
+                case BoardFieldViewDisplayState.ExitLink:
+                    LinkGrid.Visibility = Visibility.Visible;
+                    Background = playerBrush;
+                    LinkPath.Stroke = Brushes.White;
+                    LinkPath.Fill = Brushes.White;
+                    LinkText.Foreground = Brushes.White;
+                    break;
+                case BoardFieldViewDisplayState.MainVirus:
+                case BoardFieldViewDisplayState.StackVirus:
+                case BoardFieldViewDisplayState.ExitVirus:
+                    VirusGrid.Visibility = Visibility.Visible;
+                    Background = playerBrush;
+                    VirusPath.Stroke = Brushes.White;
+                    VirusPath.Fill = Brushes.White;
+                    VirusText.Foreground = Brushes.White;
+                    break;
+                case BoardFieldViewDisplayState.Empty:
+                    if (_field.Type == BoardFieldType.Stack) Background = Brushes.Black;
+                    else Background = DefaultBackground;
+                    break;
+                case BoardFieldViewDisplayState.LineBoost:
+                    LineBoostGrid.Visibility = Visibility.Visible;
+                    LineBoostGrid.Opacity = 1;
+                    break;
+                case BoardFieldViewDisplayState.Firewall:
+                    FirewallGrid.Visibility = Visibility.Visible;
+                    break;
+                case BoardFieldViewDisplayState.VirusCheck:
+                    VirusCheckGrid.Visibility = Visibility.Visible;
+                    break;
+                case BoardFieldViewDisplayState.NotFound404:
+                    NotFound404Grid.Visibility = Visibility.Visible;
+                    break;
+                case BoardFieldViewDisplayState.ExitEmpty:
+                    ExitBox.Visibility = Visibility.Visible;
+                    Background = DefaultBackground;
+                    break;
             }
         }
 
@@ -313,15 +321,27 @@ namespace AccessBattleWpf
                 if (_field.Type == BoardFieldType.Exit)
                 {
                     if (_field.Card == null)
+                    {
                         ExitBox.Visibility = Visibility.Visible;
+                        DisplayState = BoardFieldViewDisplayState.ExitEmpty;
+                    }
                     else
+                    {
                         ExitBox.Visibility = Visibility.Hidden;
+                        if (_field.Card is OnlineCard && ((OnlineCard)_field.Card).Type == OnlineCardType.Virus)
+                            DisplayState = BoardFieldViewDisplayState.MainVirus;
+                        if (_field.Card is OnlineCard && ((OnlineCard)_field.Card).Type == OnlineCardType.Link)
+                            DisplayState = BoardFieldViewDisplayState.MainLink;
+                    }                  
 
                     if (_context != null)
                         IsBlinking = _context.GetBlink(_field.Position);
                     return;
                 }
-                else { ExitBox.Visibility = Visibility.Hidden; }
+                else
+                {
+                    ExitBox.Visibility = Visibility.Hidden; // TODO: Maybe not required
+                }
 
                 if (_field.Card == null)
                 {
@@ -423,6 +443,8 @@ namespace AccessBattleWpf
                 foreach (var tl in _lineBoostAnimations)
                     _lineBoostStoryboard.RemoveAnimation(tl);
                 _lineBoostAnimationStarted = false;
+                // Background gets stuck in a wrong color. Fix:
+                UpdateDisplayState();
             }
             else
             {

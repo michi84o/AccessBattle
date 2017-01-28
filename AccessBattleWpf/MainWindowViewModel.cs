@@ -233,6 +233,8 @@ namespace AccessBattleWpf
                                 if (_game.ExecuteCommand(
                                     _game.CreateSetBoostCommand(field.Position, true)))
                                 {
+                                    ResetBlink();
+                                    _isLineBoostP1Selected = false;
                                     _game.CurrentPlayer = 2;
                                 }
                                 return;
@@ -245,7 +247,7 @@ namespace AccessBattleWpf
                             {
                                 SetBlink(f.Position, true);
                             }
-                            // TODO: If Online card, show Boost option ??? 
+                            return;
                         }
                         else if (field.Position.Y == 10)
                         {
@@ -258,15 +260,20 @@ namespace AccessBattleWpf
                                 if (boostedCard != null)
                                 {
                                     // TODO: Signal Main Window to show popup that asks player to remove boost
-                                    boostedCard.HasBoost = false;
-                                    _game.CurrentPlayer = 2;
+                                    if (_game.ExecuteCommand(
+                                    _game.CreateSetBoostCommand(boostedCard.Location.Position, false)))
+                                    {
+                                        _game.CurrentPlayer = 2;
+                                        _isLineBoostP1Selected = false;
+                                    }                                    
                                     return;
                                 }
-                                // No boosted cared
+                                // No boosted card
                                 if (_isLineBoostP1Selected)
                                 {
                                     ResetBlink();
-                                    _isLineBoostP1Selected = false;                                    
+                                    _isLineBoostP1Selected = false;
+                                    return;
                                 }
                                 else
                                 {
@@ -281,6 +288,7 @@ namespace AccessBattleWpf
                                     {
                                         SetBlink(card.Location.Position, true);
                                     }
+                                    return;
                                 }
                             }
                         }

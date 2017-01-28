@@ -50,7 +50,7 @@ namespace AccessBattleWpf
                 {
                     Duration = TimeSpan.FromSeconds(6),
                     RepeatBehavior = RepeatBehavior.Forever
-                }, this);
+                }, this);            
 
             var mainFields = new BoardFieldView[,] // X,Y
             {
@@ -84,6 +84,9 @@ namespace AccessBattleWpf
             NotFound404Field.Clicked += (s, e) => ViewModel.FieldClicked(e.Field);
 
             DeploymentControl.Initialize(_blinkStoryBoard);
+            
+            // Server field for entering server
+            ServerP2Field.Initialize(new BoardFieldViewModel(ViewModel.Game.Board.Fields[5, 10]), _blinkStoryBoard, _lineBoostStoryBoard);
 
             var fadeIn = new DoubleAnimation(0, 1, TimeSpan.FromSeconds(.5)) { BeginTime = TimeSpan.FromSeconds(0) };
             var fadeOut = new DoubleAnimation(1, 0, TimeSpan.FromSeconds(.5)) { BeginTime = TimeSpan.FromSeconds(0) };
