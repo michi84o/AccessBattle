@@ -252,7 +252,7 @@ namespace AccessBattleWpf
                         else if (field.Position.Y == 10)
                         {
                             // Extension fields
-                            if (field.Position.X == 0)
+                            if (field.Position.X == 0) // Boost P1
                             {
                                 // Line Boost field clicked
                                 // Check if a card already has a line boost
@@ -265,7 +265,7 @@ namespace AccessBattleWpf
                                     {
                                         _game.CurrentPlayer = 2;
                                         _isLineBoostP1Selected = false;
-                                    }                                    
+                                    }
                                     return;
                                 }
                                 // No boosted card
@@ -280,7 +280,7 @@ namespace AccessBattleWpf
                                     SetBlink(field.Position, true);
                                     _isLineBoostP1Selected = true;
                                     // Let all Player cards on the field blink
-                                    var allPlayerCardsOnField = 
+                                    var allPlayerCardsOnField =
                                         Game.Board.OnlineCards.FindAll(card =>
                                         card.Owner.PlayerNumber == _game.CurrentPlayer &&
                                         card.Location.Position.Y < 8);
@@ -290,6 +290,26 @@ namespace AccessBattleWpf
                                     }
                                     return;
                                 }
+                            }
+                            else if (field.Position.X == 1) // Firewall P1
+                            {
+                                return; // TODO
+                            }
+                            else if (field.Position.X == 2) // Virus Check P1
+                            {
+                                return; // TODO
+                            }
+                            else if (field.Position.X == 3) // Error 404 P1
+                            {
+                                return; // TODO
+                            }
+                            else if (field.Position.X == 4) // P1 Server Area
+                            {
+                                return; // TODO
+                            }
+                            else if (field.Position.X == 5) // P2 Server Area
+                            {
+                                return; // TODO
                             }
                         }
                     }

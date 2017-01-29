@@ -87,6 +87,7 @@ namespace AccessBattleWpf
             
             // Server field for entering server
             ServerP2Field.Initialize(new BoardFieldViewModel(ViewModel.Game.Board.Fields[5, 10]), _blinkStoryBoard, _lineBoostStoryBoard);
+            ServerP2Field.Clicked += (s, e) => ViewModel.FieldClicked(e.Field);
 
             var fadeIn = new DoubleAnimation(0, 1, TimeSpan.FromSeconds(.5)) { BeginTime = TimeSpan.FromSeconds(0) };
             var fadeOut = new DoubleAnimation(1, 0, TimeSpan.FromSeconds(.5)) { BeginTime = TimeSpan.FromSeconds(0) };

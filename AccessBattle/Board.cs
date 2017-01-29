@@ -78,9 +78,9 @@ namespace AccessBattle
             Fields[1, 10] = new BoardField(1, 10, BoardFieldType.Firewall);
             Fields[2, 10] = new BoardField(2, 10, BoardFieldType.VirusCheck);
             Fields[3, 10] = new BoardField(3, 10, BoardFieldType.Error404);
-            Fields[4, 10] = new BoardField(3, 10, BoardFieldType.ServerArea);
-            Fields[5, 10] = new BoardField(3, 10, BoardFieldType.ServerArea);
-            for (ushort x = 2; x < 8; ++x)
+            Fields[4, 10] = new BoardField(4, 10, BoardFieldType.ServerArea);
+            Fields[5, 10] = new BoardField(5, 10, BoardFieldType.ServerArea);
+            for (ushort x = 6; x < 8; ++x)
                 Fields[x, 10] = new BoardField(x, 10, BoardFieldType.Undefined);
             
             OnlineCards = new List<OnlineCard>();

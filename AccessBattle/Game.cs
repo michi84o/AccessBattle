@@ -189,10 +189,10 @@ namespace AccessBattle
         }
 
         /// <summary>
-        /// Command   Syntax             Example
+        /// Command      Syntax             Example
         /// -------------------------------------------
-        /// Move      mv x1,y1,x2,y2     mv 0,0,1,0
-        /// Boost     bs x1,y1,e         bs 0,0,1
+        /// Move         mv x1,y1,x2,y2     mv 0,0,1,0
+        /// Boost        bs x1,y1,e         bs 0,0,1
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
@@ -216,7 +216,7 @@ namespace AccessBattle
                     uint.TryParse(split[3], out y2))
                 {
                     // Check range
-                    if (x1 > 7 || x2 > 7 || y1 > 9 || y2 > 9)
+                    if (x1 > 7 || x2 > 7 || y1 > 10 || y2 > 10)
                     {
                         Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! Out of range.");
                         return false;
@@ -279,7 +279,10 @@ namespace AccessBattle
                             }
                         }
                         // Default movement: Main-Main or exit
-                        else if (field2.Type == BoardFieldType.Main || field2.Type == BoardFieldType.Exit)
+                        else if (
+                            field2.Type == BoardFieldType.Main || 
+                            field2.Type == BoardFieldType.Exit ||
+                            field2.Type == BoardFieldType.ServerArea)
                         {
                             // GetTargetFields already does some rule checks
                             if (GetTargetFields(field1).Contains(field2))
@@ -299,12 +302,11 @@ namespace AccessBattle
                                     // Remove boost if applied
                                     if (card.HasBoost) card.HasBoost = false;
                                 }
-                                // TODO: 
-                                //if (field2.Type == BoardFieldType.Exit)
-                                //{
-                                //    PlaceCardOnStack(field1.Card as OnlineCard);
-                                //    return true;
-                                //}
+                                if (field2.Type == BoardFieldType.ServerArea)
+                                {
+                                    PlaceCardOnStack(field1.Card as OnlineCard);
+                                    return true;
+                                }
                                 field2.Card = field1.Card;
                                 field1.Card = null;
                                 field2.Card.Location = field2;
@@ -448,8 +450,8 @@ namespace AccessBattle
                 var additionalfields = new List<BoardField>();
                 foreach (var f in fields)
                 {
-                    // Ignore field if it it an exit field or has an opponents card
-                    if (f.Card != null || f.Type == BoardFieldType.Exit) continue;
+                    // Ignore field if it has an opponents card
+                    if (f.Card != null) continue;
 
                     fs = new BoardField[4];
                     p = f.Position;
@@ -467,7 +469,7 @@ namespace AccessBattle
                     else
                     {
                         // Special case for exit fields:
-                        if (p.Y == 7 && field.Type == BoardFieldType.Exit && CurrentPlayer == 1)
+                        if (p.Y == 7 && f.Type == BoardFieldType.Exit && CurrentPlayer == 1)
                             fs[1] = Board.Fields[5, 10];
                     }
 

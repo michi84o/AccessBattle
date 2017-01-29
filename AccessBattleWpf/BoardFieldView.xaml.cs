@@ -93,7 +93,7 @@ namespace AccessBattleWpf
             VirusCheckGrid.Visibility = Visibility.Hidden;
             FirewallGrid.Visibility = Visibility.Hidden;
             NotFound404Grid.Visibility = Visibility.Hidden;
-            LineBoostGrid.Visibility = Visibility.Hidden;
+            //LineBoostGrid.Visibility = Visibility.Hidden; // Set below
             ExitBox.Visibility = Visibility.Hidden;
             VirusPath.Stroke = Brushes.DarkGray;
             VirusPath.Fill = Brushes.DarkGray;
@@ -110,6 +110,10 @@ namespace AccessBattleWpf
                 if (_field.Card.Owner.PlayerNumber == 1) playerBrush = Brushes.Blue;
                 else if (_field.Card.Owner.PlayerNumber == 2) playerBrush = Brushes.Gold;
             }
+
+            var hasBoost = _field != null && _field.Card != null &&
+                _field.Card is OnlineCard &&
+                ((OnlineCard)_field.Card).HasBoost;
 
             switch (_displayState)
             {
@@ -138,6 +142,11 @@ namespace AccessBattleWpf
                     VirusPath.Stroke = Brushes.White;
                     VirusPath.Fill = Brushes.White;
                     VirusText.Foreground = Brushes.White;
+                    if (hasBoost)
+                    {
+                        LineBoostGrid.Visibility = Visibility.Visible;
+                        //LineBoostGrid.Opacity = 1; Do not set
+                    }
                     break;
                 case BoardFieldViewDisplayState.Empty:
                     if (_field.Type == BoardFieldType.Stack) Background = Brushes.Black;
