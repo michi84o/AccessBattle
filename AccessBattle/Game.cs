@@ -410,7 +410,7 @@ namespace AccessBattle
             {
                 // Special case for exit fields:
                 if (p.Y == 0 && field.Type == BoardFieldType.Exit && CurrentPlayer == 2)
-                    fs[1] = Board.Fields[4, 10];
+                    fs[0] = Board.Fields[4, 10];
             }
 
             if (p.Y >= 0 && p.Y < 7) // Up

@@ -14,21 +14,11 @@ namespace AccessBattle
         int _playerIndex;
         Random rnd;
 
-        SynchronizationContext _context;
-
         public GameAI(Game game, int playerIndex = 2)
         {
             _game = game;
             rnd = new Random(Guid.NewGuid().GetHashCode());
             _playerIndex = playerIndex;
-            _context = SynchronizationContext.Current ?? new SynchronizationContext();
-        }
-
-        void ContextExecute(Action action)
-        {
-            var handler = action;
-            if (handler != null)
-                _context.Send(o => handler(), null);
         }
 
         public virtual void PlayTurn()
@@ -43,9 +33,28 @@ namespace AccessBattle
                 }
                 else if (_game.Phase == GamePhase.PlayerTurns)
                 {
-                    // Just grab a random card and move forward
                     var myCards = _game.Board.OnlineCards.Where(
                         o => o.Owner != null && o.Owner.PlayerNumber == _playerIndex).ToList();
+
+                    // First check if any card is on the Exit field
+                    int exitY = _playerIndex > 1 ? 0 : 7;
+                    ushort targetServerAreaX = (ushort)(_playerIndex > 1 ? 4 : 5);
+                    var cardOnExit = myCards.FirstOrDefault(o => 
+                            o.Location.Type == BoardFieldType.Exit &&
+                            o.Location.Position.Y == exitY);
+                    if (cardOnExit != null)
+                    {
+                        Thread.Sleep(500);
+                        UiSyncHelper.Execute(() => 
+                        {
+                            _game.ExecuteCommand(_game.CreateMoveCommand(
+                            cardOnExit.Location.Position, new Vector(targetServerAreaX, 10)));
+                            _game.CurrentPlayer = (_playerIndex == 2) ? 1 : 2;
+                        });
+                        return;
+                    }
+
+                    // Just grab a random card and move forward
                     // Choose to move a virus or link
                     var ct = OnlineCardType.Link;
                     if (rnd.Next(0, 101) <= 40) // 40% Chance to pick virus
@@ -77,16 +86,16 @@ namespace AccessBattle
                             }
                         }
                         Thread.Sleep(500);
-                        ContextExecute(() =>
+                        UiSyncHelper.Execute(() =>
                         {
                             _game.ExecuteCommand(_game.CreateMoveCommand(
-                            c.Location.Position, closestMove.Position));
+                                c.Location.Position, closestMove.Position));
+                            _game.CurrentPlayer = (_playerIndex == 2) ? 1 : 2;
                         });
-                        _game.CurrentPlayer = (_playerIndex == 2) ? 1 : 2;
                         return;
                     }
                 }
-                ContextExecute(() => { _game.CurrentPlayer = (_playerIndex == 2) ? 1 : 2; });
+                UiSyncHelper.Execute(() => { _game.CurrentPlayer = (_playerIndex == 2) ? 1 : 2; });
             })).Start();
 #pragma warning restore CC0022 // Should dispose object
         }
@@ -112,7 +121,7 @@ namespace AccessBattle
                 var depField = depFields[index];
                 depFields.Remove(depField);
                 Thread.Sleep(250);
-                ContextExecute(() =>
+                UiSyncHelper.Execute(() =>
                 {
                     if (!_game.ExecuteCommand(_game.CreateMoveCommand(stackFields[i].Position, depField.Position)))
                     {
@@ -120,7 +129,7 @@ namespace AccessBattle
                     }
                 });
             }
-            ContextExecute(() => { _game.Phase = GamePhase.PlayerTurns; });
+            UiSyncHelper.Execute(() => { _game.Phase = GamePhase.PlayerTurns; });
         }
     }
 }

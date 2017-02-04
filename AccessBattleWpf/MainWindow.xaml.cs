@@ -99,6 +99,14 @@ namespace AccessBattleWpf
             _buttonPanelStoryboardFadeOut.Children.Add(fadeOut);
 
             WeakEventManager<Game, PropertyChangedEventArgs>.AddHandler(ViewModel.Game, "PropertyChanged", Game_PropertyChanged);
+
+            Loaded += MainWindow_Loaded;
+        }
+
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            // Assigns the WPF dispatcher as context for UI synchronization
+            UiSyncHelper.Context = SynchronizationContext.Current ?? new SynchronizationContext();
         }
 
         void Game_PropertyChanged(object sender, PropertyChangedEventArgs e)

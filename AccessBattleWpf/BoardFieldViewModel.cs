@@ -15,15 +15,12 @@ namespace AccessBattleWpf
         private BoardField _field;
         public BoardField Field { get { return _field; } }
 
-        SynchronizationContext _context;
-
         public event EventHandler CardChanged;
         Card _lastCard;
 
         public BoardFieldViewModel(BoardField field)
         {
             _field = field;
-            _context = SynchronizationContext.Current ?? new SynchronizationContext();
             WeakEventManager<BoardField, PropertyChangedEventArgs>.AddHandler(field, "PropertyChanged", Field_PropertyChanged);
         }
 
@@ -53,13 +50,6 @@ namespace AccessBattleWpf
             var handler = CardChanged;
             if (handler != null)
                 handler(this, EventArgs.Empty);
-        }
-
-        void ContextExecute(Action action)
-        {
-            var handler = action;
-            if (handler != null)
-                _context.Send(o => handler(), null);
         }
 
         public AccessBattle.Vector Position
