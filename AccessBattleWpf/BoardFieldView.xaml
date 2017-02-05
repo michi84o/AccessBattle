@@ -200,5 +200,17 @@
                     Text="Not Found" TextAlignment="Center" />
             </Viewbox>
         </Grid>
+        <Grid
+            Name="FlippedGrid"
+            Visibility="Collapsed">
+            <Viewbox>
+                <TextBlock Margin="0"
+                    FontFamily="./ExternalResources/#Silkscreen"
+                    FontSize="10" Foreground="White"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Text=" 101010 " TextAlignment="Center" />
+            </Viewbox>
+        </Grid>
     </Grid>
 </Border>

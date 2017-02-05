@@ -23,8 +23,8 @@ namespace AccessBattleWpf
         //MainVirusBoosted,      
         MainLink,
         //MainLinkBoosted,
-        MainFirewall,
-        MainFlipped,      
+        OnlineCardFlipped,
+        MainFirewall,  
         StackVirusEmpty, // Stack fields show always symbol
         StackLinkEmpty,
         StackVirus,

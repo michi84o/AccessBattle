@@ -53,6 +53,9 @@ namespace AccessBattleWpf
                 ResetBlink();
                 _isLineBoostP1Selected = false;
                 _isFirewallP1Selected = false;
+                _isVirusCheckP1Selected = false;
+                _isError404P1Selected = false;
+                _VirusCheckP1Count = 0;
                 switch (_game.Phase)
                 {
                     case GamePhase.Init:
@@ -152,7 +155,10 @@ namespace AccessBattleWpf
         BoardFieldViewModel _currentlySelectedField;
         bool _isLineBoostP1Selected;
         bool _isFirewallP1Selected;
-        
+        bool _isVirusCheckP1Selected;
+        int _VirusCheckP1Count = 0;
+        bool _isError404P1Selected;
+
         public void FieldClicked(BoardFieldViewModel field)
         {
             try
@@ -242,6 +248,11 @@ namespace AccessBattleWpf
 
                             if (field.Card is FirewallCard) return; // Firewall can be removed through action menu
 
+                            // Disable selection if a special card is selected
+                            if (_isError404P1Selected || _isFirewallP1Selected ||
+                                _isVirusCheckP1Selected) // Line boost was already checked
+                                return;
+
                             _currentlySelectedField = field;
                             SetBlink(field.Position, true);
                             // Highlight all fields that card can be moved to
@@ -250,7 +261,22 @@ namespace AccessBattleWpf
                                 SetBlink(f.Position, true);
                             }
                             return;
-                        } // field card != null
+                        } // field card != null && owner == current
+                        else if (field.Card != null && field.Card.Owner.PlayerNumber == 2 && field.Card is OnlineCard)
+                        {
+                            if (_isVirusCheckP1Selected)
+                            {
+                                if (_game.ExecuteCommand(_game.CreateSetVirusCheckCommand(field.Position)))
+                                {
+                                    _isVirusCheckP1Selected = false;
+                                    ResetBlink();
+                                    _game.CurrentPlayer = 2;
+                                    ++_VirusCheckP1Count;
+                                    return;
+                                }
+                            }
+                            return;
+                        }
                         else if (_isFirewallP1Selected && field.Card == null && field.Type == BoardFieldType.Main)
                         {
                             // Place firewall
@@ -260,7 +286,7 @@ namespace AccessBattleWpf
                             }
                             _isFirewallP1Selected = false;
                             ResetBlink();
-                            _game.CurrentPlayer = 2;                            
+                            _game.CurrentPlayer = 2;
                             return;
                         }
                         else if (field.Position.Y == 10)
@@ -339,7 +365,30 @@ namespace AccessBattleWpf
                             }
                             else if (field.Position.X == 2) // Virus Check P1
                             {
-                                return; // TODO
+                                if (_isVirusCheckP1Selected)
+                                {
+                                    ResetBlink();
+                                    _isVirusCheckP1Selected = false;
+                                    return;
+                                }
+                                else
+                                {
+                                    // Card can only be used once
+                                    if (_VirusCheckP1Count > 0)
+                                        return;
+                                    // Blink all opponents cards
+                                    SetBlink(field.Position, true);
+                                    _isVirusCheckP1Selected = true;
+                                    for (int x = 0; x <= 7; ++x)
+                                    {
+                                        for (int y = 0; y <= 7; ++y)
+                                        {
+                                            if (_game.Board.Fields[x, y].Card != null && _game.Board.Fields[x, y].Card.Owner.PlayerNumber == 2)
+                                                SetBlink(_game.Board.Fields[x, y].Position, true);
+                                        }
+                                    }
+                                }
+                                return;
                             }
                             else if (field.Position.X == 3) // Error 404 P1
                             {
@@ -351,7 +400,7 @@ namespace AccessBattleWpf
                             }
                             else if (field.Position.X == 5) // P2 Server Area
                             {
-                                return; // TODO
+                                return; // This is already handled when a card was selected.
                             }
                         } // field.Position.Y == 10
                     } // _currentlySelectedField == null

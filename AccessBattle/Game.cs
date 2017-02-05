@@ -70,7 +70,11 @@ namespace AccessBattle
                 Board.GetFirewall(1).Owner = Players[0];
                 Board.GetFirewall(2).Owner = Players[1];
 
+                _p1VirusCheckCount = 0;
+                _p2VirusCheckCount = 0;
+
                 _winningPlayer = 0;
+                
                 for (int x = 0; x < 8; ++x)
                     for (int y = 0; y < 10; ++y)
                         Board.Fields[x, y].Card = null;
@@ -117,6 +121,9 @@ namespace AccessBattle
             OnPhaseChanged();
         }
 
+        int _p1VirusCheckCount = 0;
+        int _p2VirusCheckCount = 0;
+
         public string CreateMoveCommand(Vector pos1, Vector pos2)
         {
             return string.Format("mv {0},{1},{2},{3}", pos1.X, pos1.Y, pos2.X, pos2.Y);
@@ -130,6 +137,11 @@ namespace AccessBattle
         public string CreateSetFirewallCommand(Vector pos, bool setFireWall)
         {
             return string.Format("fw {0},{1},{2}", pos.X, pos.Y, setFireWall ? 1 : 0);
+        }
+
+        public string CreateSetVirusCheckCommand(Vector pos)
+        {
+            return string.Format("vc {0},{1}", pos.X, pos.Y);
         }
 
         void PlaceCardOnStack(OnlineCard card)
@@ -202,6 +214,7 @@ namespace AccessBattle
         /// Move         mv x1,y1,x2,y2     mv 0,0,1,0
         /// Boost        bs x1,y1,e         bs 0,0,1
         /// Firewall     fw x1,y1,e         fw 0,0,1
+        /// Virus Check  vc x1,y1           vc 0,0
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
@@ -290,7 +303,7 @@ namespace AccessBattle
                         }
                         // Default movement: Main-Main or exit
                         else if (
-                            field2.Type == BoardFieldType.Main || 
+                            field2.Type == BoardFieldType.Main ||
                             field2.Type == BoardFieldType.Exit ||
                             field2.Type == BoardFieldType.ServerArea)
                         {
@@ -415,8 +428,8 @@ namespace AccessBattle
                     {
                         Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! Out of range.");
                         return false;
-                    }                    
-                    var field1 = Board.Fields[x1, y1];                    
+                    }
+                    var field1 = Board.Fields[x1, y1];
                     var fw = Board.GetFirewall(_currentPlayer);
                     if (enabled == 1) // enable firewall
                     {
@@ -444,6 +457,43 @@ namespace AccessBattle
                         fw.Location = null;
                         return true;
                     }
+                }
+            }
+            #endregion
+            #region Virus Check
+            else if (command.StartsWith("vc ", StringComparison.InvariantCulture) && command.Length > 3)
+            {
+                command = command.Substring(3);
+                split = command.Split(new[] { ',' });
+                if (split.Length != 2) return false;
+                uint x1, y1;
+                if (uint.TryParse(split[0], out x1) &&
+                    uint.TryParse(split[1], out y1))
+                {
+                    // Check range
+                    if (x1 > 7 || y1 > 9)
+                    {
+                        Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! Out of range.");
+                        return false;
+                    }
+                    // Check usage
+                    if (_currentPlayer == 1 && _p1VirusCheckCount > 0 ||
+                        _currentPlayer == 2 && _p2VirusCheckCount > 0)
+                    {
+                        Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! Virus Check was already used.");
+                        return false;
+                    }
+                    var field = Board.Fields[x1, y1];
+                    int targetPlayer = 0;
+                    if (_currentPlayer == 1) targetPlayer = 2;
+                    else if (_currentPlayer == 2) targetPlayer = 1;
+                    if (field.Card != null && field.Card is OnlineCard && field.Card.Owner != null && field.Card.Owner.PlayerNumber == targetPlayer)
+                    {
+                        ((OnlineCard)field.Card).IsFaceUp = true;
+                        return true;
+                    }
+                    Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! Virus Check can only be used on cards of opponent.");
+                    return false;
                 }
             }
             #endregion

@@ -89,18 +89,19 @@ namespace AccessBattleWpf
         {
             // TODO: Databinding
             LinkGrid.Visibility = Visibility.Hidden;
-            VirusGrid.Visibility = Visibility.Hidden;
-            VirusCheckGrid.Visibility = Visibility.Hidden;
-            FirewallGrid.Visibility = Visibility.Hidden;
-            NotFound404Grid.Visibility = Visibility.Hidden;
+            VirusGrid.Visibility = Visibility.Collapsed;
+            VirusCheckGrid.Visibility = Visibility.Collapsed;
+            FirewallGrid.Visibility = Visibility.Collapsed;
+            NotFound404Grid.Visibility = Visibility.Collapsed;
             //LineBoostGrid.Visibility = Visibility.Hidden; // Set below
-            ExitBox.Visibility = Visibility.Hidden;
+            ExitBox.Visibility = Visibility.Collapsed;
             VirusPath.Stroke = Brushes.DarkGray;
             VirusPath.Fill = Brushes.DarkGray;
             LinkPath.Stroke = Brushes.DarkGray;
             LinkPath.Fill = Brushes.DarkGray;
             VirusText.Foreground = Brushes.DarkGray;
             LinkText.Foreground = Brushes.DarkGray;
+            FlippedGrid.Visibility = Visibility.Collapsed;
 
             // TODO: Card and state should not be set separately
             // Background Color
@@ -117,6 +118,10 @@ namespace AccessBattleWpf
 
             switch (_displayState)
             {
+                case BoardFieldViewDisplayState.OnlineCardFlipped:
+                    FlippedGrid.Visibility = Visibility.Visible;
+                    Background = playerBrush;
+                    break;
                 case BoardFieldViewDisplayState.StackLinkEmpty:
                     LinkGrid.Visibility = Visibility.Visible;
                     Background = Brushes.Black;
@@ -338,9 +343,11 @@ namespace AccessBattleWpf
                     else
                     {
                         ExitBox.Visibility = Visibility.Hidden;
-                        if (_field.Card is OnlineCard && ((OnlineCard)_field.Card).Type == OnlineCardType.Virus)
+                        if (_field.Card is OnlineCard && (!((OnlineCard)_field.Card).IsFaceUp && _field.Card.Owner.PlayerNumber == 2)) // TODO ??? Player specific
+                            DisplayState = BoardFieldViewDisplayState.OnlineCardFlipped;
+                        else if (_field.Card is OnlineCard && ((OnlineCard)_field.Card).Type == OnlineCardType.Virus)
                             DisplayState = BoardFieldViewDisplayState.MainVirus;
-                        if (_field.Card is OnlineCard && ((OnlineCard)_field.Card).Type == OnlineCardType.Link)
+                        else if (_field.Card is OnlineCard && ((OnlineCard)_field.Card).Type == OnlineCardType.Link)
                             DisplayState = BoardFieldViewDisplayState.MainLink;
                     }                  
 
@@ -357,13 +364,8 @@ namespace AccessBattleWpf
                 {
                     if (_field.Type == BoardFieldType.Stack)
                     {
-                        if (DisplayState == BoardFieldViewDisplayState.StackLink) DisplayState = BoardFieldViewDisplayState.StackLinkEmpty;
-                        else if (DisplayState == BoardFieldViewDisplayState.StackVirus) DisplayState = BoardFieldViewDisplayState.StackVirusEmpty;
-                        else
-                        {
-                            Trace.WriteLine("ERROR! LOST INFO ABOUT STACK PANEL TYPE");
-                            DisplayState = BoardFieldViewDisplayState.Empty;
-                        }
+                        if (_field.Position.X < 4) DisplayState = BoardFieldViewDisplayState.StackLinkEmpty;
+                        else  DisplayState = BoardFieldViewDisplayState.StackVirusEmpty;
                     }
                     else
                         DisplayState = BoardFieldViewDisplayState.Empty;
@@ -371,11 +373,13 @@ namespace AccessBattleWpf
                         IsBlinking = _context.GetBlink(_field.Position);
                     return;
                 }
-                if (_field.Card is OnlineCard && ((OnlineCard)_field.Card).Type == OnlineCardType.Virus)
+                if (_field.Card is OnlineCard && (!((OnlineCard)_field.Card).IsFaceUp && _field.Card.Owner.PlayerNumber == 2))
+                    DisplayState = BoardFieldViewDisplayState.OnlineCardFlipped;
+                else if (_field.Card is OnlineCard && ((OnlineCard)_field.Card).Type == OnlineCardType.Virus)
                     DisplayState = (_field.Type == BoardFieldType.Stack) ? BoardFieldViewDisplayState.StackVirus : BoardFieldViewDisplayState.MainVirus;
-                if (_field.Card is OnlineCard && ((OnlineCard)_field.Card).Type == OnlineCardType.Link)
+                else if (_field.Card is OnlineCard && ((OnlineCard)_field.Card).Type == OnlineCardType.Link)
                     DisplayState = (_field.Type == BoardFieldType.Stack) ? BoardFieldViewDisplayState.StackLink : BoardFieldViewDisplayState.MainLink;
-                if (_field.Card is FirewallCard)
+                else if (_field.Card is FirewallCard)
                     DisplayState = BoardFieldViewDisplayState.Firewall;
             }
             if (_context != null)
