@@ -38,8 +38,16 @@ namespace AccessBattle
     public class Board : PropChangeNotifier
     {
         public BoardField[,] Fields { get; private set; }
-        public List<OnlineCard> OnlineCards { get; private set; }        
-        public List<FirewallCard> Firewalls { get; private set; }
+        public List<OnlineCard> OnlineCards { get; private set; }
+
+        FirewallCard _fireWallP1 = new FirewallCard(); // Owner is set in Game.OnPhaseChanged() call in constructor of Game
+        FirewallCard _fireWallP2 = new FirewallCard();
+        public FirewallCard GetFirewall(int playerNumber)
+        {
+            if (playerNumber == 1) return _fireWallP1;
+            if (playerNumber == 2) return _fireWallP2;
+            return null;
+        }        
 
         #region Little Helpers
         BoardField[] _player1DeploymentFields;

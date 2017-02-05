@@ -52,6 +52,7 @@ namespace AccessBattleWpf
                 CurrentDeploymentType = OnlineCardType.Unknown;
                 ResetBlink();
                 _isLineBoostP1Selected = false;
+                _isFirewallP1Selected = false;
                 switch (_game.Phase)
                 {
                     case GamePhase.Init:
@@ -106,7 +107,7 @@ namespace AccessBattleWpf
             }
             var handler = BlinkStateChanged;
             if (handler != null) handler(this, new BlinkChangedEventArgs(new Vector(0, 0), true));
-            if (handler != null) handler(this, new BlinkChangedEventArgs(new Vector(0, 0), true));
+            //if (handler != null) handler(this, new BlinkChangedEventArgs(new Vector(0, 0), true)); ?????
         }
 
         bool SetBlink(Vector position, bool isBlinking)
@@ -150,7 +151,8 @@ namespace AccessBattleWpf
 
         BoardFieldViewModel _currentlySelectedField;
         bool _isLineBoostP1Selected;
-
+        bool _isFirewallP1Selected;
+        
         public void FieldClicked(BoardFieldViewModel field)
         {
             try
@@ -219,14 +221,12 @@ namespace AccessBattleWpf
                 #region PlayerTurns
                 else if (_game.Phase == GamePhase.PlayerTurns)
                 {
+                    // This only applies actions for player 1
                     if (_game.CurrentPlayer != 1) return;
                     if (_currentlySelectedField == null)
                     {
                         if (field.Card != null && field.Card.Owner.PlayerNumber == _game.CurrentPlayer)
                         {
-                            // TODO Check if field is firewall
-                            // If yes ask player if it should be removed
-
                             // Check if Boost should be placed
                             if (_isLineBoostP1Selected)
                             {
@@ -240,6 +240,8 @@ namespace AccessBattleWpf
                                 return;
                             }
 
+                            if (field.Card is FirewallCard) return; // Firewall can be removed through action menu
+
                             _currentlySelectedField = field;
                             SetBlink(field.Position, true);
                             // Highlight all fields that card can be moved to
@@ -247,6 +249,18 @@ namespace AccessBattleWpf
                             {
                                 SetBlink(f.Position, true);
                             }
+                            return;
+                        } // field card != null
+                        else if (_isFirewallP1Selected && field.Card == null && field.Type == BoardFieldType.Main)
+                        {
+                            // Place firewall
+                            if (!_game.ExecuteCommand(_game.CreateSetFirewallCommand(field.Position, true)))
+                            {
+                                return;
+                            }
+                            _isFirewallP1Selected = false;
+                            ResetBlink();
+                            _game.CurrentPlayer = 2;                            
                             return;
                         }
                         else if (field.Position.Y == 10)
@@ -293,7 +307,35 @@ namespace AccessBattleWpf
                             }
                             else if (field.Position.X == 1) // Firewall P1
                             {
-                                return; // TODO
+                                if (_isFirewallP1Selected)
+                                {
+                                    ResetBlink();
+                                    _isFirewallP1Selected = false;
+                                    return;
+                                }
+                                else
+                                {
+                                    // Check if firewall was already placed, if yes, remove it
+                                    var fw = _game.Board.GetFirewall(_game.CurrentPlayer);
+                                    if (fw.Location != null)
+                                    {
+                                        fw.Location.Card = null;
+                                        fw.Location = null;
+                                        _game.CurrentPlayer = 2;
+                                        return;
+                                    }
+                                    SetBlink(field.Position, true);
+                                    _isFirewallP1Selected = true;
+                                    // Let all empty fields on main area blink
+                                    for (int x = 0; x <= 7; ++x)
+                                    {
+                                        for (int y = 0; y <= 7; ++y)
+                                        {
+                                            if (_game.Board.Fields[x, y].Card == null && _game.Board.Fields[x, y].Type == BoardFieldType.Main)
+                                                SetBlink(_game.Board.Fields[x, y].Position, true);
+                                        }
+                                    }
+                                }
                             }
                             else if (field.Position.X == 2) // Virus Check P1
                             {
@@ -305,14 +347,15 @@ namespace AccessBattleWpf
                             }
                             else if (field.Position.X == 4) // P1 Server Area
                             {
-                                return; // TODO
+                                return; // UI is only used by P1 and P1 cannot enter his own server area
                             }
                             else if (field.Position.X == 5) // P2 Server Area
                             {
                                 return; // TODO
                             }
-                        }
-                    }
+                        } // field.Position.Y == 10
+                    } // _currentlySelectedField == null
+                    // Currently selected field is not null:
                     else if (_currentlySelectedField == field)
                     {
                         _currentlySelectedField = null;

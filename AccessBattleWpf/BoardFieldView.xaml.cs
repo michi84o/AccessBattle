@@ -157,6 +157,7 @@ namespace AccessBattleWpf
                     LineBoostGrid.Opacity = 1;
                     break;
                 case BoardFieldViewDisplayState.Firewall:
+                    Background = playerBrush;
                     FirewallGrid.Visibility = Visibility.Visible;
                     break;
                 case BoardFieldViewDisplayState.VirusCheck:
@@ -374,6 +375,8 @@ namespace AccessBattleWpf
                     DisplayState = (_field.Type == BoardFieldType.Stack) ? BoardFieldViewDisplayState.StackVirus : BoardFieldViewDisplayState.MainVirus;
                 if (_field.Card is OnlineCard && ((OnlineCard)_field.Card).Type == OnlineCardType.Link)
                     DisplayState = (_field.Type == BoardFieldType.Stack) ? BoardFieldViewDisplayState.StackLink : BoardFieldViewDisplayState.MainLink;
+                if (_field.Card is FirewallCard)
+                    DisplayState = BoardFieldViewDisplayState.Firewall;
             }
             if (_context != null)
                 IsBlinking = _context.GetBlink(_field.Position);
@@ -432,6 +435,9 @@ namespace AccessBattleWpf
             {
                 _blinkStoryboard.AddAnimation(_blinkAnimation);
             }
+
+            // Background gets stuck in a wrong color. Fix:
+            //UpdateDisplayState();
         }
 
         

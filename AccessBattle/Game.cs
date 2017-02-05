@@ -67,6 +67,9 @@ namespace AccessBattle
             var phase = _phase;
             if (phase == GamePhase.Init)
             {
+                Board.GetFirewall(1).Owner = Players[0];
+                Board.GetFirewall(2).Owner = Players[1];
+
                 _winningPlayer = 0;
                 for (int x = 0; x < 8; ++x)
                     for (int y = 0; y < 10; ++y)
@@ -122,6 +125,11 @@ namespace AccessBattle
         public string CreateSetBoostCommand(Vector pos, bool setBoost)
         {
             return string.Format("bs {0},{1},{2}", pos.X, pos.Y, setBoost ? 1 : 0);
+        }
+
+        public string CreateSetFirewallCommand(Vector pos, bool setFireWall)
+        {
+            return string.Format("fw {0},{1},{2}", pos.X, pos.Y, setFireWall ? 1 : 0);
         }
 
         void PlaceCardOnStack(OnlineCard card)
@@ -193,6 +201,7 @@ namespace AccessBattle
         /// -------------------------------------------
         /// Move         mv x1,y1,x2,y2     mv 0,0,1,0
         /// Boost        bs x1,y1,e         bs 0,0,1
+        /// Firewall     fw x1,y1,e         fw 0,0,1
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
@@ -204,6 +213,7 @@ namespace AccessBattle
 
             // Move Command
             // Syntax: mv x1,y1,x2,y2
+            #region Move
             if (command.StartsWith("mv ", StringComparison.InvariantCulture) && command.Length > 3)
             {
                 command = command.Substring(3);
@@ -322,6 +332,8 @@ namespace AccessBattle
                     //}
                 }
             }
+            #endregion
+            #region Boost
             else if (command.StartsWith("bs ", StringComparison.InvariantCulture) && command.Length > 3)
             {
                 command = command.Substring(3);
@@ -386,7 +398,55 @@ namespace AccessBattle
                     }
                 }
             }
-
+            #endregion
+            #region Firewall
+            else if (command.StartsWith("fw ", StringComparison.InvariantCulture) && command.Length > 3)
+            {
+                command = command.Substring(3);
+                split = command.Split(new[] { ',' });
+                if (split.Length != 3) return false;
+                uint x1, y1, enabled;
+                if (uint.TryParse(split[0], out x1) &&
+                    uint.TryParse(split[1], out y1) &&
+                    uint.TryParse(split[2], out enabled))
+                {
+                    // Check range
+                    if (x1 > 7 || y1 > 9 || enabled > 1)
+                    {
+                        Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! Out of range.");
+                        return false;
+                    }                    
+                    var field1 = Board.Fields[x1, y1];                    
+                    var fw = Board.GetFirewall(_currentPlayer);
+                    if (enabled == 1) // enable firewall
+                    {
+                        if (fw.Location != null)
+                        {
+                            Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! Firewall is already placed.");
+                            return false;
+                        }
+                        if (field1.Card != null || field1.Type != BoardFieldType.Main)
+                        {
+                            Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! Firewall can only be placed on empty main field.");
+                            return false;
+                        }
+                        field1.Card = fw;
+                        fw.Location = field1;
+                        return true;
+                    }
+                    else // disable firewall
+                    {
+                        if (field1.Card != fw)
+                        {
+                            Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! Firewall is not on the selected field.");
+                        }
+                        field1.Card = null;
+                        fw.Location = null;
+                        return true;
+                    }
+                }
+            }
+            #endregion
             Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid!");
             return false;
         }
@@ -432,7 +492,7 @@ namespace AccessBattle
             {
                 if (fs[i] == null) continue;
                 if (fs[i].Card != null && fs[i].Card.Owner.PlayerNumber == CurrentPlayer) continue;
-                if (fs[i].Card != null && !(fs[i].Card is OnlineCard)) continue; // Can only jump on online cards
+                if (fs[i].Card != null && !(fs[i].Card is OnlineCard)) continue; // Can only jump on online cards <- This ignores the firewall card
                 if (fs[i].Type == BoardFieldType.Stack) continue;
                 if (fs[i].Type == BoardFieldType.Exit)
                 {
