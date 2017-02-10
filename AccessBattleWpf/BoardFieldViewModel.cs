@@ -44,6 +44,13 @@ namespace AccessBattleWpf
             }
         }
 
+        bool _isHighlighted;
+        public bool IsHighlighted
+        {
+            get { return _isHighlighted; }
+            set { SetProp(ref _isHighlighted, value); }
+        }
+
         void Card_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (sender != _lastCard) return;

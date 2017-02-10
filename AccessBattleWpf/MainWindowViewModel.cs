@@ -56,6 +56,9 @@ namespace AccessBattleWpf
                 _isVirusCheckP1Selected = false;
                 _isError404P1Selected = false;
                 _VirusCheckP1Count = 0;
+                _Error404P1Count = 0;
+                OnPropertyChanged("IsVirusCheckVisible");
+                OnPropertyChanged("IsError404P1Visible");
                 switch (_game.Phase)
                 {
                     case GamePhase.Init:
@@ -153,11 +156,23 @@ namespace AccessBattleWpf
         }
 
         BoardFieldViewModel _currentlySelectedField;
+        //BoardFieldViewModel _currentlySelectedField1; // Only used for switching when Error 404 is applied
         bool _isLineBoostP1Selected;
         bool _isFirewallP1Selected;
         bool _isVirusCheckP1Selected;
         int _VirusCheckP1Count = 0;
+        int _Error404P1Count = 0;
         bool _isError404P1Selected;
+
+        public System.Windows.Visibility IsVirusCheckVisible
+        {
+            get { return _VirusCheckP1Count == 0 ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed; }
+        }
+
+        public System.Windows.Visibility IsError404P1Visible
+        {
+            get { return _Error404P1Count == 0 ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed; }
+        }
 
         public void FieldClicked(BoardFieldViewModel field)
         {
@@ -249,12 +264,18 @@ namespace AccessBattleWpf
                             if (field.Card is FirewallCard) return; // Firewall can be removed through action menu
 
                             // Disable selection if a special card is selected
-                            if (_isError404P1Selected || _isFirewallP1Selected ||
-                                _isVirusCheckP1Selected) // Line boost was already checked
+                            if (_isFirewallP1Selected || _isVirusCheckP1Selected) // Line boost was already checked
                                 return;
 
                             _currentlySelectedField = field;
-                            SetBlink(field.Position, true);
+                            SetBlink(field.Position, !_isError404P1Selected);
+
+                            if (_isError404P1Selected)
+                            {
+                                _currentlySelectedField.IsHighlighted = true;
+                                return;
+                            }
+
                             // Highlight all fields that card can be moved to
                             foreach (var f in _game.GetTargetFields(field.Field))
                             {
@@ -272,6 +293,7 @@ namespace AccessBattleWpf
                                     ResetBlink();
                                     _game.CurrentPlayer = 2;
                                     ++_VirusCheckP1Count;
+                                    OnPropertyChanged("IsVirusCheckVisible");
                                     return;
                                 }
                             }
@@ -392,7 +414,30 @@ namespace AccessBattleWpf
                             }
                             else if (field.Position.X == 3) // Error 404 P1
                             {
-                                return; // TODO
+                                if (_isError404P1Selected)
+                                {                                    
+                                    ResetBlink();
+                                    _isError404P1Selected = false;
+                                    return;
+                                }
+                                else
+                                {
+                                    // Card can only be used once
+                                    if (_Error404P1Count > 0)
+                                        return;
+                                    // Blink all own cards
+                                    SetBlink(field.Position, true);
+                                    _isError404P1Selected = true;
+                                    for (int x = 0; x <= 7; ++x)
+                                    {
+                                        for (int y = 0; y <= 7; ++y)
+                                        {
+                                            if (_game.Board.Fields[x, y].Card != null && _game.Board.Fields[x, y].Card.Owner.PlayerNumber == 1)
+                                                SetBlink(_game.Board.Fields[x, y].Position, true);
+                                        }
+                                    }
+                                }
+                                return;
                             }
                             else if (field.Position.X == 4) // P1 Server Area
                             {
@@ -408,10 +453,49 @@ namespace AccessBattleWpf
                     else if (_currentlySelectedField == field)
                     {
                         _currentlySelectedField = null;
-                        ResetBlink();
+                        if (_isError404P1Selected && field.IsHighlighted)
+                        {
+                            field.IsHighlighted = false;
+                            SetBlink(field.Position, true);
+                        }
+                        else 
+                            ResetBlink();
                     }
                     else
                     {
+                        if (_isError404P1Selected)
+                        {
+                            if (field.Position.Y == 10 && field.Position.X == 3)
+                            {
+                                if (_currentlySelectedField != null)
+                                {
+                                    _currentlySelectedField.IsHighlighted = false;
+                                    _currentlySelectedField = null;
+                                    ResetBlink();
+                                    _isError404P1Selected = false;
+                                    return;
+                                }
+                            }
+                            else if (field.Card != null && field.Card.Owner.PlayerNumber == 1 /*_game.CurrentPlayer*/)
+                            {
+                                // Second card was chosen, do the switch
+                                _currentlySelectedField.IsHighlighted = false;
+                                ResetBlink();
+                                _isError404P1Selected = false;
+                                _currentlySelectedField = null;
+                                // Only game is allowed to set cards
+                                if (_game.ExecuteCommand(_game.CreateUseError404Command(field.Card.Location.Position, _currentlySelectedField.Card.Location.Position, true))) // TODO
+                                {
+                                    ++_Error404P1Count;
+                                    OnPropertyChanged("IsError404P1Visible");
+                                    _game.CurrentPlayer = 2;
+                                }
+                                return;
+                            }
+                            // Ignore all other fields
+                            return;
+                        }
+
                         // Move currently selected card if possible
                         var success = _game.ExecuteCommand(_game.CreateMoveCommand(
                             _currentlySelectedField.Position, field.Position));

@@ -325,6 +325,19 @@ namespace AccessBattleWpf
             {
                 UpdateField();
             }
+            // Warning this might screw up everything. It is just used to highlight during Error 404
+            // Only Player 1 Cards
+            else if (e.PropertyName == "IsHighlighted" && _field.Card != null)
+            {
+                UpdateDisplayState();
+                if (_field.IsHighlighted)
+                {                   
+                    if (_field.Card.Owner.PlayerNumber == 1)
+                    {
+                        Background = new SolidColorBrush(Color.FromArgb(0xFF, 0x58, 0xAE, 0xFF));
+                    }
+                }
+            }
             // TODO: Update Background if Owner of card changes
         }
 

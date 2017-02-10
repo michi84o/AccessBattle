@@ -72,6 +72,8 @@ namespace AccessBattle
 
                 _p1VirusCheckCount = 0;
                 _p2VirusCheckCount = 0;
+                _p1Error404Count = 0;
+                _p2Error404Count = 0;
 
                 _winningPlayer = 0;
                 
@@ -123,6 +125,8 @@ namespace AccessBattle
 
         int _p1VirusCheckCount = 0;
         int _p2VirusCheckCount = 0;
+        int _p1Error404Count = 0;
+        int _p2Error404Count = 0;
 
         public string CreateMoveCommand(Vector pos1, Vector pos2)
         {
@@ -142,6 +146,11 @@ namespace AccessBattle
         public string CreateSetVirusCheckCommand(Vector pos)
         {
             return string.Format("vc {0},{1}", pos.X, pos.Y);
+        }
+
+        public string CreateUseError404Command(Vector pos1, Vector pos2, bool switchCards)
+        {
+            return string.Format("er {0},{1},{2},{3},{4}", pos1.X, pos1.Y, pos2.X, pos2.Y, switchCards ? 1 : 0);
         }
 
         void PlaceCardOnStack(OnlineCard card)
@@ -215,6 +224,7 @@ namespace AccessBattle
         /// Boost        bs x1,y1,e         bs 0,0,1
         /// Firewall     fw x1,y1,e         fw 0,0,1
         /// Virus Check  vc x1,y1           vc 0,0
+        /// Error 404    er x1,y1,x2,y2,s   er 0,0,1,1,1
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
@@ -495,6 +505,65 @@ namespace AccessBattle
                     Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! Virus Check can only be used on cards of opponent.");
                     return false;
                 }
+            }
+            #endregion
+            #region Error 404
+            else if (command.StartsWith("er ", StringComparison.InvariantCulture) && command.Length > 3)
+            {
+                command = command.Substring(3);
+                split = command.Split(new[] { ',' });
+                if (split.Length != 5) return false;
+                uint x1, y1, x2, y2, switchCards;
+                if (uint.TryParse(split[0], out x1) &&
+                    uint.TryParse(split[1], out y1) &&
+                    uint.TryParse(split[2], out x2) &&
+                    uint.TryParse(split[3], out y2) &&
+                    uint.TryParse(split[4], out switchCards))
+                {
+                    // Check range
+                    if (x1 > 7 || y1 > 9 || x2 > 7 || y2 > 9 || switchCards > 1)
+                    {
+                        Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! Out of range.");
+                        return false;
+                    }
+                    // Check usage
+                    if (_currentPlayer == 1 && _p1Error404Count > 0 ||
+                        _currentPlayer == 2 && _p2Error404Count > 0)
+                    {
+                        Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! Error 404 was already used.");
+                        return false;
+                    }
+                    var field1 = Board.Fields[x1, y1];
+                    var field2 = Board.Fields[x2, y2];
+                    var card1 = field1.Card as OnlineCard;
+                    var card2 = field2.Card as OnlineCard;
+                    if (card1 == null || card2 == null)
+                    {
+                        Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! One of the fields has no online card.");
+                        return false;
+                    }
+
+                    if (card1.Owner.PlayerNumber != _currentPlayer || card2.Owner.PlayerNumber != _currentPlayer)
+                    {
+                        Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! Only own cards can be switched.");
+                        return false;
+                    }
+
+                    if (_currentPlayer == 1) ++_p1Error404Count;
+                    else if (_currentPlayer == 2) ++_p2Error404Count;
+
+                    card1.IsFaceUp = false;
+                    card2.IsFaceUp = false;
+
+                    if (switchCards == 1)
+                    {
+                        field1.Card = card2;
+                        field2.Card = card1;
+                    }
+                                        
+                    return true;
+
+                } 
             }
             #endregion
             Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid!");

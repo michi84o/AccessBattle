@@ -726,6 +726,7 @@
                 </Border>
                 <custom:BoardFieldView
                     x:Name="VirusCheckField"
+                    Visibility="{Binding IsVirusCheckVisible}"
                     Grid.Column="0"
                     Style="{StaticResource MainField}"
                     BorderBrush="White"
@@ -749,6 +750,7 @@
                     x:Name="NotFound404Field"
                     Grid.Column="3"
                     Style="{StaticResource MainField}"
+                    Visibility="{Binding IsError404P1Visible}"
                     BorderBrush="White"
                     DisplayState="NotFound404">
                 </custom:BoardFieldView>
