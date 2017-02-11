@@ -100,7 +100,20 @@ namespace AccessBattleWpf
 
             WeakEventManager<Game, PropertyChangedEventArgs>.AddHandler(ViewModel.Game, "PropertyChanged", Game_PropertyChanged);
 
+            SwitchCardsCtrl.Yes += SwitchCardsCtrl_Yes;
+            SwitchCardsCtrl.No += SwitchCardsCtrl_No;
+
             Loaded += MainWindow_Loaded;
+        }
+
+        private void SwitchCardsCtrl_No(object sender, EventArgs e)
+        {
+            ViewModel.ExecuteError404(false);
+        }
+
+        private void SwitchCardsCtrl_Yes(object sender, EventArgs e)
+        {
+            ViewModel.ExecuteError404(true);
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)

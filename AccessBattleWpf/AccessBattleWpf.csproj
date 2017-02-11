@@ -37,6 +37,8 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -73,6 +75,9 @@
     </Compile>
     <Compile Include="RelayCommand.cs" />
     <Compile Include="StretchConverter.cs" />
+    <Compile Include="SwitchCardsControl.xaml.cs">
+      <DependentUpon>SwitchCardsControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="VisibilityBoolConverter.cs" />
     <Compile Include="WpfHelper.cs" />
     <Page Include="BoardFieldView.xaml">
@@ -97,6 +102,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="NewGameControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SwitchCardsControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

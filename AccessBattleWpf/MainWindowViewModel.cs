@@ -164,14 +164,21 @@ namespace AccessBattleWpf
         int _Error404P1Count = 0;
         bool _isError404P1Selected;
 
-        public System.Windows.Visibility IsVirusCheckVisible
+        bool _isSwitchCardsVisible;
+        public bool IsSwitchCardsVisible
         {
-            get { return _VirusCheckP1Count == 0 ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed; }
+            get { return _isSwitchCardsVisible; }
+            set { SetProp(ref _isSwitchCardsVisible, value); }
         }
 
-        public System.Windows.Visibility IsError404P1Visible
+        public bool IsVirusCheckVisible
         {
-            get { return _Error404P1Count == 0 ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed; }
+            get { return _VirusCheckP1Count == 0; }
+        }
+
+        public bool IsError404P1Visible
+        {
+            get { return _Error404P1Count == 0; }
         }
 
         public void FieldClicked(BoardFieldViewModel field)
@@ -241,9 +248,10 @@ namespace AccessBattleWpf
                 #endregion
                 #region PlayerTurns
                 else if (_game.Phase == GamePhase.PlayerTurns)
-                {
+                {                    
                     // This only applies actions for player 1
                     if (_game.CurrentPlayer != 1) return;
+                    if (IsSwitchCardsVisible) return;
                     if (_currentlySelectedField == null)
                     {
                         if (field.Card != null && field.Card.Owner.PlayerNumber == _game.CurrentPlayer)
@@ -482,14 +490,10 @@ namespace AccessBattleWpf
                                 _currentlySelectedField.IsHighlighted = false;
                                 ResetBlink();
                                 _isError404P1Selected = false;
-                                _currentlySelectedField = null;
-                                // Only game is allowed to set cards
-                                if (_game.ExecuteCommand(_game.CreateUseError404Command(field.Card.Location.Position, _currentlySelectedField.Card.Location.Position, true))) // TODO
-                                {
-                                    ++_Error404P1Count;
-                                    OnPropertyChanged("IsError404P1Visible");
-                                    _game.CurrentPlayer = 2;
-                                }
+                                _secondSelectedField = field;
+
+                                IsSwitchCardsVisible = true;
+
                                 return;
                             }
                             // Ignore all other fields
@@ -564,5 +568,22 @@ namespace AccessBattleWpf
             return !string.IsNullOrEmpty(_game.Players[0].Name);
         }
 
+        BoardFieldViewModel _secondSelectedField;
+        public void ExecuteError404(bool switchCards)
+        {
+            if (!IsSwitchCardsVisible || _secondSelectedField == null || _currentlySelectedField == null) return;
+
+            // Only game is allowed to set cards
+            if (_game.ExecuteCommand(_game.CreateUseError404Command(_secondSelectedField.Card.Location.Position, _currentlySelectedField.Card.Location.Position, switchCards)))
+            {
+                ++_Error404P1Count;
+                OnPropertyChanged("IsError404P1Visible");
+                _game.CurrentPlayer = 2;
+            }
+
+            _currentlySelectedField = null;
+            _secondSelectedField = null;
+            IsSwitchCardsVisible = false;
+        }
     }
 }

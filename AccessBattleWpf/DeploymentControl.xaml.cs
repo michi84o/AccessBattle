@@ -105,27 +105,6 @@ namespace AccessBattleWpf
 
         #endregion
 
-        //public static readonly DependencyProperty LinkCardsToDeployProperty =
-        //        DependencyProperty.Register("LinkCardsToDeploy", typeof(int),
-        //        typeof(DeploymentControl), new FrameworkPropertyMetadata(0));
-
-        //public int LinkCardsToDeploy
-        //{
-        //    get { return (int)GetValue(LinkCardsToDeployProperty); }
-        //    set { SetValue(LinkCardsToDeployProperty, value); }
-        //}
-
-        //public static readonly DependencyProperty VirusCardsToDeployProperty =
-        //        DependencyProperty.Register("VirusCardsToDeploy", typeof(int),
-        //        typeof(DeploymentControl), new FrameworkPropertyMetadata(0));
-
-        //public int VirusCardsToDeploy
-        //{
-        //    get { return (int)GetValue(VirusCardsToDeployProperty); }
-        //    set { SetValue(VirusCardsToDeployProperty, value); }
-        //}
-
-
         public static readonly DependencyProperty CurrentDeploymentTypeProperty =
                 DependencyProperty.Register("CurrentDeploymentType", typeof(OnlineCardType),
                 typeof(DeploymentControl), new FrameworkPropertyMetadata(OnlineCardType.Unknown));
