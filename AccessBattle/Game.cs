@@ -337,7 +337,10 @@ namespace AccessBattle
                                 }
                                 if (field2.Type == BoardFieldType.ServerArea)
                                 {
-                                    PlaceCardOnStack(field1.Card as OnlineCard);
+                                    var card = field1.Card as OnlineCard;
+                                    PlaceCardOnStack(card);
+                                    // Remove boost if applied
+                                    if (card.HasBoost) card.HasBoost = false;
                                     return true;
                                 }
                                 field2.Card = field1.Card;
