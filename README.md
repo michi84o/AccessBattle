@@ -14,5 +14,6 @@ The User interface is implemented in WPF using .NET 4.5.
 You need at least Windows Vista SP2, Windows 7 SP1 or newer 
 to use it. I tested it on Windows 7.
 
-There are no binaries in this repository yet since the UI is
-not completely finished.
+The code is currently a complete mess. I am focusing on
+making the game run. When it does I will clean it up
+and add some documentation.
