@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AccessBattle;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -26,17 +27,19 @@ namespace AccessBattle
         Error404,
     }
 
-    // TODO: Link card must perform infiltration in a separate turn
-    //       after it enters the exit field
 
     public class Game : PropChangeNotifier
     {
-        public Player[] Players { get; private set; }
+        #region Members
+
+        Player[] _players;
+        public Player[] Players { get { return _players; } }
+
         int _currentPlayer;
         public int CurrentPlayer
         {
             get { return _currentPlayer; }
-            set { SetProp(ref _currentPlayer, value); }
+            set { SetProp(ref _currentPlayer, value); } // TODO: Make private
         }
 
         int _winningPlayer;
@@ -46,12 +49,14 @@ namespace AccessBattle
             set { SetProp(ref _winningPlayer, value); }
         }
 
-        public Board Board { get; private set; }
+        Board _board;
+        public Board Board { get { return Board; }  }
+
         GamePhase _phase;
         public GamePhase Phase
         {
             get { return _phase; }
-            set
+            set // TODO: Private
             {
                 if (_phase != value)
                 {
@@ -62,6 +67,8 @@ namespace AccessBattle
             }
         }
 
+        #endregion
+
         void OnPhaseChanged()
         {
             var phase = _phase;
@@ -70,10 +77,10 @@ namespace AccessBattle
                 Board.GetFirewall(1).Owner = Players[0];
                 Board.GetFirewall(2).Owner = Players[1];
 
-                _p1VirusCheckCount = 0;
-                _p2VirusCheckCount = 0;
-                _p1Error404Count = 0;
-                _p2Error404Count = 0;
+                Players[0].Did404NotFound = false;
+                Players[0].DidVirusCheck = false;
+                Players[1].Did404NotFound = false;
+                Players[2].DidVirusCheck = false;                
 
                 _winningPlayer = 0;
                 
@@ -112,21 +119,16 @@ namespace AccessBattle
 
         public Game()
         {
-            Players = new Player[]
+            _players = new Player[]
             {
                 new Player(1) { Name = "Player 1"  },
                 new Player(2) { Name = "Player 2"  }
             };
             _winningPlayer = 0;
-            Board = new Board();
-            Phase = GamePhase.Init;
+            _board = new Board();
+            _phase = GamePhase.Init;
             OnPhaseChanged();
         }
-
-        int _p1VirusCheckCount = 0;
-        int _p2VirusCheckCount = 0;
-        int _p1Error404Count = 0;
-        int _p2Error404Count = 0;
 
         public string CreateMoveCommand(Vector pos1, Vector pos2)
         {
@@ -233,6 +235,12 @@ namespace AccessBattle
             if (string.IsNullOrEmpty(command)) return false;
             var cmdCopy = command;
             string[] split;
+
+            if (_currentPlayer < 1 || _currentPlayer > 2)
+            {
+                Trace.WriteLine("Game: Cannot execute command! Current player is not set.");
+                return false;
+            }
 
             // Move Command
             // Syntax: mv x1,y1,x2,y2
@@ -490,8 +498,7 @@ namespace AccessBattle
                         return false;
                     }
                     // Check usage
-                    if (_currentPlayer == 1 && _p1VirusCheckCount > 0 ||
-                        _currentPlayer == 2 && _p2VirusCheckCount > 0)
+                    if (Players[_currentPlayer-1].DidVirusCheck)
                     {
                         Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! Virus Check was already used.");
                         return false;
@@ -503,6 +510,7 @@ namespace AccessBattle
                     if (field.Card != null && field.Card is OnlineCard && field.Card.Owner != null && field.Card.Owner.PlayerNumber == targetPlayer)
                     {
                         ((OnlineCard)field.Card).IsFaceUp = true;
+                        Players[_currentPlayer - 1].DidVirusCheck = true;
                         return true;
                     }
                     Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! Virus Check can only be used on cards of opponent.");
@@ -530,8 +538,7 @@ namespace AccessBattle
                         return false;
                     }
                     // Check usage
-                    if (_currentPlayer == 1 && _p1Error404Count > 0 ||
-                        _currentPlayer == 2 && _p2Error404Count > 0)
+                    if (Players[_currentPlayer-1].Did404NotFound)
                     {
                         Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! Error 404 was already used.");
                         return false;
@@ -552,8 +559,7 @@ namespace AccessBattle
                         return false;
                     }
 
-                    if (_currentPlayer == 1) ++_p1Error404Count;
-                    else if (_currentPlayer == 2) ++_p2Error404Count;
+                    Players[_currentPlayer-1].Did404NotFound = true;                    
 
                     card1.IsFaceUp = false;
                     card2.IsFaceUp = false;

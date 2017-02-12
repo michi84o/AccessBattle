@@ -56,7 +56,7 @@ namespace AccessBattle
         {
             if (playerNumber == 1) return _player1DeploymentFields.ToList();
             if (playerNumber == 2) return _player2DeploymentFields.ToList();
-            return new List<BoardField>();
+            return new List<BoardField>(); // TODO: Exception?
         }
         BoardField[] _player1StackFields; // First 4 are link fields
         BoardField[] _player2StackFields; // First 4 are link fields

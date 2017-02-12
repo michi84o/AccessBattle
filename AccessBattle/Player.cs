@@ -13,24 +13,20 @@ namespace AccessBattle
         public string Name
         {
             get { return _name; }
-            set
-            {
-                if (_name == value) return;
-                _name = value;
-                OnPropertyChanged();
-            }
+            set { SetProp(ref _name, value); }
         }
         public int Points { get; set; }
 
         public bool DidVirusCheck { get; set; }
         public bool Did404NotFound { get; set; }
 
-        public readonly int PlayerNumber = 0;
+        int _playerNumber = 0;
+        public int PlayerNumber { get { return _playerNumber; } }
         public Socket Connection;
 
         public Player(int playerNumber)
         {
-            PlayerNumber = playerNumber;
+            _playerNumber = playerNumber;
         }
 
         ~Player()
