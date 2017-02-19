@@ -4,3 +4,5 @@
 /AccessBattleWpf/obj
 /.vs
 /*.suo
+/AccessBattleServer/obj
+/AccessBattleServer/bin
