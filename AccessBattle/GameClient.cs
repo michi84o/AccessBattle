@@ -13,31 +13,57 @@ namespace AccessBattle
         Game _game = new Game();
         public Game Game { get { return _game; } }
 
-        TcpClient _client;
-
+        Socket _connection;
         public GameClient()
         {
             // TODO
         }
 
+        public bool SendMessage(string message)
+        {
+            var con = _connection;
+            if (con == null) return false;
+            var bytes = Encoding.ASCII.GetBytes(message);
+            try
+            {
+                return con.Send(bytes) == bytes.Length;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("GameClient: Error sending message: " + e);
+                return false;
+            }
+        }
+
         public bool Connect(string server, ushort port)
         {
             Disconnect();
-            _client = new TcpClient(server, port);
-
-            // TODO
-
+            _connection = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            try
+            {
+                _connection.Connect(server, port);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Client connect failed: " + e);
+                return false;
+            }
+            Console.WriteLine("Client connect success!");
             return true;
         }
 
+        /// <summary>
+        /// </summary>
         public void Disconnect()
         {
-            if (_client == null) return;
-            _client.Close();
-            _client = null;
-
-            // TODO
-
+            if (_connection == null) return;
+            try
+            {
+                _connection.Close();
+                _connection.Dispose();
+            }
+            catch { }
+            _connection = null;
         }
 
     }

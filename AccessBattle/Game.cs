@@ -50,7 +50,7 @@ namespace AccessBattle
         }
 
         Board _board;
-        public Board Board { get { return Board; }  }
+        public Board Board { get { return _board; }  }
 
         GamePhase _phase;
         public GamePhase Phase
@@ -80,7 +80,7 @@ namespace AccessBattle
                 Players[0].Did404NotFound = false;
                 Players[0].DidVirusCheck = false;
                 Players[1].Did404NotFound = false;
-                Players[2].DidVirusCheck = false;                
+                Players[1].DidVirusCheck = false;                
 
                 _winningPlayer = 0;
                 

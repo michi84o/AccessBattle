@@ -12,16 +12,30 @@ namespace AccessBattleServer
 {
     class Program
     {
+        static GameServer _server;
+
         static void Main(string[] args)
         {
-            var server = new GameServer();
-            server.Start();
+            _server = new GameServer();
+            _server.Start();
 
-            Thread.Sleep(3000);
+            var client = new GameClient();
+            if (client.Connect("127.0.0.1", 3221))
+            {
+                client.SendMessage("Hello");
+            }
+            
+            string input;
+            while ((input = Console.ReadLine()) != "exit")
+            {
 
-            server.Stop();
-
-            Console.ReadKey();
+            }
+            client.Disconnect();
+            _server.Stop();
+            Thread.Sleep(5000);        
         }
+
+        
+
     }
 }

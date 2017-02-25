@@ -64,6 +64,20 @@ namespace AccessBattle
                     var socketTask = _server.AcceptSocketAsync();
                     socketTask.Wait();
                     var socket = socketTask.Result;
+
+                    if (socket != null)
+                    {
+                        var buffer = new byte[64];
+                        var args = new SocketAsyncEventArgs();
+                        args.SetBuffer(buffer, 0, buffer.Length);
+                        args.UserToken = 1;
+                        
+                        args.Completed += (sender, e) =>
+                        {
+                            Console.WriteLine("Received data from client");
+                        };
+                        socket.ReceiveAsync(args);
+                    }
                 }
                 catch (AggregateException)
                 {
@@ -76,6 +90,6 @@ namespace AccessBattle
                 }
             }
             Console.WriteLine("Wait for clients was cancelled");
-        }
+        }        
     }
 }
