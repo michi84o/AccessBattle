@@ -6,7 +6,6 @@ using System.Text;
 
 namespace AccessBattle
 {
-    // TODO: Make Disposeable
     public class Player : PropChangeNotifier
     {
         string _name;
@@ -20,18 +19,22 @@ namespace AccessBattle
         public bool DidVirusCheck { get; set; }
         public bool Did404NotFound { get; set; }
 
-        int _playerNumber = 0;
+        int _playerNumber;
         public int PlayerNumber { get { return _playerNumber; } }
-        public Socket Connection;
-
+        
         public Player(int playerNumber)
         {
             _playerNumber = playerNumber;
         }
-
-        ~Player()
+        
+        NetworkPlayer _client;
+        /// <summary>
+        /// This object is managed by GameServer. Do not dispose it!
+        /// </summary>
+        public NetworkPlayer Client
         {
-            if (Connection != null) Connection.Dispose();
+            get { return _client; }
+            set { SetProp(ref _client, value); }
         }
     }
 }
