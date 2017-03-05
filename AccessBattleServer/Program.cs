@@ -33,8 +33,57 @@ namespace AccessBattleServer
 
         }
 
+        static void TestNetworkPacket()
+        {
+            var bytes = new byte[256];
+            for (int i = 0; i <= 255; ++i) // don't use byte here !!!
+            {
+                bytes[i] = (byte)i;
+            }
+            var packet = new NetworkPacket(bytes, 8);
+            var packetRaw = packet.ToByteArray();
+            // Expecting 3 escapes
+            if (packetRaw.Length != bytes.Length + 3 + 6)
+                Console.WriteLine("Network packet length fail 1");
+
+            // pack it into new array
+            var packetRawPadded = new byte[packetRaw.Length + 3];
+            Array.Copy(packetRaw, 0, packetRawPadded, 1, packetRaw.Length);
+
+            int stxIndex, etxIndex;
+            var packet2 = NetworkPacket.FromByteArray(packetRawPadded, out stxIndex, out etxIndex);
+            if (packet2 == null)
+            {
+                Console.WriteLine("Network packet fail");
+                return;
+            }
+
+            if (stxIndex != 1)
+                Console.WriteLine("Network packet STX fail");
+            if (etxIndex != packetRaw.Length)
+                Console.WriteLine("Network packet ETX fail");
+            if (packet2.PacketType != 8)
+                Console.WriteLine("Network packet type fail");
+            if (packet2.Data.Length != 256)
+            {
+                Console.WriteLine("Network packet length fail 2");
+                return;
+            }
+            // Compare
+            bool fail = false;
+            for (int i = 0; i <= 255; ++i) // do not use byte here !!!
+            {
+                fail |= bytes[i] != packet2.Data[i];
+            }
+            if (fail)
+                Console.WriteLine("Network packet data fail");
+        }
+
         static void Main(string[] args)
         {
+            TestNetworkPacket();
+            return;
+
             _server = new GameServer();
             _server.Start();
 
@@ -51,7 +100,7 @@ namespace AccessBattleServer
             }
             client.Disconnect();
             _server.Stop();
-            Thread.Sleep(5000);        
+            Thread.Sleep(5000);
         }
 
         

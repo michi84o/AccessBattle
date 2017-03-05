@@ -16,7 +16,7 @@ using System.Threading.Tasks;
  * Packet Format: [STX|LEN|TYPE|DATA|CHSUM|ETX]
  * ----------------------------------------
  * STX = Start of packet 0x02
- * LEN = Length of data (2 byte)
+ * LEN = Length of data (2 byte) (1st byte = upper bytes, 2nd byte = lower bytes
  * TYPE = Packet type (1 byte)
  *      - 0x01: RSA public key [XML (string)]
  *      - 0x02: Login Client[user;password (string)]
@@ -39,8 +39,8 @@ namespace AccessBattle
         List<Game> _games = new List<Game>();
         public List<Game> Games { get { return _games; } }
 
-        List<NetworkPlayer> _players = new List<NetworkPlayer>();
-        public List<NetworkPlayer> Players { get { return _players; } }
+        Dictionary<int,NetworkPlayer> _players = new Dictionary<int, NetworkPlayer>();
+        public Dictionary<int, NetworkPlayer> Players { get { return _players; } }
 
         CryptoHelper _decrypter;
 
@@ -58,7 +58,7 @@ namespace AccessBattle
                 port = 3221; // OSH MK UF A 2010
             }
             _port = port;
-            if (port != 3221) Trace.WriteLine("The Organization is doing it again! El Psy Congroo");
+            if (port != 3221) Trace.WriteLine("The Organization has made their move! El Psy Congroo");
             _decrypter = new CryptoHelper();
         }
 
@@ -84,11 +84,18 @@ namespace AccessBattle
             _serverTask = null;
             _server = null;
 
-            foreach (var player in _players)
+            foreach (var item in _players)
             {
-                player.Dispose();
+                item.Value.Dispose();
             }
             _players.Clear();
+        }
+
+        int GetUid()
+        {
+            var guid = Guid.NewGuid().ToByteArray(); // 16 byte
+            var uid = guid[0] | guid[0] << 8 | guid[0] << 16 | guid[0] << 24;
+            return uid;
         }
 
         void ListenForClients(CancellationToken token)
@@ -103,20 +110,20 @@ namespace AccessBattle
 
                     if (socket != null)
                     {
-                        var player = new NetworkPlayer(socket);
-                        Players.Add(player);
+                        // We got connected. The new client has not been authenticated yet.
+                        // Give him a uid. GUID has 128 bit, but 32 bits seems enough:
+                        int uid;
+                        // Make sure we do not accidentally generate the same uid:
+                        while (Players.ContainsKey((uid = GetUid()))) { }
 
-                        var buffer = new byte[64];
-                        var args = new SocketAsyncEventArgs();
-                        args.SetBuffer(buffer, 0, buffer.Length);
-                        args.UserToken = 1;
-                                                
-                        args.Completed += (sender, e) =>
-                        {
-                            Console.WriteLine("Received data from client");
-                            
-                        };
-                        socket.ReceiveAsync(args);
+                        var serverCrypto = new CryptoHelper();
+                        var player = new NetworkPlayer(socket, uid, serverCrypto);
+                        Players.Add(uid,player);
+
+                        // Send public key. There is one key-pair for every client!
+                        serverCrypto.GetPublicKey();
+
+                        ReceiveAsync(player);
                     }
                 }
                 catch (AggregateException)
@@ -130,6 +137,42 @@ namespace AccessBattle
                 }
             }
             Console.WriteLine("Wait for clients was cancelled");
-        }        
+        }
+
+        void ClientReceive_Completed(object sender, SocketAsyncEventArgs e)
+        {
+            try
+            {
+                Console.WriteLine("Received data from client, UID: " + e.UserToken);
+                NetworkPlayer player;
+                if (!Players.TryGetValue((int)e.UserToken, out player))
+                {
+                    Console.WriteLine("GameServer: Client with UID " + e.UserToken + " does not exist");
+                    return;
+                }
+                // Process the packet ======================================
+
+
+
+                // =========================================================
+                ReceiveAsync(player);
+            }
+            // No catch for now. Exceptions will crash the server.
+            finally
+            {
+                e.Dispose();
+            }
+        }
+
+        void ReceiveAsync(NetworkPlayer player)
+        {
+            var buffer = new byte[64];
+            var args = new SocketAsyncEventArgs();
+            args.SetBuffer(buffer, 0, buffer.Length);
+            args.UserToken = player.UID;
+
+            args.Completed += ClientReceive_Completed;
+            player.Connection.ReceiveAsync(args);
+        }
     }
 }

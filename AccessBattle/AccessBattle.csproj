@@ -48,6 +48,7 @@
     <Compile Include="GameAI.cs" />
     <Compile Include="GameClient.cs" />
     <Compile Include="GameServer.cs" />
+    <Compile Include="NetworkPacket.cs" />
     <Compile Include="NetworkPlayer.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="PropChangeNotifier.cs" />

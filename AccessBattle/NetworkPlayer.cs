@@ -9,10 +9,16 @@ namespace AccessBattle
 {
     public class NetworkPlayer : IDisposable
     {
-        Socket _connection;
-        public NetworkPlayer(Socket connection)
+        public int UID { get; private set; }
+        public Socket Connection { get; private set; }
+        public CryptoHelper ServerCrypto { get; private set; }
+        public CryptoHelper ClientCrypto { get; set; }
+
+        public NetworkPlayer(Socket connection, int uid, CryptoHelper serverCrypto)
         {
-            _connection = connection;
+            Connection = connection;
+            UID = uid;
+            ServerCrypto = serverCrypto;
         }
 
         #region IDisposable
@@ -31,8 +37,10 @@ namespace AccessBattle
             if (disposing)
             {
                 // Free any managed objects here.
-                if (_connection != null) _connection.Dispose();
-                _connection = null;
+                if (Connection != null) Connection.Dispose();
+                Connection = null;
+                ServerCrypto = null;
+                ClientCrypto = null;
             }
 
             // Free any unmanaged objects here.            
