@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AccessBattle
+namespace AccessBattle.Networking
 {
     /// <summary>
     /// Uses symmetric encyption to encrypt a byte array. 

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AccessBattle
+namespace AccessBattle.Networking
 {
     public class NetworkPacketType
     {

@@ -6,7 +6,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AccessBattle
+namespace AccessBattle.Networking
 {
     public class GameClient
     {
@@ -42,6 +42,7 @@ namespace AccessBattle
             try
             {
                 _connection.Connect(server, port);
+                ReceiveAsync();
             }
             catch (Exception e)
             {
@@ -50,6 +51,33 @@ namespace AccessBattle
             }
             Console.WriteLine("Client connect success!");
             return true;
+        }
+
+        void ReceiveAsync()
+        {
+            var con = _connection;
+            if (con == null) return;
+
+            var buffer = new byte[64];
+            var args = new SocketAsyncEventArgs();
+            args.SetBuffer(buffer, 0, buffer.Length);
+            args.UserToken = 0;
+
+            args.Completed += ClientReceive_Completed;
+            con.ReceiveAsync(args);
+        }
+
+        void ClientReceive_Completed(object sender, SocketAsyncEventArgs e)
+        {
+            try
+            {
+
+            }
+            // No catch for now. Exceptions will crash the program.
+            finally
+            {
+                ReceiveAsync();
+            }
         }
 
         /// <summary>

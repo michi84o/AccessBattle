@@ -31,7 +31,7 @@ using System.Threading.Tasks;
  * ETX = End of packet   0x03
  *  
  */
-namespace AccessBattle
+namespace AccessBattle.Networking
 {
     public class GameServer
     {
@@ -121,7 +121,9 @@ namespace AccessBattle
                         Players.Add(uid,player);
 
                         // Send public key. There is one key-pair for every client!
-                        serverCrypto.GetPublicKey();
+                        var data = Encoding.ASCII.GetBytes(serverCrypto.GetPublicKey());
+                        var packet = new NetworkPacket(data, NetworkPacketType.PublicKey).ToByteArray();
+                        socket.Send(packet);
 
                         ReceiveAsync(player);
                     }

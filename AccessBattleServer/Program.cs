@@ -1,6 +1,8 @@
 ﻿using AccessBattle;
+using AccessBattle.Networking;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -79,9 +81,31 @@ namespace AccessBattleServer
                 Console.WriteLine("Network packet data fail");
         }
 
+        static void TestByteBuffer()
+        {
+            var buf = new ByteBuffer(8);
+            var bufIn = new byte[3];
+            int j = 0;
+            for (int i = 0; i < 5000; ++i)
+            {
+                if (buf.Capacity - buf.Length < 3)
+                {
+                    byte[] bufOut;
+                    Debug.Assert(buf.Take(3, out bufOut));
+                    Debug.Assert(bufOut[0] == (j++ % 256));
+                    Debug.Assert(bufOut[1] == (j++ % 256));
+                    Debug.Assert(bufOut[2] == (j++ % 256));
+                }
+                bufIn[0] = (byte)(i % 256);
+                bufIn[1] = (byte)(++i % 256);
+                bufIn[2] = (byte)(++i % 256);
+                Debug.Assert(buf.Add(bufIn));
+            }
+        }
+
         static void Main(string[] args)
         {
-            TestNetworkPacket();
+            TestByteBuffer();
             return;
 
             _server = new GameServer();
@@ -102,8 +126,5 @@ namespace AccessBattleServer
             _server.Stop();
             Thread.Sleep(5000);
         }
-
-        
-
     }
 }
