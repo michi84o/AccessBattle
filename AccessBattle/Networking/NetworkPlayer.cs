@@ -9,12 +9,12 @@ namespace AccessBattle.Networking
 {
     public class NetworkPlayer : IDisposable
     {
-        public int UID { get; private set; }
+        public uint UID { get; private set; }
         public Socket Connection { get; private set; }
         public CryptoHelper ServerCrypto { get; private set; }
         public CryptoHelper ClientCrypto { get; set; }
 
-        public NetworkPlayer(Socket connection, int uid, CryptoHelper serverCrypto)
+        public NetworkPlayer(Socket connection, uint uid, CryptoHelper serverCrypto)
         {
             Connection = connection;
             UID = uid;

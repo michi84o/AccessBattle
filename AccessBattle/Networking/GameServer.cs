@@ -39,8 +39,8 @@ namespace AccessBattle.Networking
         List<Game> _games = new List<Game>();
         public List<Game> Games { get { return _games; } }
 
-        Dictionary<int,NetworkPlayer> _players = new Dictionary<int, NetworkPlayer>();
-        public Dictionary<int, NetworkPlayer> Players { get { return _players; } }
+        Dictionary<uint,NetworkPlayer> _players = new Dictionary<uint, NetworkPlayer>();
+        public Dictionary<uint, NetworkPlayer> Players { get { return _players; } }
 
         CryptoHelper _decrypter;
 
@@ -91,11 +91,11 @@ namespace AccessBattle.Networking
             _players.Clear();
         }
 
-        int GetUid()
+        uint GetUid()
         {
             var guid = Guid.NewGuid().ToByteArray(); // 16 byte
             var uid = guid[0] | guid[0] << 8 | guid[0] << 16 | guid[0] << 24;
-            return uid;
+            return (uint)uid;
         }
 
         void ListenForClients(CancellationToken token)
@@ -112,7 +112,7 @@ namespace AccessBattle.Networking
                     {
                         // We got connected. The new client has not been authenticated yet.
                         // Give him a uid. GUID has 128 bit, but 32 bits seems enough:
-                        int uid;
+                        uint uid;
                         // Make sure we do not accidentally generate the same uid:
                         while (Players.ContainsKey((uid = GetUid()))) { }
 
@@ -123,8 +123,8 @@ namespace AccessBattle.Networking
                         // Send public key. There is one key-pair for every client!
                         var data = Encoding.ASCII.GetBytes(serverCrypto.GetPublicKey());
                         var packet = new NetworkPacket(data, NetworkPacketType.PublicKey).ToByteArray();
+                        Console.WriteLine("Server sending "+ data.Length + " byte public key within " + packet.Length + " bytes of packet data.");
                         socket.Send(packet);
-
                         ReceiveAsync(player);
                     }
                 }
@@ -145,19 +145,27 @@ namespace AccessBattle.Networking
         {
             try
             {
-                Console.WriteLine("Received data from client, UID: " + e.UserToken);
-                NetworkPlayer player;
-                if (!Players.TryGetValue((int)e.UserToken, out player))
+                if (e.SocketError != SocketError.Success)
                 {
-                    Console.WriteLine("GameServer: Client with UID " + e.UserToken + " does not exist");
-                    return;
+                    // Will be hit after client disconnect
+                    Console.WriteLine("Server receive for client (UID:"+e.UserToken+") not successful: " + e.SocketError);
                 }
-                // Process the packet ======================================
+                else if (e.BytesTransferred > 0)
+                {
+                    Console.WriteLine("Received data from client, UID: " + e.UserToken);
+                    NetworkPlayer player;
+                    if (!Players.TryGetValue((uint)e.UserToken, out player))
+                    {
+                        Console.WriteLine("GameServer: Client with UID " + e.UserToken + " does not exist");
+                        return;
+                    }
+                    // Process the packet ======================================
 
 
 
-                // =========================================================
-                ReceiveAsync(player);
+                    // =========================================================
+                    ReceiveAsync(player);
+                }                
             }
             // No catch for now. Exceptions will crash the server.
             finally

@@ -70,6 +70,63 @@ namespace AccessBattle.Networking
             return Add(new byte[] { data }, 0, 1);
         }
 
+        /// <summary>
+        /// Scan for a packet with the buffer and extract it.
+        /// </summary>
+        /// <param name="startByte">Packet start byte.</param>
+        /// <param name="endByte">Packet end byte.</param>
+        /// <param name="data">Full packet.</param>
+        /// <returns>True if successful.</returns>
+        public bool Take(byte startByte, byte endByte, out byte[] data)
+        {
+            data = null;
+            if (_length < 2) return false;
+            int startIndex = -1;
+            int endIndex = -1;
+
+            // Cases:
+            // 1: _start < _next  ...S....N.. 
+            // 2: _start = _next  ...X....... (when buffer is full)
+            // 3: _start > _next  ...N....S.. 
+
+            int requiredBytes = 1;
+            
+            if (_buffer[_start] == startByte) startIndex = _start;
+            else
+            {
+                // Sweep until next or start is reached
+                for (int i = _start + 1; i != _start && i != _next; i = (i + 1) % _buffer.Length)
+                {
+                    ++requiredBytes;
+                    if (_buffer[i] == startByte)
+                    {
+                        startIndex = i;
+                        break;
+                    }
+                }
+            }
+            if (startIndex < 0) return false;
+
+            int nextAfterStartIndex = ((startIndex + 1) % _buffer.Length);
+            // Handle case where startIndex is end of packet
+            if (nextAfterStartIndex == _next) return false;
+
+            // Now find end of packet
+            for (int i = nextAfterStartIndex; i != _start && i != _next; i = (i + 1) % _buffer.Length)
+            {
+                ++requiredBytes;
+                if (_buffer[i] == endByte)
+                {
+                    endIndex = i;
+                    break;
+                }
+            }
+
+            if (endIndex > 0)
+                return Take(requiredBytes, out data);
+            return false;
+        }
+
         public bool Take(int length, out byte[] data)
         {
             if (length > _length || length <= 0)

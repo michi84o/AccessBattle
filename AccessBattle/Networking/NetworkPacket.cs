@@ -54,11 +54,24 @@ namespace AccessBattle.Networking
 
         /// <summary>
         /// Create packet from received bytes.
-        /// 
+        /// Use this for buffers that contain exaclty one packet.
         /// </summary>
         /// <param name="buffer"></param>
-        /// <param name="stxIndex"></param>
-        /// <param name="etxIndex"></param>
+        /// <returns></returns>
+        public static NetworkPacket FromByteArray(byte[] buffer)
+        {
+            int stx, etx;
+            return FromByteArray(buffer, out stx, out etx);
+        }
+
+        /// <summary>
+        /// Create packet from received bytes.
+        /// Use this for buffers that contain multiple packets.
+        /// The stxIndex and etxIndex will tell you where the extracted packet was located within the provided buffer.
+        /// </summary>
+        /// <param name="buffer"></param>
+        /// <param name="stxIndex">Start of the packet within the provided byte array.</param>
+        /// <param name="etxIndex">End of the packet within the provided byte array.</param>
         /// <returns></returns>
         public static NetworkPacket FromByteArray(byte[] buffer, out int stxIndex, out int etxIndex)
         {

@@ -101,12 +101,13 @@ namespace AccessBattleServer
                 bufIn[2] = (byte)(++i % 256);
                 Debug.Assert(buf.Add(bufIn));
             }
+            //buf.Add(new byte[8]);
         }
 
         static void Main(string[] args)
         {
-            TestByteBuffer();
-            return;
+            //TestByteBuffer();
+            //return;
 
             _server = new GameServer();
             _server.Start();
