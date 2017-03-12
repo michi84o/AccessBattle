@@ -25,6 +25,12 @@ namespace AccessBattle.Networking
             _decrypter = new CryptoHelper();
         }
         
+        /// <summary>
+        /// This method can block up to 30s! TODO: Make async
+        /// </summary>
+        /// <param name="server"></param>
+        /// <param name="port"></param>
+        /// <returns></returns>
         public bool Connect(string server, ushort port)
         {
             Log.WriteLine("GameClient: Connecting...");
@@ -144,15 +150,61 @@ namespace AccessBattle.Networking
                         Log.WriteLine("GameClient: Received list of games from server could not be read. " + e.Message);
                     }
                     break;
+                case NetworkPacketType.ClientLogin:
+                    try
+                    {
+                        if (data[0] == 0)
+                        {
+                            IsLoggedIn = true;
+                            Log.WriteLine("GameClient: Login to server successful!");
+                        }
+                        else
+                        {
+                            IsLoggedIn = false;
+                            var error = "GameClient: Login to server failed! ";
+                            if (data[0] == 1) error += "Invalid user name";
+                            else if (data[0] == 2) error += "Invalid password";
+                            else error += "Unknown error";                            
+                        }
+                        
+                    }
+                    catch (Exception e)
+                    {
+                        Log.WriteLine("GameClient: Received login confirmation could not be read." + e.Message);
+                    }
+                    break;
                 default:
                     Log.WriteLine("");
                     break;
             }
         }
 
+        bool _isLoggedIn;
+        public bool IsLoggedIn
+        { 
+            get { return _isLoggedIn; }
+            private set { _isLoggedIn = value; }
+        }
+
+        public bool Login(string name, string password)
+        {
+            var login = new Login { Name = name, Password = password };
+            return Send(JsonConvert.SerializeObject(login), NetworkPacketType.ClientLogin);
+        }
+
         public bool RequestGameList()
         {
             return Send(new byte[0], NetworkPacketType.ListGames);
+        }
+
+        //public bool CreateGame()
+        //{
+        //    return Send(new GameInfo {Name }
+        //}
+
+        bool Send(string message, byte packetType)
+        {
+            return Send(Encoding.ASCII.GetBytes(message), packetType);
         }
 
         bool Send(byte[] message, byte packetType)
@@ -163,8 +215,9 @@ namespace AccessBattle.Networking
         /// <summary>
         /// </summary>
         public void Disconnect()
-        {
+        {            
             if (_connection == null) return;
+            IsLoggedIn = false;
             _encrypter = null;
             try
             {

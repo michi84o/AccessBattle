@@ -21,9 +21,9 @@ using System.Threading.Tasks;
  * LEN = Length of data (2 byte) (1st byte = upper bytes, 2nd byte = lower bytes
  * TYPE = Packet type (1 byte)
  *      - 0x01: RSA public key [XML (string)]
- *      - 0x02: Login Client[user;password (string)]
- *      - 0x03: List available games Client[] Server[game1;game2;... (string)]
- *      - 0x04: Create Game Client[name (string)] Server[0/1 (string, 0=OK, 1=Error)]
+ *      - 0x02: Login Client[Login (JSON)] Server[0/1 (byte, 0=OK, 1=invalid name, 2=invalid password)]
+ *      - 0x03: List available games Client[] Server[List<GameInfo> (JSON string)]
+ *      - 0x04: Create Game Client[GameInfo (UID=0,JSON)] Server[GameInfo (UID != 0 => OK)]
  *      - 0x05: Join Game Client[name (string)] Server[0/1 (string, 0=OK, 1=Error)]
  *      - 0x06: Game Init [opponent name, client player number]
  *      - 0x07: Game Status Change [??? TODO]
@@ -48,6 +48,8 @@ namespace AccessBattle.Networking
         public ushort Port { get { return _port; } }
 
         Task _serverTask;
+
+        public bool AcceptAnyClient { get; set; }
 
         public GameServer(ushort port = 3221)
         {
@@ -205,6 +207,13 @@ namespace AccessBattle.Networking
                     return;
                 }
             }
+
+            if (packet.PacketType > NetworkPacketType.ClientLogin && !player.IsLoggedIn)
+            {
+                Log.WriteLine("GameServer: Player " + player.UID + " is not logged it but tried to send packet of type " + packet.PacketType + ". Packet is ignored!");
+                return;
+            }
+
             switch (packet.PacketType)
             {
                 case NetworkPacketType.PublicKey:
@@ -228,6 +237,28 @@ namespace AccessBattle.Networking
                     }
                     var infoJson =
                     Send(JsonConvert.SerializeObject(info), NetworkPacketType.ListGames, player.Connection, player.ClientCrypto);
+                    break;
+                case NetworkPacketType.ClientLogin:
+                    try
+                    {
+                        var login = JsonConvert.DeserializeObject<Login>(Encoding.ASCII.GetString(data));
+                        if (login != null && login.Name.Length > 0)
+                        {
+                            player.Name = login.Name;
+                            player.IsLoggedIn = true;
+                            Log.WriteLine("GameServer: Player " + player.UID + " logged in successfully!");
+                            // TODO Check AcceptAnyClient variable and compare with whitelist
+                            Send(new byte[] { 0 }, NetworkPacketType.ClientLogin, player.Connection, player.ClientCrypto);
+                        }
+                        else
+                            Send(new byte[] { 1 }, NetworkPacketType.ClientLogin, player.Connection, player.ClientCrypto);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.WriteLine("GameServer: Received login of player " + player.UID + " could not be read!");
+                    }
+                    break;
+                default:
                     break;
             }
         }

@@ -10,6 +10,8 @@ namespace AccessBattle.Networking
     public class NetworkPlayer : IDisposable
     {
         public uint UID { get; private set; }
+        public string Name { get; set; }
+        public bool IsLoggedIn { get; set; }
         public Socket Connection { get; private set; }
         /// <summary>
         /// Server crypto containing its private and public key. Used to decrypt data from client.

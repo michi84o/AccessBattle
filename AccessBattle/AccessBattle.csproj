@@ -57,7 +57,8 @@
     <Compile Include="Networking\NetworkBase.cs" />
     <Compile Include="Networking\NetworkPacket.cs" />
     <Compile Include="Networking\NetworkPlayer.cs" />
-    <Compile Include="Networking\Packets\GameList.cs" />
+    <Compile Include="Networking\Packets\GameInfo.cs" />
+    <Compile Include="Networking\Packets\Login.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="PropChangeNotifier.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
