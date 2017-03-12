@@ -15,6 +15,9 @@ namespace AccessBattle.Networking
         /// Server crypto containing its private and public key. Used to decrypt data from client.
         /// </summary>
         public CryptoHelper ServerCrypto { get; private set; }
+        /// <summary>
+        /// Used to encrypt data for client
+        /// </summary>
         public CryptoHelper ClientCrypto { get; set; }
         ByteBuffer _receiveBuffer = new ByteBuffer(4096);
         public ByteBuffer ReceiveBuffer { get { return _receiveBuffer; } }

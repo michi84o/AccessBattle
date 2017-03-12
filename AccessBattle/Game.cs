@@ -32,6 +32,13 @@ namespace AccessBattle
     {
         #region Members
 
+        string _name;
+        public string Name
+        {
+            get { return _name; }
+            set { SetProp(ref _name, value); }
+        }
+
         Player[] _players;
         public Player[] Players { get { return _players; } }
 
@@ -117,8 +124,12 @@ namespace AccessBattle
             }
         }
 
-        public Game()
+        uint _uid;
+        public uint UID { get { return _uid; } }
+
+        public Game(uint uid = 0)
         {
+            _uid = uid;
             _players = new Player[]
             {
                 new Player(1) { Name = "Player 1"  },

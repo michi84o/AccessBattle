@@ -1,4 +1,6 @@
-﻿using System;
+﻿using AccessBattle.Networking.Packets;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -105,9 +107,20 @@ namespace AccessBattle.Networking
 
         void ProcessPacket(NetworkPacket packet)
         {
+            // Decrypt data
+            var data = packet.Data;
+            if (data != null && data.Length > 0 && packet.PacketType != NetworkPacketType.PublicKey)
+            {
+                data = _decrypter.Decrypt(packet.Data);
+                if (data == null)
+                {
+                    Log.WriteLine("GameClient: Error! Could not decrypt message from server");
+                    return;
+                }
+            }
             switch (packet.PacketType)
             {
-                case 0x01: // Key
+                case NetworkPacketType.PublicKey:
                     try
                     {
                         var serverPubKey = Encoding.ASCII.GetString(packet.Data);
@@ -117,6 +130,18 @@ namespace AccessBattle.Networking
                     {
                         _encrypter = null;
                         Log.WriteLine("GameClient: Received key is invalid! " + ex.Message);
+                    }
+                    break;
+                case NetworkPacketType.ListGames:
+                    try
+                    {
+                        var glistString = Encoding.ASCII.GetString(data);
+                        var glist = JsonConvert.DeserializeObject<List<GameInfo>>(glistString);
+                        Log.WriteLine("GameClient: Received list of games on server. Game count: " + glist.Count);
+                    }
+                    catch (Exception e)
+                    {
+                        Log.WriteLine("GameClient: Received list of games from server could not be read. " + e.Message);
                     }
                     break;
                 default:

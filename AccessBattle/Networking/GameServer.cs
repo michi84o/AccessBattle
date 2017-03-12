@@ -1,4 +1,6 @@
-﻿using System;
+﻿using AccessBattle.Networking.Packets;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -36,8 +38,8 @@ namespace AccessBattle.Networking
     public class GameServer : NetworkBase
     {
         // _games[0] is always local game
-        List<Game> _games = new List<Game>();
-        public List<Game> Games { get { return _games; } }
+        public Dictionary<uint, Game> _games = new Dictionary<uint, Game>();
+        public Dictionary<uint, Game> Games { get { return _games; } }
 
         Dictionary<uint,NetworkPlayer> _players = new Dictionary<uint, NetworkPlayer>();
         public Dictionary<uint, NetworkPlayer> Players { get { return _players; } }
@@ -167,38 +169,15 @@ namespace AccessBattle.Networking
                     {
                         Log.WriteLine("GameServer: Received full packet");
                         Log.WriteLine("GameServer: Receive buffer of player " + e.UserToken + " has now " + player.ReceiveBuffer.Length + " bytes of data");
-                        var pack = NetworkPacket.FromByteArray(packData);
-                        if (pack != null)
+                        var packet = NetworkPacket.FromByteArray(packData);
+                        if (packet != null)
                         {
-                            // Decrypt data
-                            var data = pack.Data;
-                            if (data != null && data.Length > 0)
-                            {
-                                data = player.ServerCrypto.Decrypt(pack.Data);
-                                if (data == null)
-                                {
-                                    Log.WriteLine("GameServer: Error! Could not decrypt message of client " + e.UserToken);
-                                    // TODO: Notify client or close connection
-                                    return;
-                                }
-                            }                            
-                            switch (pack.PacketType)
-                            {
-                                case NetworkPacketType.PublicKey:
-                                    try
-                                    {
-                                        Log.WriteLine("GameServer: Received public key of player " + e.UserToken);
-                                        player.ClientCrypto = new CryptoHelper(Encoding.ASCII.GetString(data));
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        Log.WriteLine("GameServer: Received public key of player " + e.UserToken + " is invalid!");
-                                    }
-                                    break;
-                                case NetworkPacketType.ListGames:
-                                    Log.WriteLine("GameServer: Player " + e.UserToken + " requesting game list");
-                                    break;
-                            }
+                            Log.WriteLine("GameServer: Received packet of type " + packet.PacketType + " with " + packet.Data.Length + " bytes of data");
+                            ProcessPacket(packet, player);
+                        }
+                        else
+                        {
+                            Log.WriteLine("GameServer: Could not parse packet!");
                         }
                     }
                     // =========================================================
@@ -212,5 +191,45 @@ namespace AccessBattle.Networking
             }
         }
 
+        void ProcessPacket(NetworkPacket packet, NetworkPlayer player)
+        {
+            // Decrypt data
+            var data = packet.Data;
+            if (data != null && data.Length > 0)
+            {
+                data = player.ServerCrypto.Decrypt(packet.Data);
+                if (data == null)
+                {
+                    Log.WriteLine("GameServer: Error! Could not decrypt message of client " + player.UID);
+                    // TODO: Notify client or close connection?
+                    return;
+                }
+            }
+            switch (packet.PacketType)
+            {
+                case NetworkPacketType.PublicKey:
+                    try
+                    {
+                        Log.WriteLine("GameServer: Received public key of player " + player.UID);
+                        player.ClientCrypto = new CryptoHelper(Encoding.ASCII.GetString(data));
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.WriteLine("GameServer: Received public key of player " + player.UID + " is invalid!");
+                    }
+                    break;
+                case NetworkPacketType.ListGames:
+                    Log.WriteLine("GameServer: Player " + player.UID + " requesting game list");
+                    var glist = Games.Select(kv => kv.Value).Where(v => v.Phase == GamePhase.Init && v.Players[1].Client == null && v.UID != 0).ToList();
+                    var info = new List<GameInfo>();
+                    foreach (var game in glist)
+                    {
+                        info.Add(new GameInfo { UID = game.UID, Name = game.Name, Player1 = game.Players[0].Name });
+                    }
+                    var infoJson =
+                    Send(JsonConvert.SerializeObject(info), NetworkPacketType.ListGames, player.Connection, player.ClientCrypto);
+                    break;
+            }
+        }
     }
 }

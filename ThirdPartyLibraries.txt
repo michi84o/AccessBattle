@@ -1,0 +1,6 @@
+List of third party libaries:
+
+- Newtonsoft.Json version 9.0.1
+   - https://github.com/JamesNK/Newtonsoft.Json
+   - License MIT, Copyright (c) 2007 James Newton-King
+
