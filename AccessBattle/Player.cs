@@ -10,10 +10,19 @@ namespace AccessBattle
     public class Player : PropChangeNotifier
     {
         string _name;
+        /// <summary>
+        /// Name of player. Limited to 160 characters.
+        /// </summary>
         public string Name
         {
             get { return _name; }
-            set { SetProp(ref _name, value); }
+            set
+            {
+                var n = value;
+                if (n != null && n.Length > 160)
+                    n = n.Substring(0, 160);
+                SetProp(ref _name, n);
+            }
         }
         public int Points { get; set; }
 

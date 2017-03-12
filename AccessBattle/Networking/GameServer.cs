@@ -163,7 +163,7 @@ namespace AccessBattle.Networking
                     player.ReceiveBuffer.Add(e.Buffer, 0, e.BytesTransferred);
                     Log.WriteLine("GameServer: Receive buffer of player " + e.UserToken + " has now " + player.ReceiveBuffer.Length + " bytes of data");
                     byte[] packData;
-                    if (player.ReceiveBuffer.Take(NetworkPacket.STX, NetworkPacket.ETX, out packData))
+                    while (player.ReceiveBuffer.Take(NetworkPacket.STX, NetworkPacket.ETX, out packData))
                     {
                         Log.WriteLine("GameServer: Received full packet");
                         Log.WriteLine("GameServer: Receive buffer of player " + e.UserToken + " has now " + player.ReceiveBuffer.Length + " bytes of data");
@@ -171,13 +171,17 @@ namespace AccessBattle.Networking
                         if (pack != null)
                         {
                             // Decrypt data
-                            var data = player.ServerCrypto.Decrypt(pack.Data);
-                            if (data == null)
+                            var data = pack.Data;
+                            if (data != null && data.Length > 0)
                             {
-                                Log.WriteLine("GameServer: Error! Could not decrypt message of client " + e.UserToken);
-                                // TODO: Notify client or refuse connection
-                                return;
-                            }
+                                data = player.ServerCrypto.Decrypt(pack.Data);
+                                if (data == null)
+                                {
+                                    Log.WriteLine("GameServer: Error! Could not decrypt message of client " + e.UserToken);
+                                    // TODO: Notify client or close connection
+                                    return;
+                                }
+                            }                            
                             switch (pack.PacketType)
                             {
                                 case NetworkPacketType.PublicKey:
@@ -190,6 +194,9 @@ namespace AccessBattle.Networking
                                     {
                                         Log.WriteLine("GameServer: Received public key of player " + e.UserToken + " is invalid!");
                                     }
+                                    break;
+                                case NetworkPacketType.ListGames:
+                                    Log.WriteLine("GameServer: Player " + e.UserToken + " requesting game list");
                                     break;
                             }
                         }

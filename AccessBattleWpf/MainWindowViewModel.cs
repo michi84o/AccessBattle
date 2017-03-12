@@ -10,7 +10,7 @@ using System.Diagnostics;
 
 namespace AccessBattleWpf
 {
-    // TODO: Make GameV variables globally accessible
+    // TODO: Make Game variables globally accessible
 
     public class BlinkChangedEventArgs : EventArgs
     {

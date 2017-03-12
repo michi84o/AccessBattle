@@ -15,19 +15,19 @@ namespace AccessBattle.Networking
             _className = GetType().Name;
         }
 
-        public bool Send(string message, byte packetType, Socket connection, CryptoHelper encrypter = null)
+        protected bool Send(string message, byte packetType, Socket connection, CryptoHelper encrypter = null)
         {
             return Send(Encoding.ASCII.GetBytes(message), packetType, connection, encrypter);
         }
-
-        public bool Send(byte[] message, byte packetType, Socket connection, CryptoHelper encrypter = null)
+       
+        protected bool Send(byte[] message, byte packetType, Socket connection, CryptoHelper encrypter = null)
         {
             if (connection == null || !connection.Connected || message == null)
                 return false;
             try
             {
                 var data = message;
-                if (encrypter != null)
+                if (encrypter != null && data.Length > 0)
                     data = encrypter.Encrypt(data);
                 var packet = (new NetworkPacket(data, packetType)).ToByteArray();                
                 return connection.Send(packet) == packet.Length;

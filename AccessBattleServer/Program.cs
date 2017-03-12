@@ -119,7 +119,7 @@ namespace AccessBattleServer
             var client = new GameClient();
             if (client.Connect("127.0.0.1", 3221))
             {
-                
+                client.RequestGameList();
             }
             
             string input;

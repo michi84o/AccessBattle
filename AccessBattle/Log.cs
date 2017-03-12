@@ -15,7 +15,7 @@ namespace AccessBattle
         File
     }
 
-    // TODO: Implement mode file
+    // TODO: Implement mode file, use TraceSource class
     public static class Log
     {
         private static LogMode Mode = LogMode.Debug;
@@ -35,9 +35,9 @@ namespace AccessBattle
             switch (Mode)
             {
                 case LogMode.Console: Console.WriteLine(); break;
-                case LogMode.Debug: Debug.WriteLine(Environment.NewLine); break;
+                case LogMode.Debug: Debug.WriteLine(""); break;
                 default:
-                    Console.WriteLine(); break;                
+                    Trace.WriteLine(""); break;                
             }
         }
 
@@ -48,7 +48,7 @@ namespace AccessBattle
                 case LogMode.Console: Console.WriteLine(message); break;
                 case LogMode.Debug: Debug.WriteLine(message); break;
                 default:
-                    Console.WriteLine(message); break;
+                    Trace.WriteLine(message); break;
             }
         }
 
@@ -59,7 +59,7 @@ namespace AccessBattle
                 case LogMode.Console: Console.WriteLine(format, args); break;
                 case LogMode.Debug: Debug.WriteLine(format, args); break;
                 default:
-                    Console.WriteLine(format, args); break;
+                    Trace.WriteLine(string.Format(format, args)); break;
             }
         }
 
@@ -70,7 +70,7 @@ namespace AccessBattle
                 case LogMode.Console: Console.Write(message); break;
                 case LogMode.Debug: Debug.Write(message); break;
                 default:
-                    Console.Write(message); break;
+                    Trace.Write(message); break;
             }
         }
 
@@ -81,7 +81,7 @@ namespace AccessBattle
                 case LogMode.Console: Console.Write(format, args); break;
                 case LogMode.Debug: Debug.Write(string.Format(format, args)); break;
                 default:
-                    Console.Write(format, args); break;
+                    Trace.Write(string.Format(format, args)); break;
             }
         }
     }

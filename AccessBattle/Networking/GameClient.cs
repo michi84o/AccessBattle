@@ -79,7 +79,7 @@ namespace AccessBattle.Networking
                     Log.WriteLine("GameClient: Receive buffer has now " + _receiveBuffer.Length + " bytes of data");
 
                     byte[] packData;
-                    if (_receiveBuffer.Take(NetworkPacket.STX, NetworkPacket.ETX, out packData))
+                    while (_receiveBuffer.Take(NetworkPacket.STX, NetworkPacket.ETX, out packData))
                     {
                         Log.WriteLine("GameClient: Received full packet");
                         var packet = NetworkPacket.FromByteArray(packData);
@@ -123,6 +123,16 @@ namespace AccessBattle.Networking
                     Log.WriteLine("");
                     break;
             }
+        }
+
+        public bool RequestGameList()
+        {
+            return Send(new byte[0], NetworkPacketType.ListGames);
+        }
+
+        bool Send(byte[] message, byte packetType)
+        {
+            return Send(message, packetType, _connection, _encrypter);
         }
 
         /// <summary>
