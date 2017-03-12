@@ -33,7 +33,7 @@ using System.Threading.Tasks;
  */
 namespace AccessBattle.Networking
 {
-    public class GameServer
+    public class GameServer : NetworkBase
     {
         // _games[0] is always local game
         List<Game> _games = new List<Game>();
@@ -41,8 +41,6 @@ namespace AccessBattle.Networking
 
         Dictionary<uint,NetworkPlayer> _players = new Dictionary<uint, NetworkPlayer>();
         public Dictionary<uint, NetworkPlayer> Players { get { return _players; } }
-
-        CryptoHelper _decrypter;
 
         ushort _port;
         public ushort Port { get { return _port; } }
@@ -59,7 +57,6 @@ namespace AccessBattle.Networking
             }
             _port = port;
             if (port != 3221) Trace.WriteLine("The Organization has made their move! El Psy Congroo");
-            _decrypter = new CryptoHelper();
         }
 
         TcpListener _server;
@@ -80,7 +77,7 @@ namespace AccessBattle.Networking
             _serverCts.Cancel();
             _server.Stop();            
             try { _serverTask.Wait(); }
-            catch (Exception e) { Console.WriteLine("Server Task Wait Error: " + e); }
+            catch (Exception e) { Log.WriteLine("Server Task Wait Error: " + e); }
             _serverTask = null;
             _server = null;
 
@@ -107,25 +104,27 @@ namespace AccessBattle.Networking
                     var socketTask = _server.AcceptSocketAsync();
                     socketTask.Wait();
                     var socket = socketTask.Result;
-
                     if (socket != null)
                     {
-                        // We got connected. The new client has not been authenticated yet.
-                        // Give him a uid. GUID has 128 bit, but 32 bits seems enough:
-                        uint uid;
-                        // Make sure we do not accidentally generate the same uid:
-                        while (Players.ContainsKey((uid = GetUid()))) { }
-
-                        var serverCrypto = new CryptoHelper();
-                        var player = new NetworkPlayer(socket, uid, serverCrypto);
-                        Players.Add(uid,player);
-
+                        var serverCrypto = new CryptoHelper();                        
                         // Send public key. There is one key-pair for every client!
-                        var data = Encoding.ASCII.GetBytes(serverCrypto.GetPublicKey());
-                        var packet = new NetworkPacket(data, NetworkPacketType.PublicKey).ToByteArray();
-                        Console.WriteLine("Server sending "+ data.Length + " byte public key within " + packet.Length + " bytes of packet data.");
-                        socket.Send(packet);
-                        ReceiveAsync(player);
+                        Log.WriteLine("GameServer: Sending public key...");
+                        if (!Send(serverCrypto.GetPublicKey(), NetworkPacketType.PublicKey, socket))
+                        {
+                            Log.WriteLine("GameServer: Sending public key failed! Disconnecting...");
+                            socket.Dispose();
+                        }
+                        else
+                        {
+                            // We got connected. The new client has not been authenticated yet.
+                            // Give him a uid. GUID has 128 bit, but 32 bits seems enough:
+                            uint uid;
+                            // Make sure we do not accidentally generate the same uid:
+                            while (Players.ContainsKey((uid = GetUid()))) { }
+                            var player = new NetworkPlayer(socket, uid, serverCrypto);
+                            Players.Add(uid, player);
+                            ReceiveAsync(socket, uid);
+                        }
                     }
                 }
                 catch (AggregateException)
@@ -134,37 +133,69 @@ namespace AccessBattle.Networking
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Unknown exception while waiting for clients: " + e);
+                    Log.WriteLine("Unknown exception while waiting for clients: " + e);
                     continue;
                 }
             }
-            Console.WriteLine("Wait for clients was cancelled");
+            Log.WriteLine("Wait for clients was cancelled");
         }
 
-        void ClientReceive_Completed(object sender, SocketAsyncEventArgs e)
+        protected override void Receive_Completed(object sender, SocketAsyncEventArgs e)
         {
             try
             {
                 if (e.SocketError != SocketError.Success)
                 {
                     // Will be hit after client disconnect
-                    Console.WriteLine("Server receive for client (UID:"+e.UserToken+") not successful: " + e.SocketError);
+                    Log.WriteLine("Server receive for client (UID:"+e.UserToken+") not successful: " + e.SocketError);
                 }
                 else if (e.BytesTransferred > 0)
                 {
-                    Console.WriteLine("Received data from client, UID: " + e.UserToken);
+                    Log.WriteLine("Received data from client, UID: " + e.UserToken);
                     NetworkPlayer player;
                     if (!Players.TryGetValue((uint)e.UserToken, out player))
                     {
-                        Console.WriteLine("GameServer: Client with UID " + e.UserToken + " does not exist");
+                        Log.WriteLine("GameServer: Client with UID " + e.UserToken + " does not exist");
                         return;
                     }
                     // Process the packet ======================================
-
-
-
+                    Log.WriteLine("GameServer: Received " + e.BytesTransferred + " bytes of data");
+                    player.ReceiveBuffer.Add(e.Buffer, 0, e.BytesTransferred);
+                    Log.WriteLine("GameServer: Receive buffer of player " + e.UserToken + " has now " + player.ReceiveBuffer.Length + " bytes of data");
+                    byte[] packData;
+                    if (player.ReceiveBuffer.Take(NetworkPacket.STX, NetworkPacket.ETX, out packData))
+                    {
+                        Log.WriteLine("GameServer: Received full packet");
+                        Log.WriteLine("GameServer: Receive buffer of player " + e.UserToken + " has now " + player.ReceiveBuffer.Length + " bytes of data");
+                        var pack = NetworkPacket.FromByteArray(packData);
+                        if (pack != null)
+                        {
+                            // Decrypt data
+                            var data = player.ServerCrypto.Decrypt(pack.Data);
+                            if (data == null)
+                            {
+                                Log.WriteLine("GameServer: Error! Could not decrypt message of client " + e.UserToken);
+                                // TODO: Notify client or refuse connection
+                                return;
+                            }
+                            switch (pack.PacketType)
+                            {
+                                case NetworkPacketType.PublicKey:
+                                    try
+                                    {
+                                        Log.WriteLine("GameServer: Received public key of player " + e.UserToken);
+                                        player.ClientCrypto = new CryptoHelper(Encoding.ASCII.GetString(data));
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Log.WriteLine("GameServer: Received public key of player " + e.UserToken + " is invalid!");
+                                    }
+                                    break;
+                            }
+                        }
+                    }
                     // =========================================================
-                    ReceiveAsync(player);
+                    ReceiveAsync(player.Connection, player.UID);
                 }                
             }
             // No catch for now. Exceptions will crash the server.
@@ -174,15 +205,5 @@ namespace AccessBattle.Networking
             }
         }
 
-        void ReceiveAsync(NetworkPlayer player)
-        {
-            var buffer = new byte[64];
-            var args = new SocketAsyncEventArgs();
-            args.SetBuffer(buffer, 0, buffer.Length);
-            args.UserToken = player.UID;
-
-            args.Completed += ClientReceive_Completed;
-            player.Connection.ReceiveAsync(args);
-        }
     }
 }

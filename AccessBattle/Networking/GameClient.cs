@@ -4,96 +4,91 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AccessBattle.Networking
 {
-    public class GameClient
+    public class GameClient : NetworkBase
     {
         Game _game = new Game();
         public Game Game { get { return _game; } }
         ByteBuffer _receiveBuffer = new ByteBuffer(4096);
-
-
+        CryptoHelper _encrypter;
+        CryptoHelper _decrypter;
         Socket _connection;
+
         public GameClient()
         {
-            // TODO
+            _decrypter = new CryptoHelper();
         }
-
-        public bool SendMessage(string message)
-        {
-            var con = _connection;
-            if (con == null) return false;
-            var bytes = Encoding.ASCII.GetBytes(message);
-            try
-            {
-                return con.Send(bytes) == bytes.Length;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("GameClient: Error sending message: " + e);
-                return false;
-            }
-        }
-
+        
         public bool Connect(string server, ushort port)
         {
-            Disconnect();
-            _connection = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            Log.WriteLine("GameClient: Connecting...");
             try
             {
+                //_isConnecting = true;
+                Disconnect();
+                _connection = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            
                 _connection.Connect(server, port);
-                ReceiveAsync();
+                ReceiveAsync(_connection, 0);
+
+                // Block until keys are exchanged
+                var then = DateTime.UtcNow.AddSeconds(30);
+                while (_encrypter == null && (then - DateTime.UtcNow).TotalSeconds > 0)
+                {
+                    Thread.Sleep(100);
+                }
+                if (_encrypter == null)
+                {
+                    Disconnect();
+                    Log.WriteLine("GameClient: Connect failed: No key received from server!");
+                    return false;
+                }
+                // Send own public key
+                Send(_decrypter.GetPublicKey(), NetworkPacketType.PublicKey, _connection, _encrypter);
             }
             catch (Exception e)
             {
-                Console.WriteLine("Client connect failed: " + e);
+                Log.WriteLine("GameClient: Connect failed: " + e.Message);
                 return false;
             }
-            Console.WriteLine("Client connect success!");
+            finally
+            {
+                //_isConnecting = false;
+            }
+            Log.WriteLine("GameClient: Connect success!");
             return true;
         }
 
-        void ReceiveAsync()
-        {
-            var con = _connection;
-            if (con == null) return;
-
-            var buffer = new byte[64];
-            var args = new SocketAsyncEventArgs();
-            args.SetBuffer(buffer, 0, buffer.Length);
-            args.UserToken = 0;
-
-            args.Completed += ClientReceive_Completed;
-            con.ReceiveAsync(args);
-        }
-
-        void ClientReceive_Completed(object sender, SocketAsyncEventArgs e)
+        protected override void Receive_Completed(object sender, SocketAsyncEventArgs e)
         {
             try
             {
                 if (e.SocketError != SocketError.Success)
                 {
                     // Will be hit after client disconnect
-                    Console.WriteLine("Client receive not successful: " + e.SocketError);
+                    Log.WriteLine("GameClient: Receive not successful: " + e.SocketError);
                 }
                 else if (e.BytesTransferred > 0)
                 {
-                    Console.WriteLine("Client received " + e.BytesTransferred + " bytes of data.");
+                    Log.WriteLine("GameClient: Received " + e.BytesTransferred + " bytes of data");
                     _receiveBuffer.Add(e.Buffer, 0, e.BytesTransferred);
-                    Console.WriteLine("Clients receive buffer has now " + _receiveBuffer.Length + " bytes of data.");
+                    Log.WriteLine("GameClient: Receive buffer has now " + _receiveBuffer.Length + " bytes of data");
 
                     byte[] packData;
                     if (_receiveBuffer.Take(NetworkPacket.STX, NetworkPacket.ETX, out packData))
                     {
-                        Console.WriteLine("Client received full packet");
-                        var pack = NetworkPacket.FromByteArray(packData);
-                        if (pack == null)
-                            Console.WriteLine("Client coud not parse packet!");
+                        Log.WriteLine("GameClient: Received full packet");
+                        var packet = NetworkPacket.FromByteArray(packData);
+                        if (packet == null)
+                            Log.WriteLine("GameClient: Could not parse packet!");
                         else
                         {
-                            Console.WriteLine("Client received packet of type " + pack.PacketType + " with " + pack.Data.Length + " bytes of data.");
+                            Log.WriteLine("GameClient: Received packet of type " + packet.PacketType + " with " + packet.Data.Length + " bytes of data");
+                            ProcessPacket(packet);
                         }
                     }
                 }
@@ -102,8 +97,31 @@ namespace AccessBattle.Networking
             // No catch for now. Exceptions will crash the program.
             finally
             {
-                // TODO: Call not required after disconnect
-                ReceiveAsync();
+                e.Dispose();
+                // Call not required after disconnect
+                if (_connection != null) ReceiveAsync(_connection, 0);
+            }
+        }
+
+        void ProcessPacket(NetworkPacket packet)
+        {
+            switch (packet.PacketType)
+            {
+                case 0x01: // Key
+                    try
+                    {
+                        var serverPubKey = Encoding.ASCII.GetString(packet.Data);
+                        _encrypter = new CryptoHelper(serverPubKey);
+                    }
+                    catch (Exception ex)
+                    {
+                        _encrypter = null;
+                        Log.WriteLine("GameClient: Received key is invalid! " + ex.Message);
+                    }
+                    break;
+                default:
+                    Log.WriteLine("");
+                    break;
             }
         }
 
@@ -112,14 +130,19 @@ namespace AccessBattle.Networking
         public void Disconnect()
         {
             if (_connection == null) return;
+            _encrypter = null;
             try
             {
+                Log.WriteLine("GameClient: Closing connection...");
                 _connection.Close();
                 _connection.Dispose();
+                Log.WriteLine("GameClient: Connection closed");
             }
-            catch { }
+            catch (Exception e)
+            {
+                Log.WriteLine("GameClient: Closing connection caused an exception: " + e.Message);
+            }
             _connection = null;
         }
-
     }
 }

@@ -11,8 +11,13 @@ namespace AccessBattle.Networking
     {
         public uint UID { get; private set; }
         public Socket Connection { get; private set; }
+        /// <summary>
+        /// Server crypto containing its private and public key. Used to decrypt data from client.
+        /// </summary>
         public CryptoHelper ServerCrypto { get; private set; }
         public CryptoHelper ClientCrypto { get; set; }
+        ByteBuffer _receiveBuffer = new ByteBuffer(4096);
+        public ByteBuffer ReceiveBuffer { get { return _receiveBuffer; } }
 
         public NetworkPlayer(Socket connection, uint uid, CryptoHelper serverCrypto)
         {

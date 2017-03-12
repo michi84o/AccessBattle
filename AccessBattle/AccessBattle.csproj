@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Board.cs" />
+    <Compile Include="Log.cs" />
     <Compile Include="Networking\ByteBuffer.cs" />
     <Compile Include="Card.cs" />
     <Compile Include="Networking\CryptoHelper.cs" />
@@ -49,6 +50,7 @@
     <Compile Include="GameAI.cs" />
     <Compile Include="Networking\GameClient.cs" />
     <Compile Include="Networking\GameServer.cs" />
+    <Compile Include="Networking\NetworkBase.cs" />
     <Compile Include="Networking\NetworkPacket.cs" />
     <Compile Include="Networking\NetworkPlayer.cs" />
     <Compile Include="Player.cs" />

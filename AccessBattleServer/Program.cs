@@ -20,19 +20,20 @@ namespace AccessBattleServer
         static void TestCrypto()
         {
             var decrypter = new CryptoHelper();
-            var encrypter = new CryptoHelper(decrypter.GetPublicKey());
+            var pubKey = decrypter.GetPublicKey();
+            var encrypter = new CryptoHelper(pubKey);
 
             byte[] a = new byte[] { 0, 1, 2, 3 };
 
             var a1 = encrypter.Encrypt(a);
             var a2 = decrypter.Decrypt(a1);
-
-            for (int i = 0; i < a1.Length; ++i)
+            bool error = false;
+            for (int i = 0; i < a.Length; ++i)
             {
-                Console.Write(a1[i] + " ");
+                error |= (a2[i] != a[i]);
             }
-            Console.WriteLine();
-
+            if (error) Log.WriteLine("TestCrypto FAIL");
+            else Log.WriteLine("TestCrypto OK");
         }
 
         static void TestNetworkPacket()
@@ -46,7 +47,7 @@ namespace AccessBattleServer
             var packetRaw = packet.ToByteArray();
             // Expecting 3 escapes
             if (packetRaw.Length != bytes.Length + 3 + 6)
-                Console.WriteLine("Network packet length fail 1");
+                Log.WriteLine("Network packet length fail 1");
 
             // pack it into new array
             var packetRawPadded = new byte[packetRaw.Length + 3];
@@ -56,19 +57,19 @@ namespace AccessBattleServer
             var packet2 = NetworkPacket.FromByteArray(packetRawPadded, out stxIndex, out etxIndex);
             if (packet2 == null)
             {
-                Console.WriteLine("Network packet fail");
+                Log.WriteLine("Network packet fail");
                 return;
             }
 
             if (stxIndex != 1)
-                Console.WriteLine("Network packet STX fail");
+                Log.WriteLine("Network packet STX fail");
             if (etxIndex != packetRaw.Length)
-                Console.WriteLine("Network packet ETX fail");
+                Log.WriteLine("Network packet ETX fail");
             if (packet2.PacketType != 8)
-                Console.WriteLine("Network packet type fail");
+                Log.WriteLine("Network packet type fail");
             if (packet2.Data.Length != 256)
             {
-                Console.WriteLine("Network packet length fail 2");
+                Log.WriteLine("Network packet length fail 2");
                 return;
             }
             // Compare
@@ -78,7 +79,7 @@ namespace AccessBattleServer
                 fail |= bytes[i] != packet2.Data[i];
             }
             if (fail)
-                Console.WriteLine("Network packet data fail");
+                Log.WriteLine("Network packet data fail");
         }
 
         static void TestByteBuffer()
@@ -106,7 +107,10 @@ namespace AccessBattleServer
 
         static void Main(string[] args)
         {
-            //TestByteBuffer();
+            Log.SetMode(LogMode.Console);
+            //TestCrypto();
+            ////TestByteBuffer();
+            //Console.ReadKey();
             //return;
 
             _server = new GameServer();
@@ -115,7 +119,7 @@ namespace AccessBattleServer
             var client = new GameClient();
             if (client.Connect("127.0.0.1", 3221))
             {
-                client.SendMessage("Hello");
+                
             }
             
             string input;

@@ -8,14 +8,14 @@ namespace AccessBattle.Networking
 {
     public class NetworkPacketType
     {
-        public const int PublicKey = 1;
-        public const int ClientLogin = 2;
-        public const int ListGames = 3;
-        public const int CreateGame = 4;
-        public const int JoinGame = 5;
-        public const int GameInit = 6;
-        public const int GameStatus = 7;
-        public const int GameCommand = 8;
+        public const byte PublicKey     = 0x01;
+        public const byte ClientLogin   = 0x02;
+        public const byte ListGames     = 0x03;
+        public const byte CreateGame    = 0x04;
+        public const byte JoinGame      = 0x05;
+        public const byte GameInit      = 0x06;
+        public const byte GameStatus    = 0x07;
+        public const byte GameCommand   = 0x08;
     }
 
     /// <summary>
