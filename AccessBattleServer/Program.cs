@@ -117,15 +117,14 @@ namespace AccessBattleServer
             _server.Start();
 
             var client = new GameClient();
-            if (client.Connect("127.0.0.1", 3221))
+            var t = client.Connect("127.0.0.1", 3221);
+            t.Wait();
+            if (t.Result)
             {
-                client.Login("foo", "bar");
-                var then = DateTime.UtcNow.AddSeconds(15);
-                while (!client.IsLoggedIn && (then - DateTime.UtcNow).TotalMilliseconds > 0)
-                {
-                    Thread.Sleep(100);
-                }
-                client.RequestGameList();
+                t = client.Login("foo", "bar");
+                t.Wait();
+                if (t.Result)
+                    client.RequestGameList();
             }
             
             string input;

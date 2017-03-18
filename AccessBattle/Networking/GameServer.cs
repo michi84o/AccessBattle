@@ -96,6 +96,7 @@ namespace AccessBattle.Networking
         {
             var guid = Guid.NewGuid().ToByteArray(); // 16 byte
             var uid = guid[0] | guid[0] << 8 | guid[0] << 16 | guid[0] << 24;
+            if (uid == 0) return GetUid();
             return (uint)uid;
         }
 

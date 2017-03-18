@@ -19,56 +19,81 @@ namespace AccessBattle.Networking
         CryptoHelper _encrypter;
         CryptoHelper _decrypter;
         Socket _connection;
+        readonly object _clientLock = new object();
 
         public GameClient()
         {
             _decrypter = new CryptoHelper();
         }
-        
-        /// <summary>
-        /// This method can block up to 30s! TODO: Make async
-        /// </summary>
-        /// <param name="server"></param>
-        /// <param name="port"></param>
-        /// <returns></returns>
-        public bool Connect(string server, ushort port)
-        {
-            Log.WriteLine("GameClient: Connecting...");
-            try
-            {
-                //_isConnecting = true;
-                Disconnect();
-                _connection = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            
-                _connection.Connect(server, port);
-                ReceiveAsync(_connection, 0);
 
-                // Block until keys are exchanged
-                var then = DateTime.UtcNow.AddSeconds(30);
-                while (_encrypter == null && (then - DateTime.UtcNow).TotalSeconds > 0)
-                {
-                    Thread.Sleep(100);
+        public async Task<bool> Connect(string server, ushort port)
+        {
+            if (IsConnected == null) return false;
+            lock (_clientLock)
+            {
+                if (IsConnected == null) return false;
+                Disconnect();
+                IsConnected = null;
+                Log.WriteLine("GameClient: Connecting...");
+            }
+            bool result;
+            using (var task = Task.Run(() =>
+            {
+                #region Task
+                try
+                {                    
+                    _connection = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
+                    _connection.Connect(server, port);
+                    ReceiveAsync(_connection, 0);
+                    
+                    // Block until keys are exchanged
+                    var then = DateTime.UtcNow.AddSeconds(30);
+                    while (_encrypter == null && (then - DateTime.UtcNow).TotalSeconds > 0)
+                    {
+                        Thread.Sleep(100);
+                    }
+                    if (_encrypter == null)
+                    {
+                        Disconnect();
+                        Log.WriteLine("GameClient: Connect failed: No key received from server!");
+                        IsConnected = false;
+                        return false;
+                    }
+                    // Send own public key
+                    Send(_decrypter.GetPublicKey(), NetworkPacketType.PublicKey, _connection, _encrypter);
                 }
-                if (_encrypter == null)
+                catch (Exception e)
                 {
-                    Disconnect();
-                    Log.WriteLine("GameClient: Connect failed: No key received from server!");
+                    Log.WriteLine("GameClient: Connect failed: " + e.Message);
+                    IsConnected = false;
                     return false;
                 }
-                // Send own public key
-                Send(_decrypter.GetPublicKey(), NetworkPacketType.PublicKey, _connection, _encrypter);
-            }
-            catch (Exception e)
+                Log.WriteLine("GameClient: Connect success!");
+                return true;
+                #endregion
+            }))
             {
-                Log.WriteLine("GameClient: Connect failed: " + e.Message);
-                return false;
+                result = await task;
             }
-            finally
+            IsConnected = result;
+            return result;                
+        }
+
+        public async Task<bool> Login(string name, string password)
+        {
+            bool result;
+            using (var t = Task.Run(() =>
             {
-                //_isConnecting = false;
+                IsLoggedIn = null;
+                var login = new Login { Name = name, Password = password };
+                return Send(JsonConvert.SerializeObject(login), NetworkPacketType.ClientLogin);
+            }))
+            {
+                result = await t;
+                IsLoggedIn = result;
             }
-            Log.WriteLine("GameClient: Connect success!");
-            return true;
+            return result;
         }
 
         protected override void Receive_Completed(object sender, SocketAsyncEventArgs e)
@@ -153,7 +178,7 @@ namespace AccessBattle.Networking
                 case NetworkPacketType.ClientLogin:
                     try
                     {
-                        if (data[0] == 0)
+                        if (data.Length > 0 && data[0] == 0)
                         {
                             IsLoggedIn = true;
                             Log.WriteLine("GameClient: Login to server successful!");
@@ -179,17 +204,18 @@ namespace AccessBattle.Networking
             }
         }
 
-        bool _isLoggedIn;
-        public bool IsLoggedIn
+        bool? _isConnected = false;
+        public bool? IsConnected
+        {
+            get { return _isConnected; }
+            private set { _isConnected = value; }
+        }
+
+        bool? _isLoggedIn = false;
+        public bool? IsLoggedIn
         { 
             get { return _isLoggedIn; }
             private set { _isLoggedIn = value; }
-        }
-
-        public bool Login(string name, string password)
-        {
-            var login = new Login { Name = name, Password = password };
-            return Send(JsonConvert.SerializeObject(login), NetworkPacketType.ClientLogin);
         }
 
         public bool RequestGameList()
@@ -230,6 +256,7 @@ namespace AccessBattle.Networking
             {
                 Log.WriteLine("GameClient: Closing connection caused an exception: " + e.Message);
             }
+            _isConnected = false;
             _connection = null;
         }
     }
