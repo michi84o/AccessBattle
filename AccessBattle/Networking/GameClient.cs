@@ -85,9 +85,18 @@ namespace AccessBattle.Networking
             bool result;
             using (var t = Task.Run(() =>
             {
+                #region Task
                 IsLoggedIn = null;
                 var login = new Login { Name = name, Password = password };
-                return Send(JsonConvert.SerializeObject(login), NetworkPacketType.ClientLogin);
+                if (!Send(JsonConvert.SerializeObject(login), NetworkPacketType.ClientLogin))
+                    return false;
+                var then = DateTime.UtcNow.AddSeconds(30);
+                while (IsLoggedIn == null && (then - DateTime.UtcNow).TotalSeconds > 0)
+                {
+                    Thread.Sleep(100);
+                }
+                return IsLoggedIn == true;
+                #endregion
             }))
             {
                 result = await t;
