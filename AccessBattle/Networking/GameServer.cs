@@ -24,13 +24,16 @@ using System.Threading.Tasks;
  *      - 0x02: Login Client[Login (JSON)] Server[0/1 (byte, 0=OK, 1=invalid name, 2=invalid password)]
  *      - 0x03: List available games Client[] Server[List<GameInfo> (JSON string)]
  *      - 0x04: Create Game Client[GameInfo (UID=0,JSON)] Server[GameInfo (UID != 0 => OK)]
- *      - 0x05: Join Game Client[name (string)] Server[0/1 (string, 0=OK, 1=Error)]
+ *      - 0x05: Join Game Client[name (string)] Server[0/1 (string, 0=OK, 1=Error)] // TODO
  *      - 0x06: Game Init [opponent name, client player number]
  *      - 0x07: Game Status Change [??? TODO]
  *      - 0x08: Game Command
  * DATA = Packet data (encrypted, except public key)
  * CHSUM = Checksum (all bytes XOR'ed. except STX,CHSUM,ETX)
  * ETX = End of packet   0x03
+ *  
+ *  TODO: Cleanup mechanism for games and logins
+ *  
  *  
  */
 namespace AccessBattle.Networking
@@ -138,11 +141,11 @@ namespace AccessBattle.Networking
                 }
                 catch (Exception e)
                 {
-                    Log.WriteLine("Unknown exception while waiting for clients: " + e);
+                    Log.WriteLine("GameServer: Unknown exception while waiting for clients: " + e);
                     continue;
                 }
             }
-            Log.WriteLine("Wait for clients was cancelled");
+            Log.WriteLine("GameServer: Wait for clients was cancelled");
         }
 
         protected override void Receive_Completed(object sender, SocketAsyncEventArgs e)
@@ -152,11 +155,11 @@ namespace AccessBattle.Networking
                 if (e.SocketError != SocketError.Success)
                 {
                     // Will be hit after client disconnect
-                    Log.WriteLine("Server receive for client (UID:"+e.UserToken+") not successful: " + e.SocketError);
+                    Log.WriteLine("GameServer: Receive for client (UID:" + e.UserToken+") not successful: " + e.SocketError);
                 }
                 else if (e.BytesTransferred > 0)
                 {
-                    Log.WriteLine("Received data from client, UID: " + e.UserToken);
+                    Log.WriteLine("GameServer: Received data from client, UID: " + e.UserToken);
                     NetworkPlayer player;
                     if (!Players.TryGetValue((uint)e.UserToken, out player))
                     {
@@ -257,6 +260,37 @@ namespace AccessBattle.Networking
                     catch (Exception ex)
                     {
                         Log.WriteLine("GameServer: Received login of player " + player.UID + " could not be read!");
+                    }
+                    break;
+                case NetworkPacketType.CreateGame:
+                    try
+                    {
+                        var ginfo = JsonConvert.DeserializeObject<GameInfo>(Encoding.ASCII.GetString(data));
+                        if (ginfo != null)
+                        {
+                            Log.WriteLine("GameServer: Received CreateGame packet from player " + player.UID + ": [" + ginfo.Name + "/" + ginfo.UID + "/" + ginfo.Player1 + "]");
+                            uint uid;
+                            lock (Games)
+                            {
+                                while (Games.ContainsKey((uid = GetUid()))) { }
+                                var game = new Game(uid);
+                                game.Players[0].Client = player;
+                                game.Players[0].Name = ginfo.Player1;
+                                game.Name = ginfo.Name;
+                                Games.Add(uid, game);
+                            }
+                            ginfo.UID = uid;
+                            Send(JsonConvert.SerializeObject(ginfo), NetworkPacketType.CreateGame, player.Connection, player.ClientCrypto);
+                        }
+                        else
+                        {
+                            Log.WriteLine("GameServer: Received CreateGame packet of player " + player.UID + " could not be read!");
+                            // TODO: send answer?
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.WriteLine("GameServer: Received CreateGame packet of player " + player.UID + " could not be read! "+ ex.Message);
                     }
                     break;
                 default:

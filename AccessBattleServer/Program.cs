@@ -105,28 +105,51 @@ namespace AccessBattleServer
             //buf.Add(new byte[8]);
         }
 
+        static async Task<bool> TestConnectAndLoginClient(GameClient client)
+        {
+            bool result = await client.Connect("127.0.0.1", 3221);
+            if (result) result = await client.Login("foo", "bar");
+            return result;
+        }
+
+        static void GameListReceived(object sender, GameListEventArgs args)
+        {
+            if (args.GameList != null && args.GameList.Count > 0)
+                foreach (var info in args.GameList)
+                {
+                    Console.WriteLine("Game: " + info.Name + "\r\n" + "  UID: " + info.UID + "\r\n  Host: " + info.Player1);
+                }
+            else
+                Console.WriteLine("There are currently no games");
+        }
+
+        private static void GameCreated(object sender, GameCreatedEventArgs e)
+        {
+            if (e.GameInfo.UID != 0)
+                Console.WriteLine("Game created");
+            else
+                Console.WriteLine("Create game failed!");
+            ((GameClient)sender).RequestGameList();
+        }
+
         static void Main(string[] args)
         {
-            Log.SetMode(LogMode.Console);
-            //TestCrypto();
-            ////TestByteBuffer();
-            //Console.ReadKey();
-            //return;
+            Log.SetMode(LogMode.Debug);
 
             _server = new GameServer();
             _server.Start();
 
             var client = new GameClient();
-            var t = client.Connect("127.0.0.1", 3221);
+            client.GameListReceived += GameListReceived;
+            client.GameCreated += GameCreated;
+
+            var t = TestConnectAndLoginClient(client);
             t.Wait();
-            if (t.Result)
-            {
-                t = client.Login("foo", "bar");
-                t.Wait();
-                if (t.Result)
-                    client.RequestGameList();
-            }
+            if (t.Result) client.RequestGameList();
+
+            client.CreateGame("Game1", "PlayerX");
             
+
             string input;
             while ((input = Console.ReadLine()) != "exit")
             {
@@ -136,5 +159,7 @@ namespace AccessBattleServer
             _server.Stop();
             Thread.Sleep(5000);
         }
+
+
     }
 }

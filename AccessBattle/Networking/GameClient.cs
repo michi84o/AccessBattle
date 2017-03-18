@@ -11,8 +11,28 @@ using System.Threading.Tasks;
 
 namespace AccessBattle.Networking
 {
+    public class GameListEventArgs : EventArgs
+    {
+        public List<GameInfo> GameList { get; private set; }
+        public GameListEventArgs(List<GameInfo> gameList)
+        {
+            GameList = gameList;
+        }
+    }
+    public class GameCreatedEventArgs : EventArgs
+    {
+        public GameInfo GameInfo { get; private set; }
+        public GameCreatedEventArgs(GameInfo gameInfo)
+        {
+            GameInfo = gameInfo;
+        }
+    }
+
     public class GameClient : NetworkBase
     {
+        public event EventHandler<GameListEventArgs> GameListReceived;
+        public event EventHandler<GameCreatedEventArgs> GameCreated;
+
         Game _game = new Game();
         public Game Game { get { return _game; } }
         ByteBuffer _receiveBuffer = new ByteBuffer(4096);
@@ -105,6 +125,38 @@ namespace AccessBattle.Networking
             return result;
         }
 
+        public async Task<bool> RequestGameList()
+        {
+            bool result;
+            using (var t = Task.Run(() =>
+            {
+                return Send(new byte[0], NetworkPacketType.ListGames);
+            }))
+            {
+                result = await t;
+            }
+            return result;             
+        }
+
+        public async Task<bool> CreateGame(string gameName, string playerName)
+        {
+            bool result;
+            using (var t = Task.Run(() =>
+            {
+                var info = new GameInfo
+                {
+                    UID = 0,
+                    Name = gameName,
+                    Player1 = playerName
+                };
+                return Send(JsonConvert.SerializeObject(info), NetworkPacketType.CreateGame);
+            }))
+            {
+                result = await t;
+            }
+            return result;
+        }
+
         protected override void Receive_Completed(object sender, SocketAsyncEventArgs e)
         {
             try
@@ -178,6 +230,9 @@ namespace AccessBattle.Networking
                         var glistString = Encoding.ASCII.GetString(data);
                         var glist = JsonConvert.DeserializeObject<List<GameInfo>>(glistString);
                         Log.WriteLine("GameClient: Received list of games on server. Game count: " + glist.Count);
+                        var gListHandler = GameListReceived;
+                        if (gListHandler != null)
+                            gListHandler(this, new GameListEventArgs(glist));
                     }
                     catch (Exception e)
                     {
@@ -207,6 +262,28 @@ namespace AccessBattle.Networking
                         Log.WriteLine("GameClient: Received login confirmation could not be read." + e.Message);
                     }
                     break;
+                case NetworkPacketType.CreateGame:
+                    try
+                    {
+                        // Check if an UID was assigned
+                        var ginfo = JsonConvert.DeserializeObject<GameInfo>(Encoding.ASCII.GetString(data));
+                        if (ginfo != null)
+                        {
+                            if (ginfo.UID != 0)
+                            {
+                                var gCreatedHandler = GameCreated;
+                                if (gCreatedHandler != null)
+                                    gCreatedHandler(this, new GameCreatedEventArgs(ginfo));
+                            }
+                        }
+                        else
+                            Log.WriteLine("GameClient: Received CreateGame confirmation could not be read.");
+                    }
+                    catch (Exception e)
+                    {
+                        Log.WriteLine("GameClient: Received CreateGame confirmation could not be read." + e.Message);
+                    }
+                    break;
                 default:
                     Log.WriteLine("");
                     break;
@@ -225,11 +302,6 @@ namespace AccessBattle.Networking
         { 
             get { return _isLoggedIn; }
             private set { _isLoggedIn = value; }
-        }
-
-        public bool RequestGameList()
-        {
-            return Send(new byte[0], NetworkPacketType.ListGames);
         }
 
         //public bool CreateGame()
