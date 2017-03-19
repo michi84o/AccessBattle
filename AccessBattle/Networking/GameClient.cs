@@ -27,6 +27,16 @@ namespace AccessBattle.Networking
             GameInfo = gameInfo;
         }
     }
+    public class GameJoinedEventArgs : EventArgs
+    {
+        public uint Uid { get; private set; }
+        public bool Joined { get; private set; }
+        public GameJoinedEventArgs(uint uid, bool joined)
+        {
+            Uid = uid;
+            Joined = joined;
+        }
+    }
 
     public class GameClient : NetworkBase
     {
@@ -34,7 +44,7 @@ namespace AccessBattle.Networking
 
         public event EventHandler<GameListEventArgs> GameListReceived;
         public event EventHandler<GameCreatedEventArgs> GameCreated;
-
+        public event EventHandler<GameJoinedEventArgs> GameJoined;
 
         bool? _isConnected = false;
         public bool? IsConnected
@@ -49,6 +59,8 @@ namespace AccessBattle.Networking
             get { return _isLoggedIn; }
             private set { _isLoggedIn = value; }
         }
+
+        public string LoginName { get; private set; }
 
         Game _game = new Game();
         public Game Game { get { return _game; } }
@@ -119,6 +131,11 @@ namespace AccessBattle.Networking
 
         public async Task<bool> Login(string name, string password)
         {
+            if (string.IsNullOrEmpty(name))
+            {
+                Log.WriteLine("Game Client: Cannot login with empty user name!");
+                return false;
+            }
             bool result;
             using (var t = Task.Run(() =>
             {
@@ -137,7 +154,8 @@ namespace AccessBattle.Networking
             }))
             {
                 result = await t;
-                IsLoggedIn = result;
+                LoginName = name;
+                IsLoggedIn = result;                
             }
             return result;
         }
@@ -173,8 +191,13 @@ namespace AccessBattle.Networking
             return result;
         }
 
-        public async Task<GameInfo> CreateGame(string gameName, string playerName)
+        public async Task<GameInfo> CreateGame(string gameName)
         {
+            if (IsLoggedIn != true || string.IsNullOrEmpty(LoginName))
+            {
+                Log.WriteLine("Game Client: Cannot create game when not logged in!");
+                return null;
+            }
             GameInfo result = null;
             using (var t = Task.Run(() =>
             {
@@ -182,14 +205,14 @@ namespace AccessBattle.Networking
                 {
                     UID = 0,
                     Name = gameName,
-                    Player1 = playerName
+                    Player1 = LoginName
                 };
 
                 using (var waitHandle = new AutoResetEvent(false))
                 {
                     EventHandler<GameCreatedEventArgs> handler = (sender, args) =>
                     {
-                        if (args.GameInfo != null && args.GameInfo.Name == gameName && args.GameInfo.Player1 == playerName)
+                        if (args.GameInfo != null && args.GameInfo.Name == gameName && args.GameInfo.Player1 == LoginName)
                         {
                             result = args.GameInfo;
                             waitHandle.Set();
@@ -205,6 +228,39 @@ namespace AccessBattle.Networking
                     }
                     catch (Exception e) { Log.WriteLine("GameClient::CreateGame(): " + e.Message); }
                     finally { GameCreated += handler; }
+                }
+            }))
+            {
+                await t;
+            }
+            return result;
+        }
+
+        public async Task<bool> JoinGame(uint uid)
+        {
+            var result = false;
+            using (var t = Task.Run(() =>
+            {
+                using (var waitHandle = new AutoResetEvent(false))
+                {
+                    EventHandler<GameJoinedEventArgs> handler = (sender, args) =>
+                    {
+                        if (args.Uid == uid)
+                        {
+                            result = args.Joined;
+                            waitHandle.Set();
+                        }
+                    };
+                    try
+                    {
+                        GameJoined += handler;
+                        if (Send(uid.ToString(), NetworkPacketType.JoinGame))
+                        {
+                            waitHandle.WaitOne(NetworkTimeout);
+                        }
+                    }
+                    catch (Exception e) { Log.WriteLine("GameClient::JoinGame(): " + e.Message); }
+                    finally { GameJoined -= handler; }
                 }
             }))
             {
@@ -340,12 +396,26 @@ namespace AccessBattle.Networking
                         Log.WriteLine("GameClient: Received CreateGame confirmation could not be read." + e.Message);
                     }
                     break;
+                case NetworkPacketType.JoinGame:
+                    try
+                    {
+                        var jData = Encoding.ASCII.GetString(data).Split(new[] { ';' });
+                        uint iJoinResult = uint.Parse(jData[0]);
+                        bool jResult = jData[1] == "0";
+                        var handler = GameJoined;
+                        if (handler != null)
+                            handler(this, new GameJoinedEventArgs(iJoinResult, jResult));
+                    }
+                    catch (Exception e)
+                    {
+                        Log.WriteLine("GameClient: Received JoinGame confirmation could not be read." + e.Message);
+                    }
+                    break;
                 default:
                     Log.WriteLine("");
                     break;
             }
         }
-
 
         //public bool CreateGame()
         //{

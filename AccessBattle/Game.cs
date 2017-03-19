@@ -11,6 +11,7 @@ namespace AccessBattle
 {
     public enum GamePhase
     {
+        WaitingForPlayers,
         Init,
         Deployment,
         PlayerTurns,

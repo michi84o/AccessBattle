@@ -24,7 +24,7 @@ using System.Threading.Tasks;
  *      - 0x02: Login Client[Login (JSON)] Server[0/1 (byte, 0=OK, 1=invalid name, 2=invalid password)]
  *      - 0x03: List available games Client[] Server[List<GameInfo> (JSON string)]
  *      - 0x04: Create Game Client[GameInfo (UID=0,JSON)] Server[GameInfo (UID != 0 => OK)]
- *      - 0x05: Join Game Client[uid (string)] Server[0/1 (string, 0=OK, 1=Error)]
+ *      - 0x05: Join Game Client[uid (string)] Server[uid;0/1 (string, 0=OK, 1=Error)]
  *      - 0x06: Game Init [opponent name, client player number]
  *      - 0x07: Game Status Change [??? TODO]
  *      - 0x08: Game Command
@@ -33,7 +33,7 @@ using System.Threading.Tasks;
  * ETX = End of packet   0x03
  *  
  *  TODO: Cleanup mechanism for games and logins
- *  
+ *  TODO: Lock Access to Game list
  *  
  */
 namespace AccessBattle.Networking
@@ -292,6 +292,33 @@ namespace AccessBattle.Networking
                     catch (Exception ex)
                     {
                         Log.WriteLine("GameServer: Received CreateGame packet of player " + player.UID + " could not be read! "+ ex.Message);
+                    }
+                    break;
+                case NetworkPacketType.JoinGame:
+                    try
+                    {
+                        var jUid = uint.Parse(Encoding.ASCII.GetString(data));
+                        // Check if that game exists
+                        if (Games.ContainsKey(jUid))
+                        {
+                            string joined = "1"; // = error
+                            var game = Games[jUid];
+                            if (game.Phase == GamePhase.WaitingForPlayers
+                                || game.Phase == GamePhase.Init) // TODO remove init here
+                            {
+                                // TODO: Player 1 must accept new player
+                                //   => This also means the timeout for join has to be adjusted
+
+                                // TODO: How to assign login to game?
+                                //game.Players[1]
+                                joined = "0";
+                            }
+                            Send("" + jUid + ";" + joined, NetworkPacketType.JoinGame, player.Connection, player.ClientCrypto);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.WriteLine("GameServer: Received JoinGame packet of player " + player.UID + " could not be read! " + ex.Message);
                     }
                     break;
                 default:

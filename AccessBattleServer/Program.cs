@@ -141,13 +141,24 @@ namespace AccessBattleServer
                 PrintGameList(t2.Result);
             }
 
-            var t3 = client.CreateGame("Game1", "PlayerX");
+            var t3 = client.CreateGame("Game1");
             t.Wait();
             if (t3.Result != null)
                 Console.WriteLine("Game successfully created. Uid: " + t3.Result.UID);
 
             var t4 = client.RequestGameList(); t4.Wait();
             PrintGameList(t4.Result);
+
+            Console.WriteLine("Creating Player 2...");
+            var client2 = new GameClient();
+            Console.WriteLine("...connect...");
+            client.Connect("127.0.0.1", 3221).Wait();
+            Console.WriteLine("...login...");
+            client.Login("p2", "1234").Wait();
+            Console.WriteLine("...join...");
+            var t5 = client.JoinGame(t4.Result[0].UID);
+            t5.Wait();
+            Console.WriteLine("Player 2 login status: " + t5.Result);
 
             string input;
             while ((input = Console.ReadLine()) != "exit")
