@@ -42,7 +42,7 @@ namespace AccessBattleWpf
         StoryboardAsyncWrapper _blinkStoryboard;
         StoryboardAsyncWrapper _lineBoostStoryboard;
         ColorAnimation _blinkAnimation;
-        bool _isAnimationInStoryboard;
+        //bool _isAnimationInStoryboard;
         bool _isAnimationInitialized;
 
         // Todo: Resource
@@ -406,9 +406,9 @@ namespace AccessBattleWpf
             // Overwrite Background because its instance is shared between other fields.
             Background = new SolidColorBrush(_primaryBackground);
 
-            byte r = _primaryBackground.R;
-            byte g = _primaryBackground.G;
-            byte b = _primaryBackground.B;
+            var r = _primaryBackground.R;
+            var g = _primaryBackground.G;
+            var b = _primaryBackground.B;
             double h, s, v;
             ColorHelper.RgbToHsv(r, g, b, out h, out s, out v);
             if (s > 0.15) s = .15; else if (s>0.01) s = .85;
@@ -460,7 +460,7 @@ namespace AccessBattleWpf
         
         void UpdateLineBoostAnimation()
         {
-            bool shouldAnimate =
+            var shouldAnimate =
                 _field.Card != null &&
                 _field.Card is OnlineCard &&
                 ((OnlineCard)_field.Card).HasBoost && 

@@ -30,8 +30,25 @@ namespace AccessBattle.Networking
 
     public class GameClient : NetworkBase
     {
+        const int NetworkTimeout = 15000;
+
         public event EventHandler<GameListEventArgs> GameListReceived;
         public event EventHandler<GameCreatedEventArgs> GameCreated;
+
+
+        bool? _isConnected = false;
+        public bool? IsConnected
+        {
+            get { return _isConnected; }
+            private set { _isConnected = value; }
+        }
+
+        bool? _isLoggedIn = false;
+        public bool? IsLoggedIn
+        {
+            get { return _isLoggedIn; }
+            private set { _isLoggedIn = value; }
+        }
 
         Game _game = new Game();
         public Game Game { get { return _game; } }
@@ -125,22 +142,40 @@ namespace AccessBattle.Networking
             return result;
         }
 
-        public async Task<bool> RequestGameList()
+        public async Task<List<GameInfo>> RequestGameList()
         {
-            bool result;
+            List<GameInfo> result = null;
             using (var t = Task.Run(() =>
             {
-                return Send(new byte[0], NetworkPacketType.ListGames);
+                using (var waitHandle = new AutoResetEvent(false))
+                {
+                    EventHandler<GameListEventArgs> handler = (sender, args) =>
+                    {
+                        result = args.GameList;
+                        waitHandle.Set();
+                    };
+
+                    try
+                    {
+                        GameListReceived += handler;
+                        if (Send(new byte[0], NetworkPacketType.ListGames))
+                        {
+                            waitHandle.WaitOne(NetworkTimeout);
+                        }
+                    }
+                    catch (Exception e) { Log.WriteLine("GameClient::RequestGameList(): " + e.Message); }
+                    finally { GameListReceived -= handler; }
+                }
             }))
             {
-                result = await t;
+                await t;
             }
-            return result;             
+            return result;
         }
 
-        public async Task<bool> CreateGame(string gameName, string playerName)
+        public async Task<GameInfo> CreateGame(string gameName, string playerName)
         {
-            bool result;
+            GameInfo result = null;
             using (var t = Task.Run(() =>
             {
                 var info = new GameInfo
@@ -149,10 +184,31 @@ namespace AccessBattle.Networking
                     Name = gameName,
                     Player1 = playerName
                 };
-                return Send(JsonConvert.SerializeObject(info), NetworkPacketType.CreateGame);
+
+                using (var waitHandle = new AutoResetEvent(false))
+                {
+                    EventHandler<GameCreatedEventArgs> handler = (sender, args) =>
+                    {
+                        if (args.GameInfo != null && args.GameInfo.Name == gameName && args.GameInfo.Player1 == playerName)
+                        {
+                            result = args.GameInfo;
+                            waitHandle.Set();
+                        }
+                    };
+                    try
+                    {
+                        GameCreated += handler;
+                        if (Send(JsonConvert.SerializeObject(info), NetworkPacketType.CreateGame))
+                        {
+                            waitHandle.WaitOne(NetworkTimeout);
+                        }
+                    }
+                    catch (Exception e) { Log.WriteLine("GameClient::CreateGame(): " + e.Message); }
+                    finally { GameCreated += handler; }
+                }
             }))
             {
-                result = await t;
+                await t;
             }
             return result;
         }
@@ -290,19 +346,6 @@ namespace AccessBattle.Networking
             }
         }
 
-        bool? _isConnected = false;
-        public bool? IsConnected
-        {
-            get { return _isConnected; }
-            private set { _isConnected = value; }
-        }
-
-        bool? _isLoggedIn = false;
-        public bool? IsLoggedIn
-        { 
-            get { return _isLoggedIn; }
-            private set { _isLoggedIn = value; }
-        }
 
         //public bool CreateGame()
         //{

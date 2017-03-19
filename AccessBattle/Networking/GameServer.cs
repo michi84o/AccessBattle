@@ -24,7 +24,7 @@ using System.Threading.Tasks;
  *      - 0x02: Login Client[Login (JSON)] Server[0/1 (byte, 0=OK, 1=invalid name, 2=invalid password)]
  *      - 0x03: List available games Client[] Server[List<GameInfo> (JSON string)]
  *      - 0x04: Create Game Client[GameInfo (UID=0,JSON)] Server[GameInfo (UID != 0 => OK)]
- *      - 0x05: Join Game Client[name (string)] Server[0/1 (string, 0=OK, 1=Error)] // TODO
+ *      - 0x05: Join Game Client[uid (string)] Server[0/1 (string, 0=OK, 1=Error)]
  *      - 0x06: Game Init [opponent name, client player number]
  *      - 0x07: Game Status Change [??? TODO]
  *      - 0x08: Game Command
@@ -75,7 +75,8 @@ namespace AccessBattle.Networking
             _server = new TcpListener(IPAddress.Any, _port);
             _server.Start();
             _serverCts = new CancellationTokenSource();
-            _serverTask = Task.Run(() => ListenForClients(_serverCts.Token));
+            _serverTask = new Task(() => ListenForClients(_serverCts.Token), TaskCreationOptions.LongRunning);
+            _serverTask.Start();
         }
 
         public void Stop()
@@ -84,7 +85,7 @@ namespace AccessBattle.Networking
             _serverCts.Cancel();
             _server.Stop();            
             try { _serverTask.Wait(); }
-            catch (Exception e) { Log.WriteLine("Server Task Wait Error: " + e); }
+            catch (Exception e) { Log.WriteLine("Server task wait error: " + e); }
             _serverTask = null;
             _server = null;
 
@@ -228,7 +229,7 @@ namespace AccessBattle.Networking
                     }
                     catch (Exception ex)
                     {
-                        Log.WriteLine("GameServer: Received public key of player " + player.UID + " is invalid!");
+                        Log.WriteLine("GameServer: Received public key of player " + player.UID + " is invalid! " + ex.Message);
                     }
                     break;
                 case NetworkPacketType.ListGames:
@@ -259,7 +260,7 @@ namespace AccessBattle.Networking
                     }
                     catch (Exception ex)
                     {
-                        Log.WriteLine("GameServer: Received login of player " + player.UID + " could not be read!");
+                        Log.WriteLine("GameServer: Received login of player " + player.UID + " could not be read!" + ex.Message);
                     }
                     break;
                 case NetworkPacketType.CreateGame:

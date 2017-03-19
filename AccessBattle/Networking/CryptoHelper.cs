@@ -81,6 +81,7 @@ namespace AccessBattle.Networking
             }
             catch (Exception e)
             {
+                Log.WriteLine("CryptoHelper Encrypt: " + e.Message);
                 return null;
             }
         }
@@ -113,6 +114,7 @@ namespace AccessBattle.Networking
             }
             catch (Exception e)
             {
+                Log.WriteLine("CryptoHelper Decrypt: " + e.Message);
                 return null;
             }
         }

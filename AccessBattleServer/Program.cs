@@ -1,5 +1,6 @@
 ﻿using AccessBattle;
 using AccessBattle.Networking;
+using AccessBattle.Networking.Packets;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -23,11 +24,11 @@ namespace AccessBattleServer
             var pubKey = decrypter.GetPublicKey();
             var encrypter = new CryptoHelper(pubKey);
 
-            byte[] a = new byte[] { 0, 1, 2, 3 };
+            var a = new byte[] { 0, 1, 2, 3 };
 
             var a1 = encrypter.Encrypt(a);
             var a2 = decrypter.Decrypt(a1);
-            bool error = false;
+            var error = false;
             for (int i = 0; i < a.Length; ++i)
             {
                 error |= (a2[i] != a[i]);
@@ -73,7 +74,7 @@ namespace AccessBattleServer
                 return;
             }
             // Compare
-            bool fail = false;
+            var fail = false;
             for (int i = 0; i <= 255; ++i) // do not use byte here !!!
             {
                 fail |= bytes[i] != packet2.Data[i];
@@ -86,7 +87,7 @@ namespace AccessBattleServer
         {
             var buf = new ByteBuffer(8);
             var bufIn = new byte[3];
-            int j = 0;
+            var j = 0;
             for (int i = 0; i < 5000; ++i)
             {
                 if (buf.Capacity - buf.Length < 3)
@@ -107,32 +108,24 @@ namespace AccessBattleServer
 
         static async Task<bool> TestConnectAndLoginClient(GameClient client)
         {
-            bool result = await client.Connect("127.0.0.1", 3221);
+            var result = await client.Connect("127.0.0.1", 3221);
             if (result) result = await client.Login("foo", "bar");
             return result;
         }
 
-        static void GameListReceived(object sender, GameListEventArgs args)
+        static void PrintGameList(List<GameInfo> gameList)
         {
-            if (args.GameList != null && args.GameList.Count > 0)
-                foreach (var info in args.GameList)
+            Console.WriteLine("Game List:");
+            if (gameList != null && gameList.Count > 0)
+                foreach (var info in gameList)
                 {
-                    Console.WriteLine("Game: " + info.Name + "\r\n" + "  UID: " + info.UID + "\r\n  Host: " + info.Player1);
+                    Console.WriteLine("  [UID:" +  info.UID  + ";Name:" + info.Name + ";Host:" + info.Player1 + "]");
                 }
             else
-                Console.WriteLine("There are currently no games");
+                Console.WriteLine("  There are currently no games");
         }
 
-        private static void GameCreated(object sender, GameCreatedEventArgs e)
-        {
-            if (e.GameInfo.UID != 0)
-                Console.WriteLine("Game created");
-            else
-                Console.WriteLine("Create game failed!");
-            ((GameClient)sender).RequestGameList();
-        }
-
-        static void Main(string[] args)
+        static void Main()
         {
             Log.SetMode(LogMode.Debug);
 
@@ -140,15 +133,21 @@ namespace AccessBattleServer
             _server.Start();
 
             var client = new GameClient();
-            client.GameListReceived += GameListReceived;
-            client.GameCreated += GameCreated;
 
-            var t = TestConnectAndLoginClient(client);
+            var t = TestConnectAndLoginClient(client); t.Wait();
+            if (t.Result)
+            {
+                var t2 = client.RequestGameList(); t2.Wait();
+                PrintGameList(t2.Result);
+            }
+
+            var t3 = client.CreateGame("Game1", "PlayerX");
             t.Wait();
-            if (t.Result) client.RequestGameList();
+            if (t3.Result != null)
+                Console.WriteLine("Game successfully created. Uid: " + t3.Result.UID);
 
-            client.CreateGame("Game1", "PlayerX");
-            
+            var t4 = client.RequestGameList(); t4.Wait();
+            PrintGameList(t4.Result);
 
             string input;
             while ((input = Console.ReadLine()) != "exit")
