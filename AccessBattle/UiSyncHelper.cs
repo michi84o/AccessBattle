@@ -22,5 +22,12 @@ namespace AccessBattle
             if (handler != null)
                 Context.Send(o => handler(), null);
         }
+
+        public static void ExecuteAsync(Action action)
+        {
+            var handler = action;
+            if (handler != null)
+                Context.Post(o => handler(), null);
+        }
     }
 }

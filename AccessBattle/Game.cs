@@ -1,4 +1,5 @@
 ﻿using AccessBattle;
+using AccessBattle.Networking.Packets;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -32,6 +33,10 @@ namespace AccessBattle
     {
         #region Members
 
+        object _syncLock = new object();
+        bool _isSyncing;
+        bool _isUpdating;
+
         string _name;
         public string Name
         {
@@ -46,7 +51,11 @@ namespace AccessBattle
         public int CurrentPlayer
         {
             get { return _currentPlayer; }
-            set { SetProp(ref _currentPlayer, value); } // TODO: Make private
+            set
+            {
+                // TODO: indirect lock (_gameLock)
+                SetProp(ref _currentPlayer, value);
+            } 
         }
 
         int _winningPlayer;
@@ -63,7 +72,7 @@ namespace AccessBattle
         public GamePhase Phase
         {
             get { return _phase; }
-            set // TODO: Private
+            private set // TODO: Private
             {
                 if (_phase != value)
                 {
@@ -75,6 +84,72 @@ namespace AccessBattle
         }
 
         #endregion
+
+        // TODO: Create some mechanism to prevent changes while creating snapshot
+        // Maybe a queue in a thread? Changes might trigger sync, during change sync is not possible
+        public GameSync GetSync(int player)
+        {
+            GameSync sync;
+            sync = new GameSync
+            {
+                UID = UID,
+                Name = Name,
+                P1Name = Players[0].Name,
+                P2Name = Players[1].Name,
+                P1DidVirusCheck = Players[0].DidVirusCheck,
+                P2DidVirusCheck = Players[1].DidVirusCheck,
+                P1Did404NotFound = Players[0].Did404NotFound,
+                P2Did404NotFound = Players[1].Did404NotFound,
+                CurrentPlayer = CurrentPlayer,
+                WinningPlayer = WinningPlayer,
+                Phase = Phase,
+                Board = new List<BoardFieldSyncInfo>()
+            };
+
+            // Board is 8x8 + 2 stacks
+            for (int x = 0; x < 8; ++x)
+            {
+                for (int y = 0; y < 10; ++y) // 0-7 main field, 8-9 stack Field
+                {
+                    var field = Board.Fields[x, y];
+                    if (field == null) continue;  // fields are never null, but whatever
+                    var card = field.Card;
+                    if (card == null) continue;
+                    var onlineCard = card as OnlineCard;
+                    var info = new BoardFieldSyncInfo
+                    {
+                        X = x,
+                        Y = y,
+                        Owner = onlineCard.Owner.PlayerNumber,
+                        Type = SyncCardType.Unknown
+                    };                    
+                    if (onlineCard != null)
+                    {
+                        if (onlineCard.IsFaceUp || onlineCard.Owner.PlayerNumber == player)
+                        {
+                            if (onlineCard.Type == OnlineCardType.Link)
+                                info.Type = SyncCardType.Link;
+                            else if (onlineCard.Type == OnlineCardType.Virus)
+                                info.Type = SyncCardType.Virus;
+                        }
+                        if (onlineCard.HasBoost)
+                            info.Boost = true;
+                    }
+                    else
+                    {
+                        if (card is FirewallCard)
+                            info.Type = SyncCardType.Firewall;
+                    }
+                    sync.Board.Add(info);
+                }
+            }
+            return sync;
+        }
+        
+        public void Sync(GameSync sync)
+        {
+
+        }
 
         void OnPhaseChanged()
         {
@@ -228,7 +303,7 @@ namespace AccessBattle
                 _winningPlayer = _currentPlayer == 1 ? 1 : 2;
                 Phase = GamePhase.GameOver;
             }
-        }
+        }        
 
         /// <summary>
         /// Command      Syntax             Example
@@ -243,6 +318,14 @@ namespace AccessBattle
         /// <returns></returns>
         public bool ExecuteCommand(string command)
         {
+            //while (_isSyncing) { }
+            //try
+            //{
+            //    lock (_syncLock)
+            //    {
+            //        _isUpdating = true;
+            //    }
+
             if (string.IsNullOrEmpty(command)) return false;
             var cmdCopy = command;
             string[] split;
@@ -304,6 +387,15 @@ namespace AccessBattle
                         field2.Card = field1.Card;
                         field1.Card = null;
                         field2.Card.Location = field2;
+
+                        // Change game phase if all cards are deployed
+                        if (_board.GetPlayerStackFields(0).All(o => o.Card == null) &&
+                            _board.GetPlayerStackFields(1).All(o => o.Card == null))
+                        {
+                            // TODO: Task?
+                            UiSyncHelper.ExecuteAsync(() => { Phase = GamePhase.PlayerTurns; });
+                        }
+
                         return true;
                     }
                     if (field1.Type == BoardFieldType.Main || field1.Type == BoardFieldType.Exit)
@@ -509,7 +601,7 @@ namespace AccessBattle
                         return false;
                     }
                     // Check usage
-                    if (Players[_currentPlayer-1].DidVirusCheck)
+                    if (Players[_currentPlayer - 1].DidVirusCheck)
                     {
                         Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! Virus Check was already used.");
                         return false;
@@ -549,7 +641,7 @@ namespace AccessBattle
                         return false;
                     }
                     // Check usage
-                    if (Players[_currentPlayer-1].Did404NotFound)
+                    if (Players[_currentPlayer - 1].Did404NotFound)
                     {
                         Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid! Error 404 was already used.");
                         return false;
@@ -570,7 +662,7 @@ namespace AccessBattle
                         return false;
                     }
 
-                    Players[_currentPlayer-1].Did404NotFound = true;                    
+                    Players[_currentPlayer - 1].Did404NotFound = true;
 
                     card1.IsFaceUp = false;
                     card2.IsFaceUp = false;
@@ -580,14 +672,19 @@ namespace AccessBattle
                         field1.Card = card2;
                         field2.Card = card1;
                     }
-                                        
+
                     return true;
 
-                } 
+                }
             }
             #endregion
             Trace.WriteLine("Game: Move '" + cmdCopy + "' invalid!");
             return false;
+            //}
+            //finally
+            //{
+            //    _isUpdating = false;
+            //}
         }
 
         public List<BoardField> GetTargetFields(BoardField field)

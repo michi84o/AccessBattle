@@ -133,7 +133,7 @@ namespace AccessBattle
                     }
                 });
             }
-            UiSyncHelper.Execute(() => { _game.Phase = GamePhase.PlayerTurns; });
+            //UiSyncHelper.Execute(() => { _game.Phase = GamePhase.PlayerTurns; });
         }
     }
 }

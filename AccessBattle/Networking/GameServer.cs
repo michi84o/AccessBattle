@@ -26,7 +26,7 @@ using System.Threading.Tasks;
  *      - 0x04: Create Game Client[GameInfo (UID=0,JSON)] Server[GameInfo (UID != 0 => OK)]
  *      - 0x05: Join Game Client[uid (string)] Server[uid;0/1 (string, 0=OK, 1=Error)]
  *      - 0x06: Game Init [opponent name, client player number]
- *      - 0x07: Game Status Change [??? TODO]
+ *      - 0x07: Game Sync [??? TODO]
  *      - 0x08: Game Command
  * DATA = Packet data (encrypted, except public key)
  * CHSUM = Checksum (all bytes XOR'ed. except STX,CHSUM,ETX)
@@ -308,7 +308,7 @@ namespace AccessBattle.Networking
                             {
                                 // TODO: Player 1 must accept new player
                                 //   => This also means the timeout for join has to be adjusted
-                                game.Players[2].Player = player;
+                                game.Players[1].Player = player;
                                 joined = "0";
                             }
                             Send("" + jUid + ";" + joined, NetworkPacketType.JoinGame, player.Connection, player.ClientCrypto);

@@ -125,6 +125,37 @@ namespace AccessBattleServer
                 Console.WriteLine("  There are currently no games");
         }
 
+        static void PrintBoard(GameSync sync)
+        {
+            Console.WriteLine("Game: " + sync.Name + " (" + sync.UID + ")");
+            Console.WriteLine("  Player 1: " + sync.P1Name + " (" +  
+                (sync.P1Did404NotFound ? "1" : "0") + (sync.P1DidVirusCheck ? "1" : "0")  + ")");
+            Console.WriteLine("  Player 2: " + sync.P2Name + " (" +
+                (sync.P2Did404NotFound ? "1" : "0") + (sync.P2DidVirusCheck ? "1" : "0") + ")");
+            Console.WriteLine("  Current Player: " + sync.CurrentPlayer);
+            Console.WriteLine("  Phase: " + sync.Phase);
+            Console.WriteLine("+--------+");
+            string f = "|        |";
+            var arr = new string[] { f,f,f,f,f,f,f,f,f,f };
+            foreach (var field in sync.Board)
+            {
+                var fstr = arr[field.Y].Remove(field.X + 1, 1);
+                string sym = "?";
+                if (field.Type == SyncCardType.Virus)
+                    sym = field.Boost ? "V" : "v";
+                if (field.Type == SyncCardType.Link)
+                    sym = field.Boost ? "L" : "l";
+                if (field.Type == SyncCardType.Firewall)
+                    sym = "F";
+                arr[field.Y] = fstr.Insert(field.X + 1,sym);
+            }
+            Console.WriteLine(arr[9]);
+            for (int i=7; i>=0; --i)
+                Console.WriteLine(arr[i]);
+            Console.WriteLine(arr[8]);
+            Console.WriteLine("+--------+");
+        }
+
         static void Main()
         {
             Log.SetMode(LogMode.Debug);
@@ -159,6 +190,10 @@ namespace AccessBattleServer
             var t5 = client.JoinGame(t4.Result[0].UID);
             t5.Wait();
             Console.WriteLine("Player 2 login status: " + t5.Result);
+
+            var list = _server.Games.ToList();
+            if (list.Count > 0)
+                PrintBoard(list[0].Value.GetSync(1));
 
             string input;
             while ((input = Console.ReadLine()) != "exit")
