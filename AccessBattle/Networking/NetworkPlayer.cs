@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AccessBattle.Networking
 {
-    public class NetworkPlayer : IDisposable
+    public class NetworkPlayer : IPlayer, IDisposable
     {
         public uint UID { get; private set; }
         public string Name { get; set; }
@@ -29,6 +29,13 @@ namespace AccessBattle.Networking
             Connection = connection;
             UID = uid;
             ServerCrypto = serverCrypto;
+        }
+
+        public void PlayTurn()
+        {
+            Log.WriteLine("Network Player with UID " + UID + " requested to play turn");
+            // TODO
+            // Remote game must be synchronized
         }
 
         #region IDisposable

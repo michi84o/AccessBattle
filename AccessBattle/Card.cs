@@ -7,8 +7,8 @@ namespace AccessBattle
 {
     public abstract class Card : PropChangeNotifier
     {
-        Player _owner;
-        public Player Owner
+        PlayerState _owner;
+        public PlayerState Owner
         {
             get { return _owner; }
             set { SetProp(ref _owner, value); }

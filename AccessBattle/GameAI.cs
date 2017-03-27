@@ -8,11 +8,15 @@ using System.Threading.Tasks;
 
 namespace AccessBattle
 {
-    public class GameAI
+    public class GameAI : IPlayer
     {
         Game _game;
         int _playerIndex;
         Random rnd;
+
+        public uint UID { get { return 0; } }
+
+        virtual public string Name { get { return "Dummy"; } set {  } }
 
         public GameAI(Game game, int playerIndex = 2)
         {

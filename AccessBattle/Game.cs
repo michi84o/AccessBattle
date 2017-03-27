@@ -39,8 +39,8 @@ namespace AccessBattle
             set { SetProp(ref _name, value); }
         }
 
-        Player[] _players;
-        public Player[] Players { get { return _players; } }
+        PlayerState[] _players;
+        public PlayerState[] Players { get { return _players; } }
 
         int _currentPlayer;
         public int CurrentPlayer
@@ -130,10 +130,10 @@ namespace AccessBattle
         public Game(uint uid = 0)
         {
             _uid = uid;
-            _players = new Player[]
+            _players = new PlayerState[]
             {
-                new Player(1) { Name = "Player 1"  },
-                new Player(2) { Name = "Player 2"  }
+                new PlayerState(1) { Name = "Player 1"  },
+                new PlayerState(2) { Name = "Player 2"  }
             };
             _winningPlayer = 0;
             _board = new Board();

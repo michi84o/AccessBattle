@@ -234,7 +234,7 @@ namespace AccessBattle.Networking
                     break;
                 case NetworkPacketType.ListGames:
                     Log.WriteLine("GameServer: Player " + player.UID + " requesting game list");
-                    var glist = Games.Select(kv => kv.Value).Where(v => v.Phase == GamePhase.Init && v.Players[1].Client == null && v.UID != 0).ToList();
+                    var glist = Games.Select(kv => kv.Value).Where(v => v.Phase == GamePhase.Init && v.Players[1].Player == null && v.UID != 0).ToList();
                     var info = new List<GameInfo>();
                     foreach (var game in glist)
                     {
@@ -275,7 +275,7 @@ namespace AccessBattle.Networking
                             {
                                 while (Games.ContainsKey((uid = GetUid()))) { }
                                 var game = new Game(uid);
-                                game.Players[0].Client = player;
+                                game.Players[0].Player = player;
                                 game.Players[0].Name = ginfo.Player1;
                                 game.Name = ginfo.Name;
                                 Games.Add(uid, game);
@@ -308,7 +308,7 @@ namespace AccessBattle.Networking
                             {
                                 // TODO: Player 1 must accept new player
                                 //   => This also means the timeout for join has to be adjusted
-                                game.Players[2].Client = player;
+                                game.Players[2].Player = player;
                                 joined = "0";
                             }
                             Send("" + jUid + ";" + joined, NetworkPacketType.JoinGame, player.Connection, player.ClientCrypto);
