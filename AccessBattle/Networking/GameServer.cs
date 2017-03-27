@@ -304,13 +304,11 @@ namespace AccessBattle.Networking
                             string joined = "1"; // = error
                             var game = Games[jUid];
                             if (game.Phase == GamePhase.WaitingForPlayers
-                                || game.Phase == GamePhase.Init) // TODO remove init here
+                                || game.Phase == GamePhase.Init) // TODO remove init here (when join timeout was added)
                             {
                                 // TODO: Player 1 must accept new player
                                 //   => This also means the timeout for join has to be adjusted
-
-                                // TODO: How to assign login to game?
-                                //game.Players[1]
+                                game.Players[2].Client = player;
                                 joined = "0";
                             }
                             Send("" + jUid + ";" + joined, NetworkPacketType.JoinGame, player.Connection, player.ClientCrypto);

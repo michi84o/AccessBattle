@@ -28,7 +28,6 @@ namespace AccessBattle
         Error404,
     }
 
-
     public class Game : PropChangeNotifier
     {
         #region Members

@@ -167,6 +167,7 @@ namespace AccessBattleServer
             }
             client.Disconnect();
             _server.Stop();
+            Console.WriteLine("Server stopped. Program will exit in 5 seconds.");
             Thread.Sleep(5000);
         }
 
