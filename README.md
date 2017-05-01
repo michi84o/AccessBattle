@@ -10,6 +10,7 @@ It is still in development. Right now you can play against
 a very stupid AI. The final game will be playable over network.
 
 Estimated completion: End of August 2017
+
 Current Status: Back to the drawing board (refactoring)
 
 The main game engine is inside a separate DLL so that people
