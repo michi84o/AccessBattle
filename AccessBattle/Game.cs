@@ -19,15 +19,16 @@ namespace AccessBattle
         GameOver
     }
 
-    public enum PlayerAction
-    {
-        SelectCard,
-        MoveSelectedCard,
-        TakeSelectedCard,
-        PlaceBoost,
-        TakeBoost,
-        Error404,
-    }
+    // Not used TODO
+    //public enum PlayerAction
+    //{
+    //    SelectCard,
+    //    MoveSelectedCard,
+    //    TakeSelectedCard,
+    //    PlaceBoost,
+    //    TakeBoost,
+    //    Error404,
+    //}
 
     public class Game : PropChangeNotifier
     {
@@ -148,7 +149,32 @@ namespace AccessBattle
         
         public void Sync(GameSync sync)
         {
+            // Game
+            _uid = sync.UID; // TODO check for wrong ID + Name?
+            Name = sync.Name;
 
+            // Players
+            var p = Players[0];
+            p.Name = sync.P1Name;
+            p.Did404NotFound = sync.P1Did404NotFound;
+            p.DidVirusCheck = sync.P1DidVirusCheck;
+            p = Players[1];
+            p.Name = sync.P2Name;
+            p.Did404NotFound = sync.P2Did404NotFound;
+            p.DidVirusCheck = sync.P2DidVirusCheck;            
+            WinningPlayer = sync.WinningPlayer;
+
+            // Board
+            // Step 1 find fields that are out of sync
+            List<Card> _outOfSyncCards = new List<Card>();
+            foreach (var info in sync.Board)
+            {
+                // TODO
+            }
+
+            // Game State
+            CurrentPlayer = sync.CurrentPlayer;
+            Phase = sync.Phase;
         }
 
         void OnPhaseChanged()
