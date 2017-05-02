@@ -78,7 +78,7 @@ namespace AccessBattle.Networking
                 port = 3221; // OSH MK UF A 2010
             }
             _port = port;
-            if (port != 3221) Trace.WriteLine("The Organization has made their move! El Psy Congroo");
+            if (port != 3221) Trace.WriteLine("The Organization has made its move! El Psy Congroo");
         }
 
         /// <summary>
@@ -166,9 +166,12 @@ namespace AccessBattle.Networking
                                 // Give him a uid. GUID has 128 bit, but 32 bits seems enough:
                                 uint uid;
                                 // Make sure we do not accidentally generate the same uid:
-                                while (Players.ContainsKey((uid = GetUid()))) { }
-                                var player = new NetworkPlayer(socket, uid, serverCrypto);
-                                Players.Add(uid, player);
+                                lock(Players)
+                                { 
+                                    while (Players.ContainsKey((uid = GetUid()))) { }
+                                    var player = new NetworkPlayer(socket, uid, serverCrypto);
+                                    Players.Add(uid, player);
+                                }
                                 ReceiveAsync(socket, uid);
                             }
                         }
@@ -202,16 +205,24 @@ namespace AccessBattle.Networking
             {                
                 if (_serverCts.IsCancellationRequested) return;
 
+                NetworkPlayer player;
+
                 if (e.SocketError != SocketError.Success)
                 {
                     // Will be hit after client disconnect
                     Log.WriteLine("GameServer: Receive for client (UID:" + e.UserToken + ") not successful: " + e.SocketError);
-                    // TODO: Remove client...
+                    // Remove client...
+                    lock(Players)
+                    {
+                        if (Players.ContainsKey((uint)e.UserToken))
+                        {
+                            Players.Remove((uint)e.UserToken);
+                        }
+                    }
                 }
                 else if (e.BytesTransferred > 0)
                 {
                     Log.WriteLine("GameServer: Received data from client, UID: " + e.UserToken);
-                    NetworkPlayer player;
                     if (!Players.TryGetValue((uint)e.UserToken, out player))
                     {
                         Log.WriteLine("GameServer: Client with UID " + e.UserToken + " does not exist");

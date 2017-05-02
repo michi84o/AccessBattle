@@ -372,6 +372,7 @@ namespace AccessBattle.Networking
                 if (e.SocketError != SocketError.Success)
                 {
                     // Will be hit after client disconnect
+                    // TODO Supress error message on clean disconnect
                     Log.WriteLine("GameClient: Receive not successful: " + e.SocketError);
                 }
                 else if (e.BytesTransferred > 0)
