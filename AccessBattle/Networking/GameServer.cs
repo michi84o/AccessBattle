@@ -24,7 +24,20 @@ using System.Threading.Tasks;
  *      - 0x02: Login Client[Login (JSON)] Server[0/1 (byte, 0=OK, 1=invalid name, 2=invalid password)]
  *      - 0x03: List available games Client[] Server[List<GameInfo> (JSON string)]
  *      - 0x04: Create Game Client[GameInfo (UID=0,JSON)] Server[GameInfo (UID != 0 => OK)]
- *      - 0x05: Join Game Client[uid (string)] Server[uid;0/1 (string, 0=OK, 1=Error)]
+ *      - 0x05: Join Game 
+ *              This is complicated:
+ *              -> Player 2 sends requests to join game A ["A";"0"]
+ *              -> Server acknowledges request and forwards it to Player 1
+ *              -> Player 1 accepts
+ *              -> Server acknowledges accept and sends confirmation to Player 2
+ *              Packet format:
+ *              [Game UID (string); Type (string); Player2Name (string, optional))]
+ *              Types:
+ *              "0" = Request to join (Client P1) / ACK request (Server)
+ *              "1" = Error, join not possible (Server)
+ *              "2" = Request to accept join (Server, P2 name appended)
+ *              "3" = Accept join (Client P1 to Server, Server to P2)
+ *              "4" = Decline join (Client P1 to Server, Server to P2)
  *      - 0x06: Game Init [opponent name, client player number]
  *      - 0x07: Game Sync [??? TODO]
  *      - 0x08: Game Command
@@ -359,24 +372,21 @@ namespace AccessBattle.Networking
                         Log.WriteLine("GameServer: Received CreateGame packet of player " + player.UID + " could not be read! " + ex.Message);
                     }
                     break;
-                case NetworkPacketType.JoinGame:
+                case NetworkPacketType.RequestJoinGame:
                     try
                     {
                         var jUid = uint.Parse(Encoding.ASCII.GetString(data));
                         // Check if that game exists
                         if (Games.ContainsKey(jUid))
                         {
-                            var joined = "1"; // = error
+                            var joinRequested = "1"; // = error
                             var game = Games[jUid];
-                            if (game.Phase == GamePhase.WaitingForPlayers
-                                || game.Phase == GamePhase.Init) // TODO remove init here (when join timeout was added)
+                            if (game.JoinPlayer(player))
                             {
-                                // TODO: Player 1 must accept new player
-                                //   => This also means the timeout for join has to be adjusted
-                                game.Players[1].Player = player;
-                                joined = "0";
+                                joinRequested = "0";
+                                // Get Player 1 and send notification
                             }
-                            Send("" + jUid + ";" + joined, NetworkPacketType.JoinGame, player.Connection, player.ClientCrypto);
+                            Send("" + jUid + ";" + joinRequested, NetworkPacketType.RequestJoinGame, player.Connection, player.ClientCrypto);
                         }
                     }
                     catch (Exception ex)

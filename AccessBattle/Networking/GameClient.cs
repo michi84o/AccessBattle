@@ -46,23 +46,23 @@ namespace AccessBattle.Networking
     }
 
     /// <summary>
-    /// Args for game joined events.
+    /// Args for game join request events.
     /// </summary>
-    public class GameJoinedEventArgs : EventArgs
+    public class GameJoinRequestedEventArgs : EventArgs
     {
-        /// <summary>UID of joined game.</summary>
+        /// <summary>UID of game to join.</summary>
         public uint Uid { get; private set; }
-        /// <summary>Join success flag.</summary>
-        public bool Joined { get; private set; }
+        /// <summary>Request was received and will be sent to player 1.</summary>
+        public bool RequestReceived { get; private set; }
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="uid">UID of joined game.</param>
         /// <param name="joined">Join success flag.</param>
-        public GameJoinedEventArgs(uint uid, bool joined)
+        public GameJoinRequestedEventArgs(uint uid, bool requestReceived)
         {
             Uid = uid;
-            Joined = joined;
+            RequestReceived = requestReceived;
         }
     }
 
@@ -95,8 +95,8 @@ namespace AccessBattle.Networking
         public event EventHandler<GameListEventArgs> GameListReceived;
         /// <summary>A game was created.</summary>
         public event EventHandler<GameCreatedEventArgs> GameCreated;
-        /// <summary>Joined a game.</summary>
-        public event EventHandler<GameJoinedEventArgs> GameJoined;
+        /// <summary>Game join was requested.</summary>
+        public event EventHandler<GameJoinRequestedEventArgs> GameJoinRequested;
         /// <summary>Logged into game or failed.</summary>
         public event EventHandler<LoggedInEventArgs> LoggedIn;
 
@@ -324,17 +324,17 @@ namespace AccessBattle.Networking
         }
 
         /// <summary>
-        /// Join a game on the server.
+        /// Request to join a game on the server. Other player has to confirm.
         /// </summary>
         /// <param name="uid">UID of the game.</param>
         /// <returns>True if the game was joined.</returns>
-        public async Task<bool> JoinGame(uint uid)
+        public async Task<bool> RequestJoinGame(uint uid)
         {
-            GameJoinedEventArgs result = null;
+            GameJoinRequestedEventArgs result = null;
 
             // Catch the event for receiving the list.
-            var source = new TaskCompletionSource<GameJoinedEventArgs>();
-            EventHandler<GameJoinedEventArgs> handler = (sender, args) =>
+            var source = new TaskCompletionSource<GameJoinRequestedEventArgs>();
+            EventHandler<GameJoinRequestedEventArgs> handler = (sender, args) =>
             {
                 result = args;
                 source.TrySetResult(args);
@@ -347,17 +347,17 @@ namespace AccessBattle.Networking
 
                 try
                 {
-                    GameJoined += handler;
-                    if (Send(uid.ToString(), NetworkPacketType.JoinGame))
+                    GameJoinRequested += handler;
+                    if (Send(uid.ToString(), NetworkPacketType.RequestJoinGame))
                     {
                         result = await source.Task;
                     }
                 }
                 catch (Exception e) { Log.WriteLine("GameClient::RequestGameList(): " + e.Message); }
-                finally { GameJoined -= handler; }
+                finally { GameJoinRequested -= handler; }
             }
 
-            return result?.Joined == true && result?.Uid == uid;
+            return result?.RequestReceived == true && result?.Uid == uid;
         }
 
         /// <summary>
@@ -499,15 +499,15 @@ namespace AccessBattle.Networking
                         Log.WriteLine("GameClient: Received CreateGame confirmation could not be read." + e.Message);
                     }
                     break;
-                case NetworkPacketType.JoinGame:
+                case NetworkPacketType.RequestJoinGame:
                     try
                     {
                         var jData = Encoding.ASCII.GetString(data).Split(new[] { ';' });
                         var iJoinResult = uint.Parse(jData[0]);
                         var jResult = jData[1] == "0";
-                        var handler = GameJoined;
+                        var handler = GameJoinRequested;
                         if (handler != null)
-                            handler(this, new GameJoinedEventArgs(iJoinResult, jResult));
+                            handler(this, new GameJoinRequestedEventArgs(iJoinResult, jResult));
                     }
                     catch (Exception e)
                     {

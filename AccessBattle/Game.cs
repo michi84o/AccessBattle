@@ -13,6 +13,8 @@ namespace AccessBattle
     {
         /// <summary>Game was just created and the second player has yet to join.</summary>
         WaitingForPlayers,
+        /// <summary>A player is joining the game.</summary>
+        PlayerJoining,
         /// <summary>In Init phase, the game state is reset and it is decided which player makes the first move.</summary>
         Init,
         /// <summary>Players deploy their cards in this phase.</summary>
@@ -50,6 +52,22 @@ namespace AccessBattle
         /// Player related data.
         /// </summary>
         public PlayerState[] Players { get { return _players; } }
+
+        private object _locker = new object();
+
+        public bool JoinPlayer(IPlayer player)
+        {
+            var result = false;
+            lock (_locker)
+            {
+                if (Phase == GamePhase.WaitingForPlayers)
+                {
+                    Phase = GamePhase.PlayerJoining;
+                    result = true;
+                }
+            }
+            return result;
+        }
 
         uint _uid;
         /// <summary>
