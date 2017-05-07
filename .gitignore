@@ -6,3 +6,5 @@
 /*.suo
 /AccessBattleServer/obj
 /AccessBattleServer/bin
+/AccessBattleTests/bin
+/AccessBattleTests/obj

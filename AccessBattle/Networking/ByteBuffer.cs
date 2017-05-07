@@ -77,7 +77,7 @@ namespace AccessBattle.Networking
             _length += length;
 
             // Overflow required?
-            if (_start < _next && spaceAtTheEnd < length)
+            if (_start <= _next && spaceAtTheEnd < length)
             {
                 Array.Copy(data, index, _buffer, _next, spaceAtTheEnd);
                 var remaining = length - spaceAtTheEnd;

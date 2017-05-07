@@ -50,19 +50,20 @@ namespace AccessBattle.Networking
     /// </summary>
     public class GameJoinRequestedEventArgs : EventArgs
     {
-        /// <summary>UID of game to join.</summary>
-        public uint Uid { get; private set; }
-        /// <summary>Request was received and will be sent to player 1.</summary>
-        public bool RequestReceived { get; private set; }
+        /// <summary>JoinMessage.</summary>
+        public JoinMessage Message;
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="uid">UID of joined game.</param>
-        /// <param name="joined">Join success flag.</param>
-        public GameJoinRequestedEventArgs(uint uid, bool requestReceived)
+        /// <param name="message">Join message.</param>
+        public GameJoinRequestedEventArgs(JoinMessage message)
         {
-            Uid = uid;
-            RequestReceived = requestReceived;
+            Message = new JoinMessage()
+            {
+                JoiningUser = message.JoiningUser,
+                Request = message.Request,
+                UID = message.UID
+            };
         }
     }
 
@@ -119,9 +120,6 @@ namespace AccessBattle.Networking
         /// <summary>Login name</summary>
         public string LoginName { get; private set; }
 
-        Game _game = new Game();
-        /// <summary>The current game.</summary>
-        public Game Game { get { return _game; } }
         ByteBuffer _receiveBuffer = new ByteBuffer(4096);
         CryptoHelper _encrypter;
         CryptoHelper _decrypter;
@@ -320,6 +318,8 @@ namespace AccessBattle.Networking
                 finally { GameCreated -= handler; }
             }
 
+            // Do not set Game UID here.
+            // It is better if the client program sets the UID after checking the game info.
             return result?.GameInfo;
         }
 
@@ -327,37 +327,39 @@ namespace AccessBattle.Networking
         /// Request to join a game on the server. Other player has to confirm.
         /// </summary>
         /// <param name="uid">UID of the game.</param>
-        /// <returns>True if the game was joined.</returns>
-        public async Task<bool> RequestJoinGame(uint uid)
+        /// <returns>true if the request was sent.</returns>
+        public bool RequestJoinGame(uint uid)
         {
-            GameJoinRequestedEventArgs result = null;
-
-            // Catch the event for receiving the list.
-            var source = new TaskCompletionSource<GameJoinRequestedEventArgs>();
-            EventHandler<GameJoinRequestedEventArgs> handler = (sender, args) =>
+            try
             {
-                result = args;
-                source.TrySetResult(args);
-            };
-
-            // In case no answer was received, we have to cancel
-            using (var ct = new CancellationTokenSource(NetworkTimeout * 1000))
-            {
-                ct.Token.Register(() => source.TrySetResult(null));
-
-                try
-                {
-                    GameJoinRequested += handler;
-                    if (Send(uid.ToString(), NetworkPacketType.RequestJoinGame))
-                    {
-                        result = await source.Task;
-                    }
-                }
-                catch (Exception e) { Log.WriteLine("GameClient::RequestGameList(): " + e.Message); }
-                finally { GameJoinRequested -= handler; }
+                var req = new JoinMessage() { UID = uid, Request = 0 };
+                return Send(JsonConvert.SerializeObject(req), NetworkPacketType.JoinGame);
             }
+            catch (Exception e)
+            {
+                Log.WriteLine("GameClient::RequestJoinGame(): " + e.Message);
+                return false;
+            }
+        }
 
-            return result?.RequestReceived == true && result?.Uid == uid;
+        /// <summary>
+        /// Used to accept and confirm a join. Used by both players.
+        /// </summary>
+        /// <param name="uid">UID of game.</param>
+        /// <param name="accept">true if join is accepted, else false.</param>
+        /// <returns>true if the request was sent.</returns>
+        public bool ConfirmJoin(uint uid, bool accept)
+        {
+            try
+            {
+                var req = new JoinMessage() { UID = uid, Request = accept ? 3 : 4 };
+                return Send(JsonConvert.SerializeObject(req), NetworkPacketType.JoinGame);
+            }
+            catch (Exception e)
+            {
+                Log.WriteLine("GameClient::AnswerJoinRequest(): " + e.Message);
+                return false;
+            }
         }
 
         /// <summary>
@@ -499,15 +501,16 @@ namespace AccessBattle.Networking
                         Log.WriteLine("GameClient: Received CreateGame confirmation could not be read." + e.Message);
                     }
                     break;
-                case NetworkPacketType.RequestJoinGame:
+                case NetworkPacketType.JoinGame:
                     try
                     {
-                        var jData = Encoding.ASCII.GetString(data).Split(new[] { ';' });
-                        var iJoinResult = uint.Parse(jData[0]);
-                        var jResult = jData[1] == "0";
-                        var handler = GameJoinRequested;
-                        if (handler != null)
-                            handler(this, new GameJoinRequestedEventArgs(iJoinResult, jResult));
+                        var jMsg = JsonConvert.DeserializeObject<JoinMessage>(Encoding.ASCII.GetString(data));
+                        if (jMsg != null)
+                        {
+                            var handler = GameJoinRequested;
+                            if (handler != null)
+                                handler(this, new GameJoinRequestedEventArgs(jMsg));
+                        }
                     }
                     catch (Exception e)
                     {

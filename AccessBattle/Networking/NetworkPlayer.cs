@@ -33,6 +33,11 @@ namespace AccessBattle.Networking
         public Socket Connection { get; private set; }
 
         /// <summary>
+        /// Current game this player has joined.
+        /// </summary>
+        public Game CurrentGame { get; set; }
+
+        /// <summary>
         /// Used to decrypt data that was received from the player.
         /// </summary>
         public CryptoHelper ServerCrypto { get; private set; }

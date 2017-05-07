@@ -55,7 +55,12 @@ namespace AccessBattle
 
         private object _locker = new object();
 
-        public bool JoinPlayer(IPlayer player)
+        /// <summary>
+        /// Starts joining a player. Player 1 must accept. Then player 2 must accept after waiting.
+        /// </summary>
+        /// <param name="player">Player to join.</param>
+        /// <returns></returns>
+        public bool BeginJoinPlayer(IPlayer player)
         {
             var result = false;
             lock (_locker)
@@ -63,6 +68,33 @@ namespace AccessBattle
                 if (Phase == GamePhase.WaitingForPlayers)
                 {
                     Phase = GamePhase.PlayerJoining;
+                    Players[1].Player = player;
+                    result = true;
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Confirms the joining process and starts Game Init phase.
+        /// </summary>
+        /// <param name="player"></param>
+        /// <param name="accepted"></param>
+        /// <returns></returns>
+        public bool JoinPlayer(IPlayer player, bool accepted)
+        {
+            var result = false;
+            lock (_locker)
+            {
+                if (Phase == GamePhase.PlayerJoining && Players[1].Player == player)
+                {
+                    if (accepted)
+                        Phase = GamePhase.Init;                        
+                    else
+                    {
+                        Players[1].Player = null;
+                        Phase = GamePhase.WaitingForPlayers;
+                    }
                     result = true;
                 }
             }
@@ -83,6 +115,15 @@ namespace AccessBattle
         {
             get { return _name; }
             set { SetProp(ref _name, value); }
+        }
+
+        /// <summary>
+        /// Changes the UID. Should only be used for network play when player joined a game.
+        /// </summary>
+        /// <param name="uid">New UID.</param>
+        public void SetUid(uint uid)
+        {
+            SetProp(ref _uid, uid);
         }
 
         /// <summary>

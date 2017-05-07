@@ -26,14 +26,15 @@ using System.Threading.Tasks;
  *      - 0x04: Create Game Client[GameInfo (UID=0,JSON)] Server[GameInfo (UID != 0 => OK)]
  *      - 0x05: Join Game 
  *              This is complicated:
- *              -> Player 2 sends requests to join game A ["A";"0"]
- *              -> Server acknowledges request and forwards it to Player 1
+ *              -> Player 2 sends requests to join game A
  *              -> Player 1 accepts
  *              -> Server acknowledges accept and sends confirmation to Player 2
+ *              -> Player 2 confirms again
+ *              -> Game state change (Init) is forwarded to both players
  *              Packet format:
  *              [Game UID (string); Type (string); Player2Name (string, optional))]
  *              Types:
- *              "0" = Request to join (Client P1) / ACK request (Server)
+ *              "0" = Request to join (Server to Client P1)
  *              "1" = Error, join not possible (Server)
  *              "2" = Request to accept join (Server, P2 name appended)
  *              "3" = Accept join (Client P1 to Server, Server to P2)
@@ -273,6 +274,36 @@ namespace AccessBattle.Networking
         }
 
         /// <summary>
+        /// Get game and both players.
+        /// </summary>
+        /// <param name="gameId">Game ID.</param>
+        /// <param name="game">Game instance.</param>
+        /// <param name="player1">Player 1.</param>
+        /// <param name="player2">Player 2.</param>
+        /// <returns></returns>
+        bool GetGameAndPlayers(uint gameId, out Game game, out NetworkPlayer player1, out NetworkPlayer player2)
+        {
+            player1 = null;
+            player2 = null;
+            try
+            {
+                if (_games.TryGetValue(gameId, out game))
+                {
+                    player1 = game.Players[0].Player as NetworkPlayer;
+                    player2 = game.Players[1].Player as NetworkPlayer;
+                    return true;
+                }                
+            }
+            catch (Exception)
+            {
+                game = null;
+                player1 = null;
+                player2 = null;
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Processes the received packets.
         /// </summary>
         /// <param name="packet"></param>
@@ -358,6 +389,7 @@ namespace AccessBattle.Networking
                                 game.Players[0].Name = ginfo.Player1;
                                 game.Name = ginfo.Name;
                                 Games.Add(uid, game);
+                                player.CurrentGame = game;
                             }
                             ginfo.UID = uid;
                             Send(JsonConvert.SerializeObject(ginfo), NetworkPacketType.CreateGame, player.Connection, player.ClientCrypto);
@@ -372,22 +404,64 @@ namespace AccessBattle.Networking
                         Log.WriteLine("GameServer: Received CreateGame packet of player " + player.UID + " could not be read! " + ex.Message);
                     }
                     break;
-                case NetworkPacketType.RequestJoinGame:
+                case NetworkPacketType.JoinGame:
                     try
                     {
-                        var jUid = uint.Parse(Encoding.ASCII.GetString(data));
-                        // Check if that game exists
-                        if (Games.ContainsKey(jUid))
+                        var jMsg = JsonConvert.DeserializeObject<JoinMessage>(Encoding.ASCII.GetString(data));
+                        Game game;
+                        NetworkPlayer p1, p2;
+                        if (GetGameAndPlayers(jMsg.UID, out game, out p1, out p2))                        
                         {
-                            var joinRequested = "1"; // = error
-                            var game = Games[jUid];
-                            if (game.JoinPlayer(player))
+                            // Check type of messagae
+                            if (jMsg.Request == 0) // Request to join game
                             {
-                                joinRequested = "0";
-                                // Get Player 1 and send notification
+                                var reqOK = false;
+                                if (game.BeginJoinPlayer(player))
+                                {                                    
+                                    if (p1 != null && player != p1) // Cannot request to join own game!
+                                    {                                        
+                                        var p1Req = new JoinMessage()
+                                        { UID = game.UID, Request = 2, JoiningUser = player.Name };
+                                        Send(JsonConvert.SerializeObject(p1Req), NetworkPacketType.JoinGame, p1.Connection, p1.ClientCrypto);
+                                        reqOK = true;                                        
+                                    }
+                                }
+                                if (!reqOK) // Error while joining
+                                {
+                                    var p2Err = new JoinMessage() { UID = game.UID, Request = 1 };
+                                    Send(JsonConvert.SerializeObject(p2Err), NetworkPacketType.JoinGame, player.Connection, player.ClientCrypto);
+                                }
                             }
-                            Send("" + jUid + ";" + joinRequested, NetworkPacketType.RequestJoinGame, player.Connection, player.ClientCrypto);
-                        }
+                            else if (jMsg.Request == 3) // Join Accept
+                            {
+                                if (player == p1)
+                                {
+                                    // Notify p2
+                                    var p2Answ = new JoinMessage() { UID = game.UID, Request = 3 };
+                                    Send(JsonConvert.SerializeObject(p2Answ), NetworkPacketType.JoinGame, p2.Connection, p2.ClientCrypto);
+                                }
+                                else if (player == p2)
+                                {
+                                    if (game.JoinPlayer(p2, true))
+                                    {
+                                        p2.CurrentGame = game;
+                                    }
+                                }
+                            }
+                            else if (jMsg.Request == 4) // Join Declined
+                            {
+                                if (player == p1)
+                                {
+                                    // Notify p2
+                                    var p2Answ = new JoinMessage() { UID = game.UID, Request = 4 };
+                                    Send(JsonConvert.SerializeObject(p2Answ), NetworkPacketType.JoinGame, player.Connection, player.ClientCrypto);
+                                }
+                                else if (player == p2)
+                                {
+                                    game.JoinPlayer(p2, false);                                    
+                                }
+                            }
+                        }                        
                     }
                     catch (Exception ex)
                     {
