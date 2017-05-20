@@ -89,7 +89,7 @@ namespace AccessBattle
                 if (Phase == GamePhase.PlayerJoining && Players[1].Player == player)
                 {
                     if (accepted)
-                        Phase = GamePhase.Init;                        
+                        Phase = GamePhase.Init;
                     else
                     {
                         Players[1].Player = null;

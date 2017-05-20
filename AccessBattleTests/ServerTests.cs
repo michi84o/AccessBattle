@@ -54,7 +54,7 @@ namespace AccessBattleTests
             // Join is event based due to the long waiting time for confirmation
             var client1Task = new TaskCompletionSource<bool>();
             var client2Task = new TaskCompletionSource<bool>();
-
+            // Register events
             client1.GameJoinRequested += (s, a) =>
             {
                 Assert.AreEqual(info.UID, a.Message.UID);
