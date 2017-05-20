@@ -47,7 +47,7 @@ namespace AccessBattle
             if (playerNumber == 1) return _fireWallP1;
             if (playerNumber == 2) return _fireWallP2;
             return null;
-        }        
+        }
 
         #region Little Helpers
         BoardField[] _player1DeploymentFields;

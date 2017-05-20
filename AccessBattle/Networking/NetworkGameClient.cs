@@ -87,7 +87,7 @@ namespace AccessBattle.Networking
     /// <summary>
     /// Class for network clients. 
     /// </summary>
-    public class GameClient : NetworkBase
+    public class NetworkGameClient : NetworkBase
     {
         /// <summary>Timeout for network operations in seconds.</summary>
         const int NetworkTimeout = 20;
@@ -127,7 +127,7 @@ namespace AccessBattle.Networking
         readonly object _clientLock = new object();
 
         /// <summary>Constructor.</summary>
-        public GameClient()
+        public NetworkGameClient()
         {
             _decrypter = new CryptoHelper();
         }
@@ -149,7 +149,7 @@ namespace AccessBattle.Networking
                 if (IsConnected == null) return false;
                 Disconnect();
                 IsConnected = null;
-                Log.WriteLine("GameClient: Connecting...");
+                Log.WriteLine("NetworkGameClient: Connecting...");
             }
             try
             {
@@ -167,7 +167,7 @@ namespace AccessBattle.Networking
                 if (_encrypter == null)
                 {
                     Disconnect();
-                    Log.WriteLine("GameClient: Connect failed: No key received from server!");
+                    Log.WriteLine("NetworkGameClient: Connect failed: No key received from server!");
                     IsConnected = false;
                     return false;
                 }
@@ -176,11 +176,11 @@ namespace AccessBattle.Networking
             }
             catch (Exception e)
             {
-                Log.WriteLine("GameClient: Connect failed: " + e.Message);
+                Log.WriteLine("NetworkGameClient: Connect failed: " + e.Message);
                 IsConnected = false;
                 return false;
             }
-            Log.WriteLine("GameClient: Connect success!");
+            Log.WriteLine("NetworkGameClient: Connect success!");
             IsConnected = true;
             return true;
         }
@@ -224,7 +224,7 @@ namespace AccessBattle.Networking
                         result = await source.Task;
                     }
                 }
-                catch (Exception e) { Log.WriteLine("GameClient::Login(): " + e.Message); }
+                catch (Exception e) { Log.WriteLine("NetworkGameClient::Login(): " + e.Message); }
                 finally { LoggedIn -= handler; }
             }
 
@@ -265,7 +265,7 @@ namespace AccessBattle.Networking
                         result = await source.Task;
                     }
                 }
-                catch (Exception e) { Log.WriteLine("GameClient::RequestGameList(): " + e.Message); }
+                catch (Exception e) { Log.WriteLine("NetworkGameClient::RequestGameList(): " + e.Message); }
                 finally { GameListReceived -= handler; }                
             }
             return result?.GameList;
@@ -314,13 +314,22 @@ namespace AccessBattle.Networking
                         result = await source.Task;
                     }
                 }
-                catch (Exception e) { Log.WriteLine("GameClient::CreateGame(): " + e.Message); }
+                catch (Exception e) { Log.WriteLine("NetworkGameClient::CreateGame(): " + e.Message); }
                 finally { GameCreated -= handler; }
             }
 
             // Do not set Game UID here.
             // It is better if the client program sets the UID after checking the game info.
             return result?.GameInfo;
+        }
+
+        async Task<bool> ExecuteGameCommand()
+        {
+            if (IsConnected != true || IsLoggedIn != true) return false;
+
+            // TODO Send packet to server and return answer
+
+            return false;
         }
 
         /// <summary>
@@ -337,7 +346,7 @@ namespace AccessBattle.Networking
             }
             catch (Exception e)
             {
-                Log.WriteLine("GameClient::RequestJoinGame(): " + e.Message);
+                Log.WriteLine("NetworkGameClient::RequestJoinGame(): " + e.Message);
                 return false;
             }
         }
@@ -357,7 +366,7 @@ namespace AccessBattle.Networking
             }
             catch (Exception e)
             {
-                Log.WriteLine("GameClient::AnswerJoinRequest(): " + e.Message);
+                Log.WriteLine("NetworkGameClient::AnswerJoinRequest(): " + e.Message);
                 return false;
             }
         }
@@ -375,24 +384,24 @@ namespace AccessBattle.Networking
                 {
                     // Will be hit after client disconnect
                     // TODO Supress error message on clean disconnect
-                    Log.WriteLine("GameClient: Receive not successful: " + e.SocketError);
+                    Log.WriteLine("NetworkGameClient: Receive not successful: " + e.SocketError);
                 }
                 else if (e.BytesTransferred > 0)
                 {
-                    Log.WriteLine("GameClient: Received " + e.BytesTransferred + " bytes of data");
+                    Log.WriteLine("NetworkGameClient: Received " + e.BytesTransferred + " bytes of data");
                     _receiveBuffer.Add(e.Buffer, 0, e.BytesTransferred);
-                    Log.WriteLine("GameClient: Receive buffer has now " + _receiveBuffer.Length + " bytes of data");
+                    Log.WriteLine("NetworkGameClient: Receive buffer has now " + _receiveBuffer.Length + " bytes of data");
 
                     byte[] packData;
                     while (_receiveBuffer.Take(NetworkPacket.STX, NetworkPacket.ETX, out packData))
                     {
-                        Log.WriteLine("GameClient: Received full packet");
+                        Log.WriteLine("NetworkGameClient: Received full packet");
                         var packet = NetworkPacket.FromByteArray(packData);
                         if (packet == null)
-                            Log.WriteLine("GameClient: Could not parse packet!");
+                            Log.WriteLine("NetworkGameClient: Could not parse packet!");
                         else
                         {
-                            Log.WriteLine("GameClient: Received packet of type " + packet.PacketType + " with " + packet.Data.Length + " bytes of data");
+                            Log.WriteLine("NetworkGameClient: Received packet of type " + packet.PacketType + " with " + packet.Data.Length + " bytes of data");
                             ProcessPacket(packet);
                         }
                     }
@@ -421,7 +430,7 @@ namespace AccessBattle.Networking
                 data = _decrypter.Decrypt(packet.Data);
                 if (data == null)
                 {
-                    Log.WriteLine("GameClient: Error! Could not decrypt message from server");
+                    Log.WriteLine("NetworkGameClient: Error! Could not decrypt message from server");
                     return;
                 }
             }
@@ -436,7 +445,7 @@ namespace AccessBattle.Networking
                     catch (Exception ex)
                     {
                         _encrypter = null;
-                        Log.WriteLine("GameClient: Received key is invalid! " + ex.Message);
+                        Log.WriteLine("NetworkGameClient: Received key is invalid! " + ex.Message);
                     }
                     break;
                 case NetworkPacketType.ListGames:
@@ -444,14 +453,14 @@ namespace AccessBattle.Networking
                     {
                         var glistString = Encoding.ASCII.GetString(data);
                         var glist = JsonConvert.DeserializeObject<List<GameInfo>>(glistString);
-                        Log.WriteLine("GameClient: Received list of games on server. Game count: " + glist.Count);
+                        Log.WriteLine("NetworkGameClient: Received list of games on server. Game count: " + glist.Count);
                         var gListHandler = GameListReceived;
                         if (gListHandler != null)
                             gListHandler(this, new GameListEventArgs(glist));
                     }
                     catch (Exception e)
                     {
-                        Log.WriteLine("GameClient: Received list of games from server could not be read. " + e.Message);
+                        Log.WriteLine("NetworkGameClient: Received list of games from server could not be read. " + e.Message);
                     }
                     break;
                 case NetworkPacketType.ClientLogin:
@@ -460,12 +469,12 @@ namespace AccessBattle.Networking
                         if (data.Length > 0 && data[0] == 0)
                         {
                             IsLoggedIn = true;
-                            Log.WriteLine("GameClient: Login to server successful!");
+                            Log.WriteLine("NetworkGameClient: Login to server successful!");
                         }
                         else
                         {
                             IsLoggedIn = false;
-                            var error = "GameClient: Login to server failed! ";
+                            var error = "NetworkGameClient: Login to server failed! ";
                             if (data[0] == 1) error += "Invalid user name";
                             else if (data[0] == 2) error += "Invalid password";
                             else error += "Unknown error";
@@ -476,7 +485,7 @@ namespace AccessBattle.Networking
                     }
                     catch (Exception e)
                     {
-                        Log.WriteLine("GameClient: Received login confirmation could not be read." + e.Message);
+                        Log.WriteLine("NetworkGameClient: Received login confirmation could not be read." + e.Message);
                     }
                     break;
                 case NetworkPacketType.CreateGame:
@@ -494,11 +503,11 @@ namespace AccessBattle.Networking
                             }
                         }
                         else
-                            Log.WriteLine("GameClient: Received CreateGame confirmation could not be read.");
+                            Log.WriteLine("NetworkGameClient: Received CreateGame confirmation could not be read.");
                     }
                     catch (Exception e)
                     {
-                        Log.WriteLine("GameClient: Received CreateGame confirmation could not be read." + e.Message);
+                        Log.WriteLine("NetworkGameClient: Received CreateGame confirmation could not be read." + e.Message);
                     }
                     break;
                 case NetworkPacketType.JoinGame:
@@ -514,7 +523,7 @@ namespace AccessBattle.Networking
                     }
                     catch (Exception e)
                     {
-                        Log.WriteLine("GameClient: Received JoinGame confirmation could not be read." + e.Message);
+                        Log.WriteLine("NetworkGameClient: Received JoinGame confirmation could not be read." + e.Message);
                     }
                     break;
                 default:
@@ -555,14 +564,14 @@ namespace AccessBattle.Networking
             _encrypter = null;
             try
             {
-                Log.WriteLine("GameClient: Closing connection...");
+                Log.WriteLine("NetworkGameClient: Closing connection...");
                 _connection.Close();
                 _connection.Dispose();
-                Log.WriteLine("GameClient: Connection closed");
+                Log.WriteLine("NetworkGameClient: Connection closed");
             }
             catch (Exception e)
             {
-                Log.WriteLine("GameClient: Closing connection caused an exception: " + e.Message);
+                Log.WriteLine("NetworkGameClient: Closing connection caused an exception: " + e.Message);
             }
             _isConnected = false;
             _connection = null;

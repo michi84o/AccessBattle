@@ -59,7 +59,7 @@ namespace AccessBattle.Networking
     public class GameServer : NetworkBase
     {
         /// <summary>List of current games.</summary>
-        public Dictionary<uint, Game> Games { get { return _games; } }
+        public Dictionary<uint, NetworkGame> Games { get { return _games; } }
         
         /// <summary>List of currently connected players.</summary>
         public Dictionary<uint, NetworkPlayer> Players { get { return _players; } }
@@ -72,7 +72,7 @@ namespace AccessBattle.Networking
 
         Thread _serverThread;
         ushort _port;
-        Dictionary<uint, Game> _games = new Dictionary<uint, Game>();
+        Dictionary<uint, NetworkGame> _games = new Dictionary<uint, NetworkGame>();
         Dictionary<uint, NetworkPlayer> _players = new Dictionary<uint, NetworkPlayer>();
         TcpListener _server;
         CancellationTokenSource _serverCts;
@@ -281,7 +281,7 @@ namespace AccessBattle.Networking
         /// <param name="player1">Player 1.</param>
         /// <param name="player2">Player 2.</param>
         /// <returns></returns>
-        bool GetGameAndPlayers(uint gameId, out Game game, out NetworkPlayer player1, out NetworkPlayer player2)
+        bool GetGameAndPlayers(uint gameId, out NetworkGame game, out NetworkPlayer player1, out NetworkPlayer player2)
         {
             player1 = null;
             player2 = null;
@@ -384,7 +384,7 @@ namespace AccessBattle.Networking
                             lock (Games)
                             {
                                 while (Games.ContainsKey((uid = GetUid()))) { }
-                                var game = new Game(uid);
+                                var game = new NetworkGame(uid);
                                 game.Players[0].Player = player;
                                 game.Players[0].Name = ginfo.Player1;
                                 game.Name = ginfo.Name;
@@ -408,7 +408,7 @@ namespace AccessBattle.Networking
                     try
                     {
                         var jMsg = JsonConvert.DeserializeObject<JoinMessage>(Encoding.ASCII.GetString(data));
-                        Game game;
+                        NetworkGame game;
                         NetworkPlayer p1, p2;
                         if (GetGameAndPlayers(jMsg.UID, out game, out p1, out p2))                        
                         {

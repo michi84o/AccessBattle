@@ -31,8 +31,8 @@ namespace AccessBattleTests
         [TestMethod]
         public void CreateAndJoinGame()
         {
-            var client1 = new GameClient();
-            var client2 = new GameClient();
+            var client1 = new NetworkGameClient();
+            var client2 = new NetworkGameClient();
             // Connect
             Assert.IsTrue(client1.Connect("127.0.0.1", 3221).GetAwaiter().GetResult());
             Assert.IsTrue(client2.Connect("127.0.0.1", 3221).GetAwaiter().GetResult());

@@ -44,11 +44,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Game.cs" />
+    <Compile Include="GameClient.cs" />
+    <Compile Include="Networking\GameSync.cs" />
     <Compile Include="IPlayer.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="Networking\ByteBuffer.cs" />
     <Compile Include="Networking\CryptoHelper.cs" />
-    <Compile Include="Networking\GameClient.cs" />
+    <Compile Include="Networking\NetworkGame.cs" />
+    <Compile Include="Networking\NetworkGameClient.cs" />
     <Compile Include="Networking\GameServer.cs" />
     <Compile Include="Networking\NetworkBase.cs" />
     <Compile Include="Networking\NetworkPacket.cs" />
