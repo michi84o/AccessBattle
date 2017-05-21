@@ -1,0 +1,25 @@
+﻿<Window x:Class="AccessBattle.Wpf.View.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AccessBattle.Wpf.View"
+        xmlns:viewmodel="clr-namespace:AccessBattle.Wpf.ViewModel"
+        Title="Access Battle" 
+        MinWidth="310" MinHeight="480"
+        Width="424" Height="646"
+        Background="Black">
+    <Window.DataContext>
+        <viewmodel:MainWindowViewModel/>
+    </Window.DataContext>
+    <Window.Resources>
+        <ResourceDictionary>
+            
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid>
+        <TextBlock Text="Not implemented"/>
+        <local:BoardFieldView Width="64" Height="64"/>
+        <local:BoardFieldView Width="64" Height="64" Margin="200,0,0,0"/>
+    </Grid>
+</Window>

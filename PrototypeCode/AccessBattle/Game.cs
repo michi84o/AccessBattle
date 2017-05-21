@@ -73,7 +73,7 @@ namespace AccessBattle
         public GamePhase Phase
         {
             get { return _phase; }
-            private set // TODO: Private
+            set // TODO: Private
             {
                 if (_phase != value)
                 {
