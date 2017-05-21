@@ -65,6 +65,10 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Coverters\BoardFieldVisualStateVisibilityConverter.cs" />
+    <Compile Include="Enums.cs" />
+    <Compile Include="RelayCommand.cs" />
+    <Compile Include="UiGlobals.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
     <Compile Include="View\BoardFieldView.xaml.cs">
       <DependentUpon>BoardFieldView.xaml</DependentUpon>
@@ -92,6 +96,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <Resource Include="ExternalResources\slkscr.ttf" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

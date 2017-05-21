@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace AccessBattle.Networking.Packets
 {
+    /// <summary>
+    /// Message for joining a game.
+    /// </summary>
     public class JoinMessage
     {
         /// <summary>

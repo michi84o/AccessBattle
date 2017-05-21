@@ -16,7 +16,7 @@ namespace AccessBattle.Networking
         /// <summary>
         /// Constructor that applies a unique id to the game.
         /// </summary>
-        /// <param name="uid"></param>
+        /// <param name="uid">ID of this game.</param>
         public NetworkGame(uint uid)
         {
             _uid = uid;

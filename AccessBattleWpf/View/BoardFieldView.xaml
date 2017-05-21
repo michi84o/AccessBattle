@@ -4,17 +4,58 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:AccessBattle.Wpf.View"
+             xmlns:global="clr-namespace:AccessBattle.Wpf"
+             xmlns:converters="clr-namespace:AccessBattle.Wpf.Coverters"
              mc:Ignorable="d" 
-             d:DesignHeight="64" d:DesignWidth="64">
-    <Grid>
-        <Border CornerRadius="10" Background="DarkOrange">
+             d:DesignHeight="64" d:DesignWidth="64" x:Name="BoardFieldControl">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <converters:BoardFieldVisualStateVisibilityConverter x:Key="vConvLink" PrimaryState="Link" />
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <UserControl.Template>
+        <ControlTemplate>
+            <Grid>
+                <!-- Background of control -->
+                <Border Background="{Binding Path=FieldBackground, ElementName=BoardFieldControl}" CornerRadius="2"  BorderThickness="2" BorderBrush="{Binding Path=FieldBorderBrush, ElementName=BoardFieldControl}" />
+                <!-- White overlay background for flashing animation -->
+                <!-- Animation is global. Turn of single animations by switching visibility of this overlay -->
+                <Border Background="White" CornerRadius="2" BorderThickness="2" BorderBrush="Transparent" Opacity="{Binding Source={x:Static global:UiGlobals.Instance}, Path=FlashOpacity}"/>
+                <!-- The following code defines the different contents this user control can show -->
+                <!-- The visibility of the contents just has to be switched -->
 
-        </Border>
-        <Border CornerRadius="10" Background="White" Opacity="{Binding Source={x:Static local:UiGlobals.Instance}, Path=FlashOpacity}">
-           
-        </Border>
-        <Border CornerRadius="10" >
-            <TextBlock Text="Main Content" FontSize="8" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-        </Border>
-    </Grid>
+                <Grid 
+                    Visibility="{Binding Path=FieldVisualState, ElementName=BoardFieldControl, Converter={StaticResource vConvLink}}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="3*"/>
+                        <RowDefinition Height="1*"/>
+                    </Grid.RowDefinitions>
+                    <Viewbox Margin="2" Grid.Row="0">
+                        <Path Name="LinkPath"
+                        Margin="1"
+                        Fill="DarkGray"
+                        Stroke="DarkGray" StrokeThickness="1"
+                        Data="{StaticResource LinkPath}"/>
+                    </Viewbox>
+                    <Viewbox Grid.Row="1">
+                        <TextBlock 
+                        Name ="LinkText"
+                        Grid.Row="1"
+                        FontFamily="../ExternalResources/#Silkscreen"
+                        FontSize="10" Foreground="DarkGray"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Text="LINK"/>
+                    </Viewbox>
+                </Grid>
+
+                <!-- If multiple contents are active, a separate opacity animation has to be used -->
+                <!-- Here are the possible overlay contents -->
+
+                <!-- If some adds custom content (like the server field) -->
+                <ContentPresenter Content="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Content}" />
+            </Grid>
+        </ControlTemplate>
+    </UserControl.Template>
+    
 </UserControl>

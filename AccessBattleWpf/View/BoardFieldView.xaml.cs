@@ -23,6 +23,68 @@ namespace AccessBattle.Wpf.View
         public BoardFieldView()
         {
             InitializeComponent();
+            MouseDown += (s, e) => { if (CaptureMouse()) _clickStarted = true; };
+            MouseLeave += (s, e) => 
+            {
+                if (IsMouseCaptured)
+                    ReleaseMouseCapture();
+                _clickStarted = false;  };
+            MouseUp += (s, e) => 
+            {
+                if (IsMouseCaptured)
+                    ReleaseMouseCapture();
+                if (_clickStarted)
+                {
+                    _clickStarted = false;
+                    Clicked?.Invoke(this, EventArgs.Empty);
+                    var cmd = Command;
+                    if (cmd != null && cmd.CanExecute(CommandParameter))
+                        cmd.Execute(cmd);
+                }
+            };
         }
+
+        public event EventHandler Clicked;
+
+        bool _clickStarted;
+        public ICommand Command
+        {
+            get { return (ICommand)GetValue(CommandProperty); }
+            set { SetValue(CommandProperty, value); }
+        }
+        public static readonly DependencyProperty CommandProperty = DependencyProperty.Register(
+            nameof(Command), typeof(ICommand), typeof(BoardFieldView), new PropertyMetadata(null));
+
+        public object CommandParameter
+        {
+            get { return (ICommand)GetValue(CommandParameterProperty); }
+            set { SetValue(CommandParameterProperty, value); }
+        }
+        public static readonly DependencyProperty CommandParameterProperty = DependencyProperty.Register(
+            nameof(CommandParameter), typeof(object), typeof(BoardFieldView), new PropertyMetadata(null));
+
+        public SolidColorBrush FieldBackground
+        {
+            get { return (SolidColorBrush)GetValue(FieldBackgroundProperty); }
+            set { SetValue(FieldBackgroundProperty, value); }
+        }        
+        public static readonly DependencyProperty FieldBackgroundProperty = DependencyProperty.Register(
+            nameof(FieldBackground), typeof(SolidColorBrush), typeof(BoardFieldView), new PropertyMetadata(Brushes.Transparent));
+
+        public SolidColorBrush FieldBorderBrush
+        {
+            get { return (SolidColorBrush)GetValue(FieldBackgroundProperty); }
+            set { SetValue(FieldBackgroundProperty, value); }
+        }
+        public static readonly DependencyProperty FieldBorderBrushProperty = DependencyProperty.Register(
+            nameof(FieldBorderBrush), typeof(SolidColorBrush), typeof(BoardFieldView), new PropertyMetadata(Brushes.Transparent));
+
+        public BoardFieldVisualState FieldVisualState
+        {
+            get { return (BoardFieldVisualState)GetValue(BoardFieldVisualStateProperty); }
+            set { SetValue(BoardFieldVisualStateProperty, value); }
+        }
+        public static readonly DependencyProperty BoardFieldVisualStateProperty = DependencyProperty.Register(
+            nameof(BoardFieldVisualState), typeof(BoardFieldVisualState), typeof(BoardFieldView), new PropertyMetadata(BoardFieldVisualState.Empty));
     }
 }

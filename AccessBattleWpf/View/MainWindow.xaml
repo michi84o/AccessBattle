@@ -14,12 +14,104 @@
     </Window.DataContext>
     <Window.Resources>
         <ResourceDictionary>
+            <GridLength x:Key="FieldDim">50</GridLength>
+            <GridLength x:Key="BoardBorderGridThickness">4</GridLength>
+            <Thickness x:Key="BoardBorderThickness">4</Thickness>
+            <CornerRadius x:Key="BoardBorderCornerRadius">4</CornerRadius>
+            <SolidColorBrush x:Key="PlayerBlueDeploymentLineColor" Color="#151560"/>
+            <Style x:Key="MainField" TargetType="local:BoardFieldView">
+                <Setter Property="FieldBackground" Value="#1F1F1F"/>
+                <Setter Property="FieldBorderBrush" Value="OliveDrab"/>
+                <Setter Property="Margin" Value="1"/>
+            </Style>
+            <Style x:Key="MainFieldOrange" TargetType="local:BoardFieldView" BasedOn="{StaticResource MainField}">
+                <Setter Property="FieldBackground" Value="#606015"/>
+            </Style>
+            
             
         </ResourceDictionary>
     </Window.Resources>
-    <Grid>
-        <TextBlock Text="Not implemented"/>
-        <local:BoardFieldView Width="64" Height="64"/>
-        <local:BoardFieldView Width="64" Height="64" Margin="200,0,0,0"/>
-    </Grid>
+    <Viewbox Stretch="Uniform">
+        <Grid>
+            <!--16 rows-->
+            <Grid.RowDefinitions>
+                <RowDefinition Name="RowEdgeUpper" Height="0"/>
+                <RowDefinition Name="RowStackP1" Height="{StaticResource FieldDim}" />
+                <RowDefinition Name="RowBorderUpper" Height="{StaticResource BoardBorderGridThickness}"/>
+                <RowDefinition Name="RowServerP1" Height="{StaticResource FieldDim}"/>
+                <RowDefinition Name="Row8" Height="{StaticResource FieldDim}"/>
+                <RowDefinition Name="Row7" Height="{StaticResource FieldDim}" />
+                <RowDefinition Name="Row6" Height="{StaticResource FieldDim}"/>
+                <RowDefinition Name="Row5" Height="{StaticResource FieldDim}"/>
+                <RowDefinition Name="Row4" Height="{StaticResource FieldDim}"/>
+                <RowDefinition Name="Row3" Height="{StaticResource FieldDim}"/>
+                <RowDefinition Name="Row2" Height="{StaticResource FieldDim}"/>
+                <RowDefinition Name="Row1" Height="{StaticResource FieldDim}"/>
+                <RowDefinition Name="RowServerP2" Height="{StaticResource FieldDim}" />
+                <RowDefinition Name="BorderLower" Height="{StaticResource BoardBorderGridThickness}"/>
+                <RowDefinition Name="RowStackP2" Height="{StaticResource FieldDim}" />
+                <RowDefinition Name="RowEdgeLower" Height="0"/>
+            </Grid.RowDefinitions>
+            <!--12 Columns-->
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Name="ColumnEdgeLeft" Width="0"/>
+                <ColumnDefinition Name="BorderLeft" Width="{StaticResource BoardBorderGridThickness}"/>
+                <ColumnDefinition Name="Column8" Width="{StaticResource FieldDim}"/>
+                <ColumnDefinition Name="Column7" Width="{StaticResource FieldDim}"/>
+                <ColumnDefinition Name="Column6" Width="{StaticResource FieldDim}"/>
+                <ColumnDefinition Name="Column5" Width="{StaticResource FieldDim}"/>
+                <ColumnDefinition Name="Column4" Width="{StaticResource FieldDim}"/>
+                <ColumnDefinition Name="Column3" Width="{StaticResource FieldDim}"/>
+                <ColumnDefinition Name="Column2" Width="{StaticResource FieldDim}"/>
+                <ColumnDefinition Name="Column1" Width="{StaticResource FieldDim}"/>
+                <ColumnDefinition Name="BorderRight" Width="{StaticResource BoardBorderGridThickness}"/>
+                <ColumnDefinition Name="ColumnEdgeRight" Width="0"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Main Field -->
+            <Border Name="MainFieldBorder"
+                BorderThickness="{StaticResource BoardBorderThickness}" BorderBrush="White" CornerRadius="{DynamicResource BoardBorderCornerRadius}"
+                Grid.Row="2" Grid.RowSpan="12"
+                Grid.Column="1" Grid.ColumnSpan="10"/>
+            <local:BoardFieldView  
+                Grid.Row="3" Grid.Column="4" Grid.ColumnSpan="4"
+                Margin="0,3,0,14" x:Name="ServerFieldOrange" >
+                <Viewbox 
+                    Grid.Row="3" Grid.Column="4" Grid.ColumnSpan="4" Margin="2">
+                    <Path RenderTransformOrigin="0.5,0.5"               
+                        Margin="1"
+                        Data="{StaticResource ServerTextPath}" 
+                        Stroke="Gold" StrokeThickness="1" Fill="White">
+                        <Path.RenderTransform>
+                            <ScaleTransform ScaleX="-1" ScaleY="-1"/>
+                        </Path.RenderTransform>
+                    </Path>
+                </Viewbox>
+            </local:BoardFieldView>
+            <local:BoardFieldView  
+                Grid.Row="12" Grid.Column="4" Grid.ColumnSpan="4"
+                Margin="0,14,0,3" x:Name="ServerFieldBlue" >
+                <Viewbox 
+                    Grid.Row="3" Grid.Column="4" Grid.ColumnSpan="4" Margin="2">
+                    <Path RenderTransformOrigin="0.5,0.5"               
+                        Margin="1"
+                        Data="{StaticResource ServerTextPath}" 
+                        Stroke="Blue" StrokeThickness="1" Fill="White">
+                    </Path>
+                </Viewbox>
+            </local:BoardFieldView>
+            <local:BoardFieldView                  
+                Grid.Row="4" Grid.Column="2" FieldVisualState="Link"
+                Style="{StaticResource MainFieldOrange}"/>
+            <local:BoardFieldView                 
+                Grid.Row="4" Grid.Column="3" 
+                Style="{StaticResource MainFieldOrange}"/>
+            <local:BoardFieldView                 
+                Grid.Row="4" Grid.Column="4"
+                Style="{StaticResource MainFieldOrange}"/>
+
+            <!-- Deployment fields -->
+
+        </Grid>
+    </Viewbox>
 </Window>

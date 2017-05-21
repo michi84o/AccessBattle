@@ -20,7 +20,7 @@ namespace AccessBattle.Networking
         public PlayerSync Player1 { get; set; }
         /// <summary>State of player that joined the game.</summary>
         public PlayerSync Player2 { get; set; }
-
+        /// <summary>State of the board.</summary>
         public BoardSync Board { get; set; }
     }
 

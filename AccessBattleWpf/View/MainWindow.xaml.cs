@@ -26,53 +26,10 @@ namespace AccessBattle.Wpf.View
         {
             InitializeComponent();
             UiGlobals.Instance.StartFlashing();
-            Task.Delay(5000).ContinueWith(o => 
+            Task.Delay(10000).ContinueWith(o => 
             {
                 Application.Current.Dispatcher.Invoke(() => { UiGlobals.Instance.StopFlashing(); });
             });
         }
     }
-
-    public class UiGlobals : UserControl, INotifyPropertyChanged
-    {
-        private UiGlobals() { }
-        static UiGlobals _instance;
-        public static UiGlobals Instance
-        {
-            get
-            {
-                return _instance ?? (_instance = new UiGlobals());
-            }
-        }
-
-        double _flashOpacity = 0;
-        public double FlashOpacity
-        {
-            get { return (double)GetValue(FlashOpacityProperty); }
-            set { SetValue(FlashOpacityProperty, value); }
-        }
-
-        public void StartFlashing()
-        {
-            var animation = new DoubleAnimation(0, 1, TimeSpan.FromSeconds(1))
-            {
-                AutoReverse = true,
-                RepeatBehavior = RepeatBehavior.Forever
-            };
-
-            BeginAnimation(FlashOpacityProperty, animation);
-        }
-
-        public void StopFlashing()
-        {
-            BeginAnimation(FlashOpacityProperty, null);
-            FlashOpacity = 0;
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public static readonly DependencyProperty FlashOpacityProperty = DependencyProperty.Register(
-            "FlashOpacity", typeof(double), typeof(UiGlobals), new PropertyMetadata(0.0));
-    }
-
 }

@@ -420,7 +420,7 @@ namespace AccessBattle.Networking
                                 {                                    
                                     if (p1 != null && player != p1) // Cannot request to join own game!
                                     {                                        
-                                        var p1Req = new JoinMessage()
+                                        var p1Req = new JoinMessage
                                         { UID = game.UID, Request = 2, JoiningUser = player.Name };
                                         Send(JsonConvert.SerializeObject(p1Req), NetworkPacketType.JoinGame, p1.Connection, p1.ClientCrypto);
                                         reqOK = true;                                        
@@ -428,7 +428,7 @@ namespace AccessBattle.Networking
                                 }
                                 if (!reqOK) // Error while joining
                                 {
-                                    var p2Err = new JoinMessage() { UID = game.UID, Request = 1 };
+                                    var p2Err = new JoinMessage { UID = game.UID, Request = 1 };
                                     Send(JsonConvert.SerializeObject(p2Err), NetworkPacketType.JoinGame, player.Connection, player.ClientCrypto);
                                 }
                             }
@@ -437,7 +437,7 @@ namespace AccessBattle.Networking
                                 if (player == p1)
                                 {
                                     // Notify p2
-                                    var p2Answ = new JoinMessage() { UID = game.UID, Request = 3 };
+                                    var p2Answ = new JoinMessage { UID = game.UID, Request = 3 };
                                     Send(JsonConvert.SerializeObject(p2Answ), NetworkPacketType.JoinGame, p2.Connection, p2.ClientCrypto);
                                 }
                                 else if (player == p2)
@@ -453,7 +453,7 @@ namespace AccessBattle.Networking
                                 if (player == p1)
                                 {
                                     // Notify p2
-                                    var p2Answ = new JoinMessage() { UID = game.UID, Request = 4 };
+                                    var p2Answ = new JoinMessage { UID = game.UID, Request = 4 };
                                     Send(JsonConvert.SerializeObject(p2Answ), NetworkPacketType.JoinGame, player.Connection, player.ClientCrypto);
                                 }
                                 else if (player == p2)

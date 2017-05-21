@@ -58,7 +58,7 @@ namespace AccessBattle.Networking
         /// <param name="message">Join message.</param>
         public GameJoinRequestedEventArgs(JoinMessage message)
         {
-            Message = new JoinMessage()
+            Message = new JoinMessage
             {
                 JoiningUser = message.JoiningUser,
                 Request = message.Request,
@@ -328,6 +328,7 @@ namespace AccessBattle.Networking
             if (IsConnected != true || IsLoggedIn != true) return false;
 
             // TODO Send packet to server and return answer
+            await Task.Delay(1);
 
             return false;
         }
@@ -341,7 +342,7 @@ namespace AccessBattle.Networking
         {
             try
             {
-                var req = new JoinMessage() { UID = uid, Request = 0 };
+                var req = new JoinMessage { UID = uid, Request = 0 };
                 return Send(JsonConvert.SerializeObject(req), NetworkPacketType.JoinGame);
             }
             catch (Exception e)
@@ -361,7 +362,7 @@ namespace AccessBattle.Networking
         {
             try
             {
-                var req = new JoinMessage() { UID = uid, Request = accept ? 3 : 4 };
+                var req = new JoinMessage { UID = uid, Request = accept ? 3 : 4 };
                 return Send(JsonConvert.SerializeObject(req), NetworkPacketType.JoinGame);
             }
             catch (Exception e)

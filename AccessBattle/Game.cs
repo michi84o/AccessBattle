@@ -65,7 +65,6 @@ namespace AccessBattle
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="uid">ID of this game (mainly used for server).</param>
         public Game()
         {
             _players = new PlayerState[]
