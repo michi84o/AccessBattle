@@ -11,6 +11,10 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <converters:BoardFieldVisualStateVisibilityConverter x:Key="vConvLink" PrimaryState="Link" />
+            <converters:BoardFieldVisualStateVisibilityConverter x:Key="vConvVirus" PrimaryState="Virus"/>
+
+            <converters:BoardFieldCardVisualStateBrushConverter x:Key="cardConv"/>
+            <converters:BoardFieldCardVisualStateBrushConverter x:Key="cardConvPath" PathColorMode="True"/>
         </ResourceDictionary>
     </UserControl.Resources>
     <UserControl.Template>
@@ -18,13 +22,16 @@
             <Grid>
                 <!-- Background of control -->
                 <Border Background="{Binding Path=FieldBackground, ElementName=BoardFieldControl}" CornerRadius="2"  BorderThickness="2" BorderBrush="{Binding Path=FieldBorderBrush, ElementName=BoardFieldControl}" />
+                <!-- This layer overrides the background when a card is on this field -->
+                <Border Background="{Binding Path=FieldCardVisualState, ElementName=BoardFieldControl, Converter={StaticResource cardConv} }" CornerRadius="2" BorderThickness="2" BorderBrush="Transparent" />
                 <!-- White overlay background for flashing animation -->
-                <!-- Animation is global. Turn of single animations by switching visibility of this overlay -->
                 <Border Background="White" CornerRadius="2" BorderThickness="2" BorderBrush="Transparent" Opacity="{Binding Source={x:Static global:UiGlobals.Instance}, Path=FlashOpacity}"/>
+
                 <!-- The following code defines the different contents this user control can show -->
                 <!-- The visibility of the contents just has to be switched -->
 
                 <Grid 
+                    Margin="1"
                     Visibility="{Binding Path=FieldVisualState, ElementName=BoardFieldControl, Converter={StaticResource vConvLink}}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="3*"/>
@@ -33,8 +40,8 @@
                     <Viewbox Margin="2" Grid.Row="0">
                         <Path Name="LinkPath"
                         Margin="1"
-                        Fill="DarkGray"
-                        Stroke="DarkGray" StrokeThickness="1"
+                        Fill="{Binding Path=FieldCardVisualState, ElementName=BoardFieldControl, Converter={StaticResource cardConvPath}}"
+                        Stroke="{Binding Path=FieldCardVisualState, ElementName=BoardFieldControl, Converter={StaticResource cardConvPath}}" StrokeThickness="1"
                         Data="{StaticResource LinkPath}"/>
                     </Viewbox>
                     <Viewbox Grid.Row="1">
@@ -42,10 +49,36 @@
                         Name ="LinkText"
                         Grid.Row="1"
                         FontFamily="../ExternalResources/#Silkscreen"
-                        FontSize="10" Foreground="DarkGray"
+                        FontSize="10" Foreground="{Binding Path=FieldCardVisualState, ElementName=BoardFieldControl, Converter={StaticResource cardConvPath}}"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         Text="LINK"/>
+                    </Viewbox>
+                </Grid>
+                <Grid 
+                    Margin="1"
+                    Visibility="{Binding Path=FieldVisualState, ElementName=BoardFieldControl, Converter={StaticResource vConvVirus}}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="3*"/>
+                        <RowDefinition Height="1*"/>
+                    </Grid.RowDefinitions>
+                    <Viewbox Margin="2" Grid.Row="0">
+                        <Path
+                        Name="VirusPath"
+                        Margin="1"
+                        Fill="{Binding Path=FieldCardVisualState, ElementName=BoardFieldControl, Converter={StaticResource cardConvPath}}"
+                        Stroke="{Binding Path=FieldCardVisualState, ElementName=BoardFieldControl, Converter={StaticResource cardConvPath}}" StrokeThickness="1"
+                        Data="{StaticResource VirusPath}"/>
+                    </Viewbox>
+                    <Viewbox Grid.Row="1">
+                        <TextBlock 
+                        Name="VirusText"
+                        Grid.Row="1"
+                        FontFamily="../ExternalResources/#Silkscreen"
+                        FontSize="10" Foreground="{Binding Path=FieldCardVisualState, ElementName=BoardFieldControl, Converter={StaticResource cardConvPath}}"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Text="VIRUS"/>
                     </Viewbox>
                 </Grid>
 

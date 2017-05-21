@@ -12,9 +12,9 @@ a very stupid AI. The final game will be playable over network.
 - Estimated completion: End of August 2017
 - Current Status and next steps:
   - [x] Create and join games over server
+  - [ ] UI rewrite (WIP)
   - [ ] Synchronize game data between clients (WIP)
   - [ ] Game logic rewrite
-  - [ ] UI rewrite
 
 The main game engine is inside a separate DLL so that people
 can program their own user interface for it. The DLL should

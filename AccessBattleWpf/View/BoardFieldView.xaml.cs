@@ -86,5 +86,13 @@ namespace AccessBattle.Wpf.View
         }
         public static readonly DependencyProperty BoardFieldVisualStateProperty = DependencyProperty.Register(
             nameof(BoardFieldVisualState), typeof(BoardFieldVisualState), typeof(BoardFieldView), new PropertyMetadata(BoardFieldVisualState.Empty));
+
+        public BoardFieldCardVisualState FieldCardVisualState
+        {
+            get { return (BoardFieldCardVisualState)GetValue(BoardFieldCardVisualStateProperty); }
+            set { SetValue(BoardFieldCardVisualStateProperty, value); }
+        }
+        public static readonly DependencyProperty BoardFieldCardVisualStateProperty = DependencyProperty.Register(
+            nameof(BoardFieldCardVisualState), typeof(BoardFieldCardVisualState), typeof(BoardFieldView), new PropertyMetadata(BoardFieldCardVisualState.Empty));
     }
 }

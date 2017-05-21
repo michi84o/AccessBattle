@@ -21,6 +21,16 @@ namespace AccessBattle.Wpf
         Error404   = 0x040,
         Exit       = 0x080,
         Firewall   = 0x100,
-        Flipped    = 0x200,
+        Flipped    = 0x200,        
+    }
+
+    /// <summary>
+    /// Visual state for fields that contain cards.
+    /// </summary>
+    public enum BoardFieldCardVisualState
+    {
+        Empty  = 0x00,
+        Blue   = 0x01,
+        Orange = 0x02,
     }
 }

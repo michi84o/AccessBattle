@@ -101,14 +101,32 @@
                 </Viewbox>
             </local:BoardFieldView>
             <local:BoardFieldView                  
-                Grid.Row="4" Grid.Column="2" FieldVisualState="Link"
+                Grid.Row="4" Grid.Column="2"
                 Style="{StaticResource MainFieldOrange}"/>
             <local:BoardFieldView                 
-                Grid.Row="4" Grid.Column="3" 
+                Grid.Row="4" Grid.Column="3"
                 Style="{StaticResource MainFieldOrange}"/>
             <local:BoardFieldView                 
                 Grid.Row="4" Grid.Column="4"
                 Style="{StaticResource MainFieldOrange}"/>
+
+
+
+            <local:BoardFieldView                 
+                Grid.Row="5" Grid.Column="2" FieldVisualState="Link"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="5" Grid.Column="3" FieldVisualState="Virus"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="5" Grid.Column="4" FieldVisualState="Link" FieldCardVisualState="Blue"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="5" Grid.Column="5"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="5" Grid.Column="6"
+                Style="{StaticResource MainField}"/>
 
             <!-- Deployment fields -->
 
