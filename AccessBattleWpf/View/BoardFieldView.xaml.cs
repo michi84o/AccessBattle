@@ -94,5 +94,20 @@ namespace AccessBattle.Wpf.View
         }
         public static readonly DependencyProperty BoardFieldCardVisualStateProperty = DependencyProperty.Register(
             nameof(BoardFieldCardVisualState), typeof(BoardFieldCardVisualState), typeof(BoardFieldView), new PropertyMetadata(BoardFieldCardVisualState.Empty));
+
+        public bool IsExitFlipped
+        {
+            get { return (bool)GetValue(IsExitFlippedProperty); }
+            set { SetValue(IsExitFlippedProperty, value); }
+        }
+        public static readonly DependencyProperty IsExitFlippedProperty = DependencyProperty.Register(
+            nameof(IsExitFlipped), typeof(bool), typeof(BoardFieldView), new PropertyMetadata(false));
+        public bool IsCardFlipped
+        {
+            get { return (bool)GetValue(IsCardFlippedProperty); }
+            set { SetValue(IsCardFlippedProperty, value); }
+        }
+        public static readonly DependencyProperty IsCardFlippedProperty = DependencyProperty.Register(
+            nameof(IsCardFlipped), typeof(bool), typeof(BoardFieldView), new PropertyMetadata(false));
     }
 }

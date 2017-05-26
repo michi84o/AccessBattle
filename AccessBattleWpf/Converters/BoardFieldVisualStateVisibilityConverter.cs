@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 
-namespace AccessBattle.Wpf.Coverters
+namespace AccessBattle.Wpf.Converters
 {
     public class BoardFieldVisualStateVisibilityConverter : IValueConverter
     {

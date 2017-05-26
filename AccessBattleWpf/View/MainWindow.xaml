@@ -19,6 +19,11 @@
             <Thickness x:Key="BoardBorderThickness">4</Thickness>
             <CornerRadius x:Key="BoardBorderCornerRadius">4</CornerRadius>
             <SolidColorBrush x:Key="PlayerBlueDeploymentLineColor" Color="#151560"/>
+            <Style x:Key="StackField" TargetType="local:BoardFieldView">
+                <Setter Property="FieldBorderBrush" Value="DarkGray"/>
+                <Setter Property="BorderThickness" Value="2"/>
+                <Setter Property="Margin" Value="1"/>
+            </Style>
             <Style x:Key="MainField" TargetType="local:BoardFieldView">
                 <Setter Property="FieldBackground" Value="#1F1F1F"/>
                 <Setter Property="FieldBorderBrush" Value="OliveDrab"/>
@@ -26,6 +31,9 @@
             </Style>
             <Style x:Key="MainFieldOrange" TargetType="local:BoardFieldView" BasedOn="{StaticResource MainField}">
                 <Setter Property="FieldBackground" Value="#606015"/>
+            </Style>
+            <Style x:Key="MainFieldBlue" TargetType="local:BoardFieldView" BasedOn="{StaticResource MainField}">
+                <Setter Property="FieldBackground" Value="#151560"/>
             </Style>
             
             
@@ -100,6 +108,7 @@
                     </Path>
                 </Viewbox>
             </local:BoardFieldView>
+            
             <local:BoardFieldView                  
                 Grid.Row="4" Grid.Column="2"
                 Style="{StaticResource MainFieldOrange}"/>
@@ -110,7 +119,24 @@
                 Grid.Row="4" Grid.Column="4"
                 Style="{StaticResource MainFieldOrange}"/>
 
+            <local:BoardFieldView                 
+                Grid.Row="3" Grid.Column="5"
+                Style="{StaticResource MainField}" FieldVisualState="Exit"
+                Grid.RowSpan="2" VerticalAlignment="Bottom" Height="60"/>
+            <local:BoardFieldView                 
+                Grid.Row="3" Grid.Column="6"
+                Style="{StaticResource MainField}" FieldVisualState="Exit"
+                Grid.RowSpan="2" VerticalAlignment="Bottom" Height="60"/>
 
+            <local:BoardFieldView  
+                Grid.Row="4" Grid.Column="7"
+                Style="{StaticResource MainFieldOrange}"/>
+            <local:BoardFieldView  
+                Grid.Row="4" Grid.Column="8"
+                Style="{StaticResource MainFieldOrange}"/>
+            <local:BoardFieldView  
+                Grid.Row="4" Grid.Column="9"
+                Style="{StaticResource MainFieldOrange}"/>
 
             <local:BoardFieldView                 
                 Grid.Row="5" Grid.Column="2" FieldVisualState="Link"
@@ -123,13 +149,241 @@
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView                 
                 Grid.Row="5" Grid.Column="5"
-                Style="{StaticResource MainField}"/>
+                Style="{StaticResource MainFieldOrange}"/>
             <local:BoardFieldView                 
                 Grid.Row="5" Grid.Column="6"
+                Style="{StaticResource MainFieldOrange}"/>
+            <local:BoardFieldView                 
+                Grid.Row="5" Grid.Column="7"
                 Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="5" Grid.Column="8"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="5" Grid.Column="9"
+                Style="{StaticResource MainField}"/>
+
+            <local:BoardFieldView                 
+                Grid.Row="6" Grid.Column="2"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="6" Grid.Column="3"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="6" Grid.Column="4"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="6" Grid.Column="5"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="6" Grid.Column="6"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="6" Grid.Column="7"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="6" Grid.Column="8"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="6" Grid.Column="9"
+                Style="{StaticResource MainField}"/>
+
+            <local:BoardFieldView                 
+                Grid.Row="7" Grid.Column="2"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="7" Grid.Column="3"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="7" Grid.Column="4"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="7" Grid.Column="5"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="7" Grid.Column="6"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="7" Grid.Column="7"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="7" Grid.Column="8"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="7" Grid.Column="9"
+                Style="{StaticResource MainField}"/>
+
+            <local:BoardFieldView                 
+                Grid.Row="8" Grid.Column="2"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="8" Grid.Column="3"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="8" Grid.Column="4"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="8" Grid.Column="5"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="8" Grid.Column="6"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="8" Grid.Column="7"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="8" Grid.Column="8"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="8" Grid.Column="9"
+                Style="{StaticResource MainField}"/>
+
+            <local:BoardFieldView                 
+                Grid.Row="9" Grid.Column="2"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="9" Grid.Column="3"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="9" Grid.Column="4"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="9" Grid.Column="5"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="9" Grid.Column="6"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="9" Grid.Column="7"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="9" Grid.Column="8"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="9" Grid.Column="9"
+                Style="{StaticResource MainField}"/>
+
+            <local:BoardFieldView                 
+                Grid.Row="10" Grid.Column="2"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="10" Grid.Column="3"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="10" Grid.Column="4"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="10" Grid.Column="5"
+                Style="{StaticResource MainFieldBlue}"/>
+            <local:BoardFieldView                 
+                Grid.Row="10" Grid.Column="6"
+                Style="{StaticResource MainFieldBlue}"/>
+            <local:BoardFieldView                 
+                Grid.Row="10" Grid.Column="7"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="10" Grid.Column="8"
+                Style="{StaticResource MainField}"/>
+            <local:BoardFieldView                 
+                Grid.Row="10" Grid.Column="9"
+                Style="{StaticResource MainField}"/>
+
+            <local:BoardFieldView                 
+                Grid.Row="11" Grid.Column="2"
+                Style="{StaticResource MainFieldBlue}"/>
+            <local:BoardFieldView                 
+                Grid.Row="11" Grid.Column="3"
+                Style="{StaticResource MainFieldBlue}"/>
+            <local:BoardFieldView                 
+                Grid.Row="11" Grid.Column="4"
+                Style="{StaticResource MainFieldBlue}"/>
+            <local:BoardFieldView                 
+                Grid.Row="11" Grid.Column="5" FieldVisualState="Exit" IsExitFlipped="True"
+                Style="{StaticResource MainField}"
+                Grid.RowSpan="2" VerticalAlignment="Top" Height="60"/>
+            <local:BoardFieldView                 
+                Grid.Row="11" Grid.Column="6"  FieldVisualState="Exit" IsExitFlipped="True"
+                Style="{StaticResource MainField}"
+                Grid.RowSpan="2" VerticalAlignment="Top" Height="60"/>
+            <local:BoardFieldView                 
+                Grid.Row="11" Grid.Column="7"
+                Style="{StaticResource MainFieldBlue}"/>
+            <local:BoardFieldView                 
+                Grid.Row="11" Grid.Column="8"
+                Style="{StaticResource MainFieldBlue}"/>
+            <local:BoardFieldView                 
+                Grid.Row="11" Grid.Column="9"
+                Style="{StaticResource MainFieldBlue}"/>
 
             <!-- Deployment fields -->
 
+            <Grid
+                Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <local:BoardFieldView Grid.Column="0" FieldVisualState="Link" Style="{StaticResource StackField}" IsCardFlipped="True"/>
+                <local:BoardFieldView Grid.Column="1" FieldVisualState="Link" Style="{StaticResource StackField}" IsCardFlipped="True"/>
+                <local:BoardFieldView Grid.Column="2" FieldVisualState="Link" Style="{StaticResource StackField}" IsCardFlipped="True"/>
+                <local:BoardFieldView Grid.Column="3" FieldVisualState="Link" Style="{StaticResource StackField}" IsCardFlipped="True"/>
+            </Grid>
+
+            <Grid
+                Grid.Row="1" Grid.Column="7" Grid.ColumnSpan="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <local:BoardFieldView Grid.Column="0" FieldVisualState="Virus" Style="{StaticResource StackField}" IsCardFlipped="True"/>
+                <local:BoardFieldView Grid.Column="1" FieldVisualState="Virus" Style="{StaticResource StackField}" IsCardFlipped="True"/>
+                <local:BoardFieldView Grid.Column="2" FieldVisualState="Virus" Style="{StaticResource StackField}" IsCardFlipped="True"/>
+                <local:BoardFieldView Grid.Column="3" FieldVisualState="Virus" Style="{StaticResource StackField}" IsCardFlipped="True"/>
+            </Grid>
+
+
+            <Grid
+                Grid.Row="14" Grid.Column="2" Grid.ColumnSpan="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <local:BoardFieldView Grid.Column="0" FieldVisualState="Virus" Style="{StaticResource StackField}"/>
+                <local:BoardFieldView Grid.Column="1" FieldVisualState="Virus" Style="{StaticResource StackField}"/>
+                <local:BoardFieldView Grid.Column="2" FieldVisualState="Virus" Style="{StaticResource StackField}"/>
+                <local:BoardFieldView Grid.Column="3" FieldVisualState="Virus" Style="{StaticResource StackField}"/>
+            </Grid>
+
+            <Grid
+                Grid.Row="14" Grid.Column="5" Grid.ColumnSpan="2" Margin="5">
+                <local:BoardFieldView
+                    Style="{StaticResource StackField}">
+                    <TextBlock 
+                        Text="Actions" Foreground="DarkGray" FontSize="14"
+                        VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                </local:BoardFieldView>
+            </Grid>
+            
+            <Grid
+                Grid.Row="14" Grid.Column="7" Grid.ColumnSpan="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <local:BoardFieldView Grid.Column="0" FieldVisualState="Link" Style="{StaticResource StackField}"/>
+                <local:BoardFieldView Grid.Column="1" FieldVisualState="Link" Style="{StaticResource StackField}"/>
+                <local:BoardFieldView Grid.Column="2" FieldVisualState="Link" Style="{StaticResource StackField}"/>
+                <local:BoardFieldView Grid.Column="3" FieldVisualState="Link" Style="{StaticResource StackField}"/>
+            </Grid>
+            
         </Grid>
     </Viewbox>
 </Window>

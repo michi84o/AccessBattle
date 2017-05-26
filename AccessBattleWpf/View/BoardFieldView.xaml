@@ -5,16 +5,22 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:AccessBattle.Wpf.View"
              xmlns:global="clr-namespace:AccessBattle.Wpf"
-             xmlns:converters="clr-namespace:AccessBattle.Wpf.Coverters"
+             xmlns:converters="clr-namespace:AccessBattle.Wpf.Converters"
              mc:Ignorable="d" 
-             d:DesignHeight="64" d:DesignWidth="64" x:Name="BoardFieldControl">
+             d:DesignHeight="64" d:DesignWidth="64" x:Name="BoardFieldControl"
+             FontFamily="../ExternalResources/#Silkscreen">
     <UserControl.Resources>
         <ResourceDictionary>
             <converters:BoardFieldVisualStateVisibilityConverter x:Key="vConvLink" PrimaryState="Link" />
             <converters:BoardFieldVisualStateVisibilityConverter x:Key="vConvVirus" PrimaryState="Virus"/>
 
+            <converters:BoardFieldVisualStateVisibilityConverter x:Key="vConvExit" PrimaryState="Exit"/>
+
             <converters:BoardFieldCardVisualStateBrushConverter x:Key="cardConv"/>
             <converters:BoardFieldCardVisualStateBrushConverter x:Key="cardConvPath" PathColorMode="True"/>
+
+            <converters:FlipConverter x:Key="convFlip" />
+
         </ResourceDictionary>
     </UserControl.Resources>
     <UserControl.Template>
@@ -30,9 +36,37 @@
                 <!-- The following code defines the different contents this user control can show -->
                 <!-- The visibility of the contents just has to be switched -->
 
+                <!-- Exit Field -->
+                <Grid
+                    Margin="1"
+                    Visibility="{Binding Path=FieldVisualState, ElementName=BoardFieldControl, Converter={StaticResource vConvExit}}">
+                    <Viewbox Margin="2">
+                        <Grid RenderTransformOrigin="0.5,0.5">
+                            <Path 
+                            Fill="Orange" Stroke="Orange" StrokeThickness="1"
+                            Data="{StaticResource ExitPath}"  />
+                                    <Path
+                            Fill="White" Stroke="White" StrokeThickness="1"
+                            Data="{StaticResource DoorPath}"  />
+                                    <Path                         
+                            Stroke="White" StrokeThickness="1"
+                            Data="{StaticResource DoorPath2}"  />
+                                    <Path 
+                            Fill="Orange" Stroke="Orange" StrokeThickness="1"
+                            Data="{StaticResource DoorArrowPath}" />
+                            <Grid.RenderTransform>
+                                <ScaleTransform ScaleX="{Binding Path=IsExitFlipped , ElementName=BoardFieldControl, Converter={StaticResource convFlip}}" 
+                                                ScaleY="{Binding Path=IsExitFlipped , ElementName=BoardFieldControl, Converter={StaticResource convFlip}}" />
+                            </Grid.RenderTransform>
+                        </Grid>
+                    </Viewbox>
+                </Grid>
+                
+                <!-- Link Field -->
                 <Grid 
                     Margin="1"
-                    Visibility="{Binding Path=FieldVisualState, ElementName=BoardFieldControl, Converter={StaticResource vConvLink}}">
+                    Visibility="{Binding Path=FieldVisualState, ElementName=BoardFieldControl, Converter={StaticResource vConvLink}}"
+                    RenderTransformOrigin="0.5,0.5">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="3*"/>
                         <RowDefinition Height="1*"/>
@@ -48,16 +82,21 @@
                         <TextBlock 
                         Name ="LinkText"
                         Grid.Row="1"
-                        FontFamily="../ExternalResources/#Silkscreen"
                         FontSize="10" Foreground="{Binding Path=FieldCardVisualState, ElementName=BoardFieldControl, Converter={StaticResource cardConvPath}}"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         Text="LINK"/>
                     </Viewbox>
+                    <Grid.RenderTransform>
+                        <ScaleTransform ScaleX="{Binding Path=IsCardFlipped , ElementName=BoardFieldControl, Converter={StaticResource convFlip}}" 
+                                        ScaleY="{Binding Path=IsCardFlipped , ElementName=BoardFieldControl, Converter={StaticResource convFlip}}" />
+                    </Grid.RenderTransform>
                 </Grid>
+                <!-- Virus Field -->
                 <Grid 
                     Margin="1"
-                    Visibility="{Binding Path=FieldVisualState, ElementName=BoardFieldControl, Converter={StaticResource vConvVirus}}">
+                    Visibility="{Binding Path=FieldVisualState, ElementName=BoardFieldControl, Converter={StaticResource vConvVirus}}"
+                    RenderTransformOrigin="0.5,0.5">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="3*"/>
                         <RowDefinition Height="1*"/>
@@ -74,12 +113,15 @@
                         <TextBlock 
                         Name="VirusText"
                         Grid.Row="1"
-                        FontFamily="../ExternalResources/#Silkscreen"
                         FontSize="10" Foreground="{Binding Path=FieldCardVisualState, ElementName=BoardFieldControl, Converter={StaticResource cardConvPath}}"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         Text="VIRUS"/>
                     </Viewbox>
+                    <Grid.RenderTransform>
+                        <ScaleTransform ScaleX="{Binding Path=IsCardFlipped , ElementName=BoardFieldControl, Converter={StaticResource convFlip}}" 
+                                        ScaleY="{Binding Path=IsCardFlipped , ElementName=BoardFieldControl, Converter={StaticResource convFlip}}" />
+                    </Grid.RenderTransform>
                 </Grid>
 
                 <!-- If multiple contents are active, a separate opacity animation has to be used -->

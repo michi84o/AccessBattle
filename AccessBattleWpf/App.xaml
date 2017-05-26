@@ -42,15 +42,5 @@
                 M14,1 h-1.5 M14,1 h1.5
                 M14,0 h-.5 M14,0 h.5
         </StreamGeometry>
-
-        <Style TargetType="{x:Type TextBlock}">
-            <Setter Property="FontFamily" Value="./ExternalResources/#Silkscreen" />
-        </Style>
-        <Style TargetType="{x:Type TextBox}">
-            <Setter Property="FontFamily" Value="./ExternalResources/#Silkscreen" />
-        </Style>
-        <Style TargetType="{x:Type Button}">
-            <Setter Property="FontFamily" Value="./ExternalResources/#Silkscreen" />
-        </Style>
     </Application.Resources>
 </Application>
