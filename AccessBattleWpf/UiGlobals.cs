@@ -60,5 +60,42 @@ namespace AccessBattle.Wpf
             nameof(FlashOpacity), typeof(double), typeof(UiGlobals), new PropertyMetadata(0.0));
 
         #endregion
+
+        #region Multi-Overlay Opacity Flash
+
+        public void StartMultiOverlayFlashing()
+        {
+            var animation1 = new DoubleAnimation(0, 1, TimeSpan.FromSeconds(1))
+            {
+                BeginTime= TimeSpan.FromSeconds(0)
+            };
+            var animation2 = new DoubleAnimation(1, 0, TimeSpan.FromSeconds(1))
+            {
+                BeginTime = TimeSpan.FromSeconds(2)
+            };
+            var storyboard = new Storyboard
+            {
+                Duration = TimeSpan.FromSeconds(6),
+                RepeatBehavior = RepeatBehavior.Forever
+            };
+            Storyboard.SetTarget(animation1, this);
+            Storyboard.SetTargetProperty(animation1, new PropertyPath(nameof(MultiOverlayOpacity)));
+            Storyboard.SetTarget(animation2, this);
+            Storyboard.SetTargetProperty(animation2, new PropertyPath(nameof(MultiOverlayOpacity)));
+            storyboard.Children.Add(animation1);
+            storyboard.Children.Add(animation2);
+            storyboard.Begin(this, true);
+        }
+
+        public double MultiOverlayOpacity
+        {
+            get { return (double)GetValue(MultiOverlayOpacityProperty); }
+            set { SetValue(MultiOverlayOpacityProperty, value); }
+        }
+
+        public static readonly DependencyProperty MultiOverlayOpacityProperty = DependencyProperty.Register(
+            nameof(MultiOverlayOpacity), typeof(double), typeof(UiGlobals), new PropertyMetadata(0.0));
+
+        #endregion
     }
 }

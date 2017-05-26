@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace AccessBattle.Networking
 {
     /// <summary>
-    /// Class for storing information about network players.
+    /// Class for storing information about network players. Used by the game server.
     /// </summary>
     public class NetworkPlayer : IPlayer, IDisposable
     {

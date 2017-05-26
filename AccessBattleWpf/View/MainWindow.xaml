@@ -145,10 +145,10 @@
                 Grid.Row="5" Grid.Column="3" FieldVisualState="Virus"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView                 
-                Grid.Row="5" Grid.Column="4" FieldVisualState="Link" FieldCardVisualState="Blue"
+                Grid.Row="5" Grid.Column="4" FieldVisualState="Link,LineBoost" FieldCardVisualState="Blue"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView                 
-                Grid.Row="5" Grid.Column="5"
+                Grid.Row="5" Grid.Column="5"  FieldVisualState="Link" FieldCardVisualState="Blue"
                 Style="{StaticResource MainFieldOrange}"/>
             <local:BoardFieldView                 
                 Grid.Row="5" Grid.Column="6"

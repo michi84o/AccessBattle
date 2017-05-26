@@ -8,5 +8,6 @@ namespace AccessBattle.Wpf.ViewModel
 {
     public class MainWindowViewModel
     {
+
     }
 }

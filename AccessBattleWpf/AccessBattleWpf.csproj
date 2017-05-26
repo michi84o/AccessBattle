@@ -66,8 +66,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Converters\BoardFieldCardVisualStateBrushConverter.cs" />
+    <Compile Include="Converters\BoardFieldVisualStateMultiOverlayConverter.cs" />
     <Compile Include="Converters\BoardFieldVisualStateVisibilityConverter.cs" />
     <Compile Include="Converters\FlipConverter.cs" />
+    <Compile Include="Converters\OpacityInverter.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="RelayCommand.cs" />
     <Compile Include="UiGlobals.cs" />

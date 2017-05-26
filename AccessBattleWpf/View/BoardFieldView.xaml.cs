@@ -102,6 +102,7 @@ namespace AccessBattle.Wpf.View
         }
         public static readonly DependencyProperty IsExitFlippedProperty = DependencyProperty.Register(
             nameof(IsExitFlipped), typeof(bool), typeof(BoardFieldView), new PropertyMetadata(false));
+
         public bool IsCardFlipped
         {
             get { return (bool)GetValue(IsCardFlippedProperty); }
@@ -109,5 +110,8 @@ namespace AccessBattle.Wpf.View
         }
         public static readonly DependencyProperty IsCardFlippedProperty = DependencyProperty.Register(
             nameof(IsCardFlipped), typeof(bool), typeof(BoardFieldView), new PropertyMetadata(false));
+
+
+
     }
 }

@@ -15,11 +15,28 @@
             <converters:BoardFieldVisualStateVisibilityConverter x:Key="vConvVirus" PrimaryState="Virus"/>
 
             <converters:BoardFieldVisualStateVisibilityConverter x:Key="vConvExit" PrimaryState="Exit"/>
+            <converters:BoardFieldVisualStateVisibilityConverter x:Key="vConvLineBoost" PrimaryState="LineBoost"/>
 
             <converters:BoardFieldCardVisualStateBrushConverter x:Key="cardConv"/>
-            <converters:BoardFieldCardVisualStateBrushConverter x:Key="cardConvPath" PathColorMode="True"/>
+            <converters:BoardFieldCardVisualStateBrushConverter x:Key="cardConvPath" PathColorMode="True" />
 
             <converters:FlipConverter x:Key="convFlip" />
+            <converters:OpacityInverter x:Key="convOpacityInv" />
+
+            <converters:BoardFieldVisualStateMultiOverlayConverter x:Key="convMultiOverlay" />
+
+            <Style TargetType="Grid" x:Key="MultiOverlayGrid"  >
+                <Style.Triggers>
+                    <DataTrigger 
+                            Binding="{Binding Path=FieldVisualState, ElementName=BoardFieldControl, Converter={StaticResource convMultiOverlay}}" Value="True">
+                        <Setter Property="Opacity" Value="{Binding Source={x:Static global:UiGlobals.Instance}, Path=MultiOverlayOpacity, Converter={StaticResource convOpacityInv}}"/>
+                    </DataTrigger>
+                    <DataTrigger 
+                            Binding="{Binding Path=FieldVisualState, ElementName=BoardFieldControl, Converter={StaticResource convMultiOverlay}}" Value="False">
+                        <Setter Property="Opacity" Value="1"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
 
         </ResourceDictionary>
     </UserControl.Resources>
@@ -66,7 +83,8 @@
                 <Grid 
                     Margin="1"
                     Visibility="{Binding Path=FieldVisualState, ElementName=BoardFieldControl, Converter={StaticResource vConvLink}}"
-                    RenderTransformOrigin="0.5,0.5">
+                    RenderTransformOrigin="0.5,0.5"
+                    Style="{StaticResource MultiOverlayGrid}">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="3*"/>
                         <RowDefinition Height="1*"/>
@@ -127,7 +145,40 @@
                 <!-- If multiple contents are active, a separate opacity animation has to be used -->
                 <!-- Here are the possible overlay contents -->
 
-                <!-- If some adds custom content (like the server field) -->
+                <!-- Line Boost Field -->
+                <Grid
+                    Visibility="{Binding Path=FieldVisualState, ElementName=BoardFieldControl, Converter={StaticResource vConvLineBoost}}"
+                    Opacity="{Binding Source={x:Static global:UiGlobals.Instance}, Path=MultiOverlayOpacity}"
+                    Margin="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height=".8*"/>
+                        <RowDefinition Height=".1*"/>
+                        <RowDefinition Height=".3*"/>
+                    </Grid.RowDefinitions>
+                    <Viewbox Margin="2" Grid.Row="0" Grid.RowSpan="2" >
+                        <Path
+                    Margin="1"
+                    Fill="White"
+                    Stroke="White" StrokeThickness="1"
+                    Data="{StaticResource LineBoostPath}"/>
+                    </Viewbox>
+                    <Viewbox Grid.Row="1" Grid.RowSpan="2" VerticalAlignment="Top">
+                        <TextBlock Margin="0"
+                        FontSize="10" Foreground="White"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Text="  Line      " TextAlignment="Center" />
+                    </Viewbox>
+                    <Viewbox Grid.Row="2" VerticalAlignment="Bottom">
+                        <TextBlock Margin="0"
+                        FontSize="10" Foreground="White"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Text="    Boost  " TextAlignment="Center" />
+                    </Viewbox>
+                </Grid>
+
+                <!-- If someone adds custom content (like the server field) -->
                 <ContentPresenter Content="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Content}" />
             </Grid>
         </ControlTemplate>

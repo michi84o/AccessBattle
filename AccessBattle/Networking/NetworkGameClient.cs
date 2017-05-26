@@ -85,7 +85,7 @@ namespace AccessBattle.Networking
     }
 
     /// <summary>
-    /// Class for network clients. 
+    /// Class for network clients. Used for communication with the server.
     /// </summary>
     public class NetworkGameClient : NetworkBase
     {
