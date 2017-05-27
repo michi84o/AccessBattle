@@ -73,6 +73,7 @@
     <Compile Include="Enums.cs" />
     <Compile Include="RelayCommand.cs" />
     <Compile Include="UiGlobals.cs" />
+    <Compile Include="ViewModel\BoardFieldViewModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
     <Compile Include="View\BoardFieldView.xaml.cs">
       <DependentUpon>BoardFieldView.xaml</DependentUpon>
@@ -111,6 +112,12 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Model\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AccessBattle\AccessBattle.csproj">
+      <Project>{f17f07f0-81f9-4320-a0c0-e9bbe9f6869c}</Project>
+      <Name>AccessBattle</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

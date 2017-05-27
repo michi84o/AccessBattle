@@ -85,7 +85,7 @@ namespace AccessBattle.Wpf.View
             set { SetValue(BoardFieldVisualStateProperty, value); }
         }
         public static readonly DependencyProperty BoardFieldVisualStateProperty = DependencyProperty.Register(
-            nameof(BoardFieldVisualState), typeof(BoardFieldVisualState), typeof(BoardFieldView), new PropertyMetadata(BoardFieldVisualState.Empty));
+            nameof(FieldVisualState), typeof(BoardFieldVisualState), typeof(BoardFieldView), new PropertyMetadata(BoardFieldVisualState.Empty));
 
         public BoardFieldCardVisualState FieldCardVisualState
         {
@@ -93,7 +93,7 @@ namespace AccessBattle.Wpf.View
             set { SetValue(BoardFieldCardVisualStateProperty, value); }
         }
         public static readonly DependencyProperty BoardFieldCardVisualStateProperty = DependencyProperty.Register(
-            nameof(BoardFieldCardVisualState), typeof(BoardFieldCardVisualState), typeof(BoardFieldView), new PropertyMetadata(BoardFieldCardVisualState.Empty));
+            nameof(FieldCardVisualState), typeof(BoardFieldCardVisualState), typeof(BoardFieldView), new PropertyMetadata(BoardFieldCardVisualState.Empty));
 
         public bool IsExitFlipped
         {
