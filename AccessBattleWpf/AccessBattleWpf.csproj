@@ -69,6 +69,7 @@
     <Compile Include="Converters\BoardFieldVisualStateMultiOverlayConverter.cs" />
     <Compile Include="Converters\BoardFieldVisualStateVisibilityConverter.cs" />
     <Compile Include="Converters\FlipConverter.cs" />
+    <Compile Include="Converters\HostPlayerColorConverter.cs" />
     <Compile Include="Converters\OpacityInverter.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="RelayCommand.cs" />

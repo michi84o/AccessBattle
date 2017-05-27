@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace AccessBattle.Wpf.ViewModel
-{ 
+{
     public class BoardFieldViewModel : PropChangeNotifier
     {
         BoardFieldVisualState _visualState = BoardFieldVisualState.Empty;

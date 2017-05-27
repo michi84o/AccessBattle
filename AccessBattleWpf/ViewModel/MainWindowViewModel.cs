@@ -19,13 +19,21 @@ namespace AccessBattle.Wpf.ViewModel
         /// It maps the internal two-dimensinal list and contains the items row-wise,
         /// starting from row (y=)0.
         /// item 0 is field [0,0], item 1 is field [1,0], item 8 is field [1,0].
+        /// The length of this list is 88.
         /// </summary>
         public List<BoardFieldViewModel> BoardFieldList { get; private set; }
 
         #endregion
 
+        public bool IsPlayerHost
+        {
+            get; set;
+        }
+
         public MainWindowViewModel()
         {
+            IsPlayerHost = true;
+
             BoardFieldList = new List<BoardFieldViewModel>();
             for (int y = 0; y < 11; ++y)
                 for (int x = 0; x < 8; ++x)
@@ -39,26 +47,6 @@ namespace AccessBattle.Wpf.ViewModel
 
             _boardFields[3, 7].DefaultVisualState = BoardFieldVisualState.Exit;
             _boardFields[4, 7].DefaultVisualState = BoardFieldVisualState.Exit;
-
-            Task.Delay(3000).ContinueWith(t =>
-            {
-                for (int y = 0; y < 11; ++y)
-                    for (int x = 0; x < 8; ++x)
-                    {
-                        Application.Current.Dispatcher.Invoke(() =>
-                        {
-                            _boardFields[x, y].VisualState = BoardFieldVisualState.Virus;
-                            _boardFields[x, y].CardVisualState = BoardFieldCardVisualState.Orange;
-                        });
-                        Task.Delay(100).Wait();
-                        Application.Current.Dispatcher.Invoke(() =>
-                        {
-                            _boardFields[x, y].VisualState = BoardFieldVisualState.Empty;
-                            _boardFields[x, y].CardVisualState = BoardFieldCardVisualState.Empty;
-                        });
-                }
-            });
-
         }
 
     }
