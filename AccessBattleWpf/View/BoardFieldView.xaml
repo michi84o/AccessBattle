@@ -13,10 +13,13 @@
         <ResourceDictionary>
             <converters:BoardFieldVisualStateVisibilityConverter x:Key="vConvLink" PrimaryState="Link" />
             <converters:BoardFieldVisualStateVisibilityConverter x:Key="vConvVirus" PrimaryState="Virus"/>
-
+            <converters:BoardFieldVisualStateVisibilityConverter x:Key="vConvVirusCheck" PrimaryState="VirusCheck"/>
+            <converters:BoardFieldVisualStateVisibilityConverter x:Key="vConv404" PrimaryState="Error404"/>
+            <converters:BoardFieldVisualStateVisibilityConverter x:Key="vConvFirewall" PrimaryState="Firewall"/>
             <converters:BoardFieldVisualStateVisibilityConverter x:Key="vConvExit" PrimaryState="Exit"/>
+            <converters:BoardFieldVisualStateVisibilityConverter x:Key="vConvFlipped" PrimaryState="Flipped"/>
             <converters:BoardFieldVisualStateVisibilityConverter x:Key="vConvLineBoost" PrimaryState="LineBoost"/>
-
+            
             <converters:BoardFieldCardVisualStateBrushConverter x:Key="cardConv"/>
             <converters:BoardFieldCardVisualStateBrushConverter x:Key="cardConvPath" PathColorMode="True" />
 
@@ -140,6 +143,105 @@
                         <ScaleTransform ScaleX="{Binding Path=IsCardFlipped , ElementName=BoardFieldControl, Converter={StaticResource convFlip}}" 
                                         ScaleY="{Binding Path=IsCardFlipped , ElementName=BoardFieldControl, Converter={StaticResource convFlip}}" />
                     </Grid.RenderTransform>
+                </Grid>
+
+                <!-- Virus Check -->
+                <Grid
+                    Margin="1"
+                    Visibility="{Binding Path=FieldVisualState, ElementName=BoardFieldControl, Converter={StaticResource vConvVirusCheck}}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height=".8*"/>
+                        <RowDefinition Height=".1*"/>
+                        <RowDefinition Height=".3*"/>
+                    </Grid.RowDefinitions>
+                    <Viewbox Margin="2" Grid.Row="0" Grid.RowSpan="2">
+                        <Path
+                            Margin="1"
+                            Fill="White"
+                            Stroke="White" StrokeThickness="1"
+                            Data="{StaticResource VirusCheckPath}"/>
+                    </Viewbox>
+                    <Viewbox Grid.Row="1" VerticalAlignment="Top" Grid.RowSpan="2">
+                        <TextBlock Margin="0"
+                            FontSize="10" Foreground="White"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Text=" Virus     " />   
+                    </Viewbox>
+                    <Viewbox Grid.Row="2" VerticalAlignment="Bottom">
+                        <TextBlock Margin="0"
+                            FontSize="10" Foreground="White"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Text="    Check  " />   
+                    </Viewbox>
+                </Grid>
+
+                <!-- Error 404 - not found -->
+                <Grid
+                    Margin="1"
+                    Visibility="{Binding Path=FieldVisualState, ElementName=BoardFieldControl, Converter={StaticResource vConv404}}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height=".8*"/>
+                        <RowDefinition Height=".1*"/>
+                        <RowDefinition Height=".3*"/>
+                    </Grid.RowDefinitions>
+                    <Viewbox Margin="2" Grid.Row="0" Grid.RowSpan="2" >
+                        <Path
+                            Margin="1"
+                            Fill="White"
+                            Stroke="White" StrokeThickness="1"
+                            Data="{StaticResource NotFound404Path}"/>
+                    </Viewbox>
+                    <Viewbox Grid.Row="1" Grid.RowSpan="2" VerticalAlignment="Top">
+                        <TextBlock Margin="0"
+                            FontSize="10" Foreground="White"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Text="    404    " TextAlignment="Center" />
+                    </Viewbox>
+                    <Viewbox Grid.Row="2" VerticalAlignment="Bottom">
+                        <TextBlock Margin="1,0,1,0"
+                            FontSize="10" Foreground="White"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Text="Not Found" TextAlignment="Center" />
+                    </Viewbox>
+                </Grid>
+
+                <Grid
+                    Margin="1"
+                    Visibility="{Binding Path=FieldVisualState, ElementName=BoardFieldControl, Converter={StaticResource vConvFirewall}}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height=".8*"/>
+                        <RowDefinition Height=".3*"/>
+                    </Grid.RowDefinitions>
+                    <Viewbox Margin="2" Grid.Row="0">
+                        <Path
+                            Margin="1"
+                            Fill="White"
+                            Stroke="White" StrokeThickness="1"
+                            Data="{StaticResource FirewallPath}"/>
+                    </Viewbox>
+                    <Viewbox Grid.Row="1">
+                        <TextBlock Margin="2,0,2,0"
+                            FontSize="10" Foreground="White"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Text="Firewall" />
+                    </Viewbox>
+                </Grid>
+
+                <Grid
+                    Margin="1"
+                    Visibility="{Binding Path=FieldVisualState, ElementName=BoardFieldControl, Converter={StaticResource vConvFlipped}}">
+                    <Viewbox>
+                        <TextBlock Margin="0"
+                            FontSize="10" Foreground="White"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Text=" 101010 " TextAlignment="Center" />
+                    </Viewbox>
                 </Grid>
 
                 <!-- If multiple contents are active, a separate opacity animation has to be used -->

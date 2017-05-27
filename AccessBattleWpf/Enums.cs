@@ -17,11 +17,11 @@ namespace AccessBattle.Wpf
         Virus      = 0x004,
         LineBoost  = 0x008,
         VirusCheck = 0x010,
-        ServerArea = 0x020,
+        ServerArea = 0x020, // Not used
         Error404   = 0x040,
         Exit       = 0x080,
         Firewall   = 0x100,
-        Flipped    = 0x200,        
+        Flipped    = 0x200,
     }
 
     /// <summary>

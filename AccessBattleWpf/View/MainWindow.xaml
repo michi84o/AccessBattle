@@ -150,17 +150,17 @@
             <local:BoardFieldView                 
                 Grid.Row="5" Grid.Column="5"  FieldVisualState="Link" FieldCardVisualState="Blue"
                 Style="{StaticResource MainFieldOrange}"/>
-            <local:BoardFieldView                 
-                Grid.Row="5" Grid.Column="6"
+            <local:BoardFieldView
+                Grid.Row="5" Grid.Column="6" FieldVisualState="VirusCheck" FieldCardVisualState="Blue"
                 Style="{StaticResource MainFieldOrange}"/>
             <local:BoardFieldView                 
-                Grid.Row="5" Grid.Column="7"
+                Grid.Row="5" Grid.Column="7" FieldVisualState="Error404"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView                 
-                Grid.Row="5" Grid.Column="8"
+                Grid.Row="5" Grid.Column="8" FieldVisualState="Firewall" FieldCardVisualState="Blue"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView                 
-                Grid.Row="5" Grid.Column="9"
+                Grid.Row="5" Grid.Column="9" FieldVisualState="Flipped" FieldCardVisualState="Orange"
                 Style="{StaticResource MainField}"/>
 
             <local:BoardFieldView                 
