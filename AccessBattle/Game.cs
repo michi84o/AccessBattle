@@ -4,6 +4,35 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+// Board is 8x8 using Chess notation
+// as base for position indexes
+//   a b c d e f g h
+// 8                 8  7
+// 7                 7  6
+// ...               ...
+// 2                 2  1
+// 1                 1  0
+//   a b c d e f g h
+//   0 1 2 3 4 5 6 7
+//
+// X is horizontal, Y is vertical
+// (0,0) is a1, (7,7) is h8
+//
+// Stack:
+// For simplification,
+// the first 4 fields are always links.
+// Board orientation is ignored
+// Player1: Fields (0,8) - (7,8)
+// Player2: Fields (0,9) - (7,9)
+//
+// Additional fields: Mainly for UI use
+// Player1 Boost Button: Field (0,10)
+// Player1 Firewall Button: Field (1,10)
+// Player1 Virus Check: Field (2,10)
+// Player1 Error 404: Field (3,10)
+// Player1 Server Area : Field (4,10)
+// Player2 Server Area : Field (5,10)
+
 namespace AccessBattle
 {
     /// <summary>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AccessBattle.Wpf.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,13 @@ namespace AccessBattle.Wpf.ViewModel
 {
     public class MainWindowViewModel : PropChangeNotifier
     {
+        GameModel _model;
+
+        public bool IsPlayerHost
+        {
+            get { return _model.IsPlayerHost; }
+            set { _model.IsPlayerHost = value; } // Prop change triggered by model
+        }
 
         #region Board Field Visual States
 
@@ -25,14 +33,10 @@ namespace AccessBattle.Wpf.ViewModel
 
         #endregion
 
-        public bool IsPlayerHost
-        {
-            get; set;
-        }
-
         public MainWindowViewModel()
         {
-            IsPlayerHost = true;
+            _model = new GameModel();
+            _model.PropertyChanged += _model_PropertyChanged;
 
             BoardFieldList = new List<BoardFieldViewModel>();
             for (int y = 0; y < 11; ++y)
@@ -49,5 +53,12 @@ namespace AccessBattle.Wpf.ViewModel
             _boardFields[4, 7].DefaultVisualState = BoardFieldVisualState.Exit;
         }
 
+        private void _model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(_model.IsPlayerHost))
+            {
+                OnPropertyChanged(nameof(IsPlayerHost));
+            }
+        }
     }
 }

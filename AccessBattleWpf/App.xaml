@@ -15,7 +15,7 @@
         <StreamGeometry x:Key="FirewallPath">
             M0,0 L0,31 31,31 31,0 z M3,7 L3,24 7,24 7,28 24,28 24,24 28,24 28,7 24,7
             24,3 7,3 7,7 3,7z M8,8 L8,11 11,11 11,8 z M8,20 L 8,23 11,23 11,20 z
-            M20,20 L 20,23 23,23 23,20 z M20,8 L20,11 23,11 23,8 z 
+            M20,20 L 20,23 23,23 23,20 z M20,8 L20,11 23,11 23,8 z
             M12,12 L 12,19 19,19 19,12z
         </StreamGeometry>
         <StreamGeometry x:Key="VirusCheckPath">
@@ -35,12 +35,46 @@
         <StreamGeometry x:Key="DoorPath">M9,9L9,21 11,21 11,22 13,22 13,23 15,23 15,24 16,24 16,13 14,13 14,12 12,12 12,11 10,11 10,9z</StreamGeometry>
         <StreamGeometry x:Key="DoorPath2">M9,9L19,9 19,21 9,21z</StreamGeometry>
         <StreamGeometry x:Key="DoorArrowPath">
-            F1 M12,7 L12,5, 16,5 16,7 z                  
-                M14,4 h-4.5 M14,4 h4.5 
+            F1 M12,7 L12,5, 16,5 16,7 z
+                M14,4 h-4.5 M14,4 h4.5
                 M14,3 h-3.5 M14,3 h3.5
                 M14,2 h-2.5 M14,2 h2.5
                 M14,1 h-1.5 M14,1 h1.5
                 M14,0 h-.5 M14,0 h.5
         </StreamGeometry>
+
+
+        <Style TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="Black"/>
+            <Setter Property="FontFamily" Value="./ExternalResources/#Silkscreen"/>
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="Foreground" Value="DarkGray"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="DarkGray" BorderThickness="2" CornerRadius="2">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#303030"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#606060"/>
+                </Trigger>
+                <!--<Trigger Property="IsEnabled" Value="True">
+                    <Setter Property="Foreground" Value="DarkGray"></Setter>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Foreground" Value="#303030"></Setter>
+                </Trigger>-->
+            </Style.Triggers>
+        </Style>
+
     </Application.Resources>
 </Application>
