@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace AccessBattle.Wpf.ViewModel
 {
     public class BoardFieldViewModel : PropChangeNotifier
     {
+        BoardField _field;
+
         BoardFieldVisualState _visualState = BoardFieldVisualState.Empty;
         public BoardFieldVisualState VisualState
         {
@@ -32,6 +36,66 @@ namespace AccessBattle.Wpf.ViewModel
         {
             get { return _cardVisualState; }
             set { SetProp(ref _cardVisualState, value); }
+        }
+
+        public void RegisterBoardField(BoardField field)
+        {
+            if (field == _field) return;
+            if (_field != null)
+            {
+                WeakEventManager<BoardField, PropertyChangedEventArgs>.RemoveHandler(
+                    _field, nameof(_field.PropertyChanged), Field_PropertyChanged);
+            }
+            _field = field;
+            if (_field != null)
+            {
+                WeakEventManager<BoardField, PropertyChangedEventArgs>.AddHandler(
+                _field, nameof(_field.PropertyChanged), Field_PropertyChanged);
+            }
+        }
+
+        private void Field_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            var s = sender as BoardField;
+            if (s == null || s != _field) return;
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                if (e.PropertyName == nameof(s.Card))
+                {
+                    if (s.Card == null)
+                    {
+                        VisualState = BoardFieldVisualState.Empty;
+                        CardVisualState = BoardFieldCardVisualState.Empty;
+                    }
+                    else if (s.Card is OnlineCard && s.Card.Owner != null)
+                    {
+                        var type = ((OnlineCard)s.Card).Type;
+                        switch (type)
+                        {
+                            case OnlineCardType.Link:
+                                VisualState = BoardFieldVisualState.Link;
+                                break;
+                            case OnlineCardType.Virus:
+                                VisualState = BoardFieldVisualState.Virus;
+                                break;
+                            default:
+                                VisualState = BoardFieldVisualState.Flipped;
+                                break;
+                        }
+                        var num = s.Card.Owner.PlayerNumber;
+                        if (num == 1)
+                        {
+                            CardVisualState = BoardFieldCardVisualState.Blue;
+                        }
+                        else if (num == 2)
+                        {
+                            CardVisualState = BoardFieldCardVisualState.Orange;
+                        }
+                    }
+                }
+            });
+
         }
     }
 }

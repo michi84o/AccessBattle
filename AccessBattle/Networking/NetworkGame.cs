@@ -46,7 +46,7 @@ namespace AccessBattle.Networking
         {
             SetProp(ref _uid, uid);
         }
-        
+
         /// <summary>
         /// Starts joining a player. Player 1 must accept. Then player 2 must accept after waiting.
         /// </summary>

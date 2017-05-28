@@ -25,11 +25,7 @@ using System.Threading.Tasks;
 // Player1: Fields (0,8) - (7,8)
 // Player2: Fields (0,9) - (7,9)
 //
-// Additional fields: Mainly for UI use
-// Player1 Boost Button: Field (0,10)
-// Player1 Firewall Button: Field (1,10)
-// Player1 Virus Check: Field (2,10)
-// Player1 Error 404: Field (3,10)
+// Additional fields:
 // Player1 Server Area : Field (4,10)
 // Player2 Server Area : Field (5,10)
 
@@ -75,6 +71,21 @@ namespace AccessBattle
         /// </summary>
         public PlayerState[] Players { get { return _players; } }
 
+        /// <summary>
+        /// Represents all fields of the game board.
+        /// </summary>
+        public BoardField[,] Board { get; private set; }
+
+        /// <summary>
+        /// Online cards of players. First index is player, second index is card.
+        /// Each player has 8 online cards.
+        /// </summary>
+        public OnlineCard[,] PlayerOnlineCards { get; private set; }
+
+        /// <summary>
+        /// Firewall cards of players. Index is player index.
+        /// </summary>
+        public FirewallCard[] PlayerFirewallCards { get; private set; }
 
         /// <summary>
         /// Assumes that both players have properly joined the game.
@@ -86,7 +97,16 @@ namespace AccessBattle
             Players[1].Did404NotFound = false;
             Players[1].DidVirusCheck = false;
 
-            // TODO: Reset Board and Cards
+            for (int p = 0; p < 2; ++p)
+                for (int c = 0; c < 8; ++c)
+                {
+                    PlayerOnlineCards[p, c].Type = OnlineCardType.FaceDown;
+                }
+
+            // Reset Board
+            for (int x = 0; x < 8; ++x)
+                for (int y = 0; y < 10; ++y)
+                    Board[x, y].Card = null;
 
             Phase = GamePhase.Init;
         }
@@ -102,6 +122,31 @@ namespace AccessBattle
                 new PlayerState(2) { Name = "Player 2"  }
             };
             _phase = GamePhase.WaitingForPlayers;
+
+            Board = new BoardField[8, 11];
+            for (ushort y = 0; y < 11; ++y)
+                for (ushort x = 0; x < 8; ++x)
+                {
+                    Board[x, y] = new BoardField(x, y);
+                }
+
+            PlayerOnlineCards = new OnlineCard[2, 8];
+            for (int p = 0; p < 2; ++p)
+                for (int c = 0; c < 8; ++c)
+                    PlayerOnlineCards[p, c] = new OnlineCard { Owner = _players[p] };
+
+            PlayerFirewallCards = new FirewallCard[2]
+            {
+                new FirewallCard { Owner = _players[0] },
+                new FirewallCard { Owner = _players[1] },
+            };
+
+            // TODO: Remove (testcode for UI)
+            Task.Delay(5000).ContinueWith(t =>
+            {
+                Board[2, 2].Card = PlayerOnlineCards[0, 2];
+            });
+
         }
     }
 }

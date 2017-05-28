@@ -25,12 +25,6 @@ namespace AccessBattle.Wpf.View
         public MainWindow()
         {
             InitializeComponent();
-            UiGlobals.Instance.StartFlashing();
-            UiGlobals.Instance.StartMultiOverlayFlashing();
-            Task.Delay(2000).ContinueWith(o => 
-            {
-                Application.Current.Dispatcher.Invoke(() => { UiGlobals.Instance.StopFlashing(); });
-            });
         }
     }
 }

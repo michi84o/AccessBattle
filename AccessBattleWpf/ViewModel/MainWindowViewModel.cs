@@ -1,6 +1,7 @@
 ﻿using AccessBattle.Wpf.Model;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -51,9 +52,14 @@ namespace AccessBattle.Wpf.ViewModel
 
             _boardFields[3, 7].DefaultVisualState = BoardFieldVisualState.Exit;
             _boardFields[4, 7].DefaultVisualState = BoardFieldVisualState.Exit;
+
+
+            for (int y = 0; y < 11; ++y)
+                for (int x = 0; x < 8; ++x)
+                    _boardFields[x, y].RegisterBoardField(_model.Game.Board[x, y]);
         }
 
-        private void _model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        void _model_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(_model.IsPlayerHost))
             {

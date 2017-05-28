@@ -24,12 +24,12 @@ namespace AccessBattle.Wpf.View
         {
             InitializeComponent();
             MouseDown += (s, e) => { if (CaptureMouse()) _clickStarted = true; };
-            MouseLeave += (s, e) => 
+            MouseLeave += (s, e) =>
             {
                 if (IsMouseCaptured)
                     ReleaseMouseCapture();
                 _clickStarted = false;  };
-            MouseUp += (s, e) => 
+            MouseUp += (s, e) =>
             {
                 if (IsMouseCaptured)
                     ReleaseMouseCapture();
@@ -67,7 +67,7 @@ namespace AccessBattle.Wpf.View
         {
             get { return (SolidColorBrush)GetValue(FieldBackgroundProperty); }
             set { SetValue(FieldBackgroundProperty, value); }
-        }        
+        }
         public static readonly DependencyProperty FieldBackgroundProperty = DependencyProperty.Register(
             nameof(FieldBackground), typeof(SolidColorBrush), typeof(BoardFieldView), new PropertyMetadata(Brushes.Transparent));
 

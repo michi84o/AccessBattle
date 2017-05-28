@@ -11,6 +11,14 @@ namespace AccessBattle
     /// </summary>
     public class BoardField : PropChangeNotifier
     {
+        Card _card;
+        /// <summary>Card that was placed on this field</summary>
+        public Card Card
+        {
+            get { return _card; }
+            set { SetProp(ref _card, value); }
+        }
+
         /// <summary>X Location of this field.</summary>
         public ushort X { get; private set; }
         /// <summary>Y Location of this field.</summary>

@@ -25,7 +25,7 @@ namespace AccessBattleServer
                 while ((line = Console.ReadLine()) != "exit")
                 {
 
-                }                
+                }
             }
             finally
             {

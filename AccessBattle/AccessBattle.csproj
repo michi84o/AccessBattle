@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BoardField.cs" />
+    <Compile Include="Card.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Networking\GameSync.cs" />
     <Compile Include="IPlayer.cs" />

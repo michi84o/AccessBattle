@@ -429,15 +429,10 @@
                 <local:BoardFieldView Grid.Column="3" FieldVisualState="Virus" Style="{StaticResource StackField}"/>
             </Grid>
 
-            <Grid
-                Grid.Row="14" Grid.Column="5" Grid.ColumnSpan="2" Margin="5">
-                <local:BoardFieldView
-                    Style="{StaticResource StackField}">
-                    <TextBlock
-                        Text="Actions" Foreground="DarkGray" FontSize="14"
-                        VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                </local:BoardFieldView>
-            </Grid>
+            <Button
+                Grid.Row="14" Grid.Column="5" Grid.ColumnSpan="2" Margin="5"
+                Content="Actions">
+            </Button>
 
             <Grid
                 Grid.Row="14" Grid.Column="7" Grid.ColumnSpan="3">
@@ -455,6 +450,7 @@
 
             <!-- Overlay dialogues -->
             <local:WelcomeControl
+                Visibility="Collapsed"
                 Grid.ColumnSpan="12"
                 Grid.RowSpan="16"
                 Width="300" Height="200" />
