@@ -140,13 +140,6 @@ namespace AccessBattle
                 new FirewallCard { Owner = _players[0] },
                 new FirewallCard { Owner = _players[1] },
             };
-
-            // TODO: Remove (testcode for UI)
-            Task.Delay(5000).ContinueWith(t =>
-            {
-                Board[2, 2].Card = PlayerOnlineCards[0, 2];
-            });
-
         }
     }
 }

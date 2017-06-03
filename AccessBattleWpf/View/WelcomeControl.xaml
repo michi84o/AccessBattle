@@ -27,10 +27,10 @@
 
             <Button
                 Grid.Row="1" Grid.Column="1"
-                Content="Local Game" Margin="5"/>
+                Content="Local Game" Margin="5" Command="{Binding StartLocalGameCommand}" />
             <Button
                 Grid.Row="2" Grid.Column="1"
-                Content="Network Game" Margin="5"/>
+                Content="Network Game" Margin="5" Command="{Binding StartNetworkGameCommand}" />
 
         </Grid>
     </Border>

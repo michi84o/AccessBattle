@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 
 namespace AccessBattle.Wpf.ViewModel
 {
@@ -17,6 +18,13 @@ namespace AccessBattle.Wpf.ViewModel
         {
             get { return _model.IsPlayerHost; }
             set { _model.IsPlayerHost = value; } // Prop change triggered by model
+        }
+
+        bool _welcomeMenuAvailable;
+        public bool WelcomeMenuAvailable
+        {
+            get { return _welcomeMenuAvailable; }
+            set { SetProp(ref _welcomeMenuAvailable, value); }
         }
 
         #region Board Field Visual States
@@ -38,6 +46,8 @@ namespace AccessBattle.Wpf.ViewModel
         {
             _model = new GameModel();
             _model.PropertyChanged += _model_PropertyChanged;
+
+            _welcomeMenuAvailable = true;
 
             BoardFieldList = new List<BoardFieldViewModel>();
             for (int y = 0; y < 11; ++y)
@@ -64,6 +74,34 @@ namespace AccessBattle.Wpf.ViewModel
             if (e.PropertyName == nameof(_model.IsPlayerHost))
             {
                 OnPropertyChanged(nameof(IsPlayerHost));
+            }
+        }
+
+        public ICommand StartLocalGameCommand
+        {
+            get
+            {
+                return new RelayCommand(o =>
+                {
+                    WelcomeMenuAvailable = false;
+                }, o =>
+                {
+                    return false;
+                });
+            }
+        }
+
+        public ICommand StartNetworkGameCommand
+        {
+            get
+            {
+                return new RelayCommand(o =>
+                {
+                    WelcomeMenuAvailable = false;
+                }, o =>
+                {
+                    return true;
+                });
             }
         }
     }
