@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="AccessBattle.Wpf.View.WelcomeControl"
+﻿<UserControl x:Class="AccessBattle.Wpf.View.NetworkGameMenu"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -14,6 +14,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition/>
                 <RowDefinition/>
+                <RowDefinition/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width=".2*"/>
@@ -22,16 +23,17 @@
             </Grid.ColumnDefinitions>
             <TextBlock
                 Grid.Row="0" Grid.ColumnSpan="3"
-                Text="ACCESS BATTLE" FontSize="28"
+                Text="Network Game" FontSize="28"
                 VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5" />
-
             <Button
                 Grid.Row="1" Grid.Column="1"
-                Content="Local Game" Margin="5" Command="{Binding StartLocalGameCommand}" />
+                Content="Create Game" Margin="5" Command="{Binding CreateNetworkGameCommand}" />
             <Button
                 Grid.Row="2" Grid.Column="1"
-                Content="Network Game" Margin="5" Command="{Binding StartNetworkGameCommand}" />
-
+                Content="Join Game" Margin="5" Command="{Binding JoinNetworkGameCommand}" />
+            <Button
+                Grid.Row="3" Grid.Column="1"
+                Content="BACK" Margin="5" Command="{Binding ShowWelcomeMenuCommand}" />
         </Grid>
     </Border>
 </UserControl>

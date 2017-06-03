@@ -27,6 +27,13 @@ namespace AccessBattle.Wpf.ViewModel
             set { SetProp(ref _welcomeMenuAvailable, value); }
         }
 
+        bool _networkGameMenuAvailable;
+        public bool NetworkGameMenuAvailable
+        {
+            get { return _networkGameMenuAvailable; }
+            set { SetProp(ref _networkGameMenuAvailable, value); }
+        }
+
         #region Board Field Visual States
 
         BoardFieldViewModel[,] _boardFields = new BoardFieldViewModel[8, 11];
@@ -98,9 +105,68 @@ namespace AccessBattle.Wpf.ViewModel
                 return new RelayCommand(o =>
                 {
                     WelcomeMenuAvailable = false;
+                    NetworkGameMenuAvailable = true;
                 }, o =>
                 {
                     return true;
+                });
+            }
+        }
+
+        public ICommand CreateNetworkGameCommand
+        {
+            get
+            {
+                return new RelayCommand(o =>
+                {
+
+                }, o =>
+                {
+                    return true;
+                });
+            }
+        }
+
+        public ICommand JoinNetworkGameCommand
+        {
+            get
+            {
+                return new RelayCommand(o =>
+                {
+
+                }, o =>
+                {
+                    return true;
+                });
+            }
+        }
+
+        public ICommand ShowWelcomeMenuCommand
+        {
+            get
+            {
+                return new RelayCommand(o =>
+                {
+                    NetworkGameMenuAvailable = false;
+
+                    WelcomeMenuAvailable = true;
+                }, o =>
+                {
+                    return true;
+                });
+            }
+        }
+
+        public ICommand ActionsCommand
+        {
+            get
+            {
+                return new RelayCommand(o =>
+                {
+                }, o =>
+                {
+                    return _model.Game.Phase == GamePhase.PlayerTurns;
+                    // TODO: Also only if its current players turn
                 });
             }
         }

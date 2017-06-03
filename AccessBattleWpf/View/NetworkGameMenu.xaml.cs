@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace AccessBattle.Wpf.View
 {
     /// <summary>
-    /// Interaction logic for WelcomeControl.xaml
+    /// Interaction logic for NetworkGameMenu.xaml
     /// </summary>
-    public partial class WelcomeControl : UserControl
+    public partial class NetworkGameMenu : UserControl
     {
-        public WelcomeControl()
+        public NetworkGameMenu()
         {
             InitializeComponent();
         }

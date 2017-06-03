@@ -54,8 +54,11 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Converters\BoolVisibilityConverter.cs" />
-    <Compile Include="View\WelcomeControl.xaml.cs">
-      <DependentUpon>WelcomeControl.xaml</DependentUpon>
+    <Compile Include="View\NetworkGameMenu.xaml.cs">
+      <DependentUpon>NetworkGameMenu.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\WelcomeMenu.xaml.cs">
+      <DependentUpon>WelcomeMenu.xaml</DependentUpon>
     </Compile>
     <Page Include="View\BoardFieldView.xaml">
       <SubType>Designer</SubType>
@@ -88,7 +91,11 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="View\WelcomeControl.xaml">
+    <Page Include="View\NetworkGameMenu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\WelcomeMenu.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
