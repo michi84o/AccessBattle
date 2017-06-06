@@ -35,7 +35,6 @@ namespace AccessBattle.Wpf.ViewModel
         // View models for menus:
         WelcomeMenuViewModel _welcomeVm;
         NetworkGameMenuViewModel _networkGameVm;
-        NetworkSettingsMenuViewModel _networkSettingsVm;
 
         public PropChangeNotifier CurrentMenuViewModel
         {
@@ -43,10 +42,10 @@ namespace AccessBattle.Wpf.ViewModel
             {
                 switch (_currentMenu)
                 {
-                    case MenuType.Welcome: return _welcomeVm;
+                    case MenuType.None:return null;
                     case MenuType.NetworkGame: return _networkGameVm;
-                    case MenuType.NetworkSettings: return _networkSettingsVm;
-                    default: return null;
+                    case MenuType.Welcome:
+                    default: return _welcomeVm;
                 }
             }
         }
@@ -73,8 +72,7 @@ namespace AccessBattle.Wpf.ViewModel
 
             // Menu view models
             _welcomeVm = new WelcomeMenuViewModel(this);
-            _networkSettingsVm = new NetworkSettingsMenuViewModel(this);
-            _networkGameVm = new NetworkGameMenuViewModel(this, _networkSettingsVm);
+            _networkGameVm = new NetworkGameMenuViewModel(this);
 
             CurrentMenu = MenuType.Welcome;
 

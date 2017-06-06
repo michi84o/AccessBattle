@@ -13,31 +13,54 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
             </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width=".2*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width=".2*"/>
-            </Grid.ColumnDefinitions>
             <TextBlock
                 Grid.Row="0" Grid.ColumnSpan="3"
                 Text="Network Game" FontSize="28"
                 VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5" />
-            <Button
-                Grid.Row="1" Grid.Column="1"
-                Content="Create Game" Margin="5" Command="{Binding CreateNetworkGameCommand}" />
-            <Button
-                Grid.Row="2" Grid.Column="1"
-                Content="Join Game" Margin="5" Command="{Binding JoinNetworkGameCommand}" />
-            <Button
-                Grid.Row="3" Grid.Column="1"
-                Content="Settings" Margin="5" Command="{Binding NetworkSettingsCommand}" />
-            <Button
-                Grid.Row="4" Grid.Column="1"
-                Content="BACK" Margin="5" Command="{Binding ShowWelcomeMenuCommand}" />
+            <Grid
+                Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid
+                    Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="0.5*" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="IP" VerticalAlignment="Center" Margin="3,0,3,0" />
+                    <TextBox   Grid.Column="1" Text="255.255.255.255" Margin="3,0,3,0" />
+                    <TextBlock Grid.Column="2" Text="Port" VerticalAlignment="Center" Margin="3,0,3,0" />
+                    <TextBox   Grid.Column="3" Text="65535" Margin="3,0,3,0" />
+                </Grid>
+                <ListView
+                    Grid.Row="1"
+                    Margin="3" SelectedIndex="2"/>
+                <Button
+                    Grid.Row="1" Content="Connect to Server" Margin="28" Height="50"/>
+                <Button Grid.Row="2" Content="Join Selected game" Margin="3"/>
+                <Grid
+                    Grid.Row="3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="New Game" Margin="3,0,3,0" VerticalAlignment="Center" />
+                    <TextBox   Grid.Column="1" Text="New Game" Margin="3,0,3,0" VerticalAlignment="Center"/>
+                    <Button    Grid.Column="2" Content="Create" Margin="3,0,3,0" FontSize="14" VerticalAlignment="Center"
+                               Command="{Binding CreateNetworkGameCommand}"/>
+                </Grid>
+                <Button
+                    Grid.Row="4" Content="Back" Margin="3" Command="{Binding ShowWelcomeMenuCommand}"/>
+            </Grid>
         </Grid>
     </Border>
 </UserControl>

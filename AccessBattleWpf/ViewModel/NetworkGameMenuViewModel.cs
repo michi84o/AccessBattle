@@ -10,12 +10,49 @@ namespace AccessBattle.Wpf.ViewModel
 {
     public class NetworkGameMenuViewModel : MenuViewModelBase
     {
-        NetworkSettingsMenuViewModel _settings;
-
         public NetworkGameMenuViewModel(
-            IMenuHolder parent, NetworkSettingsMenuViewModel settings) : base(parent)
+            IMenuHolder parent) : base(parent) { }
+
+        public bool SettingsValid
         {
-            _settings = settings;
+            get
+            {
+                System.Net.IPAddress a;
+                return System.Net.IPAddress.TryParse(IpAddress, out a) && Port > 1023;
+            }
+        }
+
+        string _ipAddress = "127.0.0.1";
+        public string IpAddress
+        {
+            get { return _ipAddress; }
+            set
+            {
+                if (SetProp(ref _ipAddress, value))
+                    OnPropertyChanged(nameof(SettingsValid));
+            }
+        }
+
+        ushort _port = 3221;
+        public ushort Port
+        {
+            get { return _port; }
+            set
+            {
+                if (SetProp(ref _port, value))
+                    OnPropertyChanged(nameof(SettingsValid));
+            }
+        }
+
+        public ICommand BackCommand
+        {
+            get
+            {
+                return new RelayCommand(o =>
+                {
+                    ParentViewModel.CurrentMenu = MenuType.NetworkGame;
+                });
+            }
         }
 
         public ICommand CreateNetworkGameCommand
@@ -25,7 +62,7 @@ namespace AccessBattle.Wpf.ViewModel
                 return new RelayCommand(o =>
                 {
 
-                }, o => { return _settings.SettingsValid; });
+                }, o => { return SettingsValid; });
             }
         }
 
@@ -36,18 +73,7 @@ namespace AccessBattle.Wpf.ViewModel
                 return new RelayCommand(o =>
                 {
 
-                }, o => { return _settings.SettingsValid; });
-            }
-        }
-
-        public ICommand NetworkSettingsCommand
-        {
-            get
-            {
-                return new RelayCommand(o =>
-                {
-                    ParentViewModel.CurrentMenu = MenuType.NetworkSettings;
-                }, o => { return true; });
+                }, o => { return SettingsValid; });
             }
         }
 
