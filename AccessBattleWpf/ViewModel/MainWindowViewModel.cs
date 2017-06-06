@@ -1,4 +1,5 @@
-﻿using AccessBattle.Wpf.Model;
+﻿using AccessBattle.Wpf.Interfaces;
+using AccessBattle.Wpf.Model;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -10,7 +11,7 @@ using System.Windows.Input;
 
 namespace AccessBattle.Wpf.ViewModel
 {
-    public class MainWindowViewModel : PropChangeNotifier
+    public class MainWindowViewModel : PropChangeNotifier, IMenuHolder
     {
         GameModel _model;
 
@@ -20,18 +21,34 @@ namespace AccessBattle.Wpf.ViewModel
             set { _model.IsPlayerHost = value; } // Prop change triggered by model
         }
 
-        bool _welcomeMenuAvailable;
-        public bool WelcomeMenuAvailable
+        MenuType _currentMenu;
+        public MenuType CurrentMenu
         {
-            get { return _welcomeMenuAvailable; }
-            set { SetProp(ref _welcomeMenuAvailable, value); }
+            get { return _currentMenu; }
+            set
+            {
+                if (SetProp(ref _currentMenu, value))
+                    OnPropertyChanged(nameof(CurrentMenuViewModel));
+            }
         }
 
-        bool _networkGameMenuAvailable;
-        public bool NetworkGameMenuAvailable
+        // View models for menus:
+        WelcomeMenuViewModel _welcomeVm;
+        NetworkGameMenuViewModel _networkGameVm;
+        NetworkSettingsMenuViewModel _networkSettingsVm;
+
+        public PropChangeNotifier CurrentMenuViewModel
         {
-            get { return _networkGameMenuAvailable; }
-            set { SetProp(ref _networkGameMenuAvailable, value); }
+            get
+            {
+                switch (_currentMenu)
+                {
+                    case MenuType.Welcome: return _welcomeVm;
+                    case MenuType.NetworkGame: return _networkGameVm;
+                    case MenuType.NetworkSettings: return _networkSettingsVm;
+                    default: return null;
+                }
+            }
         }
 
         #region Board Field Visual States
@@ -54,7 +71,12 @@ namespace AccessBattle.Wpf.ViewModel
             _model = new GameModel();
             _model.PropertyChanged += _model_PropertyChanged;
 
-            _welcomeMenuAvailable = true;
+            // Menu view models
+            _welcomeVm = new WelcomeMenuViewModel(this);
+            _networkSettingsVm = new NetworkSettingsMenuViewModel(this);
+            _networkGameVm = new NetworkGameMenuViewModel(this, _networkSettingsVm);
+
+            CurrentMenu = MenuType.Welcome;
 
             BoardFieldList = new List<BoardFieldViewModel>();
             for (int y = 0; y < 11; ++y)
@@ -84,78 +106,7 @@ namespace AccessBattle.Wpf.ViewModel
             }
         }
 
-        public ICommand StartLocalGameCommand
-        {
-            get
-            {
-                return new RelayCommand(o =>
-                {
-                    WelcomeMenuAvailable = false;
-                }, o =>
-                {
-                    return false;
-                });
-            }
-        }
 
-        public ICommand StartNetworkGameCommand
-        {
-            get
-            {
-                return new RelayCommand(o =>
-                {
-                    WelcomeMenuAvailable = false;
-                    NetworkGameMenuAvailable = true;
-                }, o =>
-                {
-                    return true;
-                });
-            }
-        }
-
-        public ICommand CreateNetworkGameCommand
-        {
-            get
-            {
-                return new RelayCommand(o =>
-                {
-
-                }, o =>
-                {
-                    return true;
-                });
-            }
-        }
-
-        public ICommand JoinNetworkGameCommand
-        {
-            get
-            {
-                return new RelayCommand(o =>
-                {
-
-                }, o =>
-                {
-                    return true;
-                });
-            }
-        }
-
-        public ICommand ShowWelcomeMenuCommand
-        {
-            get
-            {
-                return new RelayCommand(o =>
-                {
-                    NetworkGameMenuAvailable = false;
-
-                    WelcomeMenuAvailable = true;
-                }, o =>
-                {
-                    return true;
-                });
-            }
-        }
 
         public ICommand ActionsCommand
         {

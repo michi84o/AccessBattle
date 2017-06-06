@@ -41,6 +41,14 @@ namespace AccessBattle
             set { SetProp(ref _isFaceUp, value); }
         }
 
+        /// <summary>
+        /// Type of online card.
+        /// </summary>
+        /// <remarks>
+        /// There is no derived class for the types
+        /// because the opponent should not be able to know
+        /// the type of the card if it is face down.
+        /// This is easier to implement.</remarks>
         public OnlineCardType Type
         {
             get { return _type; }

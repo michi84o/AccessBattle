@@ -54,8 +54,16 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Converters\BoolVisibilityConverter.cs" />
+    <Compile Include="Interfaces\IMenuHolder.cs" />
+    <Compile Include="ViewModel\MenuViewModelBase.cs" />
+    <Compile Include="ViewModel\NetworkGameMenuViewModel.cs" />
+    <Compile Include="ViewModel\NetworkSettingsMenuViewModel.cs" />
+    <Compile Include="ViewModel\WelcomeMenuViewModel.cs" />
     <Compile Include="View\NetworkGameMenu.xaml.cs">
       <DependentUpon>NetworkGameMenu.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\NetworkSettingsMenu.xaml.cs">
+      <DependentUpon>NetworkSettingsMenu.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\WelcomeMenu.xaml.cs">
       <DependentUpon>WelcomeMenu.xaml</DependentUpon>
@@ -92,6 +100,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="View\NetworkGameMenu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\NetworkSettingsMenu.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

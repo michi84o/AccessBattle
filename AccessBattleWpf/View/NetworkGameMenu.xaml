@@ -15,6 +15,7 @@
                 <RowDefinition/>
                 <RowDefinition/>
                 <RowDefinition/>
+                <RowDefinition/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width=".2*"/>
@@ -33,6 +34,9 @@
                 Content="Join Game" Margin="5" Command="{Binding JoinNetworkGameCommand}" />
             <Button
                 Grid.Row="3" Grid.Column="1"
+                Content="Settings" Margin="5" Command="{Binding NetworkSettingsCommand}" />
+            <Button
+                Grid.Row="4" Grid.Column="1"
                 Content="BACK" Margin="5" Command="{Binding ShowWelcomeMenuCommand}" />
         </Grid>
     </Border>

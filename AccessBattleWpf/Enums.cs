@@ -33,4 +33,12 @@ namespace AccessBattle.Wpf
         Blue   = 0x01,
         Orange = 0x02,
     }
+
+    public enum MenuType
+    {
+        None,
+        Welcome,
+        NetworkGame,
+        NetworkSettings,
+    }
 }
