@@ -98,15 +98,30 @@ namespace AccessBattle.Networking
         public event EventHandler<GameCreatedEventArgs> GameCreated;
         /// <summary>Game join was requested.</summary>
         public event EventHandler<GameJoinRequestedEventArgs> GameJoinRequested;
-        /// <summary>Logged into game or failed.</summary>
+        /// <summary>Logged into server or login failed.</summary>
         public event EventHandler<LoggedInEventArgs> LoggedIn;
 
         bool? _isConnected = false;
-        /// <summary>Joined a game.</summary>
+        /// <summary>Is connected to server. Null during connect.</summary>
         public bool? IsConnected
         {
             get { return _isConnected; }
-            private set { _isConnected = value; }
+            private set
+            {
+                _isConnected = value;
+                if (_isConnected == false)
+                {
+                    IsLoggedIn = false;
+                }
+            }
+        }
+
+        bool? _isJoined = false;
+        /// <summary>Has joined a game if true.</summary>
+        public bool? IsJoined
+        {
+            get { return _isJoined; }
+            private set { _isJoined = value; }
         }
 
         bool? _isLoggedIn = false;
@@ -114,14 +129,24 @@ namespace AccessBattle.Networking
         public bool? IsLoggedIn
         {
             get { return _isLoggedIn; }
-            private set { _isLoggedIn = value; }
+            private set
+            {
+                _isLoggedIn = value;
+                if (IsLoggedIn == false)
+                {
+                    IsJoined = false;
+                }
+            }
         }
 
         /// <summary>Login name</summary>
         public string LoginName { get; private set; }
 
         ByteBuffer _receiveBuffer = new ByteBuffer(4096);
+
         CryptoHelper _encrypter;
+        CancellationTokenSource _encrypterWaiter = null;
+
         CryptoHelper _decrypter;
         Socket _connection;
         readonly object _clientLock = new object();
@@ -155,14 +180,43 @@ namespace AccessBattle.Networking
             {
                 _connection = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
-                _connection.Connect(server, port);
+                var connectTcs = new TaskCompletionSource<bool>();
+                using (var args = new SocketAsyncEventArgs())
+                {
+                    EventHandler<SocketAsyncEventArgs> connectHandler = (s, e) =>
+                    {
+                        connectTcs.TrySetResult(true);
+                    };
+                    args.Completed += connectHandler;
+                    args.RemoteEndPoint = new IPEndPoint(IPAddress.Parse(server), port);
+
+                    using (var tcs = new CancellationTokenSource(TimeSpan.FromSeconds(NetworkTimeout)))
+                    {
+                        tcs.Token.Register(() =>
+                        {
+                            connectTcs.TrySetResult(true);
+                        });
+                        if (_connection.ConnectAsync(args))
+                        {
+                            await connectTcs.Task;
+                        }
+                    }
+                    if (!_connection.Connected)
+                    {
+                        _connection.Dispose();
+                        IsConnected = false;
+                        return false;
+                    }
+                }
+
                 ReceiveAsync(_connection, 0);
 
                 // Block until keys are exchanged
-                var then = DateTime.UtcNow.AddSeconds(NetworkTimeout);
-                while (_encrypter == null && (then - DateTime.UtcNow).TotalSeconds > 0)
+                var keyExchangeTcs = new TaskCompletionSource<bool>();
+                using (_encrypterWaiter = new CancellationTokenSource(TimeSpan.FromSeconds(NetworkTimeout)))
                 {
-                    await Task.Delay(100);
+                    _encrypterWaiter.Token.Register(() => { keyExchangeTcs.SetResult(true); });
+                    await keyExchangeTcs.Task;
                 }
                 if (_encrypter == null)
                 {
@@ -203,7 +257,7 @@ namespace AccessBattle.Networking
             var login = new Login { Name = name, Password = password };
 
             // Catch the event for receiving the list.
-            LoggedInEventArgs result = null;            
+            LoggedInEventArgs result = null;
             var source = new TaskCompletionSource<LoggedInEventArgs>();
             EventHandler<LoggedInEventArgs> handler = (sender, args) =>
             {
@@ -266,7 +320,7 @@ namespace AccessBattle.Networking
                     }
                 }
                 catch (Exception e) { Log.WriteLine("NetworkGameClient::RequestGameList(): " + e.Message); }
-                finally { GameListReceived -= handler; }                
+                finally { GameListReceived -= handler; }
             }
             return result?.GameList;
         }
@@ -343,11 +397,13 @@ namespace AccessBattle.Networking
             try
             {
                 var req = new JoinMessage { UID = uid, Request = 0 };
+                IsJoined = null;
                 return Send(JsonConvert.SerializeObject(req), NetworkPacketType.JoinGame);
             }
             catch (Exception e)
             {
                 Log.WriteLine("NetworkGameClient::RequestJoinGame(): " + e.Message);
+                IsJoined = false;
                 return false;
             }
         }
@@ -363,11 +419,13 @@ namespace AccessBattle.Networking
             try
             {
                 var req = new JoinMessage { UID = uid, Request = accept ? 3 : 4 };
-                return Send(JsonConvert.SerializeObject(req), NetworkPacketType.JoinGame);
+                IsJoined = Send(JsonConvert.SerializeObject(req), NetworkPacketType.JoinGame);
+                return IsJoined == true;
             }
             catch (Exception e)
             {
                 Log.WriteLine("NetworkGameClient::AnswerJoinRequest(): " + e.Message);
+                IsJoined = false;
                 return false;
             }
         }
@@ -448,6 +506,7 @@ namespace AccessBattle.Networking
                         _encrypter = null;
                         Log.WriteLine("NetworkGameClient: Received key is invalid! " + ex.Message);
                     }
+                    finally { _encrypterWaiter?.Cancel(); }
                     break;
                 case NetworkPacketType.ListGames:
                     try
