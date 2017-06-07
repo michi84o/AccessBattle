@@ -8,12 +8,19 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using AccessBattle.Networking;
 
 namespace AccessBattle.Wpf.ViewModel
 {
     public class MainWindowViewModel : PropChangeNotifier, IMenuHolder
     {
         GameModel _model;
+
+        NetworkGameClient _networkClient = new NetworkGameClient();
+        public NetworkGameClient NetworkClient
+        {
+            get { return _networkClient; }
+        }
 
         public bool IsPlayerHost
         {

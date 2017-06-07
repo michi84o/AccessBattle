@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AccessBattle.Networking;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -15,5 +16,6 @@ namespace AccessBattle.Wpf.Interfaces
     public interface IMenuHolder
     {
         MenuType CurrentMenu { get; set; }
+        NetworkGameClient NetworkClient { get; }
     }
 }

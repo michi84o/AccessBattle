@@ -72,6 +72,9 @@ namespace AccessBattleTests
 
             Assert.IsTrue(client2.RequestJoinGame(games[0].UID));
 
+            Assert.IsTrue(client2.IsConnected == true);
+            Assert.IsTrue(client2.IsLoggedIn == true);
+
             // Abort after 3 seconds
             using (var ct = new CancellationTokenSource(3000))
             {
@@ -82,6 +85,9 @@ namespace AccessBattleTests
                 });
                 Assert.IsTrue(client1Task.Task.GetAwaiter().GetResult());
                 Assert.IsTrue(client2Task.Task.GetAwaiter().GetResult());
+
+                Assert.IsTrue(client1.IsJoined == true);
+                Assert.IsTrue(client2.IsJoined == true);
             }
 
 

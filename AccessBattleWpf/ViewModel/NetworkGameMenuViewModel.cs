@@ -1,6 +1,8 @@
-﻿using AccessBattle.Wpf.Interfaces;
+﻿using AccessBattle.Networking.Packets;
+using AccessBattle.Wpf.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,10 +10,39 @@ using System.Windows.Input;
 
 namespace AccessBattle.Wpf.ViewModel
 {
+    // TODO: Filter for Game list
+
     public class NetworkGameMenuViewModel : MenuViewModelBase
     {
         public NetworkGameMenuViewModel(
-            IMenuHolder parent) : base(parent) { }
+            IMenuHolder parent) : base(parent)
+        {
+            Games = new ObservableCollection<GameInfo>
+            {
+                new GameInfo { UID= 2147483647, Name="MyGame", Player1="Player1" },
+                new GameInfo { UID= 123, Name="Awesome Game", Player1="cvsgsagf 12131fs" }
+            };
+        }
+
+        public ObservableCollection<GameInfo> Games { get; private set; }
+
+        GameInfo _selectedGame;
+        public GameInfo SelectedGame
+        {
+            get { return _selectedGame; }
+            set { SetProp(ref _selectedGame, value); }
+        }
+
+        bool _isConnecting;
+        public bool IsConnecting
+        {
+            get { return _isConnecting; }
+            set
+            {
+                if (SetProp(ref _isConnecting, value))
+                    OnPropertyChanged(nameof(CanConnect));
+            }
+        }
 
         public bool SettingsValid
         {
@@ -22,6 +53,11 @@ namespace AccessBattle.Wpf.ViewModel
             }
         }
 
+        public bool CanConnect
+        {
+            get { return SettingsValid && ParentViewModel.NetworkClient.IsConnected == false && !IsConnecting; }
+        }
+
         string _ipAddress = "127.0.0.1";
         public string IpAddress
         {
@@ -29,7 +65,12 @@ namespace AccessBattle.Wpf.ViewModel
             set
             {
                 if (SetProp(ref _ipAddress, value))
+                {
+                    ParentViewModel.NetworkClient.Disconnect();
+                    Games.Clear();
                     OnPropertyChanged(nameof(SettingsValid));
+                    OnPropertyChanged(nameof(CanConnect));
+                }
             }
         }
 
@@ -40,18 +81,28 @@ namespace AccessBattle.Wpf.ViewModel
             set
             {
                 if (SetProp(ref _port, value))
+                {
+                    ParentViewModel.NetworkClient.Disconnect();
+                    Games.Clear();
                     OnPropertyChanged(nameof(SettingsValid));
+                    OnPropertyChanged(nameof(CanConnect));
+                }
             }
         }
 
-        public ICommand BackCommand
+        #region Commands
+
+        public ICommand ConnectToServerCommand
         {
             get
             {
-                return new RelayCommand(o =>
+                return new RelayCommand(async o =>
                 {
-                    ParentViewModel.CurrentMenu = MenuType.NetworkGame;
-                });
+                    IsConnecting = true;
+                    bool result = await ParentViewModel.NetworkClient.Connect(IpAddress, Port);
+                    IsConnecting = false;
+                    CommandManager.InvalidateRequerySuggested();
+                }, o => { return CanConnect; });
             }
         }
 
@@ -62,7 +113,12 @@ namespace AccessBattle.Wpf.ViewModel
                 return new RelayCommand(o =>
                 {
 
-                }, o => { return SettingsValid; });
+                }, o =>
+                {
+                    return
+                    ParentViewModel.NetworkClient.IsLoggedIn == true &&
+                    !IsConnecting;
+                });
             }
         }
 
@@ -73,7 +129,13 @@ namespace AccessBattle.Wpf.ViewModel
                 return new RelayCommand(o =>
                 {
 
-                }, o => { return SettingsValid; });
+                }, o =>
+                {
+                    return
+                        ParentViewModel.NetworkClient.IsLoggedIn == true &&
+                        ParentViewModel.NetworkClient.IsJoined == false &&
+                        !IsConnecting;
+                });
             }
         }
 
@@ -84,8 +146,10 @@ namespace AccessBattle.Wpf.ViewModel
                 return new RelayCommand(o =>
                 {
                     ParentViewModel.CurrentMenu = MenuType.Welcome;
-                });
+                }, o => !IsConnecting);
             }
         }
+
+        #endregion
     }
 }
