@@ -3,15 +3,15 @@ using AccessBattle.Wpf.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Data;
 using System.Windows.Input;
 
 namespace AccessBattle.Wpf.ViewModel
 {
-    // TODO: Filter for Game list
-
     public class NetworkGameMenuViewModel : MenuViewModelBase
     {
         public NetworkGameMenuViewModel(
@@ -22,6 +22,36 @@ namespace AccessBattle.Wpf.ViewModel
                 new GameInfo { UID= 2147483647, Name="MyGame", Player1="Player1" },
                 new GameInfo { UID= 123, Name="Awesome Game", Player1="cvsgsagf 12131fs" }
             };
+
+            _gamesView = new CollectionViewSource
+            {
+                Source = Games
+            };
+            _gamesView.Filter += GamesView_Filter;
+        }
+
+        private void GamesView_Filter(object sender, FilterEventArgs e)
+        {
+            if (string.IsNullOrEmpty(FilterText))
+            {
+                e.Accepted = true;
+                return;
+            }
+
+            var info = e.Item as GameInfo;
+            if (info.Name.ToUpper().Contains(FilterText.ToUpper()))
+                e.Accepted = true;
+            else
+                e.Accepted = false;
+        }
+
+        CollectionViewSource _gamesView;
+        public ICollectionView GamesView
+        {
+            get
+            {
+                return _gamesView.View;
+            }
         }
 
         public ObservableCollection<GameInfo> Games { get; private set; }
@@ -90,21 +120,36 @@ namespace AccessBattle.Wpf.ViewModel
             }
         }
 
-        #region Commands
-
-        public ICommand ConnectToServerCommand
+        string _filterText;
+        public string FilterText
         {
-            get
+            get { return _filterText; }
+            set
             {
-                return new RelayCommand(async o =>
-                {
-                    IsConnecting = true;
-                    bool result = await ParentViewModel.NetworkClient.Connect(IpAddress, Port);
-                    IsConnecting = false;
-                    CommandManager.InvalidateRequerySuggested();
-                }, o => { return CanConnect; });
+                if (SetProp(ref _filterText, value))
+                    _gamesView.View.Refresh();
             }
         }
+
+        string _newGameText;
+        public string NewGameText
+        {
+            get { return _newGameText; }
+            set { SetProp(ref _newGameText, value); }
+        }
+
+        #region Commands
+
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        public ICommand ConnectToServerCommand =>
+            new RelayCommand(async o =>
+            {
+                IsConnecting = true;
+                var result = await ParentViewModel.NetworkClient.Connect(IpAddress, Port);
+                IsConnecting = false;
+                CommandManager.InvalidateRequerySuggested();
+            }, o => { return CanConnect; });
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
 
         public ICommand CreateNetworkGameCommand
         {

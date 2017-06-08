@@ -30,6 +30,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <Grid
                     Grid.Row="0">
@@ -46,7 +47,7 @@
                 </Grid>
                 <ListView
                     Grid.Row="1"
-                    Margin="3" SelectedIndex="2" ItemsSource="{Binding Games}"
+                    Margin="3" SelectedIndex="2" ItemsSource="{Binding GamesView}"
                     IsEnabled="{Binding SettingsValid}">
                     <ListView.ItemTemplate>
                         <DataTemplate>
@@ -75,17 +76,29 @@
                 <Grid
                     Grid.Row="3">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="80" />
                         <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="65" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="New Game" Margin="3,0,3,0" VerticalAlignment="Center" />
-                    <TextBox   Grid.Column="1" Text="New Game" Margin="3,0,3,0" VerticalAlignment="Center"/>
-                    <Button    Grid.Column="2" Content="Create" Margin="3,0,3,0" FontSize="14" VerticalAlignment="Center"
+                    <TextBlock Grid.Column="0" Text="Search" Margin="3,0,0,3" VerticalAlignment="Center" />
+                    <TextBox   Grid.Column="1" Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,3,3" VerticalAlignment="Stretch"/>
+                    <Button    Grid.Column="2" Content="Find" Margin="0,0,3,3" FontSize="14" VerticalAlignment="Stretch"
+                               Command="{Binding CreateNetworkGameCommand}"/>
+                </Grid>
+                <Grid
+                    Grid.Row="4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="80" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="65" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="New Game" Margin="3,0,0,0" VerticalAlignment="Center" />
+                    <TextBox   Grid.Column="1" Text="{Binding NewGameText, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,3,0" VerticalAlignment="Stretch"/>
+                    <Button    Grid.Column="2" Content="Create" Margin="0,0,3,0" FontSize="14" VerticalAlignment="Stretch"
                                Command="{Binding CreateNetworkGameCommand}"/>
                 </Grid>
                 <Button
-                    Grid.Row="4" Content="Back" Margin="3" Command="{Binding ShowWelcomeMenuCommand}"/>
+                    Grid.Row="5" Content="Back" Margin="3" Command="{Binding ShowWelcomeMenuCommand}"/>
             </Grid>
         </Grid>
     </Border>

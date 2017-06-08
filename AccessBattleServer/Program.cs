@@ -12,7 +12,7 @@ namespace AccessBattleServer
 
         static void Main(string[] args)
         {
-            Log.SetMode(LogMode.Debug);
+            Log.SetMode(LogMode.Console);
 
             try
             {
