@@ -10,7 +10,7 @@ namespace AccessBattle.Networking
     /// <summary>
     /// Base class for networking.
     /// </summary>
-    public abstract class NetworkBase
+    public abstract class NetworkBase // TODO: Implement INotifyPropertyChanged
     {
         /// <summary>
         /// Name of class that implements this base class. Used for error messages.

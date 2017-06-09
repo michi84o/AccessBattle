@@ -24,7 +24,7 @@ using System.Threading.Tasks;
  *      - 0x02: Login Client[Login (JSON)] Server[0/1 (byte, 0=OK, 1=invalid name, 2=invalid password)]
  *      - 0x03: List available games Client[] Server[List<GameInfo> (JSON string)]
  *      - 0x04: Create Game Client[GameInfo (UID=0,JSON)] Server[GameInfo (UID != 0 => OK)]
- *      - 0x05: Join Game 
+ *      - 0x05: Join Game
  *              This is complicated:
  *              -> Player 2 sends requests to join game A
  *              -> Player 1 accepts
@@ -45,10 +45,12 @@ using System.Threading.Tasks;
  * DATA = Packet data (encrypted, except public key)
  * CHSUM = Checksum (all bytes XOR'ed. except STX,CHSUM,ETX)
  * ETX = End of packet   0x03
- *  
+ *
  *  TODO: Cleanup mechanism for games and logins
  *  TODO: Lock Access to Game list
- *  
+ *
+ *  TODO: Behavior when user logs in with serveral client instances. Also reconnect behavior.
+ *
  */
 namespace AccessBattle.Networking
 {
@@ -60,13 +62,13 @@ namespace AccessBattle.Networking
     {
         /// <summary>List of current games.</summary>
         public Dictionary<uint, NetworkGame> Games { get { return _games; } }
-        
+
         /// <summary>List of currently connected players.</summary>
         public Dictionary<uint, NetworkPlayer> Players { get { return _players; } }
-        
+
         /// <summary>Network port to use for accepting connections.</summary>
         public ushort Port { get { return _port; } }
-     
+
         /// <summary>If true, any client is accepted. Else the database of registered users is used (TODO: NOT IMPLEMENTED).</summary>
         public bool AcceptAnyClient { get; set; }
 
@@ -83,7 +85,7 @@ namespace AccessBattle.Networking
         /// <param name="port">
         /// Network port to use for accepting connections.
         /// It is vital for our plans to use port 3221, or otherwise the organization will notice us!</param>
-        public GameServer(ushort port = 3221)
+        public GameServer(ushort port = 3221) // TODO: AcceptAnyClient parameter or link to user database
         {
             if (port < 1024)
             {
@@ -103,7 +105,7 @@ namespace AccessBattle.Networking
             Stop();
             _server = new TcpListener(IPAddress.Any, _port);
             _serverCts = new CancellationTokenSource();
-            _server.Start();            
+            _server.Start();
             _serverThread = new Thread(() => ListenForClients(_serverCts.Token)) { IsBackground = true };
             _serverThread.Start();
         }
@@ -121,7 +123,7 @@ namespace AccessBattle.Networking
             try { _serverThread.Abort(); }
             catch (Exception e) { Log.WriteLine("Server thread abort failed " + e); }
             _server = null;
-            
+
             // No try catch here. If this goes wrong we should restart the server.
             foreach (var item in _players)
             {
@@ -166,6 +168,11 @@ namespace AccessBattle.Networking
                         var socket = socketTask.Result;
                         if (socket != null)
                         {
+                            // Send server info
+                            Send(JsonConvert.SerializeObject(
+                                new ServerInfo(AcceptAnyClient)),
+                                NetworkPacketType.ServerInfo, null);
+
                             var serverCrypto = new CryptoHelper();
                             // Send public key. There is one key-pair for every client!
                             Log.WriteLine("GameServer: Sending public key...");
@@ -181,7 +188,7 @@ namespace AccessBattle.Networking
                                 uint uid;
                                 // Make sure we do not accidentally generate the same uid:
                                 lock(Players)
-                                { 
+                                {
                                     while (Players.ContainsKey((uid = GetUid()))) { }
                                     var player = new NetworkPlayer(socket, uid, serverCrypto);
                                     Players.Add(uid, player);
@@ -205,7 +212,7 @@ namespace AccessBattle.Networking
             catch (ThreadAbortException)
             {
                 Log.WriteLine("GameServer: ListenForClients aborted!");
-            }            
+            }
         }
 
         /// <summary>
@@ -216,7 +223,7 @@ namespace AccessBattle.Networking
         protected override void Receive_Completed(object sender, SocketAsyncEventArgs e)
         {
             try // Only for dispose. No exceptions catched here!
-            {                
+            {
                 if (_serverCts.IsCancellationRequested) return;
 
                 NetworkPlayer player;
@@ -292,7 +299,7 @@ namespace AccessBattle.Networking
                     player1 = game.Players[0].Player as NetworkPlayer;
                     player2 = game.Players[1].Player as NetworkPlayer;
                     return true;
-                }                
+                }
             }
             catch (Exception)
             {
@@ -361,7 +368,7 @@ namespace AccessBattle.Networking
                         {
                             player.Name = login.Name;
                             player.IsLoggedIn = true;
-                            Log.WriteLine("GameServer: Player " + player.UID + " logged in successfully!");
+                            Log.WriteLine("GameServer: Player " + (login.Name ?? "?") + " (" +player.UID + ") logged in successfully!");
                             // TODO Check AcceptAnyClient variable and compare with whitelist
                             Send(new byte[] { 0 }, NetworkPacketType.ClientLogin, player.Connection, player.ClientCrypto);
                         }
@@ -410,20 +417,20 @@ namespace AccessBattle.Networking
                         var jMsg = JsonConvert.DeserializeObject<JoinMessage>(Encoding.ASCII.GetString(data));
                         NetworkGame game;
                         NetworkPlayer p1, p2;
-                        if (GetGameAndPlayers(jMsg.UID, out game, out p1, out p2))                        
+                        if (GetGameAndPlayers(jMsg.UID, out game, out p1, out p2))
                         {
                             // Check type of messagae
                             if (jMsg.Request == 0) // Request to join game
                             {
                                 var reqOK = false;
                                 if (game.BeginJoinPlayer(player))
-                                {                                    
+                                {
                                     if (p1 != null && player != p1) // Cannot request to join own game!
-                                    {                                        
+                                    {
                                         var p1Req = new JoinMessage
                                         { UID = game.UID, Request = 2, JoiningUser = player.Name };
                                         Send(JsonConvert.SerializeObject(p1Req), NetworkPacketType.JoinGame, p1.Connection, p1.ClientCrypto);
-                                        reqOK = true;                                        
+                                        reqOK = true;
                                     }
                                 }
                                 if (!reqOK) // Error while joining
@@ -458,10 +465,10 @@ namespace AccessBattle.Networking
                                 }
                                 else if (player == p2)
                                 {
-                                    game.JoinPlayer(p2, false);                                    
+                                    game.JoinPlayer(p2, false);
                                 }
                             }
-                        }                        
+                        }
                     }
                     catch (Exception ex)
                     {

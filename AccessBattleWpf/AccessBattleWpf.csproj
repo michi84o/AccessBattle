@@ -53,7 +53,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converters\BoolInverter.cs" />
     <Compile Include="Converters\BoolVisibilityConverter.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Interfaces\IMenuHolder.cs" />
     <Compile Include="ViewModel\MenuViewModelBase.cs" />
     <Compile Include="ViewModel\NetworkGameMenuViewModel.cs" />

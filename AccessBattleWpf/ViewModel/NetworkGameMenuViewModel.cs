@@ -1,12 +1,15 @@
-﻿using AccessBattle.Networking.Packets;
+﻿using AccessBattle.Networking;
+using AccessBattle.Networking.Packets;
 using AccessBattle.Wpf.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Security;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 
@@ -28,6 +31,14 @@ namespace AccessBattle.Wpf.ViewModel
                 Source = Games
             };
             _gamesView.Filter += GamesView_Filter;
+
+            WeakEventManager<NetworkGameClient, ServerInfoEventArgs>.AddHandler(
+                parent.NetworkClient, nameof(parent.NetworkClient.ServerInfoReceived), ServerInfoReceivedHandler);
+        }
+
+        void ServerInfoReceivedHandler(object sender, ServerInfoEventArgs args)
+        {
+            RequiresPassword = args.Info.RequiresLogin;
         }
 
         private void GamesView_Filter(object sender, FilterEventArgs e)
@@ -63,6 +74,11 @@ namespace AccessBattle.Wpf.ViewModel
             set { SetProp(ref _selectedGame, value); }
         }
 
+        public bool CanChangeConnection
+        {
+            get { return !IsLoggingIn && !IsConnecting; }
+        }
+
         bool _isConnecting;
         public bool IsConnecting
         {
@@ -70,8 +86,43 @@ namespace AccessBattle.Wpf.ViewModel
             set
             {
                 if (SetProp(ref _isConnecting, value))
+                {
                     OnPropertyChanged(nameof(CanConnect));
+                    OnPropertyChanged(nameof(CanChangeConnection));
+                }
             }
+        }
+
+        bool _isLoggingIn;
+        public bool IsLoggingIn
+        {
+            get { return _isLoggingIn; }
+            set
+            {
+                if (SetProp(ref _isLoggingIn, value))
+                    OnPropertyChanged(nameof(CanChangeConnection));
+            }
+        }
+
+        bool _requiresPassword;
+        public bool RequiresPassword
+        {
+            get { return _requiresPassword; }
+            set { SetProp(ref _requiresPassword, value); }
+        }
+
+        string _loginName;
+        public string LoginName
+        {
+            get { return _loginName; }
+            set { SetProp(ref _loginName, value); }
+        }
+
+        SecureString _loginPassword;
+        public SecureString LoginPassword
+        {
+            get { return _loginPassword; }
+            set { SetProp(ref _loginPassword, value); }
         }
 
         public bool SettingsValid
@@ -85,7 +136,7 @@ namespace AccessBattle.Wpf.ViewModel
 
         public bool CanConnect
         {
-            get { return SettingsValid && ParentViewModel.NetworkClient.IsConnected == false && !IsConnecting; }
+            get { return SettingsValid && ParentViewModel.NetworkClient.IsConnected == false && !IsConnecting && !IsLoggingIn; }
         }
 
         string _ipAddress = "127.0.0.1";
@@ -147,6 +198,7 @@ namespace AccessBattle.Wpf.ViewModel
                 IsConnecting = true;
                 var result = await ParentViewModel.NetworkClient.Connect(IpAddress, Port);
                 IsConnecting = false;
+                IsLoggingIn = true;
                 CommandManager.InvalidateRequerySuggested();
             }, o => { return CanConnect; });
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
@@ -162,7 +214,7 @@ namespace AccessBattle.Wpf.ViewModel
                 {
                     return
                     ParentViewModel.NetworkClient.IsLoggedIn == true &&
-                    !IsConnecting;
+                    !IsConnecting && !IsLoggingIn;
                 });
             }
         }
@@ -179,7 +231,7 @@ namespace AccessBattle.Wpf.ViewModel
                     return
                         ParentViewModel.NetworkClient.IsLoggedIn == true &&
                         ParentViewModel.NetworkClient.IsJoined == false &&
-                        !IsConnecting;
+                        !IsConnecting && !IsLoggingIn;
                 });
             }
         }
@@ -191,7 +243,7 @@ namespace AccessBattle.Wpf.ViewModel
                 return new RelayCommand(o =>
                 {
                     ParentViewModel.CurrentMenu = MenuType.Welcome;
-                }, o => !IsConnecting);
+                }, o => !IsConnecting && !IsLoggingIn);
             }
         }
 

@@ -6,9 +6,10 @@
              xmlns:local="clr-namespace:AccessBattle.Wpf.View"
              xmlns:converters="clr-namespace:AccessBattle.Wpf.Converters"
              FontFamily="../ExternalResources/#Silkscreen"
-             Foreground="DarkGray">
+             Foreground="DarkGray" Width="300" Height="400">
     <UserControl.Resources>
         <converters:BoolVisibilityConverter x:Key="visconv" />
+        <!--<converters:BoolInverter x:Key="boolinv" />-->
     </UserControl.Resources>
     <Border
         CornerRadius="4" BorderBrush="White" BorderThickness="2"
@@ -41,9 +42,9 @@
                         <ColumnDefinition Width="0.5*" />
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0" Text="IP" VerticalAlignment="Center" Margin="3,0,3,0" />
-                    <TextBox   Grid.Column="1" Text="{Binding IpAddress, UpdateSourceTrigger=PropertyChanged}" Margin="3,0,3,0" />
+                    <TextBox   Grid.Column="1" Text="{Binding IpAddress, UpdateSourceTrigger=PropertyChanged}" Margin="3,0,3,0" IsEnabled="{Binding CanChangeConnection}" />
                     <TextBlock Grid.Column="2" Text="Port" VerticalAlignment="Center" Margin="3,0,3,0" />
-                    <TextBox   Grid.Column="3" Text="{Binding Port, UpdateSourceTrigger=PropertyChanged}" Margin="3,0,3,0" />
+                    <TextBox   Grid.Column="3" Text="{Binding Port, UpdateSourceTrigger=PropertyChanged}" Margin="3,0,3,0" IsEnabled="{Binding CanChangeConnection}" />
                 </Grid>
                 <ListView
                     Grid.Row="1"
@@ -72,18 +73,58 @@
                     Visibility="{Binding IsConnecting, Converter={StaticResource visconv}}">
                     <TextBlock Text="Connecting..." FontSize="18" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="Yellow"/>
                 </Border>
+                <Border
+                    Grid.Row="1" BorderBrush="Yellow" BorderThickness="2" Margin="10" CornerRadius="2" Background="Black"
+                    Visibility="{Binding IsLoggingIn, Converter={StaticResource visconv}}"
+                    VerticalAlignment="Center">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                            Text="Login" FontSize="18" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="Yellow"/>
+                        <TextBlock
+                            Grid.Row="1" Grid.Column="0"
+                            Text="Name" Foreground="Yellow"
+                            VerticalAlignment="Center" Margin="3"
+                            />
+                        <TextBox
+                            Grid.Row="1" Grid.Column="1"
+                            Text="{Binding LoginName}" Foreground="Yellow" Margin="3"
+                            />
+                        <TextBlock
+                            Grid.Row="2" Grid.Column="0"
+                            Text="Password" Foreground="Yellow"
+                            Visibility="{Binding RequiresPassword, Converter={StaticResource visconv}}"
+                            VerticalAlignment="Center" Margin="3" />
+                        <PasswordBox
+                            Grid.Row="2" Grid.Column="1" PasswordChar="*"
+                            Visibility="{Binding RequiresPassword, Converter={StaticResource visconv}}"
+                            PasswordChanged="PasswordBox_PasswordChanged" Foreground="Yellow" Margin="3"
+                            />
+                        <Button
+                            Grid.Row="3" Grid.Column="0" Content="Cancel" Margin="3"/>
+                        <Button
+                            Grid.Row="3" Grid.Column="1" Content="OK" Margin="3"/>
+                    </Grid>
+                </Border>
                 <Button Grid.Row="2" Content="Join Selected game" Margin="3" Command="{Binding JoinNetworkGameCommand}"/>
                 <Grid
                     Grid.Row="3">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="80" />
                         <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="65" />
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0" Text="Search" Margin="3,0,0,3" VerticalAlignment="Center" />
                     <TextBox   Grid.Column="1" Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,3,3" VerticalAlignment="Stretch"/>
-                    <Button    Grid.Column="2" Content="Find" Margin="0,0,3,3" FontSize="14" VerticalAlignment="Stretch"
-                               Command="{Binding CreateNetworkGameCommand}"/>
                 </Grid>
                 <Grid
                     Grid.Row="4">

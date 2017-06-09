@@ -91,6 +91,38 @@
             </Setter>
         </Style>
 
+        <Style TargetType="{x:Type PasswordBox}">
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="AllowDrop" Value="true"/>
+            <Setter Property="Foreground" Value="DarkGray" />
+            <Setter Property="CaretBrush" Value="DarkGray" />
+            <Setter Property="SelectionBrush" Value="White" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type PasswordBox}">
+                        <Border
+                          Name="Border"
+                          CornerRadius="2"
+                          Padding="1"
+                          Background="Black"
+                          BorderBrush="DarkGray"
+                          BorderThickness="2" >
+                            <ScrollViewer Margin="0" x:Name="PART_ContentHost"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Border" Property="Background" Value="Black"/>
+                                <Setter TargetName="Border" Property="BorderBrush" Value="Black"/>
+                                <Setter Property="Foreground" Value="DarkGray"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <Style TargetType="{x:Type Button}">
             <Setter Property="Background" Value="Black"/>
             <Setter Property="FontFamily" Value="./ExternalResources/#Silkscreen"/>

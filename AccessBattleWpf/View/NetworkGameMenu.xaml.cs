@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AccessBattle.Wpf.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,14 @@ namespace AccessBattle.Wpf.View
         public NetworkGameMenu()
         {
             InitializeComponent();
+        }
+
+        void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            var dc = DataContext as NetworkGameMenuViewModel;
+            var box = sender as PasswordBox;
+            if (dc == null || box ==null) return;
+            dc.LoginPassword = box.SecurePassword;
         }
     }
 }

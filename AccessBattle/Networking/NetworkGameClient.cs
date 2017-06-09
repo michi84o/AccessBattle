@@ -85,6 +85,26 @@ namespace AccessBattle.Networking
     }
 
     /// <summary>
+    /// Args for server info.
+    /// </summary>
+    public class ServerInfoEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Information about the server.
+        /// </summary>
+        public ServerInfo Info { get; private set; }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="info"></param>
+        public ServerInfoEventArgs(ServerInfo info)
+        {
+            Info = info;
+        }
+    }
+
+    /// <summary>
     /// Class for network clients. Used for communication with the server.
     /// </summary>
     public class NetworkGameClient : NetworkBase
@@ -100,6 +120,19 @@ namespace AccessBattle.Networking
         public event EventHandler<GameJoinRequestedEventArgs> GameJoinRequested;
         /// <summary>Logged into server or login failed.</summary>
         public event EventHandler<LoggedInEventArgs> LoggedIn;
+        /// <summary>Received server info. This normally happens during connect.</summary>
+        public event EventHandler<ServerInfoEventArgs> ServerInfoReceived;
+
+        bool? _serverRequiresLogin;
+        /// <summary>
+        /// True if the currently connected server requires a login with username and password.
+        /// A login is always required. If this value is false, it only means the user can use anly login values.
+        /// </summary>
+        public bool? ServerRequiresLogin
+        {
+            get { return _serverRequiresLogin; }
+            set { _serverRequiresLogin = value; }
+        }
 
         bool? _isConnected = false;
         /// <summary>Is connected to server. Null during connect.</summary>
@@ -125,7 +158,7 @@ namespace AccessBattle.Networking
         }
 
         bool? _isLoggedIn = false;
-        /// <summary>Login status. Is null during connect.</summary>
+        /// <summary>Login status. Is null during log in.</summary>
         public bool? IsLoggedIn
         {
             get { return _isLoggedIn; }
@@ -586,8 +619,26 @@ namespace AccessBattle.Networking
                         Log.WriteLine("NetworkGameClient: Received JoinGame confirmation could not be read." + e.Message);
                     }
                     break;
+                case NetworkPacketType.ServerInfo:
+                    try
+                    {
+                        // Server data is always unencrypted
+                        var jMsg = JsonConvert.DeserializeObject<ServerInfo>(Encoding.ASCII.GetString(packet.Data));
+                        if (jMsg != null)
+                        {
+                            var handler = ServerInfoReceived;
+                            if (handler != null)
+                                handler(this, new ServerInfoEventArgs(jMsg));
+                            ServerRequiresLogin = jMsg.RequiresLogin;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Log.WriteLine("NetworkGameClient: Received ServerInfo could not be read." + e.Message);
+                    }
+                    break;
                 default:
-                    Log.WriteLine("");
+                    Log.WriteLine("NetworkGameClient: Packet type " + packet.PacketType + " not recognized!");
                     break;
             }
         }
@@ -621,6 +672,7 @@ namespace AccessBattle.Networking
         {
             if (_connection == null) return;
             IsLoggedIn = false;
+            ServerRequiresLogin = null;
             _encrypter = null;
             try
             {
@@ -633,7 +685,7 @@ namespace AccessBattle.Networking
             {
                 Log.WriteLine("NetworkGameClient: Closing connection caused an exception: " + e.Message);
             }
-            _isConnected = false;
+            IsConnected = false;
             _connection = null;
         }
     }
