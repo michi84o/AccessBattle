@@ -34,23 +34,33 @@ namespace AccessBattle.Wpf.ViewModel
             get { return _currentMenu; }
             set
             {
+                var lastVm = CurrentMenuViewModel;
                 if (SetProp(ref _currentMenu, value))
+                {
                     OnPropertyChanged(nameof(CurrentMenuViewModel));
+
+                    lastVm?.Suspend();
+                    CurrentMenuViewModel?.Activate();
+                }
             }
         }
 
         // View models for menus:
         WelcomeMenuViewModel _welcomeVm;
         NetworkGameMenuViewModel _networkGameVm;
+        WaitForJoinMenuViewModel _waitForJoinVm;
+        AcceptJoinMenuViewModel _acceptJoinVm;
 
-        public PropChangeNotifier CurrentMenuViewModel
+        public MenuViewModelBase CurrentMenuViewModel
         {
             get
             {
                 switch (_currentMenu)
                 {
-                    case MenuType.None:return null;
+                    case MenuType.None: return null;
                     case MenuType.NetworkGame: return _networkGameVm;
+                    case MenuType.WaitForOpponent: return _waitForJoinVm;
+                    case MenuType.AcceptJoin: return _acceptJoinVm;
                     case MenuType.Welcome:
                     default: return _welcomeVm;
                 }
@@ -80,6 +90,8 @@ namespace AccessBattle.Wpf.ViewModel
             // Menu view models
             _welcomeVm = new WelcomeMenuViewModel(this);
             _networkGameVm = new NetworkGameMenuViewModel(this);
+            _waitForJoinVm = new WaitForJoinMenuViewModel(this);
+            _acceptJoinVm = new AcceptJoinMenuViewModel(this);
 
             CurrentMenu = MenuType.Welcome;
 

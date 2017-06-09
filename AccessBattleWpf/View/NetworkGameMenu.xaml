@@ -9,7 +9,7 @@
              Foreground="DarkGray" Width="300" Height="400">
     <UserControl.Resources>
         <converters:BoolVisibilityConverter x:Key="visconv" />
-        <!--<converters:BoolInverter x:Key="boolinv" />-->
+        <converters:BoolInverter x:Key="boolinv" />
     </UserControl.Resources>
     <Border
         CornerRadius="4" BorderBrush="White" BorderThickness="2"
@@ -48,7 +48,7 @@
                 </Grid>
                 <ListView
                     Grid.Row="1"
-                    Margin="3" SelectedIndex="2" ItemsSource="{Binding GamesView}"
+                    Margin="3" SelectedIndex="2" ItemsSource="{Binding GamesView}" SelectedItem="{Binding SelectedGame}"
                     IsEnabled="{Binding SettingsValid}">
                     <ListView.ItemTemplate>
                         <DataTemplate>
@@ -59,7 +59,7 @@
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="{Binding Name}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
-                                <TextBlock Grid.Column="1" Text="|" Margin="3,0,3,0" VerticalAlignment="Center" HorizontalAlignment="Left" Foreground="#505050"/>
+                                <TextBlock Grid.Column="1" Text="-" Margin="3,0,3,0" VerticalAlignment="Center" HorizontalAlignment="Left" Foreground="#505050"/>
                                 <TextBlock Grid.Column="2" Text="{Binding Player1}" VerticalAlignment="Center" HorizontalAlignment="Left" Foreground="#505050" />
                             </Grid>
                         </DataTemplate>
@@ -98,7 +98,8 @@
                             />
                         <TextBox
                             Grid.Row="1" Grid.Column="1"
-                            Text="{Binding LoginName}" Foreground="Yellow" Margin="3"
+                            Text="{Binding LoginName, UpdateSourceTrigger=PropertyChanged}" Foreground="Yellow" Margin="3"
+                            KeyUp="TextBox_KeyUp"
                             />
                         <TextBlock
                             Grid.Row="2" Grid.Column="0"
@@ -109,11 +110,12 @@
                             Grid.Row="2" Grid.Column="1" PasswordChar="*"
                             Visibility="{Binding RequiresPassword, Converter={StaticResource visconv}}"
                             PasswordChanged="PasswordBox_PasswordChanged" Foreground="Yellow" Margin="3"
+                            KeyUp="TextBox_KeyUp"
                             />
                         <Button
-                            Grid.Row="3" Grid.Column="0" Content="Cancel" Margin="3"/>
+                            Grid.Row="3" Grid.Column="0" Content="Cancel" Margin="3" Command="{Binding CancelLoginCommand}"/>
                         <Button
-                            Grid.Row="3" Grid.Column="1" Content="OK" Margin="3"/>
+                            Grid.Row="3" Grid.Column="1" Content="OK" Margin="3" Command="{Binding LoginCommand}"/>
                     </Grid>
                 </Border>
                 <Button Grid.Row="2" Content="Join Selected game" Margin="3" Command="{Binding JoinNetworkGameCommand}"/>
@@ -134,7 +136,7 @@
                         <ColumnDefinition Width="65" />
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0" Text="New Game" Margin="3,0,0,0" VerticalAlignment="Center" />
-                    <TextBox   Grid.Column="1" Text="{Binding NewGameText, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,3,0" VerticalAlignment="Stretch"/>
+                    <TextBox   Grid.Column="1" Text="{Binding NewGameText, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,3,0" VerticalAlignment="Stretch" IsEnabled="{Binding IsCreatingGame, Converter={StaticResource boolinv}}" />
                     <Button    Grid.Column="2" Content="Create" Margin="0,0,3,0" FontSize="14" VerticalAlignment="Stretch"
                                Command="{Binding CreateNetworkGameCommand}"/>
                 </Grid>

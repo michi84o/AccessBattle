@@ -21,6 +21,9 @@ namespace AccessBattle.Wpf.Model
             set { SetProp(ref _isPlayerHost, value); }
         }
 
+        // TODO: Behavior when opponent disconnects
+        // TODO: Option to give up game
+
         public GameModel()
         {
 

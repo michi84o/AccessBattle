@@ -7,14 +7,16 @@
     public class NetworkPacketType
     {
         public const byte PublicKey = 0x01;
-
         public const byte ClientLogin = 0x02;
+        // Packets above 0x02 require user to be logged in
         public const byte ListGames = 0x03;
         public const byte CreateGame = 0x04;
         public const byte JoinGame = 0x05;
         public const byte GameInit = 0x06;
         public const byte GameStatus = 0x07;
         public const byte GameCommand = 0x08;
+
+        // TODO: Packet for quitting game
 
         /// <summary>Information about server.</summary>
         public const byte ServerInfo = 0xFE;

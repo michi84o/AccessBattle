@@ -13,6 +13,14 @@ namespace AccessBattle.Wpf.ViewModel
     {
         public WelcomeMenuViewModel(IMenuHolder parent) : base(parent) { }
 
+        public override void Activate()
+        {
+        }
+
+        public override void Suspend()
+        {
+        }
+
         public ICommand StartLocalGameCommand
         {
             get

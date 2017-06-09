@@ -15,5 +15,10 @@ namespace AccessBattle.Wpf.ViewModel
         {
             ParentViewModel = parent;
         }
+
+        public abstract void Activate();
+        public abstract void Suspend();
+
+
     }
 }

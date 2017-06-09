@@ -1,5 +1,6 @@
 ﻿using AccessBattle.Networking;
 using AccessBattle.Networking.Packets;
+using AccessBattle.Wpf.Extensions;
 using AccessBattle.Wpf.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -34,6 +35,72 @@ namespace AccessBattle.Wpf.ViewModel
 
             WeakEventManager<NetworkGameClient, ServerInfoEventArgs>.AddHandler(
                 parent.NetworkClient, nameof(parent.NetworkClient.ServerInfoReceived), ServerInfoReceivedHandler);
+
+            WeakEventManager<NetworkGameClient, GameJoinRequestedEventArgs>.AddHandler(
+                parent.NetworkClient, nameof(parent.NetworkClient.GameJoinRequested), JoinRequestedHandler);
+
+            _gameListUpdateTimer = new System.Threading.Timer(new System.Threading.TimerCallback(UpdateGameList));
+        }
+
+        public override void Activate()
+        {
+            var client = ParentViewModel.NetworkClient;
+            if (client.IsConnected == true && client.IsLoggedIn == true
+                && !(client.IsJoined == true))
+            {
+                _gameListUpdateTimer.Change(0, System.Threading.Timeout.Infinite);
+            }
+        }
+
+        public override void Suspend()
+        {
+            _gameListUpdateTimer.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
+        }
+
+        void JoinRequestedHandler(object sender, GameJoinRequestedEventArgs args)
+        {
+            //args.Message.
+        }
+
+        void UpdateGameList(object state)
+        {
+            var t = (System.Threading.Timer)state;
+
+            // disable timer
+            t.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
+
+            Application.Current.Dispatcher.BeginInvoke(
+                System.Windows.Threading.DispatcherPriority.Background,
+                (Action)(async () =>
+                {
+                    var client = ParentViewModel.NetworkClient;
+                    if (client.IsConnected == true && client.IsLoggedIn == true
+                        && !(client.IsJoined==true))
+                    {
+                        var list = await ParentViewModel.NetworkClient.RequestGameList();
+
+                        // Remove games that don't exist anymore
+                        var games = Games.ToList();
+                        foreach (var game in games)
+                        {
+                            if (!list.Exists(o => o.UID == game.UID))
+                                Games.Remove(game);
+                        }
+
+                        games = Games.ToList();
+                        // Remove games from list that are already in Games
+                        list.RemoveAll(o => games.Exists(oo => oo.UID == o.UID));
+
+                        // Add the remaining games
+                        foreach (var game in list)
+                            Games.Add(game);
+
+                        _gamesView.View.Refresh();
+
+                        // re-enable timer
+                        t.Change(5000, System.Threading.Timeout.Infinite);
+                    }
+                }));
         }
 
         void ServerInfoReceivedHandler(object sender, ServerInfoEventArgs args)
@@ -55,6 +122,8 @@ namespace AccessBattle.Wpf.ViewModel
             else
                 e.Accepted = false;
         }
+
+        System.Threading.Timer _gameListUpdateTimer;
 
         CollectionViewSource _gamesView;
         public ICollectionView GamesView
@@ -116,6 +185,20 @@ namespace AccessBattle.Wpf.ViewModel
         {
             get { return _loginName; }
             set { SetProp(ref _loginName, value); }
+        }
+
+        bool _isCreatingGame;
+        public bool IsCreatingGame
+        {
+            get { return _isCreatingGame; }
+            set { SetProp(ref _isCreatingGame, value); }
+        }
+
+        bool _isJoiningGame;
+        public bool IsJoiningGame
+        {
+            get { return _isJoiningGame; }
+            set { SetProp(ref _isJoiningGame, value); }
         }
 
         SecureString _loginPassword;
@@ -207,14 +290,24 @@ namespace AccessBattle.Wpf.ViewModel
         {
             get
             {
-                return new RelayCommand(o =>
+                return new RelayCommand(async o =>
                 {
-
+                    IsCreatingGame = true;
+                    await Task.Delay(1000);
+                    var result = await ParentViewModel.NetworkClient.CreateGame(NewGameText);
+                    if (result != null && result.Name == NewGameText)
+                    {
+                        ParentViewModel.CurrentMenu = MenuType.WaitForOpponent;
+                        // TODO: Should be cancelled after 60s if no one joines
+                        // TODO: The timer for polling the game list is still running
+                    }
+                    IsCreatingGame = false;
                 }, o =>
                 {
                     return
+                    !string.IsNullOrEmpty(NewGameText) &&
                     ParentViewModel.NetworkClient.IsLoggedIn == true &&
-                    !IsConnecting && !IsLoggingIn;
+                    !IsConnecting && !IsLoggingIn && !IsCreatingGame && !IsJoiningGame;
                 });
             }
         }
@@ -225,13 +318,15 @@ namespace AccessBattle.Wpf.ViewModel
             {
                 return new RelayCommand(o =>
                 {
-
+                    var uid = SelectedGame?.UID;
+                    if (uid == null) return;
+                    ParentViewModel.NetworkClient.RequestJoinGame(uid.Value);
                 }, o =>
                 {
                     return
                         ParentViewModel.NetworkClient.IsLoggedIn == true &&
                         ParentViewModel.NetworkClient.IsJoined == false &&
-                        !IsConnecting && !IsLoggingIn;
+                        !IsConnecting && !IsLoggingIn && SelectedGame != null && !IsCreatingGame && !IsJoiningGame;
                 });
             }
         }
@@ -242,8 +337,44 @@ namespace AccessBattle.Wpf.ViewModel
             {
                 return new RelayCommand(o =>
                 {
+                    ParentViewModel.NetworkClient.Disconnect();
                     ParentViewModel.CurrentMenu = MenuType.Welcome;
-                }, o => !IsConnecting && !IsLoggingIn);
+                }, o => !IsConnecting && !IsLoggingIn && !IsCreatingGame && !IsJoiningGame);
+            }
+        }
+
+        bool _sendingLogin;
+        public ICommand LoginCommand
+        {
+            get
+            {
+                return new RelayCommand(async o =>
+                {
+                    _sendingLogin = true;
+                    CommandManager.InvalidateRequerySuggested();
+                    var result = await ParentViewModel.NetworkClient.Login(LoginName, LoginPassword.ConvertToUnsecureString());
+                    _sendingLogin = false;
+                    if (result)
+                    {
+                        IsLoggingIn = false;
+                        _gameListUpdateTimer.Change(0, System.Threading.Timeout.Infinite);
+                    }
+                    CommandManager.InvalidateRequerySuggested();
+                }, o => !string.IsNullOrEmpty(LoginName) && IsLoggingIn && ParentViewModel.NetworkClient.IsConnected == true && !_sendingLogin);
+            }
+        }
+
+        public ICommand CancelLoginCommand
+        {
+            get
+            {
+                return new RelayCommand(o =>
+                {
+                    IsLoggingIn = false;
+                    ParentViewModel.NetworkClient.Disconnect();
+                    OnPropertyChanged(nameof(CanConnect));
+                    CommandManager.InvalidateRequerySuggested();
+                }, o => !_sendingLogin);
             }
         }
 

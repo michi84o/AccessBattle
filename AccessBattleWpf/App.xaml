@@ -82,8 +82,8 @@
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter TargetName="Border" Property="Background" Value="Black"/>
-                                <Setter TargetName="Border" Property="BorderBrush" Value="Black"/>
-                                <Setter Property="Foreground" Value="DarkGray"/>
+                                <Setter TargetName="Border" Property="BorderBrush" Value="#505050"/>
+                                <Setter Property="Foreground" Value="#505050"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -114,8 +114,8 @@
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter TargetName="Border" Property="Background" Value="Black"/>
-                                <Setter TargetName="Border" Property="BorderBrush" Value="Black"/>
-                                <Setter Property="Foreground" Value="DarkGray"/>
+                                <Setter TargetName="Border" Property="BorderBrush" Value="#505050"/>
+                                <Setter Property="Foreground" Value="#505050"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>

@@ -57,15 +57,27 @@
     <Compile Include="Converters\BoolVisibilityConverter.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Interfaces\IMenuHolder.cs" />
+    <Compile Include="ViewModel\AcceptJoinMenuViewModel.cs" />
     <Compile Include="ViewModel\MenuViewModelBase.cs" />
     <Compile Include="ViewModel\NetworkGameMenuViewModel.cs" />
+    <Compile Include="ViewModel\WaitForJoinMenuViewModel.cs" />
     <Compile Include="ViewModel\WelcomeMenuViewModel.cs" />
+    <Compile Include="View\AcceptJoinMenu.xaml.cs">
+      <DependentUpon>AcceptJoinMenu.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\NetworkGameMenu.xaml.cs">
       <DependentUpon>NetworkGameMenu.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\WaitForJoinMenu.xaml.cs">
+      <DependentUpon>WaitForJoinMenu.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\WelcomeMenu.xaml.cs">
       <DependentUpon>WelcomeMenu.xaml</DependentUpon>
     </Compile>
+    <Page Include="View\AcceptJoinMenu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\BoardFieldView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -98,6 +110,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="View\NetworkGameMenu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\WaitForJoinMenu.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

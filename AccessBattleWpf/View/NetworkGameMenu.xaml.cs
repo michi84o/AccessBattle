@@ -33,5 +33,16 @@ namespace AccessBattle.Wpf.View
             if (dc == null || box ==null) return;
             dc.LoginPassword = box.SecurePassword;
         }
+
+        void TextBox_KeyUp(object sender, KeyEventArgs e)
+        {
+            var dc = DataContext as NetworkGameMenuViewModel;
+            if (dc == null) return;
+            if (e.Key == Key.Enter)
+            {
+                if (dc.LoginCommand.CanExecute(null))
+                    dc.LoginCommand.Execute(null);
+            }
+        }
     }
 }

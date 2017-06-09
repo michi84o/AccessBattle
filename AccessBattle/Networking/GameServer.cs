@@ -50,7 +50,7 @@ using System.Threading.Tasks;
  *  TODO: Lock Access to Game list
  *
  *  TODO: Behavior when user logs in with serveral client instances. Also reconnect behavior.
- *
+ *  TODO: Cleanup game list if a player creates a game and disconnects
  */
 namespace AccessBattle.Networking
 {
@@ -364,11 +364,11 @@ namespace AccessBattle.Networking
                     try
                     {
                         var login = JsonConvert.DeserializeObject<Login>(Encoding.ASCII.GetString(data));
-                        if (login != null && login.Name.Length > 0)
+                        if (login?.Name?.Length > 0)
                         {
-                            player.Name = login.Name;
+                            player.Name = login.Name.ToUpper();
                             player.IsLoggedIn = true;
-                            Log.WriteLine("GameServer: Player " + (login.Name ?? "?") + " (" +player.UID + ") logged in successfully!");
+                            Log.WriteLine("GameServer: Player " + (player.Name ?? "?") + " (" + player.UID + ") logged in successfully!");
                             // TODO Check AcceptAnyClient variable and compare with whitelist
                             Send(new byte[] { 0 }, NetworkPacketType.ClientLogin, player.Connection, player.ClientCrypto);
                         }
@@ -386,15 +386,15 @@ namespace AccessBattle.Networking
                         var ginfo = JsonConvert.DeserializeObject<GameInfo>(Encoding.ASCII.GetString(data));
                         if (ginfo != null)
                         {
-                            Log.WriteLine("GameServer: Received CreateGame packet from player " + player.UID + ": [" + ginfo.Name + "/" + ginfo.UID + "/" + ginfo.Player1 + "]");
+                            Log.WriteLine("GameServer: Received CreateGame packet from player " + player.UID + ": [" + ginfo.Name.ToUpper() + "/" + ginfo.UID + "/" + ginfo.Player1.ToUpper() + "]");
                             uint uid;
                             lock (Games)
                             {
                                 while (Games.ContainsKey((uid = GetUid()))) { }
                                 var game = new NetworkGame(uid);
                                 game.Players[0].Player = player;
-                                game.Players[0].Name = ginfo.Player1;
-                                game.Name = ginfo.Name;
+                                game.Players[0].Name = player.Name; // Ignore name from packet or people start faking names
+                                game.Name = ginfo.Name.ToUpper();
                                 Games.Add(uid, game);
                                 player.CurrentGame = game;
                             }
