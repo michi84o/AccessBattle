@@ -34,17 +34,17 @@ namespace AccessBattle.Wpf.ViewModel
             _gamesView.Filter += GamesView_Filter;
 
             WeakEventManager<NetworkGameClient, ServerInfoEventArgs>.AddHandler(
-                parent.NetworkClient, nameof(parent.NetworkClient.ServerInfoReceived), ServerInfoReceivedHandler);
+                parent.Model.Client, nameof(parent.Model.Client.ServerInfoReceived), ServerInfoReceivedHandler);
 
             WeakEventManager<NetworkGameClient, GameJoinRequestedEventArgs>.AddHandler(
-                parent.NetworkClient, nameof(parent.NetworkClient.GameJoinRequested), JoinRequestedHandler);
+                parent.Model.Client, nameof(parent.Model.Client.GameJoinRequested), JoinRequestedHandler);
 
             _gameListUpdateTimer = new System.Threading.Timer(new System.Threading.TimerCallback(UpdateGameList));
         }
 
         public override void Activate()
         {
-            var client = ParentViewModel.NetworkClient;
+            var client = ParentViewModel.Model.Client;
             if (client.IsConnected == true && client.IsLoggedIn == true
                 && !(client.IsJoined == true))
             {
@@ -59,7 +59,17 @@ namespace AccessBattle.Wpf.ViewModel
 
         void JoinRequestedHandler(object sender, GameJoinRequestedEventArgs args)
         {
-            //args.Message.
+            if (!IsJoiningGame || args.Message.UID != SelectedGame?.UID) return;
+
+            IsJoiningGame = false;
+
+            if (args.Message.Request == 3)
+            {
+                ParentViewModel.Model.Client.ConfirmJoin(args.Message.UID, true);
+                ParentViewModel.Model.IsPlayerHost = false;
+                ParentViewModel.Model.UID = args.Message.UID;
+                // TODO: Init Game
+            }
         }
 
         void UpdateGameList(object state)
@@ -73,11 +83,11 @@ namespace AccessBattle.Wpf.ViewModel
                 System.Windows.Threading.DispatcherPriority.Background,
                 (Action)(async () =>
                 {
-                    var client = ParentViewModel.NetworkClient;
+                    var client = ParentViewModel.Model.Client;
                     if (client.IsConnected == true && client.IsLoggedIn == true
                         && !(client.IsJoined==true))
                     {
-                        var list = await ParentViewModel.NetworkClient.RequestGameList();
+                        var list = await ParentViewModel.Model.Client.RequestGameList();
 
                         // Remove games that don't exist anymore
                         var games = Games.ToList();
@@ -219,7 +229,7 @@ namespace AccessBattle.Wpf.ViewModel
 
         public bool CanConnect
         {
-            get { return SettingsValid && ParentViewModel.NetworkClient.IsConnected == false && !IsConnecting && !IsLoggingIn; }
+            get { return SettingsValid && ParentViewModel.Model.Client.IsConnected == false && !IsConnecting && !IsLoggingIn; }
         }
 
         string _ipAddress = "127.0.0.1";
@@ -230,7 +240,7 @@ namespace AccessBattle.Wpf.ViewModel
             {
                 if (SetProp(ref _ipAddress, value))
                 {
-                    ParentViewModel.NetworkClient.Disconnect();
+                    ParentViewModel.Model.Client.Disconnect();
                     Games.Clear();
                     OnPropertyChanged(nameof(SettingsValid));
                     OnPropertyChanged(nameof(CanConnect));
@@ -246,7 +256,7 @@ namespace AccessBattle.Wpf.ViewModel
             {
                 if (SetProp(ref _port, value))
                 {
-                    ParentViewModel.NetworkClient.Disconnect();
+                    ParentViewModel.Model.Client.Disconnect();
                     Games.Clear();
                     OnPropertyChanged(nameof(SettingsValid));
                     OnPropertyChanged(nameof(CanConnect));
@@ -279,7 +289,7 @@ namespace AccessBattle.Wpf.ViewModel
             new RelayCommand(async o =>
             {
                 IsConnecting = true;
-                var result = await ParentViewModel.NetworkClient.Connect(IpAddress, Port);
+                var result = await ParentViewModel.Model.Client.Connect(IpAddress, Port);
                 IsConnecting = false;
                 IsLoggingIn = true;
                 CommandManager.InvalidateRequerySuggested();
@@ -293,11 +303,13 @@ namespace AccessBattle.Wpf.ViewModel
                 return new RelayCommand(async o =>
                 {
                     IsCreatingGame = true;
-                    await Task.Delay(1000);
-                    var result = await ParentViewModel.NetworkClient.CreateGame(NewGameText);
+                    var result = await ParentViewModel.Model.Client.CreateGame(NewGameText);
                     if (result != null && result.Name == NewGameText)
                     {
-                        ParentViewModel.CurrentMenu = MenuType.WaitForOpponent;
+                        //ParentViewModel.Model.Client.RegisterGame(ParentViewModel.Game, result);
+                        ParentViewModel.CurrentMenu = MenuType.WaitForJoin;
+                        ParentViewModel.Model.IsPlayerHost = true;
+                        ParentViewModel.Model.UID = result.UID;
                         // TODO: Should be cancelled after 60s if no one joines
                         // TODO: The timer for polling the game list is still running
                     }
@@ -306,7 +318,7 @@ namespace AccessBattle.Wpf.ViewModel
                 {
                     return
                     !string.IsNullOrEmpty(NewGameText) &&
-                    ParentViewModel.NetworkClient.IsLoggedIn == true &&
+                    ParentViewModel.Model.Client.IsLoggedIn == true &&
                     !IsConnecting && !IsLoggingIn && !IsCreatingGame && !IsJoiningGame;
                 });
             }
@@ -320,12 +332,13 @@ namespace AccessBattle.Wpf.ViewModel
                 {
                     var uid = SelectedGame?.UID;
                     if (uid == null) return;
-                    ParentViewModel.NetworkClient.RequestJoinGame(uid.Value);
+                    IsJoiningGame = true;
+                    ParentViewModel.Model.Client.RequestJoinGame(uid.Value);
                 }, o =>
                 {
                     return
-                        ParentViewModel.NetworkClient.IsLoggedIn == true &&
-                        ParentViewModel.NetworkClient.IsJoined == false &&
+                        ParentViewModel.Model.Client.IsLoggedIn == true &&
+                        ParentViewModel.Model.Client.IsJoined == false &&
                         !IsConnecting && !IsLoggingIn && SelectedGame != null && !IsCreatingGame && !IsJoiningGame;
                 });
             }
@@ -337,7 +350,7 @@ namespace AccessBattle.Wpf.ViewModel
             {
                 return new RelayCommand(o =>
                 {
-                    ParentViewModel.NetworkClient.Disconnect();
+                    ParentViewModel.Model.Client.Disconnect();
                     ParentViewModel.CurrentMenu = MenuType.Welcome;
                 }, o => !IsConnecting && !IsLoggingIn && !IsCreatingGame && !IsJoiningGame);
             }
@@ -352,7 +365,7 @@ namespace AccessBattle.Wpf.ViewModel
                 {
                     _sendingLogin = true;
                     CommandManager.InvalidateRequerySuggested();
-                    var result = await ParentViewModel.NetworkClient.Login(LoginName, LoginPassword.ConvertToUnsecureString());
+                    var result = await ParentViewModel.Model.Client.Login(LoginName, LoginPassword.ConvertToUnsecureString());
                     _sendingLogin = false;
                     if (result)
                     {
@@ -360,7 +373,7 @@ namespace AccessBattle.Wpf.ViewModel
                         _gameListUpdateTimer.Change(0, System.Threading.Timeout.Infinite);
                     }
                     CommandManager.InvalidateRequerySuggested();
-                }, o => !string.IsNullOrEmpty(LoginName) && IsLoggingIn && ParentViewModel.NetworkClient.IsConnected == true && !_sendingLogin);
+                }, o => !string.IsNullOrEmpty(LoginName) && IsLoggingIn && ParentViewModel.Model.Client.IsConnected == true && !_sendingLogin);
             }
         }
 
@@ -371,7 +384,7 @@ namespace AccessBattle.Wpf.ViewModel
                 return new RelayCommand(o =>
                 {
                     IsLoggingIn = false;
-                    ParentViewModel.NetworkClient.Disconnect();
+                    ParentViewModel.Model.Client.Disconnect();
                     OnPropertyChanged(nameof(CanConnect));
                     CommandManager.InvalidateRequerySuggested();
                 }, o => !_sendingLogin);

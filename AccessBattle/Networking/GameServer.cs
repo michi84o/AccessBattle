@@ -243,21 +243,21 @@ namespace AccessBattle.Networking
                 }
                 else if (e.BytesTransferred > 0)
                 {
-                    Log.WriteLine("GameServer: Received data from client, UID: " + e.UserToken);
+                    //Log.WriteLine("GameServer: Received data from client, UID: " + e.UserToken);
                     if (!Players.TryGetValue((uint)e.UserToken, out player))
                     {
                         Log.WriteLine("GameServer: Client with UID " + e.UserToken + " does not exist");
                         return;
                     }
                     // Process the packet ======================================
-                    Log.WriteLine("GameServer: Received " + e.BytesTransferred + " bytes of data");
+                    //Log.WriteLine("GameServer: Received " + e.BytesTransferred + " bytes of data");
                     player.ReceiveBuffer.Add(e.Buffer, 0, e.BytesTransferred);
-                    Log.WriteLine("GameServer: Receive buffer of player " + e.UserToken + " has now " + player.ReceiveBuffer.Length + " bytes of data");
+                    //Log.WriteLine("GameServer: Receive buffer of player " + e.UserToken + " has now " + player.ReceiveBuffer.Length + " bytes of data");
                     byte[] packData;
                     while (player.ReceiveBuffer.Take(NetworkPacket.STX, NetworkPacket.ETX, out packData))
                     {
-                        Log.WriteLine("GameServer: Received full packet");
-                        Log.WriteLine("GameServer: Receive buffer of player " + e.UserToken + " has now " + player.ReceiveBuffer.Length + " bytes of data");
+                        //Log.WriteLine("GameServer: Received full packet");
+                        //Log.WriteLine("GameServer: Receive buffer of player " + e.UserToken + " has now " + player.ReceiveBuffer.Length + " bytes of data");
                         var packet = NetworkPacket.FromByteArray(packData);
                         if (packet != null)
                         {

@@ -116,9 +116,9 @@ namespace AccessBattle.Networking
             var endIndex = -1;
 
             // Cases:
-            // 1: _start < _next  ...S....N.. 
+            // 1: _start < _next  ...S....N..
             // 2: _start = _next  ...X....... (when buffer is full)
-            // 3: _start > _next  ...N....S.. 
+            // 3: _start > _next  ...N....S..
 
             var requiredBytes = 1;
 

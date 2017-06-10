@@ -14,13 +14,12 @@ namespace AccessBattle.Wpf.ViewModel
 {
     public class MainWindowViewModel : PropChangeNotifier, IMenuHolder
     {
-        GameModel _model;
+        GameModel _model = new GameModel();
 
-        NetworkGameClient _networkClient = new NetworkGameClient();
-        public NetworkGameClient NetworkClient
-        {
-            get { return _networkClient; }
-        }
+        public GameModel Model => _model;
+
+        //public NetworkGameClient NetworkClient => _model.Client;
+        //public Game Game => _model.Game;
 
         public bool IsPlayerHost
         {
@@ -59,7 +58,7 @@ namespace AccessBattle.Wpf.ViewModel
                 {
                     case MenuType.None: return null;
                     case MenuType.NetworkGame: return _networkGameVm;
-                    case MenuType.WaitForOpponent: return _waitForJoinVm;
+                    case MenuType.WaitForJoin: return _waitForJoinVm;
                     case MenuType.AcceptJoin: return _acceptJoinVm;
                     case MenuType.Welcome:
                     default: return _welcomeVm;
@@ -84,7 +83,6 @@ namespace AccessBattle.Wpf.ViewModel
 
         public MainWindowViewModel()
         {
-            _model = new GameModel();
             _model.PropertyChanged += _model_PropertyChanged;
 
             // Menu view models
@@ -123,8 +121,6 @@ namespace AccessBattle.Wpf.ViewModel
             }
         }
 
-
-
         public ICommand ActionsCommand
         {
             get
@@ -138,5 +134,7 @@ namespace AccessBattle.Wpf.ViewModel
                 });
             }
         }
+
+
     }
 }

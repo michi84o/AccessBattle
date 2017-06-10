@@ -105,6 +105,26 @@ namespace AccessBattle.Networking
     }
 
     /// <summary>
+    /// Args for game synchronization.
+    /// </summary>
+    public class GameSyncEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Game sync packet.
+        /// </summary>
+        public GameSync Sync { get; private set; }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="sync"></param>
+        public GameSyncEventArgs(GameSync sync)
+        {
+            Sync = sync;
+        }
+    }
+
+    /// <summary>
     /// Class for network clients. Used for communication with the server.
     /// </summary>
     public class NetworkGameClient : NetworkBase
@@ -122,6 +142,8 @@ namespace AccessBattle.Networking
         public event EventHandler<LoggedInEventArgs> LoggedIn;
         /// <summary>Received server info. This normally happens during connect.</summary>
         public event EventHandler<ServerInfoEventArgs> ServerInfoReceived;
+        /// <summary>Received game synchronization packet.</summary>
+        public event EventHandler<GameSyncEventArgs> GameSyncReceived;
 
         bool? _serverRequiresLogin;
         /// <summary>
@@ -405,8 +427,6 @@ namespace AccessBattle.Networking
                 finally { GameCreated -= handler; }
             }
 
-            // Do not set Game UID here.
-            // It is better if the client program sets the UID after checking the game info.
             return result?.GameInfo;
         }
 

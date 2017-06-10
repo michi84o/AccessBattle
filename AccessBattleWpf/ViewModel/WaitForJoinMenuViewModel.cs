@@ -17,7 +17,7 @@ namespace AccessBattle.Wpf.ViewModel
             IMenuHolder parent) : base(parent)
         {
             WeakEventManager<NetworkGameClient, GameJoinRequestedEventArgs>.AddHandler(
-                parent.NetworkClient, nameof(parent.NetworkClient.GameJoinRequested), JoinRequestedHandler);
+                parent.Model.Client, nameof(parent.Model.Client.GameJoinRequested), JoinRequestedHandler);
 
             _canCancel = true;
         }
@@ -32,13 +32,12 @@ namespace AccessBattle.Wpf.ViewModel
 
         }
 
-
-
         void JoinRequestedHandler(object sender, GameJoinRequestedEventArgs args)
         {
             // Might be in network menu and creating a new game
-            if (ParentViewModel.CurrentMenu != MenuType.WaitForOpponent) return;
+            if (ParentViewModel.CurrentMenu != MenuType.WaitForJoin) return;
 
+            ParentViewModel.CurrentMenu = MenuType.AcceptJoin;
         }
 
         bool _canCancel;
@@ -55,7 +54,7 @@ namespace AccessBattle.Wpf.ViewModel
                 return new RelayCommand(o =>
                 {
                     // TODO: Send a abort game packet
-                    ParentViewModel.NetworkClient.Disconnect();
+                    ParentViewModel.Model.Client.Disconnect();
                     ParentViewModel.CurrentMenu = MenuType.NetworkGame;
                 }, o => CanCancel);
             }

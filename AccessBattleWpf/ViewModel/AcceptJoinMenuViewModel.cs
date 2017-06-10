@@ -17,7 +17,7 @@ namespace AccessBattle.Wpf.ViewModel
             IMenuHolder parent) : base(parent)
         {
             WeakEventManager<NetworkGameClient, GameJoinRequestedEventArgs>.AddHandler(
-               parent.NetworkClient, nameof(parent.NetworkClient.GameJoinRequested), JoinRequestedHandler);
+               parent.Model.Client, nameof(parent.Model.Client.GameJoinRequested), JoinRequestedHandler);
         }
 
         public override void Activate()
@@ -30,29 +30,28 @@ namespace AccessBattle.Wpf.ViewModel
 
         }
 
-        // TODO: Add handling for multiple received join messages
-        JoinMessage _currentJoinMessage;
+        List<JoinMessage> _joinMessages = new List<JoinMessage>();
 
         public string CurrentJoiningPlayer
-        {
-            get { return _currentJoinMessage?.JoiningUser; }
-        }
+            => _joinMessages.Count > 0 ? _joinMessages[0]?.JoiningUser : "";
+        public JoinMessage CurrentJoinMessage => _joinMessages.Count > 0 ? _joinMessages[0] : null;
 
         void JoinRequestedHandler(object sender, GameJoinRequestedEventArgs args)
         {
             // Might be in network menu and creating a new game
-            if (ParentViewModel.CurrentMenu != MenuType.WaitForOpponent) return;
+            if (ParentViewModel.CurrentMenu != MenuType.WaitForJoin &&
+                ParentViewModel.CurrentMenu != MenuType.AcceptJoin) return;
 
-            if (_currentJoinMessage != null) return; // ignore new message for now
-            _currentJoinMessage = args.Message;
+            // Wrong game (TODO: test if this can happen)
+            if (args.Message.UID != ParentViewModel.Model.UID)
+            {
+                ParentViewModel.Model.Client.ConfirmJoin(args.Message.UID, false);
+                return;
+            }
+
+            _joinMessages.Add(args.Message);
             OnPropertyChanged(nameof(CurrentJoiningPlayer));
-        }
-
-        string _joiningPlayer;
-        string JoiningPlayer
-        {
-            get { return _joiningPlayer; }
-            set { SetProp(ref _joiningPlayer, value); }
+            OnPropertyChanged(nameof(CurrentJoinMessage));
         }
 
         public ICommand AcceptCommand
@@ -61,8 +60,8 @@ namespace AccessBattle.Wpf.ViewModel
             {
                 return new RelayCommand(o =>
                 {
-                    // Depends what we are doing
-                    // TODO
+                    ParentViewModel.Model.Client.ConfirmJoin(ParentViewModel.Model.UID, true);
+                    // TODO: Init game
                 }, o => true);
             }
         }
@@ -73,8 +72,7 @@ namespace AccessBattle.Wpf.ViewModel
             {
                 return new RelayCommand(o =>
                 {
-                    // Depends what we are doing
-                    // TODO
+                    ParentViewModel.Model.Client.ConfirmJoin(ParentViewModel.Model.UID, false);
                 }, o => true);
             }
         }

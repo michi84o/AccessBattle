@@ -11,8 +11,11 @@ a very stupid AI. The final game will be playable over network.
 
 - Estimated completion: End of August 2017
 - Current Status and next steps:
-  - [x] Create and join games over server
+  - [x] Create and join games over server (only library functions)
   - [ ] UI rewrite (WIP)
+    - [x] Display Board and cards
+	- [ ] Menus (WIP)
+	- [ ] Player interaction	
   - [ ] Synchronize game data between clients (WIP)
   - [ ] Game logic rewrite
 
