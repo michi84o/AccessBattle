@@ -6,6 +6,21 @@ using System.Threading.Tasks;
 
 namespace AccessBattle.Networking.Packets
 {
+    /// <summary>Types of join requests.</summary>
+    public enum JoinRequestType
+    {
+        /// <summary>Request to join game (P2 -> Server)</summary>
+        Join            = 0,
+        /// <summary> Error, join not possible (Server -> P2)</summary>
+        Error           = 1,
+        /// <summary>Request to accept join (Server -> P1)</summary>
+        RequestAccept   = 2,
+        /// <summary>Accept join (P1 -> Server -> P2) (P2 -> Server)</summary>
+        Accept          = 3,
+        /// <summary>Decline join (P1 -> Server -> P2)</summary>
+        Decline         = 4,
+    }
+
     /// <summary>
     /// Message for joining a game.
     /// </summary>
@@ -17,14 +32,9 @@ namespace AccessBattle.Networking.Packets
         public uint UID { get; set; }
 
         /// <summary>
-        /// Request type:
-        /// 0 - Request to join game (P2 -> Server)
-        /// 1 - Error, join not possible (Server -> P2)
-        /// 2 - Request to accept join (Server -> P1)
-        /// 3 - Accept join (P1 -> Server -> P2) (P2 -> Server)
-        /// 4 - Decline join (P1 -> Server -> P2)
+        /// Join Request
         /// </summary>
-        public int Request { get; set; }
+        public JoinRequestType Request { get; set; }
 
         /// <summary>
         /// User that is joining. Only used when Request is 2.

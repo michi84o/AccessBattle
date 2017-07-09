@@ -462,6 +462,14 @@ namespace AccessBattle.Networking
         }
 
         /// <summary>
+        /// Sets IsJoined to false.
+        /// </summary>
+        public void ResetJoinState()
+        {
+            IsJoined = false;
+        }
+
+        /// <summary>
         /// Used to accept and confirm a join. Used by both players.
         /// </summary>
         /// <param name="uid">UID of game.</param>
@@ -471,9 +479,9 @@ namespace AccessBattle.Networking
         {
             try
             {
-                var req = new JoinMessage { UID = uid, Request = accept ? 3 : 4 };
-                IsJoined = Send(JsonConvert.SerializeObject(req), NetworkPacketType.JoinGame);
-                return IsJoined == true;
+                var req = new JoinMessage { UID = uid, Request = accept ? JoinRequestType.Accept : JoinRequestType.Decline };
+                IsJoined = Send(JsonConvert.SerializeObject(req), NetworkPacketType.JoinGame) && accept;
+                return IsJoined == accept;
             }
             catch (Exception e)
             {
@@ -632,6 +640,8 @@ namespace AccessBattle.Networking
                             var handler = GameJoinRequested;
                             if (handler != null)
                                 handler(this, new GameJoinRequestedEventArgs(jMsg));
+
+                            // TODO if joining and other side declined then set IsJoined to false
                         }
                     }
                     catch (Exception e)

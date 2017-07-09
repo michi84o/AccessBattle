@@ -64,13 +64,24 @@ namespace AccessBattle.Wpf.ViewModel
             IsJoiningGame = false;
             _joiningGame = null;
 
-            if (args.Message.Request == 3)
+            if (args.Message.Request == JoinRequestType.Accept)
             {
                 ParentViewModel.Model.Client.ConfirmJoin(args.Message.UID, true);
                 ParentViewModel.Model.IsPlayerHost = false;
                 ParentViewModel.Model.UID = args.Message.UID;
                 // TODO: Init Game
                 MessageBox.Show("TODO: INIT GAME");
+            }
+            else if (args.Message.Request == JoinRequestType.Decline) // Declined
+            {
+                _joiningGame = null;
+                IsJoiningGame = false;
+                ParentViewModel.Model.Client.ResetJoinState(); // TODO: Client must be able to handle this internally
+            }
+            else
+            {
+                // TODO
+                MessageBox.Show("TODO: UNHANDLED JOIN REQUEST");
             }
         }
 

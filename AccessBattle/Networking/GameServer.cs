@@ -420,7 +420,7 @@ namespace AccessBattle.Networking
                         if (GetGameAndPlayers(jMsg.UID, out game, out p1, out p2))
                         {
                             // Check type of messagae
-                            if (jMsg.Request == 0) // Request to join game
+                            if (jMsg.Request == JoinRequestType.Join)
                             {
                                 var reqOK = false;
                                 if (game.BeginJoinPlayer(player))
@@ -428,23 +428,23 @@ namespace AccessBattle.Networking
                                     if (p1 != null && player != p1) // Cannot request to join own game!
                                     {
                                         var p1Req = new JoinMessage
-                                        { UID = game.UID, Request = 2, JoiningUser = player.Name };
+                                        { UID = game.UID, Request = JoinRequestType.RequestAccept, JoiningUser = player.Name };
                                         Send(JsonConvert.SerializeObject(p1Req), NetworkPacketType.JoinGame, p1.Connection, p1.ClientCrypto);
                                         reqOK = true;
                                     }
                                 }
                                 if (!reqOK) // Error while joining
                                 {
-                                    var p2Err = new JoinMessage { UID = game.UID, Request = 1 };
+                                    var p2Err = new JoinMessage { UID = game.UID, Request = JoinRequestType.Error };
                                     Send(JsonConvert.SerializeObject(p2Err), NetworkPacketType.JoinGame, player.Connection, player.ClientCrypto);
                                 }
                             }
-                            else if (jMsg.Request == 3) // Join Accept
+                            else if (jMsg.Request == JoinRequestType.Accept)
                             {
                                 if (player == p1)
                                 {
                                     // Notify p2
-                                    var p2Answ = new JoinMessage { UID = game.UID, Request = 3 };
+                                    var p2Answ = new JoinMessage { UID = game.UID, Request = JoinRequestType.Accept };
                                     Send(JsonConvert.SerializeObject(p2Answ), NetworkPacketType.JoinGame, p2.Connection, p2.ClientCrypto);
                                 }
                                 else if (player == p2)
@@ -455,13 +455,13 @@ namespace AccessBattle.Networking
                                     }
                                 }
                             }
-                            else if (jMsg.Request == 4) // Join Declined
+                            else if (jMsg.Request == JoinRequestType.Decline)
                             {
                                 if (player == p1)
                                 {
                                     // Notify p2
-                                    var p2Answ = new JoinMessage { UID = game.UID, Request = 4 };
-                                    Send(JsonConvert.SerializeObject(p2Answ), NetworkPacketType.JoinGame, player.Connection, player.ClientCrypto);
+                                    var p2Answ = new JoinMessage { UID = game.UID, Request = JoinRequestType.Decline };
+                                    Send(JsonConvert.SerializeObject(p2Answ), NetworkPacketType.JoinGame, p2.Connection, p2.ClientCrypto);
                                 }
                                 else if (player == p2)
                                 {
