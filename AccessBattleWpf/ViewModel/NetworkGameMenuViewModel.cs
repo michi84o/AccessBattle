@@ -59,9 +59,10 @@ namespace AccessBattle.Wpf.ViewModel
 
         void JoinRequestedHandler(object sender, GameJoinRequestedEventArgs args)
         {
-            if (!IsJoiningGame || args.Message.UID != SelectedGame?.UID) return;
+            if (!IsJoiningGame || args.Message.UID != _joiningGame?.UID) return;
 
             IsJoiningGame = false;
+            _joiningGame = null;
 
             if (args.Message.Request == 3)
             {
@@ -69,6 +70,7 @@ namespace AccessBattle.Wpf.ViewModel
                 ParentViewModel.Model.IsPlayerHost = false;
                 ParentViewModel.Model.UID = args.Message.UID;
                 // TODO: Init Game
+                MessageBox.Show("TODO: INIT GAME");
             }
         }
 
@@ -85,27 +87,31 @@ namespace AccessBattle.Wpf.ViewModel
                 {
                     var client = ParentViewModel.Model.Client;
                     if (client.IsConnected == true && client.IsLoggedIn == true
-                        && !(client.IsJoined==true))
+                        && !(client.IsJoined == true))
                     {
                         var list = await ParentViewModel.Model.Client.RequestGameList();
 
-                        // Remove games that don't exist anymore
-                        var games = Games.ToList();
-                        foreach (var game in games)
+                        // If server does not answer, list will be null!
+                        if (list != null)
                         {
-                            if (!list.Exists(o => o.UID == game.UID))
-                                Games.Remove(game);
+                            // Remove games that don't exist anymore
+                            var games = Games.ToList();
+                            foreach (var game in games)
+                            {
+                                if (!list.Exists(o => o.UID == game.UID))
+                                    Games.Remove(game);
+                            }
+
+                            games = Games.ToList();
+                            // Remove games from list that are already in Games
+                            list.RemoveAll(o => games.Exists(oo => oo.UID == o.UID));
+
+                            // Add the remaining games
+                            foreach (var game in list)
+                                Games.Add(game);
+
+                            _gamesView.View.Refresh();
                         }
-
-                        games = Games.ToList();
-                        // Remove games from list that are already in Games
-                        list.RemoveAll(o => games.Exists(oo => oo.UID == o.UID));
-
-                        // Add the remaining games
-                        foreach (var game in list)
-                            Games.Add(game);
-
-                        _gamesView.View.Refresh();
 
                         // re-enable timer
                         t.Change(5000, System.Threading.Timeout.Infinite);
@@ -147,11 +153,14 @@ namespace AccessBattle.Wpf.ViewModel
         public ObservableCollection<GameInfo> Games { get; private set; }
 
         GameInfo _selectedGame;
+        /// <summary>Selected game in game list.</summary>
+        /// <remarks>Game gets removed from list if player tries to join!</remarks>
         public GameInfo SelectedGame
         {
             get { return _selectedGame; }
             set { SetProp(ref _selectedGame, value); }
         }
+        GameInfo _joiningGame = null;
 
         public bool CanChangeConnection
         {
@@ -330,8 +339,13 @@ namespace AccessBattle.Wpf.ViewModel
             {
                 return new RelayCommand(o =>
                 {
-                    var uid = SelectedGame?.UID;
-                    if (uid == null) return;
+                    _joiningGame = SelectedGame;
+                    var uid = _joiningGame?.UID;
+                    if (uid == null)
+                    {
+                        _joiningGame = null;
+                        return;
+                    }
                     IsJoiningGame = true;
                     ParentViewModel.Model.Client.RequestJoinGame(uid.Value);
                 }, o =>
