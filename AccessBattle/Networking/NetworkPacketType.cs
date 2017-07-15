@@ -15,8 +15,7 @@
         public const byte GameInit = 0x06;
         public const byte GameStatus = 0x07;
         public const byte GameCommand = 0x08;
-
-        // TODO: Packet for quitting game
+        public const byte ExitGame = 0x09;
 
         /// <summary>Information about server.</summary>
         public const byte ServerInfo = 0xFE;

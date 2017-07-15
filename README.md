@@ -10,6 +10,7 @@ It is still in development. Right now you can play against
 a very stupid AI. The final game will be playable over network.
 
 - Estimated completion: End of August 2017
+  - UPDATE: Due to some private problems, the release might be postponed by one month
 - Current Status and next steps:
   - [x] Create and join games over server (only library functions)
   - [ ] UI rewrite (WIP)

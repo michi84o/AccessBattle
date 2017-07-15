@@ -40,6 +40,7 @@ namespace AccessBattle.Wpf
         Welcome,
         NetworkGame,
         WaitForJoin,
+        WaitForAccept,
         AcceptJoin
     }
 }

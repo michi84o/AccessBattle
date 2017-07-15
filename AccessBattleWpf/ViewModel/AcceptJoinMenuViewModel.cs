@@ -62,6 +62,8 @@ namespace AccessBattle.Wpf.ViewModel
                 {
                     ParentViewModel.Model.Client.ConfirmJoin(ParentViewModel.Model.UID, true);
                     // TODO: Init game
+                    ParentViewModel.CurrentMenu = MenuType.None;
+                    MessageBox.Show("TODO: Init Game (2)");
                 }, o => true);
             }
         }

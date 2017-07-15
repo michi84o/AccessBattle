@@ -53,8 +53,7 @@ namespace AccessBattle.Wpf.ViewModel
             {
                 return new RelayCommand(o =>
                 {
-                    // TODO: Send a abort game packet
-                    ParentViewModel.Model.Client.Disconnect();
+                    ParentViewModel.Model.Client.ExitGame(ParentViewModel.Model.UID);
                     ParentViewModel.CurrentMenu = MenuType.NetworkGame;
                 }, o => CanCancel);
             }

@@ -49,6 +49,7 @@ namespace AccessBattle.Wpf.ViewModel
         NetworkGameMenuViewModel _networkGameVm;
         WaitForJoinMenuViewModel _waitForJoinVm;
         AcceptJoinMenuViewModel _acceptJoinVm;
+        WaitForAcceptMenuViewModel _waitForAccept;
 
         public MenuViewModelBase CurrentMenuViewModel
         {
@@ -60,6 +61,7 @@ namespace AccessBattle.Wpf.ViewModel
                     case MenuType.NetworkGame: return _networkGameVm;
                     case MenuType.WaitForJoin: return _waitForJoinVm;
                     case MenuType.AcceptJoin: return _acceptJoinVm;
+                    case MenuType.WaitForAccept: return _waitForAccept;
                     case MenuType.Welcome:
                     default: return _welcomeVm;
                 }
@@ -90,6 +92,7 @@ namespace AccessBattle.Wpf.ViewModel
             _networkGameVm = new NetworkGameMenuViewModel(this);
             _waitForJoinVm = new WaitForJoinMenuViewModel(this);
             _acceptJoinVm = new AcceptJoinMenuViewModel(this);
+            _waitForAccept = new WaitForAcceptMenuViewModel(this);
 
             CurrentMenu = MenuType.Welcome;
 

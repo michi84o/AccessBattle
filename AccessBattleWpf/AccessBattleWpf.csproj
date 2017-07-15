@@ -60,6 +60,7 @@
     <Compile Include="ViewModel\AcceptJoinMenuViewModel.cs" />
     <Compile Include="ViewModel\MenuViewModelBase.cs" />
     <Compile Include="ViewModel\NetworkGameMenuViewModel.cs" />
+    <Compile Include="ViewModel\WaitForAcceptMenuViewModel.cs" />
     <Compile Include="ViewModel\WaitForJoinMenuViewModel.cs" />
     <Compile Include="ViewModel\WelcomeMenuViewModel.cs" />
     <Compile Include="View\AcceptJoinMenu.xaml.cs">
@@ -67,6 +68,9 @@
     </Compile>
     <Compile Include="View\NetworkGameMenu.xaml.cs">
       <DependentUpon>NetworkGameMenu.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\WaitForAcceptMenu.xaml.cs">
+      <DependentUpon>WaitForAcceptMenu.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\WaitForJoinMenu.xaml.cs">
       <DependentUpon>WaitForJoinMenu.xaml</DependentUpon>
@@ -110,6 +114,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="View\NetworkGameMenu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\WaitForAcceptMenu.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

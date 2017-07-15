@@ -92,5 +92,19 @@ namespace AccessBattle.Networking
             }
             return result;
         }
+
+        /// <summary>
+        /// Lets player exit a game. Game is automatically lost if game was running.
+        /// </summary>
+        /// <param name="player"></param>
+        public void ExitGame(IPlayer player)
+        {
+            if (Phase == GamePhase.Deployment || Phase == GamePhase.PlayerTurns)
+            {
+                if (Players[0]?.Player == player) WinningPlayer = 2;
+                if (Players[1]?.Player == player) WinningPlayer = 1;
+            }
+            Phase = GamePhase.GameOver;
+        }
     }
 }

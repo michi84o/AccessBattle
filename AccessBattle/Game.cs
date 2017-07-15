@@ -65,6 +65,19 @@ namespace AccessBattle
             protected set { SetProp(ref _phase, value); }
         }
 
+        int _winningPlayer;
+        /// <summary>
+        /// If game phase is GameOver then this value shows which player won
+        /// </summary>
+        public int WinningPlayer
+        {
+            get { return _winningPlayer; }
+            set
+            {
+                SetProp(ref _winningPlayer, value);
+            }
+        }
+
         PlayerState[] _players;
         /// <summary>
         /// Player related data.

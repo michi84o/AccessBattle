@@ -70,7 +70,8 @@ namespace AccessBattle.Wpf.ViewModel
                 ParentViewModel.Model.IsPlayerHost = false;
                 ParentViewModel.Model.UID = args.Message.UID;
                 // TODO: Init Game
-                MessageBox.Show("TODO: INIT GAME");
+                ParentViewModel.CurrentMenu = MenuType.None;
+                MessageBox.Show("TODO: INIT GAME (1)");
             }
             else if (args.Message.Request == JoinRequestType.Decline) // Declined
             {
@@ -172,6 +173,7 @@ namespace AccessBattle.Wpf.ViewModel
             set { SetProp(ref _selectedGame, value); }
         }
         GameInfo _joiningGame = null;
+        public GameInfo JoiningGame { get { return _joiningGame; } }
 
         public bool CanChangeConnection
         {
@@ -358,6 +360,7 @@ namespace AccessBattle.Wpf.ViewModel
                         return;
                     }
                     IsJoiningGame = true;
+                    ParentViewModel.CurrentMenu = MenuType.WaitForAccept;
                     ParentViewModel.Model.Client.RequestJoinGame(uid.Value);
                 }, o =>
                 {

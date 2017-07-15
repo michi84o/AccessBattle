@@ -58,6 +58,7 @@
     <Compile Include="Networking\NetworkPacket.cs" />
     <Compile Include="Networking\NetworkPacketType.cs" />
     <Compile Include="Networking\NetworkPlayer.cs" />
+    <Compile Include="Networking\Packets\ExitGame.cs" />
     <Compile Include="Networking\Packets\GameInfo.cs" />
     <Compile Include="Networking\Packets\GameSync.cs" />
     <Compile Include="Networking\Packets\JoinMessage.cs" />

@@ -492,6 +492,25 @@ namespace AccessBattle.Networking
         }
 
         /// <summary>
+        /// Exit a game. If game was active and had not finished, player will loose the game.
+        /// </summary>
+        /// <param name="uid"></param>
+        /// <returns>True if request was sent.</returns>
+        public bool ExitGame(uint uid)
+        {
+            try
+            {
+                var pak = new ExitGame { UID = uid };
+                return Send(JsonConvert.SerializeObject(pak), NetworkPacketType.ExitGame);
+            }
+            catch (Exception e)
+            {
+                Log.WriteLine("NetworkGameClient::ExitGame(): " + e.Message);
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Handler for the ReceiveAsync method.
         /// </summary>
         /// <param name="sender">Sender.</param>
@@ -665,6 +684,17 @@ namespace AccessBattle.Networking
                     catch (Exception e)
                     {
                         Log.WriteLine("NetworkGameClient: Received ServerInfo could not be read." + e.Message);
+                    }
+                    break;
+                case NetworkPacketType.ExitGame:
+                    try
+                    {
+                        var eMsg = JsonConvert.DeserializeObject<ExitGame>(Encoding.ASCII.GetString(data));
+
+                    }
+                    catch (Exception e)
+                    {
+                        Log.WriteLine("NetworkGameClient: Received ExitGame message could not be read." + e.Message);
                     }
                     break;
                 default:

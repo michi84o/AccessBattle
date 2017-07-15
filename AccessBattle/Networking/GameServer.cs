@@ -460,19 +460,55 @@ namespace AccessBattle.Networking
                                 if (player == p1)
                                 {
                                     // Notify p2
-                                    var p2Answ = new JoinMessage { UID = game.UID, Request = JoinRequestType.Decline };
-                                    Send(JsonConvert.SerializeObject(p2Answ), NetworkPacketType.JoinGame, p2.Connection, p2.ClientCrypto);
+                                    if (p2 == null) Log.WriteLine("GameServer: Player " + player.UID + " sent a decline join, but there is no second player!");
+                                    else
+                                    {
+                                        var p2Answ = new JoinMessage { UID = game.UID, Request = JoinRequestType.Decline };
+                                        Send(JsonConvert.SerializeObject(p2Answ), NetworkPacketType.JoinGame, p2.Connection, p2.ClientCrypto);
+                                    }
                                 }
                                 else if (player == p2)
                                 {
                                     game.JoinPlayer(p2, false);
                                 }
+                                // TODO: A player that might have wanted to join could send a decline to cancel the join
                             }
                         }
                     }
                     catch (Exception ex)
                     {
                         Log.WriteLine("GameServer: Received JoinGame packet of player " + player.UID + " could not be read! " + ex.Message);
+                    }
+                    break;
+                case NetworkPacketType.ExitGame:
+                    try
+                    {
+                        var eMsg = JsonConvert.DeserializeObject<ExitGame>(Encoding.ASCII.GetString(data));
+                        if (eMsg != null)
+                        {
+                            NetworkPlayer p1, p2;
+                            NetworkGame game;
+                            if (GetGameAndPlayers(eMsg.UID, out game, out p1, out p2) && (p1 == player || p2 == player))
+                            {
+                                // TODO Store old phase to check if further action is required
+                                game.ExitGame(player);
+
+                                // TODO Unsubscribe from change events
+                                Games.Remove(game.UID);
+
+                                // TODO Notify who has won the game
+
+                                var ans = new ExitGame { UID = game.UID };
+                                if (p1 != null)
+                                    Send(JsonConvert.SerializeObject(ans), NetworkPacketType.ExitGame, p1.Connection, p1.ClientCrypto);
+                                if (p2 != null)
+                                    Send(JsonConvert.SerializeObject(ans), NetworkPacketType.ExitGame, p2.Connection, p2.ClientCrypto);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.WriteLine("GameServer: Received ExitGame packet of player " + player.UID + " could not be read! " + ex.Message);
                     }
                     break;
                 default:

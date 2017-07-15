@@ -41,13 +41,13 @@ namespace AccessBattle.Networking
         /// Used to decrypt data that was received from the player.
         /// </summary>
         public CryptoHelper ServerCrypto { get; private set; }
-                
+
         /// <summary>
         /// Used to encrypt data that is sent to the player.
         /// </summary>
         /// <remarks>
         /// This crypto must be provided by the client and is received later.
-        /// Therefore this property was made read/write. 
+        /// Therefore this property was made read/write.
         /// It should only be written once the key was received.</remarks>
         public CryptoHelper ClientCrypto { get; set; }
 
@@ -76,7 +76,7 @@ namespace AccessBattle.Networking
         public void PlayTurn()
         {
             Log.WriteLine("Network Player with UID " + UID + " requested to play turn");
-            // TODO           
+            // TODO
         }
 
         #region IDisposable
@@ -109,7 +109,7 @@ namespace AccessBattle.Networking
                 ClientCrypto = null;
             }
 
-            // Free any unmanaged objects here.            
+            // Free any unmanaged objects here.
             disposed = true;
         }
         #endregion
