@@ -470,9 +470,12 @@ namespace AccessBattle.Networking
                                 }
                                 else if (player == p2)
                                 {
+                                    // A player that might have wanted to join could send a decline to cancel the join
                                     game.JoinPlayer(p2, false);
+                                    // Notify p1 so that his 'Player Joining' screen gets closed
+                                    var p1Answ = new JoinMessage { UID = game.UID, Request = JoinRequestType.Decline, JoiningUser = p2.Name };
+                                    Send(JsonConvert.SerializeObject(p1Answ), NetworkPacketType.JoinGame, p1.Connection, p1.ClientCrypto);
                                 }
-                                // TODO: A player that might have wanted to join could send a decline to cancel the join
                             }
                         }
                     }

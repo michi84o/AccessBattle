@@ -33,8 +33,27 @@ namespace AccessBattle.Wpf.ViewModel
         List<JoinMessage> _joinMessages = new List<JoinMessage>();
 
         public string CurrentJoiningPlayer
-            => _joinMessages.Count > 0 ? _joinMessages[0]?.JoiningUser : "";
-        public JoinMessage CurrentJoinMessage => _joinMessages.Count > 0 ? _joinMessages[0] : null;
+        {
+            get
+            {
+                if (_joinMessages.Count == 0) return "";
+                string msg;
+                lock (_joinMessages)
+                    msg = _joinMessages.Count > 0 ? _joinMessages[0]?.JoiningUser : "";
+                return msg;
+            }
+        }
+        public JoinMessage CurrentJoinMessage
+        {
+            get
+            {
+                if (_joinMessages.Count == 0) return null;
+                JoinMessage msg;
+                lock (_joinMessages)
+                    msg = _joinMessages.Count > 0 ? _joinMessages[0] : null;
+                return msg;
+            }
+        }
 
         void JoinRequestedHandler(object sender, GameJoinRequestedEventArgs args)
         {
@@ -49,9 +68,23 @@ namespace AccessBattle.Wpf.ViewModel
                 return;
             }
 
-            _joinMessages.Add(args.Message);
+            // Handle decline
+            lock (_joinMessages)
+            {
+                if (args.Message.Request == JoinRequestType.Decline)
+                {
+
+                    _joinMessages.RemoveAll(o => o.JoiningUser == args.Message.JoiningUser);
+                }
+                else
+                {
+                    _joinMessages.Add(args.Message);
+                }
+            }
             OnPropertyChanged(nameof(CurrentJoiningPlayer));
             OnPropertyChanged(nameof(CurrentJoinMessage));
+            if (_joinMessages.Count == 0)
+                ParentViewModel.CurrentMenu = MenuType.WaitForJoin;
         }
 
         public ICommand AcceptCommand
@@ -75,7 +108,15 @@ namespace AccessBattle.Wpf.ViewModel
                 return new RelayCommand(o =>
                 {
                     ParentViewModel.Model.Client.ConfirmJoin(ParentViewModel.Model.UID, false);
-                    ParentViewModel.CurrentMenu = MenuType.WaitForJoin;
+                    lock (_joinMessages)
+                    {
+                        if (_joinMessages.Count > 0)
+                            _joinMessages.RemoveAt(0);
+                    }
+                    OnPropertyChanged(nameof(CurrentJoiningPlayer));
+                    OnPropertyChanged(nameof(CurrentJoinMessage));
+                    if (_joinMessages.Count == 0)
+                        ParentViewModel.CurrentMenu = MenuType.WaitForJoin;
                 }, o => true);
             }
         }

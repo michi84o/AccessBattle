@@ -668,8 +668,9 @@ namespace AccessBattle.Networking
                             if (handler != null)
                                 handler(this, new GameJoinRequestedEventArgs(jMsg));
 
-                            // TODO if joining and other side declined then set IsJoined to false
-                            IsJoined = false;
+                            // If joining and other side declined then set IsJoined to false
+                            if (jMsg.Request == JoinRequestType.Decline)
+                                IsJoined = false;
                         }
                     }
                     catch (Exception e)
