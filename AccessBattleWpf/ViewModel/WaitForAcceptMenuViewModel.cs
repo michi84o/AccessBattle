@@ -18,7 +18,6 @@ namespace AccessBattle.Wpf.ViewModel
         public WaitForAcceptMenuViewModel(
             IMenuHolder parent) : base(parent)
         {
-
         }
 
         public override void Activate()
@@ -37,8 +36,11 @@ namespace AccessBattle.Wpf.ViewModel
             {
                 return new RelayCommand(o =>
                 {
-                    ParentViewModel.Model.Client.ConfirmJoin(ParentViewModel.Model.UID, false);
-                    ParentViewModel.CurrentMenu = MenuType.NetworkGame;
+                    var jg = ParentViewModel.JoiningGame?.UID;
+                    if (jg != null)
+                        ParentViewModel.Model.Client.ConfirmJoin(jg.Value, false);
+                    else
+                        ParentViewModel.CurrentMenu = MenuType.NetworkGame;
                 }, o => true);
             }
         }

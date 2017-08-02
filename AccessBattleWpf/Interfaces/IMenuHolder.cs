@@ -1,4 +1,5 @@
 ﻿using AccessBattle.Networking;
+using AccessBattle.Networking.Packets;
 using AccessBattle.Wpf.Model;
 using System;
 using System.Collections.Generic;
@@ -18,5 +19,6 @@ namespace AccessBattle.Wpf.Interfaces
     {
         MenuType CurrentMenu { get; set; }
         GameModel Model { get; }
+        GameInfo JoiningGame { get; set; }
     }
 }

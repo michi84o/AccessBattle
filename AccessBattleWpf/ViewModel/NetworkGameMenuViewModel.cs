@@ -39,6 +39,10 @@ namespace AccessBattle.Wpf.ViewModel
             WeakEventManager<NetworkGameClient, GameJoinRequestedEventArgs>.AddHandler(
                 parent.Model.Client, nameof(parent.Model.Client.GameJoinRequested), JoinRequestedHandler);
 
+            WeakEventManager<NetworkGameClient, GameJoinRequestedEventArgs>.AddHandler(
+                parent.Model.Client, nameof(parent.Model.Client.ConfirmJoinCalled), ConfirmJoinCalledHandler);
+
+
             _gameListUpdateTimer = new System.Threading.Timer(new System.Threading.TimerCallback(UpdateGameList));
         }
 
@@ -57,12 +61,24 @@ namespace AccessBattle.Wpf.ViewModel
             _gameListUpdateTimer.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
         }
 
+        void ConfirmJoinCalledHandler(object sender, GameJoinRequestedEventArgs args)
+        {
+            if (args.Message.UID != ParentViewModel.JoiningGame?.UID) return;
+
+            // Player pressed the cancel button while waiting for accept
+            if (args.Message.Request == JoinRequestType.Decline
+                && ParentViewModel.CurrentMenu == MenuType.WaitForAccept)
+            {
+                ParentViewModel.JoiningGame = null;
+                ParentViewModel.CurrentMenu = MenuType.NetworkGame;
+            }
+        }
+
         void JoinRequestedHandler(object sender, GameJoinRequestedEventArgs args)
         {
-            if (!IsJoiningGame || args.Message.UID != _joiningGame?.UID) return;
+            if (args.Message.UID != ParentViewModel.JoiningGame?.UID) return;
 
-            IsJoiningGame = false;
-            _joiningGame = null;
+            ParentViewModel.JoiningGame = null;
 
             if (args.Message.Request == JoinRequestType.Accept)
             {
@@ -75,9 +91,9 @@ namespace AccessBattle.Wpf.ViewModel
             }
             else if (args.Message.Request == JoinRequestType.Decline) // Declined
             {
-                _joiningGame = null;
-                IsJoiningGame = false;
-                ParentViewModel.Model.Client.ResetJoinState(); // TODO: Client must be able to handle this internally
+                ParentViewModel.JoiningGame = null;
+
+                ParentViewModel.CurrentMenu = MenuType.NetworkGame;
             }
             else
             {
@@ -172,8 +188,6 @@ namespace AccessBattle.Wpf.ViewModel
             get { return _selectedGame; }
             set { SetProp(ref _selectedGame, value); }
         }
-        GameInfo _joiningGame = null;
-        public GameInfo JoiningGame { get { return _joiningGame; } }
 
         public bool CanChangeConnection
         {
@@ -226,11 +240,9 @@ namespace AccessBattle.Wpf.ViewModel
             set { SetProp(ref _isCreatingGame, value); }
         }
 
-        bool _isJoiningGame;
-        public bool IsJoiningGame
+        bool IsJoiningGame
         {
-            get { return _isJoiningGame; }
-            set { SetProp(ref _isJoiningGame, value); }
+            get { return ParentViewModel.JoiningGame != null; }
         }
 
         SecureString _loginPassword;
@@ -352,14 +364,13 @@ namespace AccessBattle.Wpf.ViewModel
             {
                 return new RelayCommand(o =>
                 {
-                    _joiningGame = SelectedGame;
-                    var uid = _joiningGame?.UID;
+                    ParentViewModel.JoiningGame = SelectedGame;
+                    var uid = ParentViewModel.JoiningGame?.UID;
                     if (uid == null)
                     {
-                        _joiningGame = null;
+                        ParentViewModel.JoiningGame = null;
                         return;
                     }
-                    IsJoiningGame = true;
                     ParentViewModel.CurrentMenu = MenuType.WaitForAccept;
                     ParentViewModel.Model.Client.RequestJoinGame(uid.Value);
                 }, o =>

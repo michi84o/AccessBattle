@@ -144,6 +144,13 @@ namespace AccessBattle.Networking
         public event EventHandler<ServerInfoEventArgs> ServerInfoReceived;
         /// <summary>Received game synchronization packet.</summary>
         public event EventHandler<GameSyncEventArgs> GameSyncReceived;
+        /// <summary>
+        /// The method ConfirmJoin was called. Used for communication between view models.
+        /// The two parameters of ConfirmJoin are encoded in the event args.
+        /// The used uid is stored in UID. The accept parameter is stored as 'Accept' (true) or 'Decline' (false).
+        /// TODO: This is strange design. There might be a more elegant way.
+        /// </summary>
+        public event EventHandler<GameJoinRequestedEventArgs> ConfirmJoinCalled;
 
         bool? _serverRequiresLogin;
         /// <summary>
@@ -461,13 +468,13 @@ namespace AccessBattle.Networking
             }
         }
 
-        /// <summary>
-        /// Sets IsJoined to false.
-        /// </summary>
-        public void ResetJoinState()
-        {
-            IsJoined = false;
-        }
+        ///// <summary>
+        ///// Sets IsJoined to false.
+        ///// </summary>
+        //public void ResetJoinState()
+        //{
+        //    IsJoined = false;
+        //}
 
         /// <summary>
         /// Used to accept and confirm a join. Used by both players.
@@ -481,6 +488,7 @@ namespace AccessBattle.Networking
             {
                 var req = new JoinMessage { UID = uid, Request = accept ? JoinRequestType.Accept : JoinRequestType.Decline };
                 IsJoined = Send(JsonConvert.SerializeObject(req), NetworkPacketType.JoinGame) && accept;
+                ConfirmJoinCalled?.Invoke(this, new GameJoinRequestedEventArgs(new JoinMessage() { UID = uid, Request = accept ? JoinRequestType.Accept : JoinRequestType.Decline }));
                 return IsJoined == accept;
             }
             catch (Exception e)
@@ -661,6 +669,7 @@ namespace AccessBattle.Networking
                                 handler(this, new GameJoinRequestedEventArgs(jMsg));
 
                             // TODO if joining and other side declined then set IsJoined to false
+                            IsJoined = false;
                         }
                     }
                     catch (Exception e)

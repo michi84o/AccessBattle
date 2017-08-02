@@ -75,6 +75,7 @@ namespace AccessBattle.Wpf.ViewModel
                 return new RelayCommand(o =>
                 {
                     ParentViewModel.Model.Client.ConfirmJoin(ParentViewModel.Model.UID, false);
+                    ParentViewModel.CurrentMenu = MenuType.WaitForJoin;
                 }, o => true);
             }
         }

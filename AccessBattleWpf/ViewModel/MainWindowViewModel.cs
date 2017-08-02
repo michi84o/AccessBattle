@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using AccessBattle.Networking;
+using AccessBattle.Networking.Packets;
 
 namespace AccessBattle.Wpf.ViewModel
 {
@@ -138,6 +139,11 @@ namespace AccessBattle.Wpf.ViewModel
             }
         }
 
-
+        GameInfo _joiningGame = null;
+        public GameInfo JoiningGame
+        {
+            get { return _joiningGame; }
+            set { SetProp(ref _joiningGame, value); }
+        }
     }
 }

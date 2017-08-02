@@ -463,6 +463,7 @@ namespace AccessBattle.Networking
                                     if (p2 == null) Log.WriteLine("GameServer: Player " + player.UID + " sent a decline join, but there is no second player!");
                                     else
                                     {
+                                        game.JoinPlayer(p2, false);
                                         var p2Answ = new JoinMessage { UID = game.UID, Request = JoinRequestType.Decline };
                                         Send(JsonConvert.SerializeObject(p2Answ), NetworkPacketType.JoinGame, p2.Connection, p2.ClientCrypto);
                                     }
