@@ -19,9 +19,16 @@ namespace AccessBattle
             set { SetProp(ref _owner, value); }
         }
 
-        //// TODO Not required. Board fields must know which card is on them
-        ///// <summary>Board field this card is currently on.</summary>
-        //public BoardField Location { get; set; }
+        public abstract Sync GetSync();
+
+        public class Sync
+        {
+            public int Owner;
+            public bool IsFaceUp;
+            public bool HasBoost;
+            public OnlineCardType Type;
+            public bool IsFirewall;
+        }
     }
 
     /// <summary>
@@ -72,8 +79,20 @@ namespace AccessBattle
         public static OnlineCardType GetCardType(Card card)
         {
             var c = card as OnlineCard;
-            if (c == null) return OnlineCardType.FaceDown;
+            if (c == null) return OnlineCardType.Unknown;
             return c.Type;
+        }
+
+        public override Sync GetSync()
+        {
+            return new Sync
+            {
+                Owner = Owner.PlayerNumber,
+                HasBoost = HasBoost,
+                IsFaceUp = IsFaceUp,
+                IsFirewall = false,
+                Type = Type
+            };
         }
     }
 
@@ -83,7 +102,7 @@ namespace AccessBattle
     public enum OnlineCardType
     {
         /// <summary>Required to display cards that are face down.</summary>
-        FaceDown,
+        Unknown,
         /// <summary>Link card.</summary>
         Link,
         /// <summary>Virus card.</summary>
@@ -96,6 +115,16 @@ namespace AccessBattle
     /// </summary>
     public class FirewallCard : Card
     {
-
+        public override Sync GetSync()
+        {
+            return new Sync
+            {
+                Owner = Owner.PlayerNumber,
+                HasBoost = false,
+                IsFaceUp = true,
+                IsFirewall = true,
+                Type = OnlineCardType.Unknown
+            };
+        }
     }
 }

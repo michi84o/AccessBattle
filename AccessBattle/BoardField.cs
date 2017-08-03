@@ -35,5 +35,20 @@ namespace AccessBattle
             Y = y;
         }
 
+        public Sync GetSync()
+        {
+            return new Sync
+            {
+                Card = Card?.GetSync(),
+                X = X,
+                Y = Y,
+            };
+        }
+
+        public class Sync
+        {
+            public Card.Sync Card;
+            public ushort X, Y;
+        }
     }
 }

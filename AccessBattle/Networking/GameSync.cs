@@ -12,41 +12,50 @@ namespace AccessBattle.Networking
     public class GameSync
     {
         /// <summary>Game ID.</summary>
-        public int UID { get; set; }
+        public uint UID { get; set; }
         /// <summary>Current game phase.</summary>
         public GamePhase Phase { get; set; }
 
         /// <summary>State of player that created the game.</summary>
-        public PlayerSync Player1 { get; set; }
+        public PlayerState.Sync Player1 { get; set; }
         /// <summary>State of player that joined the game.</summary>
-        public PlayerSync Player2 { get; set; }
+        public PlayerState.Sync Player2 { get; set; }
         /// <summary>State of the board.</summary>
-        public BoardSync Board { get; set; }
-    }
+        public List<BoardField.Sync> FieldsWithCards { get; set; }
 
-    /// <summary>
-    /// Player synchronization class.
-    /// </summary>
-    /// <remarks>
-    /// User names and ID have not to be synced because they don't change after join.
-    /// </remarks>
-    public class PlayerSync
-    {
-        /// <summary>Points of the player (to track score if played multiple times).</summary>
-        public int Points { get; set; }
-        /// <summary>Player already did his virus check.</summary>
-        public bool DidVirusCheck { get; set; }
-        /// <summary>Player already used the 404 card.</summary>
-        public bool Did404NotFound { get; set; }
-    }
+        // player: For which player this game sync should be. Hides cards. 1 = Player1, 2 = Player 2
+        public static GameSync FromGame(Game game, uint id, int player)
+        {
+            var board = game.Board;
 
-    /// <summary>
-    /// Board synchronization class.
-    /// Contains locations of all deployed cards.
-    /// </summary>
-    public class BoardSync
-    {
-        // TODO: Make sure players can not cheat. Do not send data that the opponent cannot see. No IDs
-    }
+            // Board = new BoardField[8, 11];
+            var fieldsWithCard = new List<BoardField.Sync>();
+            for (ushort y = 0; y < 11; ++y)
+                for (ushort x = 0; x < 8; ++x)
+                {
+                    var field = board[x, y];
+                    if (field.Card != null) fieldsWithCard.Add(board[x, y].GetSync());
+                }
+            var sync = new GameSync
+            {
+                UID = id,
+                Phase = game.Phase,
+                Player1 = game.Players[0].GetSync(),
+                Player2 = game.Players[1].GetSync(),
+                FieldsWithCards = fieldsWithCard,
+            };
 
+            if (player != 1 && player != 2) return sync;
+
+            // Hide cards of opponent
+            foreach (var field in sync.FieldsWithCards)
+            {
+                if (field.Card.Owner != player && !field.Card.IsFaceUp)
+                {
+                    field.Card.Type = OnlineCardType.Unknown;
+                }
+            }
+            return sync;
+        }
+    }
 }

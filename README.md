@@ -12,7 +12,7 @@ a very stupid AI. The final game will be playable over network.
 - Estimated completion: End of August 2017
   - Got some vacation days for the first week in August. That should give me the time I need to finish this.
 - Current Status and next steps:
-  - [x] Create and join games over server (only library functions)
+  - [x] Create and join games over server
   - [ ] UI rewrite (WIP)
     - [x] Display Board and cards
 	- [ ] Menus (WIP)

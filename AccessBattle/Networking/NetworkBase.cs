@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
@@ -12,6 +13,11 @@ namespace AccessBattle.Networking
     /// </summary>
     public abstract class NetworkBase // TODO: Implement INotifyPropertyChanged
     {
+        /// <summary>
+        /// Default JSON serializer settings.
+        /// </summary>
+        protected JsonSerializerSettings _serializerSettings = new JsonSerializerSettings { DefaultValueHandling = DefaultValueHandling.Ignore };
+
         /// <summary>
         /// Name of class that implements this base class. Used for error messages.
         /// </summary>

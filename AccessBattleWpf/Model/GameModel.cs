@@ -10,6 +10,7 @@ namespace AccessBattle.Wpf.Model
 {
     public class GameModel : PropChangeNotifier
     {
+        // TODO: Can only be used in a local match. Only play contains unknown cards.
         Game _game = new Game();
         public Game Game { get { return _game; } }
 

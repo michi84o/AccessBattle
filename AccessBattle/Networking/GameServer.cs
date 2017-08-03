@@ -51,6 +51,7 @@ using System.Threading.Tasks;
  *
  *  TODO: Behavior when user logs in with serveral client instances. Also reconnect behavior.
  *  TODO: Cleanup game list if a player creates a game and disconnects
+ *  TODO: Allow reconnects after connection abort
  */
 namespace AccessBattle.Networking
 {
@@ -170,7 +171,7 @@ namespace AccessBattle.Networking
                         {
                             // Send server info
                             Send(JsonConvert.SerializeObject(
-                                new ServerInfo(AcceptAnyClient)),
+                                new ServerInfo(AcceptAnyClient), _serializerSettings),
                                 NetworkPacketType.ServerInfo, null);
 
                             var serverCrypto = new CryptoHelper();
@@ -358,7 +359,7 @@ namespace AccessBattle.Networking
                         info.Add(new GameInfo { UID = game.UID, Name = game.Name, Player1 = game.Players[0].Name });
                     }
                     var infoJson =
-                    Send(JsonConvert.SerializeObject(info), NetworkPacketType.ListGames, player.Connection, player.ClientCrypto);
+                    Send(JsonConvert.SerializeObject(info, _serializerSettings), NetworkPacketType.ListGames, player.Connection, player.ClientCrypto);
                     break;
                 case NetworkPacketType.ClientLogin:
                     try
@@ -399,7 +400,7 @@ namespace AccessBattle.Networking
                                 player.CurrentGame = game;
                             }
                             ginfo.UID = uid;
-                            Send(JsonConvert.SerializeObject(ginfo), NetworkPacketType.CreateGame, player.Connection, player.ClientCrypto);
+                            Send(JsonConvert.SerializeObject(ginfo, _serializerSettings), NetworkPacketType.CreateGame, player.Connection, player.ClientCrypto);
                         }
                         else
                         {
@@ -429,14 +430,14 @@ namespace AccessBattle.Networking
                                     {
                                         var p1Req = new JoinMessage
                                         { UID = game.UID, Request = JoinRequestType.RequestAccept, JoiningUser = player.Name };
-                                        Send(JsonConvert.SerializeObject(p1Req), NetworkPacketType.JoinGame, p1.Connection, p1.ClientCrypto);
+                                        Send(JsonConvert.SerializeObject(p1Req, _serializerSettings), NetworkPacketType.JoinGame, p1.Connection, p1.ClientCrypto);
                                         reqOK = true;
                                     }
                                 }
                                 if (!reqOK) // Error while joining
                                 {
                                     var p2Err = new JoinMessage { UID = game.UID, Request = JoinRequestType.Error };
-                                    Send(JsonConvert.SerializeObject(p2Err), NetworkPacketType.JoinGame, player.Connection, player.ClientCrypto);
+                                    Send(JsonConvert.SerializeObject(p2Err, _serializerSettings), NetworkPacketType.JoinGame, player.Connection, player.ClientCrypto);
                                 }
                             }
                             else if (jMsg.Request == JoinRequestType.Accept)
@@ -445,7 +446,7 @@ namespace AccessBattle.Networking
                                 {
                                     // Notify p2
                                     var p2Answ = new JoinMessage { UID = game.UID, Request = JoinRequestType.Accept };
-                                    Send(JsonConvert.SerializeObject(p2Answ), NetworkPacketType.JoinGame, p2.Connection, p2.ClientCrypto);
+                                    Send(JsonConvert.SerializeObject(p2Answ, _serializerSettings), NetworkPacketType.JoinGame, p2.Connection, p2.ClientCrypto);
                                 }
                                 else if (player == p2)
                                 {
@@ -465,7 +466,7 @@ namespace AccessBattle.Networking
                                     {
                                         game.JoinPlayer(p2, false);
                                         var p2Answ = new JoinMessage { UID = game.UID, Request = JoinRequestType.Decline };
-                                        Send(JsonConvert.SerializeObject(p2Answ), NetworkPacketType.JoinGame, p2.Connection, p2.ClientCrypto);
+                                        Send(JsonConvert.SerializeObject(p2Answ, _serializerSettings), NetworkPacketType.JoinGame, p2.Connection, p2.ClientCrypto);
                                     }
                                 }
                                 else if (player == p2)
@@ -474,7 +475,7 @@ namespace AccessBattle.Networking
                                     game.JoinPlayer(p2, false);
                                     // Notify p1 so that his 'Player Joining' screen gets closed
                                     var p1Answ = new JoinMessage { UID = game.UID, Request = JoinRequestType.Decline, JoiningUser = p2.Name };
-                                    Send(JsonConvert.SerializeObject(p1Answ), NetworkPacketType.JoinGame, p1.Connection, p1.ClientCrypto);
+                                    Send(JsonConvert.SerializeObject(p1Answ, _serializerSettings), NetworkPacketType.JoinGame, p1.Connection, p1.ClientCrypto);
                                 }
                             }
                         }
@@ -504,9 +505,9 @@ namespace AccessBattle.Networking
 
                                 var ans = new ExitGame { UID = game.UID };
                                 if (p1 != null)
-                                    Send(JsonConvert.SerializeObject(ans), NetworkPacketType.ExitGame, p1.Connection, p1.ClientCrypto);
+                                    Send(JsonConvert.SerializeObject(ans, _serializerSettings), NetworkPacketType.ExitGame, p1.Connection, p1.ClientCrypto);
                                 if (p2 != null)
-                                    Send(JsonConvert.SerializeObject(ans), NetworkPacketType.ExitGame, p2.Connection, p2.ClientCrypto);
+                                    Send(JsonConvert.SerializeObject(ans, _serializerSettings), NetworkPacketType.ExitGame, p2.Connection, p2.ClientCrypto);
                             }
                         }
                     }

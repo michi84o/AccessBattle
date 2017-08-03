@@ -335,7 +335,7 @@ namespace AccessBattle.Networking
                 try
                 {
                     LoggedIn += handler;
-                    if (Send(JsonConvert.SerializeObject(login), NetworkPacketType.ClientLogin))
+                    if (Send(JsonConvert.SerializeObject(login, _serializerSettings), NetworkPacketType.ClientLogin))
                     {
                         result = await source.Task;
                     }
@@ -425,7 +425,7 @@ namespace AccessBattle.Networking
                 try
                 {
                     GameCreated += handler;
-                    if (Send(JsonConvert.SerializeObject(info), NetworkPacketType.CreateGame))
+                    if (Send(JsonConvert.SerializeObject(info, _serializerSettings), NetworkPacketType.CreateGame))
                     {
                         result = await source.Task;
                     }
@@ -458,7 +458,7 @@ namespace AccessBattle.Networking
             {
                 var req = new JoinMessage { UID = uid, Request = 0 };
                 IsJoined = null;
-                return Send(JsonConvert.SerializeObject(req), NetworkPacketType.JoinGame);
+                return Send(JsonConvert.SerializeObject(req, _serializerSettings), NetworkPacketType.JoinGame);
             }
             catch (Exception e)
             {
@@ -487,7 +487,7 @@ namespace AccessBattle.Networking
             try
             {
                 var req = new JoinMessage { UID = uid, Request = accept ? JoinRequestType.Accept : JoinRequestType.Decline };
-                IsJoined = Send(JsonConvert.SerializeObject(req), NetworkPacketType.JoinGame) && accept;
+                IsJoined = Send(JsonConvert.SerializeObject(req, _serializerSettings), NetworkPacketType.JoinGame) && accept;
                 ConfirmJoinCalled?.Invoke(this, new GameJoinRequestedEventArgs(new JoinMessage() { UID = uid, Request = accept ? JoinRequestType.Accept : JoinRequestType.Decline }));
                 return IsJoined == accept;
             }
@@ -509,7 +509,7 @@ namespace AccessBattle.Networking
             try
             {
                 var pak = new ExitGame { UID = uid };
-                return Send(JsonConvert.SerializeObject(pak), NetworkPacketType.ExitGame);
+                return Send(JsonConvert.SerializeObject(pak, _serializerSettings), NetworkPacketType.ExitGame);
             }
             catch (Exception e)
             {

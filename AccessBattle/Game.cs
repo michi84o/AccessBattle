@@ -113,7 +113,7 @@ namespace AccessBattle
             for (int p = 0; p < 2; ++p)
                 for (int c = 0; c < 8; ++c)
                 {
-                    PlayerOnlineCards[p, c].Type = OnlineCardType.FaceDown;
+                    PlayerOnlineCards[p, c].Type = OnlineCardType.Unknown;
                 }
 
             // Reset Board

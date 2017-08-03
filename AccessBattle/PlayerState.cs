@@ -57,7 +57,19 @@ namespace AccessBattle
 
         int _playerNumber;
         /// <summary>Player number (1 or 2).</summary>
-        public int PlayerNumber { get { return _playerNumber; } }
+        public int PlayerNumber
+        {
+            get { return _playerNumber; }
+            set
+            {
+                if (_playerNumber != 0 && _playerNumber != value)
+                    throw new InvalidOperationException("The player number can only be set once!");
+                _playerNumber = value;
+            }
+        }
+
+        /// <summary>Only for serialization!</summary>
+        public PlayerState() { }
 
         /// <summary>
         /// Constructor.
@@ -84,6 +96,25 @@ namespace AccessBattle
                     if (value != null) Name = value.Name;
                 }
             }
+        }
+
+        public Sync GetSync()
+        {
+            return new Sync
+            {
+                Points = Points,
+                DidVirusCheck = DidVirusCheck,
+                Did404NotFound = Did404NotFound,
+                PlayerNumber = PlayerNumber
+            };
+        }
+
+        public class Sync
+        {
+            public int Points;
+            public bool DidVirusCheck;
+            public bool Did404NotFound;
+            public int PlayerNumber;
         }
     }
 }
