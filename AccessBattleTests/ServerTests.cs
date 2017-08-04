@@ -102,7 +102,7 @@ namespace AccessBattleTests
             game.Board[0, 0].Card = new OnlineCard() { IsFaceUp = false, Owner = game.Players[0], Type = OnlineCardType.Link };
             game.Board[1, 0].Card = new OnlineCard() { IsFaceUp = false, Owner = game.Players[1], Type = OnlineCardType.Virus };
 
-            var sync = AccessBattle.Networking.GameSync.FromGame(game, 0, 1);
+            var sync = AccessBattle.Networking.Packets.GameSync.FromGame(game, 0, 1);
             var str = JsonConvert.SerializeObject(sync, new JsonSerializerSettings { DefaultValueHandling = DefaultValueHandling.Ignore });
             Assert.IsNotNull(str);
             Assert.IsTrue(str.Contains("Link"));

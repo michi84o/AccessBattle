@@ -46,7 +46,7 @@
     <Compile Include="BoardField.cs" />
     <Compile Include="Card.cs" />
     <Compile Include="Game.cs" />
-    <Compile Include="Networking\GameSync.cs" />
+    <Compile Include="Networking\Packets\GameSync.cs" />
     <Compile Include="IPlayer.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="Networking\ByteBuffer.cs" />
@@ -60,7 +60,6 @@
     <Compile Include="Networking\NetworkPlayer.cs" />
     <Compile Include="Networking\Packets\ExitGame.cs" />
     <Compile Include="Networking\Packets\GameInfo.cs" />
-    <Compile Include="Networking\Packets\GameSync.cs" />
     <Compile Include="Networking\Packets\JoinMessage.cs" />
     <Compile Include="Networking\Packets\Login.cs" />
     <Compile Include="Networking\Packets\ServerInfo.cs" />
