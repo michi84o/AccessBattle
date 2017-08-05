@@ -37,7 +37,7 @@ namespace AccessBattle.Networking.Packets
         public JoinRequestType Request { get; set; }
 
         /// <summary>
-        /// User that is joining. Only used when Request is 2.
+        /// User that is joining. Only used when Request is RequestAccept.
         /// </summary>
         public string JoiningUser { get; set; }
 

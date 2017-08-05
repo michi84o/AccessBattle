@@ -95,7 +95,7 @@ namespace AccessBattle.Networking
                 port = 3221; // OSH MK UF A 2010
             }
             _port = port;
-            if (port != 3221) Trace.WriteLine("The Organization has made its move! El Psy Congroo");
+            if (port != 3221) Log.WriteLine("The Organization has made its move! El Psy Congroo");
         }
 
         /// <summary>
@@ -262,7 +262,7 @@ namespace AccessBattle.Networking
                         var packet = NetworkPacket.FromByteArray(packData);
                         if (packet != null)
                         {
-                            Log.WriteLine("GameServer: Received packet of type " + packet.PacketType + " with " + packet.Data.Length + " bytes of data");
+                            //Log.WriteLine("GameServer: Received packet of type " + packet.PacketType + " with " + packet.Data.Length + " bytes of data");
                             ProcessPacket(packet, player);
                         }
                         else
@@ -447,12 +447,15 @@ namespace AccessBattle.Networking
                                     // Notify p2
                                     var p2Answ = new JoinMessage { UID = game.UID, Request = JoinRequestType.Accept };
                                     Send(JsonConvert.SerializeObject(p2Answ, _serializerSettings), NetworkPacketType.JoinGame, p2.Connection, p2.ClientCrypto);
+                                    // At this point client of p1 expects game to start
+                                    // p2 will send a final confirm. Wait for it.
                                 }
                                 else if (player == p2)
                                 {
                                     if (game.JoinPlayer(p2, true))
                                     {
                                         p2.CurrentGame = game;
+                                        // At this point client of p2 expects game to start
                                     }
                                 }
                             }

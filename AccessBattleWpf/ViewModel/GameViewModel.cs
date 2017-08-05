@@ -25,7 +25,7 @@ namespace AccessBattle.Wpf.ViewModel
         public GamePhase Phase
         {
             get { return _phase; }
-            protected set { SetProp(ref _phase, value); }
+            set { SetProp(ref _phase, value); }
         }
 
         public PlayerState Player1 { get; private set; }

@@ -39,6 +39,14 @@ namespace AccessBattle.Wpf.ViewModel
                 {
                     OnPropertyChanged(nameof(CurrentMenuViewModel));
 
+                    if (_currentMenu == MenuType.WaitForAccept ||
+                        _currentMenu == MenuType.WaitForJoin ||
+                        _currentMenu == MenuType.AcceptJoin)
+                        Model.Game.Phase = GamePhase.PlayerJoining;
+                    else if (
+                        _currentMenu == MenuType.NetworkGame ||
+                        _currentMenu == MenuType.Welcome)
+                        Model.Game.Phase = GamePhase.WaitingForPlayers;
                     lastVm?.Suspend();
                     CurrentMenuViewModel?.Activate();
                 }
@@ -136,7 +144,6 @@ namespace AccessBattle.Wpf.ViewModel
                     return
                        (IsPlayerHost && _model.Game.Phase == GamePhase.Player1Turn) ||
                       (!IsPlayerHost && _model.Game.Phase == GamePhase.Player2Turn);
-                    // TODO: Also only if its current players turn
                 });
             }
         }

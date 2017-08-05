@@ -57,6 +57,20 @@ namespace AccessBattle.Wpf.ViewModel
 
         void JoinRequestedHandler(object sender, GameJoinRequestedEventArgs args)
         {
+            // Special case: Accepted connection but a decline is incoming!
+            if (ParentViewModel.CurrentMenu == MenuType.None && ParentViewModel.Model.Game.Phase == GamePhase.PlayerJoining)
+            {
+                lock (_joinMessages)
+                {
+                    if (CurrentJoinMessage?.JoiningUser == args.Message.JoiningUser && args.Message.Request == JoinRequestType.Decline)
+                    {
+                        _joinMessages.Clear();
+                        ParentViewModel.CurrentMenu = MenuType.WaitForJoin;
+                    }
+                }
+
+            }
+
             // Might be in network menu and creating a new game
             if (ParentViewModel.CurrentMenu != MenuType.WaitForJoin &&
                 ParentViewModel.CurrentMenu != MenuType.AcceptJoin) return;
@@ -73,7 +87,6 @@ namespace AccessBattle.Wpf.ViewModel
             {
                 if (args.Message.Request == JoinRequestType.Decline)
                 {
-
                     _joinMessages.RemoveAll(o => o.JoiningUser == args.Message.JoiningUser);
                 }
                 else
@@ -96,7 +109,16 @@ namespace AccessBattle.Wpf.ViewModel
                     ParentViewModel.Model.Client.ConfirmJoin(ParentViewModel.Model.UID, true);
                     // TODO: Init game
                     ParentViewModel.CurrentMenu = MenuType.None;
-                    MessageBox.Show("TODO: Init Game (2)");
+                    MessageBox.Show("TODO: Init Game (p1)");
+                    // At this stage it is still possible that we get a decline join packet from p2.
+                    // In that case we must revert to the waiting menu.
+                    // This is done above.
+                    // Clear all join requests
+                    lock (_joinMessages)
+                    {
+                        while (_joinMessages.Count > 1)
+                            _joinMessages.RemoveAt(1);
+                    }
                 }, o => true);
             }
         }
