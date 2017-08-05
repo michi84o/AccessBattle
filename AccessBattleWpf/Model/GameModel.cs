@@ -1,18 +1,21 @@
 ﻿using AccessBattle.Networking;
 using AccessBattle.Networking.Packets;
+using AccessBattle.Wpf.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Threading;
 
 namespace AccessBattle.Wpf.Model
 {
     public class GameModel : PropChangeNotifier
     {
-        // TODO: Can only be used in a local match. Only play contains unknown cards.
-        Game _game = new Game();
-        public Game Game { get { return _game; } }
+        GameViewModel _game = new GameViewModel();
+        public GameViewModel Game => _game;
 
         uint _uid;
         /// <summary>
@@ -37,16 +40,22 @@ namespace AccessBattle.Wpf.Model
         // TODO: Behavior when opponent disconnects
         // TODO: Option to give up game
 
+        // For UI synchronization
+        //SynchronizationContext _context; // TODO: Maybe later
+
         public GameModel()
         {
             _client.GameSyncReceived += GameSyncReceived;
+            //_context = SynchronizationContext.Current ?? new SynchronizationContext();
         }
 
         #region Game Synchronization
 
         void GameSyncReceived(object sender, GameSyncEventArgs e)
         {
-            if (UID != e.Sync.UID) return; // TODO: Tell server
+            if (UID != e.Sync.UID) return; // TODO: Tell server?
+            //_context.Post(o => { _game.Synchronize(e.Sync); }, null);
+            Application.Current.Dispatcher.Invoke(() => { _game.Synchronize(e.Sync); });
         }
 
         #endregion

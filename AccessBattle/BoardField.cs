@@ -35,6 +35,26 @@ namespace AccessBattle
             Y = y;
         }
 
+        public void Update(Sync sync, PlayerState p1, PlayerState p2)
+        {
+            Card card;
+            if (sync.Card.IsFirewall)
+            {
+                card = new FirewallCard();
+            }
+            else
+            {
+                card = new OnlineCard
+                {
+                    HasBoost = sync.Card.HasBoost,
+                    IsFaceUp = sync.Card.IsFaceUp,
+                    Owner = sync.Card.Owner == 1 ? p1 : p2,
+                    Type = sync.Card.Type
+                };
+            }
+            Card = card;
+        }
+
         public Sync GetSync()
         {
             return new Sync

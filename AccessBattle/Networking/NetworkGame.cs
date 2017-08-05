@@ -99,12 +99,13 @@ namespace AccessBattle.Networking
         /// <param name="player"></param>
         public void ExitGame(IPlayer player)
         {
-            if (Phase == GamePhase.Deployment || Phase == GamePhase.PlayerTurns)
+            if (Phase == GamePhase.Deployment || Phase == GamePhase.Player1Turn || Phase == GamePhase.Player2Turn)
             {
-                if (Players[0]?.Player == player) WinningPlayer = 2;
-                if (Players[1]?.Player == player) WinningPlayer = 1;
+                if (Players[0]?.Player == player) Phase = GamePhase.Player2Win;
+                if (Players[1]?.Player == player) Phase = GamePhase.Player1Win;
             }
-            Phase = GamePhase.GameOver;
+            else
+                Phase = GamePhase.Aborted;
         }
     }
 }

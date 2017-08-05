@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+// TODO: Include information about last player action so it can be animated
+
 namespace AccessBattle.Networking.Packets
 {
     /// <summary>

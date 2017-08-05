@@ -44,10 +44,16 @@ namespace AccessBattle
         Init,
         /// <summary>Players deploy their cards in this phase.</summary>
         Deployment,
-        /// <summary>Main game phase.</summary>
-        PlayerTurns,
-        /// <summary>Game is over. One of the players won.</summary>
-        GameOver
+        /// <summary>Main game phase. Player 1 turn.</summary>
+        Player1Turn,
+        /// <summary>Main game phase. Player 2 turn.</summary>
+        Player2Turn,
+        /// <summary>Game is over. Player 1 won.</summary>
+        Player1Win,
+        /// <summary>Game is over. Player 2 won.</summary>
+        Player2Win,
+        /// <summary>Game was aborted. No winner.</summary>
+        Aborted
     }
 
     /// <summary>
@@ -63,19 +69,6 @@ namespace AccessBattle
         {
             get { return _phase; }
             protected set { SetProp(ref _phase, value); }
-        }
-
-        int _winningPlayer;
-        /// <summary>
-        /// If game phase is GameOver then this value shows which player won
-        /// </summary>
-        public int WinningPlayer
-        {
-            get { return _winningPlayer; }
-            set
-            {
-                SetProp(ref _winningPlayer, value);
-            }
         }
 
         PlayerState[] _players;

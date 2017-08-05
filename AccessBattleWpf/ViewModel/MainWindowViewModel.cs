@@ -133,7 +133,9 @@ namespace AccessBattle.Wpf.ViewModel
                 {
                 }, o =>
                 {
-                    return _model.Game.Phase == GamePhase.PlayerTurns;
+                    return
+                       (IsPlayerHost && _model.Game.Phase == GamePhase.Player1Turn) ||
+                      (!IsPlayerHost && _model.Game.Phase == GamePhase.Player2Turn);
                     // TODO: Also only if its current players turn
                 });
             }

@@ -50,26 +50,25 @@ namespace AccessBattle
         /// </summary>
         public int Points { get; set; }
 
+        bool _didVirusCheck;
         /// <summary>Player already did his virus check.</summary>
-        public bool DidVirusCheck { get; set; }
+        public bool DidVirusCheck
+        {
+            get { return _didVirusCheck; }
+            set { SetProp(ref _didVirusCheck, value); }
+        }
+
+        bool _did404NotFound;
         /// <summary>Player already used the 404 card.</summary>
-        public bool Did404NotFound { get; set; }
+        public bool Did404NotFound
+        {
+            get { return _did404NotFound; }
+            set { SetProp(ref _did404NotFound, value); }
+        }
 
         int _playerNumber;
         /// <summary>Player number (1 or 2).</summary>
-        public int PlayerNumber
-        {
-            get { return _playerNumber; }
-            set
-            {
-                if (_playerNumber != 0 && _playerNumber != value)
-                    throw new InvalidOperationException("The player number can only be set once!");
-                _playerNumber = value;
-            }
-        }
-
-        /// <summary>Only for serialization!</summary>
-        public PlayerState() { }
+        public int PlayerNumber => _playerNumber;
 
         /// <summary>
         /// Constructor.
@@ -109,12 +108,26 @@ namespace AccessBattle
             };
         }
 
-        public class Sync
+        public void Update(Sync sync)
         {
-            public int Points;
-            public bool DidVirusCheck;
-            public bool Did404NotFound;
-            public int PlayerNumber;
+            Points = sync.Points;
+            DidVirusCheck = sync.DidVirusCheck;
+            Did404NotFound = sync.Did404NotFound;
+            // Dangerous!
+            //PlayerNumber = sync.PlayerNumber;
+        }
+
+        public class Sync : PropChangeNotifier
+        {
+            int _points;
+            bool _didVirusCheck;
+            bool _did404NotFound;
+            int _playerNumber;
+
+            public int Points { get { return _points; } set { SetProp(ref _points, value); } }
+            public bool DidVirusCheck { get { return _didVirusCheck; } set { SetProp(ref _didVirusCheck, value); } }
+            public bool Did404NotFound { get { return _did404NotFound; } set { SetProp(ref _did404NotFound, value); } }
+            public int PlayerNumber { get { return _playerNumber; } set { SetProp(ref _playerNumber, value); } }
         }
     }
 }
