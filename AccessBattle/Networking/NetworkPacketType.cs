@@ -13,7 +13,7 @@
         public const byte CreateGame = 0x04;
         public const byte JoinGame = 0x05;
         public const byte GameInit = 0x06;
-        public const byte GameStatus = 0x07;
+        public const byte GameSync = 0x07;
         public const byte GameCommand = 0x08;
         public const byte ExitGame = 0x09;
 

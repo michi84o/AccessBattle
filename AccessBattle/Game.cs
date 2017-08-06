@@ -96,7 +96,7 @@ namespace AccessBattle
         /// <summary>
         /// Assumes that both players have properly joined the game.
         /// </summary>
-        protected void InitGame()
+        public void InitGame()
         {
             Players[0].Did404NotFound = false;
             Players[0].DidVirusCheck = false;

@@ -55,6 +55,13 @@ namespace AccessBattle.Wpf.Model
         {
             if (UID != e.Sync.UID) return; // TODO: Tell server?
             //_context.Post(o => { _game.Synchronize(e.Sync); }, null);
+
+            if (e.Sync.UID != UID)
+            {
+                Log.WriteLine("GameModel: Error! Server sent GameSync for wrong game! Local UID: " + UID + ", server UID: " + e.Sync.UID);
+                // TODO: Tell server?
+                return;
+            }
             Application.Current.Dispatcher.Invoke(() => { _game.Synchronize(e.Sync); });
         }
 

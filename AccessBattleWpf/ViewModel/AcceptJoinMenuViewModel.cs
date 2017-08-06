@@ -109,7 +109,7 @@ namespace AccessBattle.Wpf.ViewModel
                     ParentViewModel.Model.Client.ConfirmJoin(ParentViewModel.Model.UID, true);
                     // TODO: Init game
                     ParentViewModel.CurrentMenu = MenuType.None;
-                    MessageBox.Show("TODO: Init Game (p1)");
+                    //MessageBox.Show("TODO: Init Game (p1)");
                     // At this stage it is still possible that we get a decline join packet from p2.
                     // In that case we must revert to the waiting menu.
                     // This is done above.

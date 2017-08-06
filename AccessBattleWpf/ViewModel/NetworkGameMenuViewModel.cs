@@ -87,7 +87,7 @@ namespace AccessBattle.Wpf.ViewModel
                 ParentViewModel.Model.UID = args.Message.UID;
                 // TODO: Init Game
                 ParentViewModel.CurrentMenu = MenuType.None;
-                MessageBox.Show("TODO: INIT GAME (p2)");
+                //MessageBox.Show("TODO: INIT GAME (p2)");
             }
             else if (args.Message.Request == JoinRequestType.Decline) // Declined
             {

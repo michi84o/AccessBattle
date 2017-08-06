@@ -15,12 +15,9 @@ namespace AccessBattle.Wpf.ViewModel
 {
     public class MainWindowViewModel : PropChangeNotifier, IMenuHolder
     {
-        GameModel _model = new GameModel();
+        GameModel _model;
 
         public GameModel Model => _model;
-
-        //public NetworkGameClient NetworkClient => _model.Client;
-        //public Game Game => _model.Game;
 
         public bool IsPlayerHost
         {
@@ -94,6 +91,7 @@ namespace AccessBattle.Wpf.ViewModel
 
         public MainWindowViewModel()
         {
+            _model = new GameModel();
             _model.PropertyChanged += _model_PropertyChanged;
 
             // Menu view models

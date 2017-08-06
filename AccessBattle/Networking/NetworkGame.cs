@@ -80,13 +80,12 @@ namespace AccessBattle.Networking
             {
                 if (Phase == GamePhase.PlayerJoining && Players[1].Player == player)
                 {
-                    if (accepted)
-                        InitGame();
-                    else
+                    if (!accepted)
                     {
                         Players[1].Player = null;
                         Phase = GamePhase.WaitingForPlayers;
                     }
+                    // If accepted, server must call InitGame
                     result = true;
                 }
             }

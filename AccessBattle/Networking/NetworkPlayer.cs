@@ -35,7 +35,7 @@ namespace AccessBattle.Networking
         /// <summary>
         /// Current game this player has joined.
         /// </summary>
-        public Game CurrentGame { get; set; }
+        public Game CurrentGame { get; set; } // TODO: Check if server resets this properly when leaving
 
         /// <summary>
         /// Used to decrypt data that was received from the player.

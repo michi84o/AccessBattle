@@ -707,6 +707,25 @@ namespace AccessBattle.Networking
                         Log.WriteLine("NetworkGameClient: Received ExitGame message could not be read." + e.Message);
                     }
                     break;
+                case NetworkPacketType.GameSync:
+                    try
+                    {
+                        var eMsg = JsonConvert.DeserializeObject<GameSync>(Encoding.ASCII.GetString(data));
+                        if (eMsg != null)
+                        {
+                            var handler = GameSyncReceived;
+                            if (handler != null)
+                            {
+                                handler(this, new GameSyncEventArgs(eMsg));
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Log.WriteLine("NetworkGameClient: Received GameSync message could not be read." + e.Message);
+                    }
+                    break;
+                    break;
                 default:
                     Log.WriteLine("NetworkGameClient: Packet type " + packet.PacketType + " not recognized!");
                     break;

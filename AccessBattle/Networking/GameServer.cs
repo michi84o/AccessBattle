@@ -456,6 +456,15 @@ namespace AccessBattle.Networking
                                     {
                                         p2.CurrentGame = game;
                                         // At this point client of p2 expects game to start
+                                        game.InitGame();
+                                        var syncP1 = GameSync.FromGame(game, game.UID, 1);
+                                        var syncP2 = GameSync.FromGame(game, game.UID, 2);
+                                        Send(JsonConvert.SerializeObject(syncP1, _serializerSettings), NetworkPacketType.GameSync, p1.Connection, p1.ClientCrypto);
+                                        Send(JsonConvert.SerializeObject(syncP2, _serializerSettings), NetworkPacketType.GameSync, p2.Connection, p2.ClientCrypto);
+                                    }
+                                    else
+                                    {
+                                        Log.WriteLine("GameServer: Joining player 2 (" + p2.UID + ") for game " + game.UID + " failed!");
                                     }
                                 }
                             }
