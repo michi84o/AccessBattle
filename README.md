@@ -10,15 +10,14 @@ It is still in development. Right now you can play against
 a very stupid AI. The final game will be playable over network.
 
 - Estimated completion: End of August 2017
-  - Got some vacation days for the first week in August. That should give me the time I need to finish this.
 - Current Status and next steps:
   - [x] Create and join games over server
   - [ ] UI rewrite (WIP)
     - [x] Display Board and cards
 	- [ ] Menus (WIP)
-	- [ ] Player interaction	
-  - [ ] Synchronize game data between clients (WIP)
-  - [ ] Game logic rewrite
+	- [ ] Player interaction (WIP)	
+  - [x] Synchronize game data between clients
+  - [ ] Game logic rewrite (WIP)
 
 The main game engine is inside a separate DLL so that people
 can program their own user interface for it. The DLL should

@@ -103,16 +103,28 @@ namespace AccessBattle
             Players[1].Did404NotFound = false;
             Players[1].DidVirusCheck = false;
 
-            for (int p = 0; p < 2; ++p)
-                for (int c = 0; c < 8; ++c)
-                {
-                    PlayerOnlineCards[p, c].Type = OnlineCardType.Unknown;
-                }
-
             // Reset Board
             for (int x = 0; x < 8; ++x)
                 for (int y = 0; y < 10; ++y)
                     Board[x, y].Card = null;
+
+            // Place cards on stack for deployment
+            // Half of the cards are link, other half are virus
+            for (int p = 0; p < 2; ++p)
+            {
+                for (int c = 0; c < 4; ++c)
+                {
+                    PlayerOnlineCards[p, c].Type = OnlineCardType.Link;
+                    PlayerOnlineCards[p, c].IsFaceUp = false;
+                    Board[c, 8 + p].Card = PlayerOnlineCards[p, c];
+                }
+                for (int c = 4; c < 8; ++c)
+                {
+                    PlayerOnlineCards[p, c].Type = OnlineCardType.Virus;
+                    PlayerOnlineCards[p, c].IsFaceUp = false;
+                    Board[c, 8 + p].Card = PlayerOnlineCards[p, c];
+                }
+            }
 
             Phase = GamePhase.Init;
         }

@@ -411,10 +411,10 @@
                     <ColumnDefinition/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <local:BoardFieldView Grid.Column="0" FieldVisualState="Link" Style="{StaticResource StackField}" IsCardFlipped="True"/>
-                <local:BoardFieldView Grid.Column="1" FieldVisualState="Link" Style="{StaticResource StackField}" IsCardFlipped="True"/>
-                <local:BoardFieldView Grid.Column="2" FieldVisualState="Link" Style="{StaticResource StackField}" IsCardFlipped="True"/>
-                <local:BoardFieldView Grid.Column="3" FieldVisualState="Link" Style="{StaticResource StackField}" IsCardFlipped="True"/>
+                <local:BoardFieldView Grid.Column="0" FieldVisualState="{Binding BoardFieldList[72].VisualState}" FieldCardVisualState="{Binding BoardFieldList[72].CardVisualState}" Style="{StaticResource StackField}" IsCardFlipped="True"/>
+                <local:BoardFieldView Grid.Column="1" FieldVisualState="{Binding BoardFieldList[73].VisualState}" FieldCardVisualState="{Binding BoardFieldList[73].CardVisualState}" Style="{StaticResource StackField}" IsCardFlipped="True"/>
+                <local:BoardFieldView Grid.Column="2" FieldVisualState="{Binding BoardFieldList[74].VisualState}" FieldCardVisualState="{Binding BoardFieldList[74].CardVisualState}" Style="{StaticResource StackField}" IsCardFlipped="True"/>
+                <local:BoardFieldView Grid.Column="3" FieldVisualState="{Binding BoardFieldList[75].VisualState}" FieldCardVisualState="{Binding BoardFieldList[75].CardVisualState}" Style="{StaticResource StackField}" IsCardFlipped="True"/>
             </Grid>
 
             <Grid
@@ -425,10 +425,10 @@
                     <ColumnDefinition/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <local:BoardFieldView Grid.Column="0" FieldVisualState="Virus" Style="{StaticResource StackField}" IsCardFlipped="True"/>
-                <local:BoardFieldView Grid.Column="1" FieldVisualState="Virus" Style="{StaticResource StackField}" IsCardFlipped="True"/>
-                <local:BoardFieldView Grid.Column="2" FieldVisualState="Virus" Style="{StaticResource StackField}" IsCardFlipped="True"/>
-                <local:BoardFieldView Grid.Column="3" FieldVisualState="Virus" Style="{StaticResource StackField}" IsCardFlipped="True"/>
+                <local:BoardFieldView Grid.Column="0" FieldVisualState="{Binding BoardFieldList[76].VisualState}" FieldCardVisualState="{Binding BoardFieldList[76].CardVisualState}" Style="{StaticResource StackField}" IsCardFlipped="True"/>
+                <local:BoardFieldView Grid.Column="1" FieldVisualState="{Binding BoardFieldList[77].VisualState}" FieldCardVisualState="{Binding BoardFieldList[77].CardVisualState}" Style="{StaticResource StackField}" IsCardFlipped="True"/>
+                <local:BoardFieldView Grid.Column="2" FieldVisualState="{Binding BoardFieldList[78].VisualState}" FieldCardVisualState="{Binding BoardFieldList[78].CardVisualState}" Style="{StaticResource StackField}" IsCardFlipped="True"/>
+                <local:BoardFieldView Grid.Column="3" FieldVisualState="{Binding BoardFieldList[79].VisualState}" FieldCardVisualState="{Binding BoardFieldList[79].CardVisualState}" Style="{StaticResource StackField}" IsCardFlipped="True"/>
             </Grid>
 
             <Grid
@@ -439,10 +439,10 @@
                     <ColumnDefinition/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <local:BoardFieldView Grid.Column="0" FieldVisualState="Virus" Style="{StaticResource StackField}"/>
-                <local:BoardFieldView Grid.Column="1" FieldVisualState="Virus" Style="{StaticResource StackField}"/>
-                <local:BoardFieldView Grid.Column="2" FieldVisualState="Virus" Style="{StaticResource StackField}"/>
-                <local:BoardFieldView Grid.Column="3" FieldVisualState="Virus" Style="{StaticResource StackField}"/>
+                <local:BoardFieldView Grid.Column="0" FieldVisualState="{Binding BoardFieldList[68].VisualState}" FieldCardVisualState="{Binding BoardFieldList[68].CardVisualState}" Style="{StaticResource StackField}"/>
+                <local:BoardFieldView Grid.Column="1" FieldVisualState="{Binding BoardFieldList[69].VisualState}" FieldCardVisualState="{Binding BoardFieldList[69].CardVisualState}" Style="{StaticResource StackField}"/>
+                <local:BoardFieldView Grid.Column="2" FieldVisualState="{Binding BoardFieldList[70].VisualState}" FieldCardVisualState="{Binding BoardFieldList[70].CardVisualState}" Style="{StaticResource StackField}"/>
+                <local:BoardFieldView Grid.Column="3" FieldVisualState="{Binding BoardFieldList[71].VisualState}" FieldCardVisualState="{Binding BoardFieldList[71].CardVisualState}" Style="{StaticResource StackField}"/>
             </Grid>
 
             <Button
@@ -458,10 +458,10 @@
                     <ColumnDefinition/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <local:BoardFieldView Grid.Column="0" FieldVisualState="Link" Style="{StaticResource StackField}"/>
-                <local:BoardFieldView Grid.Column="1" FieldVisualState="Link" Style="{StaticResource StackField}"/>
-                <local:BoardFieldView Grid.Column="2" FieldVisualState="Link" Style="{StaticResource StackField}"/>
-                <local:BoardFieldView Grid.Column="3" FieldVisualState="Link" Style="{StaticResource StackField}"/>
+                <local:BoardFieldView Grid.Column="0" FieldVisualState="{Binding BoardFieldList[64].VisualState}" FieldCardVisualState="{Binding BoardFieldList[64].CardVisualState}" Style="{StaticResource StackField}"/>
+                <local:BoardFieldView Grid.Column="1" FieldVisualState="{Binding BoardFieldList[65].VisualState}" FieldCardVisualState="{Binding BoardFieldList[65].CardVisualState}" Style="{StaticResource StackField}"/>
+                <local:BoardFieldView Grid.Column="2" FieldVisualState="{Binding BoardFieldList[66].VisualState}" FieldCardVisualState="{Binding BoardFieldList[66].CardVisualState}" Style="{StaticResource StackField}"/>
+                <local:BoardFieldView Grid.Column="3" FieldVisualState="{Binding BoardFieldList[67].VisualState}" FieldCardVisualState="{Binding BoardFieldList[67].CardVisualState}" Style="{StaticResource StackField}"/>
             </Grid>
 
             <!-- Overlay dialogues -->

@@ -117,6 +117,24 @@ namespace AccessBattle.Wpf.ViewModel
             _boardFields[3, 7].DefaultVisualState = BoardFieldVisualState.Exit;
             _boardFields[4, 7].DefaultVisualState = BoardFieldVisualState.Exit;
 
+            // Stack
+            _boardFields[0, 8].DefaultVisualState = BoardFieldVisualState.Link; // 64
+            _boardFields[1, 8].DefaultVisualState = BoardFieldVisualState.Link;
+            _boardFields[2, 8].DefaultVisualState = BoardFieldVisualState.Link;
+            _boardFields[3, 8].DefaultVisualState = BoardFieldVisualState.Link;
+            _boardFields[4, 8].DefaultVisualState = BoardFieldVisualState.Virus; // 68
+            _boardFields[5, 8].DefaultVisualState = BoardFieldVisualState.Virus;
+            _boardFields[6, 8].DefaultVisualState = BoardFieldVisualState.Virus;
+            _boardFields[7, 8].DefaultVisualState = BoardFieldVisualState.Virus;
+            _boardFields[0, 9].DefaultVisualState = BoardFieldVisualState.Link; // 72
+            _boardFields[1, 9].DefaultVisualState = BoardFieldVisualState.Link;
+            _boardFields[2, 9].DefaultVisualState = BoardFieldVisualState.Link;
+            _boardFields[3, 9].DefaultVisualState = BoardFieldVisualState.Link;
+            _boardFields[4, 9].DefaultVisualState = BoardFieldVisualState.Virus; // 76
+            _boardFields[5, 9].DefaultVisualState = BoardFieldVisualState.Virus;
+            _boardFields[6, 9].DefaultVisualState = BoardFieldVisualState.Virus;
+            _boardFields[7, 9].DefaultVisualState = BoardFieldVisualState.Virus; // 79
+
 
             for (int y = 0; y < 11; ++y)
                 for (int x = 0; x < 8; ++x)
