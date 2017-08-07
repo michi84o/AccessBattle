@@ -1,12 +1,12 @@
 ﻿<UserControl x:Class="AccessBattle.Wpf.View.BoardFieldView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:AccessBattle.Wpf.View"
              xmlns:global="clr-namespace:AccessBattle.Wpf"
              xmlns:converters="clr-namespace:AccessBattle.Wpf.Converters"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"
              d:DesignHeight="64" d:DesignWidth="64" x:Name="BoardFieldControl"
              FontFamily="../ExternalResources/#Silkscreen">
     <UserControl.Resources>
@@ -19,7 +19,7 @@
             <converters:BoardFieldVisualStateVisibilityConverter x:Key="vConvExit" PrimaryState="Exit"/>
             <converters:BoardFieldVisualStateVisibilityConverter x:Key="vConvFlipped" PrimaryState="Flipped"/>
             <converters:BoardFieldVisualStateVisibilityConverter x:Key="vConvLineBoost" PrimaryState="LineBoost"/>
-            
+
             <converters:BoardFieldCardVisualStateBrushConverter x:Key="cardConv"/>
             <converters:BoardFieldCardVisualStateBrushConverter x:Key="cardConvPath" PathColorMode="True" />
 
@@ -30,11 +30,11 @@
 
             <Style TargetType="Grid" x:Key="MultiOverlayGrid"  >
                 <Style.Triggers>
-                    <DataTrigger 
+                    <DataTrigger
                             Binding="{Binding Path=FieldVisualState, ElementName=BoardFieldControl, Converter={StaticResource convMultiOverlay}}" Value="True">
                         <Setter Property="Opacity" Value="{Binding Source={x:Static global:UiGlobals.Instance}, Path=MultiOverlayOpacity, Converter={StaticResource convOpacityInv}}"/>
                     </DataTrigger>
-                    <DataTrigger 
+                    <DataTrigger
                             Binding="{Binding Path=FieldVisualState, ElementName=BoardFieldControl, Converter={StaticResource convMultiOverlay}}" Value="False">
                         <Setter Property="Opacity" Value="1"/>
                     </DataTrigger>
@@ -62,28 +62,28 @@
                     Visibility="{Binding Path=FieldVisualState, ElementName=BoardFieldControl, Converter={StaticResource vConvExit}}">
                     <Viewbox Margin="2">
                         <Grid RenderTransformOrigin="0.5,0.5">
-                            <Path 
+                            <Path
                             Fill="Orange" Stroke="Orange" StrokeThickness="1"
                             Data="{StaticResource ExitPath}"  />
                                     <Path
                             Fill="White" Stroke="White" StrokeThickness="1"
                             Data="{StaticResource DoorPath}"  />
-                                    <Path                         
+                                    <Path
                             Stroke="White" StrokeThickness="1"
                             Data="{StaticResource DoorPath2}"  />
-                                    <Path 
+                                    <Path
                             Fill="Orange" Stroke="Orange" StrokeThickness="1"
                             Data="{StaticResource DoorArrowPath}" />
                             <Grid.RenderTransform>
-                                <ScaleTransform ScaleX="{Binding Path=IsExitFlipped , ElementName=BoardFieldControl, Converter={StaticResource convFlip}}" 
+                                <ScaleTransform ScaleX="{Binding Path=IsExitFlipped , ElementName=BoardFieldControl, Converter={StaticResource convFlip}}"
                                                 ScaleY="{Binding Path=IsExitFlipped , ElementName=BoardFieldControl, Converter={StaticResource convFlip}}" />
                             </Grid.RenderTransform>
                         </Grid>
                     </Viewbox>
                 </Grid>
-                
+
                 <!-- Link Field -->
-                <Grid 
+                <Grid
                     Margin="1"
                     Visibility="{Binding Path=FieldVisualState, ElementName=BoardFieldControl, Converter={StaticResource vConvLink}}"
                     RenderTransformOrigin="0.5,0.5"
@@ -100,7 +100,7 @@
                         Data="{StaticResource LinkPath}"/>
                     </Viewbox>
                     <Viewbox Grid.Row="1">
-                        <TextBlock 
+                        <TextBlock
                         Name ="LinkText"
                         Grid.Row="1"
                         FontSize="10" Foreground="{Binding Path=FieldCardVisualState, ElementName=BoardFieldControl, Converter={StaticResource cardConvPath}}"
@@ -109,12 +109,12 @@
                         Text="LINK"/>
                     </Viewbox>
                     <Grid.RenderTransform>
-                        <ScaleTransform ScaleX="{Binding Path=IsCardFlipped , ElementName=BoardFieldControl, Converter={StaticResource convFlip}}" 
+                        <ScaleTransform ScaleX="{Binding Path=IsCardFlipped , ElementName=BoardFieldControl, Converter={StaticResource convFlip}}"
                                         ScaleY="{Binding Path=IsCardFlipped , ElementName=BoardFieldControl, Converter={StaticResource convFlip}}" />
                     </Grid.RenderTransform>
                 </Grid>
                 <!-- Virus Field -->
-                <Grid 
+                <Grid
                     Margin="1"
                     Visibility="{Binding Path=FieldVisualState, ElementName=BoardFieldControl, Converter={StaticResource vConvVirus}}"
                     RenderTransformOrigin="0.5,0.5">
@@ -131,7 +131,7 @@
                         Data="{StaticResource VirusPath}"/>
                     </Viewbox>
                     <Viewbox Grid.Row="1">
-                        <TextBlock 
+                        <TextBlock
                         Name="VirusText"
                         Grid.Row="1"
                         FontSize="10" Foreground="{Binding Path=FieldCardVisualState, ElementName=BoardFieldControl, Converter={StaticResource cardConvPath}}"
@@ -140,7 +140,7 @@
                         Text="VIRUS"/>
                     </Viewbox>
                     <Grid.RenderTransform>
-                        <ScaleTransform ScaleX="{Binding Path=IsCardFlipped , ElementName=BoardFieldControl, Converter={StaticResource convFlip}}" 
+                        <ScaleTransform ScaleX="{Binding Path=IsCardFlipped , ElementName=BoardFieldControl, Converter={StaticResource convFlip}}"
                                         ScaleY="{Binding Path=IsCardFlipped , ElementName=BoardFieldControl, Converter={StaticResource convFlip}}" />
                     </Grid.RenderTransform>
                 </Grid>
@@ -166,14 +166,14 @@
                             FontSize="10" Foreground="White"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
-                            Text=" Virus     " />   
+                            Text=" Virus     " />
                     </Viewbox>
                     <Viewbox Grid.Row="2" VerticalAlignment="Bottom">
                         <TextBlock Margin="0"
                             FontSize="10" Foreground="White"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
-                            Text="    Check  " />   
+                            Text="    Check  " />
                     </Viewbox>
                 </Grid>
 
@@ -285,5 +285,5 @@
             </Grid>
         </ControlTemplate>
     </UserControl.Template>
-    
+
 </UserControl>

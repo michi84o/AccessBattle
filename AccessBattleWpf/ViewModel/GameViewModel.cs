@@ -12,7 +12,7 @@ namespace AccessBattle.Wpf.ViewModel
     /// Includes board and cards.
     /// Provides abstraction of the game class for remote and local games.
     /// </summary>
-    public class GameViewModel : PropChangeNotifier
+    public class GameViewModel : PropChangeNotifier, IBoardGame
     {
         // TODO: Add a "register local game" method
         // TODO: Add a "register remote game" method
@@ -28,8 +28,8 @@ namespace AccessBattle.Wpf.ViewModel
             set { SetProp(ref _phase, value); }
         }
 
-        public PlayerState Player1 { get; private set; }
-        public PlayerState Player2 { get; private set; }
+        PlayerState[] _players;
+        public PlayerState[] Players => _players;
 
         public BoardField[,] Board { get; private set; }
 
@@ -42,8 +42,9 @@ namespace AccessBattle.Wpf.ViewModel
                     Board[x, y] = new BoardField(x, y);
                 }
 
-            Player1 = new PlayerState(1);
-            Player2 = new PlayerState(2);
+            _players = new PlayerState[2];
+            _players[0] = new PlayerState(1);
+            _players[1] = new PlayerState(2);
         }
 
         public void Synchronize(GameSync sync)
@@ -55,11 +56,11 @@ namespace AccessBattle.Wpf.ViewModel
                     Board[x, y].Card = null;
                 }
             // Update all fields
-            Player1.Update(sync.Player1);
-            Player2.Update(sync.Player2);
+            _players[0].Update(sync.Player1);
+            _players[1].Update(sync.Player2);
             foreach (var field in sync.FieldsWithCards)
             {
-                Board[field.X, field.Y].Update(field, Player1, Player2);
+                Board[field.X, field.Y].Update(field, _players);
             }
             Phase = sync.Phase;
         }

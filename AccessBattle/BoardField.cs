@@ -12,17 +12,35 @@ namespace AccessBattle
     public class BoardField : PropChangeNotifier
     {
         Card _card;
-        /// <summary>Card that was placed on this field</summary>
+        /// <summary>
+        /// Card that was placed on this field.
+        /// </summary>
         public Card Card
         {
             get { return _card; }
-            set { SetProp(ref _card, value); }
+            set
+            {
+                SetProp(ref _card, value);
+                //SetProp(_card, value, ()=>
+                //{
+                //    _card = value;
+                //    if (value != null)
+                //    {
+                //        value.Location = this;
+                //    }
+                //});
+            }
         }
 
         /// <summary>X Location of this field.</summary>
         public ushort X { get; private set; }
         /// <summary>Y Location of this field.</summary>
         public ushort Y { get; private set; }
+
+        /// <summary>Checks the coordinates to determine if this field in an exit field.</summary>
+        public bool IsExit => X >= 3 && X <= 4 && (Y == 0 || Y == 7);
+        /// <summary>Checks the coordinates to determine if this field in a stack field.</summary>
+        public bool IsStack => Y >= 8 && Y <= 9;
 
         /// <summary>
         /// Constructor.
@@ -35,7 +53,7 @@ namespace AccessBattle
             Y = y;
         }
 
-        public void Update(Sync sync, PlayerState p1, PlayerState p2)
+        public void Update(Sync sync, PlayerState[] players)
         {
             Card card;
             if (sync.Card.IsFirewall)
@@ -48,7 +66,7 @@ namespace AccessBattle
                 {
                     HasBoost = sync.Card.HasBoost,
                     IsFaceUp = sync.Card.IsFaceUp,
-                    Owner = sync.Card.Owner == 1 ? p1 : p2,
+                    Owner = sync.Card.Owner == 1 ? players[0] : players[1],
                     Type = sync.Card.Type
                 };
             }

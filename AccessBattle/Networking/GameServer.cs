@@ -528,6 +528,38 @@ namespace AccessBattle.Networking
                         Log.WriteLine("GameServer: Received ExitGame packet of player " + player.UID + " could not be read! " + ex.Message);
                     }
                     break;
+                case NetworkPacketType.GameCommand:
+                    try
+                    {
+                        var cmdMsg = JsonConvert.DeserializeObject<GameCommand>(Encoding.ASCII.GetString(data));
+                        if (cmdMsg != null)
+                        {
+                            NetworkPlayer p1, p2;
+                            NetworkGame game;
+                            if (GetGameAndPlayers(cmdMsg.UID, out game, out p1, out p2) && (p1 == player || p2 == player))
+                            {
+                                var result = game.ExecuteCommand(cmdMsg.Command, p1 == player ? 1 : 2);
+                                var response = new GameCommand
+                                {
+                                    UID = game.UID,
+                                    Command = result ? "OK" : "FAIL"
+                                };
+                                Send(JsonConvert.SerializeObject(response, _serializerSettings), NetworkPacketType.GameCommand, player.Connection, player.ClientCrypto);
+                                if (result)
+                                {
+                                    var syncP1 = GameSync.FromGame(game, game.UID, 1);
+                                    var syncP2 = GameSync.FromGame(game, game.UID, 2);
+                                    Send(JsonConvert.SerializeObject(syncP1, _serializerSettings), NetworkPacketType.GameSync, p1.Connection, p1.ClientCrypto);
+                                    Send(JsonConvert.SerializeObject(syncP2, _serializerSettings), NetworkPacketType.GameSync, p2.Connection, p2.ClientCrypto);
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.WriteLine("GameServer: Received GameCommand packet of player " + player.UID + " could not be read! " + ex.Message);
+                    }
+                    break;
                 default:
                     break;
             }

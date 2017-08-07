@@ -29,6 +29,21 @@ namespace AccessBattle
             public OnlineCardType Type;
             public bool IsFirewall;
         }
+
+        //BoardField _location;
+        ///// <summary>
+        ///// Adds a reference to a board field for finding the card faster.
+        ///// The getter returns null when the set value contains another card.
+        ///// </summary>
+        //public BoardField Location
+        //{
+        //    get
+        //    {
+        //        if (_location?.Card != this) return null;
+        //        return _location;
+        //    }
+        //    set { SetProp(ref _location, value); }
+        //}
     }
 
     /// <summary>

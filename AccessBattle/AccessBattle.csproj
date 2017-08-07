@@ -46,6 +46,8 @@
     <Compile Include="BoardField.cs" />
     <Compile Include="Card.cs" />
     <Compile Include="Game.cs" />
+    <Compile Include="IBoardGame.cs" />
+    <Compile Include="Networking\Packets\GameCommand.cs" />
     <Compile Include="Networking\Packets\GameSync.cs" />
     <Compile Include="IPlayer.cs" />
     <Compile Include="Log.cs" />
