@@ -58,7 +58,7 @@ namespace AccessBattle.Wpf.ViewModel
         void JoinRequestedHandler(object sender, GameJoinRequestedEventArgs args)
         {
             // Special case: Accepted connection but a decline is incoming!
-            if (ParentViewModel.CurrentMenu == MenuType.None && ParentViewModel.Model.Game.Phase == GamePhase.PlayerJoining)
+            if (ParentViewModel.CurrentMenu == MenuType.Deployment && ParentViewModel.Model.Game.Phase == GamePhase.PlayerJoining)
             {
                 lock (_joinMessages)
                 {
@@ -107,8 +107,7 @@ namespace AccessBattle.Wpf.ViewModel
                 return new RelayCommand(o =>
                 {
                     ParentViewModel.Model.Client.ConfirmJoin(ParentViewModel.Model.UID, true);
-                    // TODO: Init game
-                    ParentViewModel.CurrentMenu = MenuType.None;
+                    ParentViewModel.CurrentMenu = MenuType.Deployment;
                     //MessageBox.Show("TODO: Init Game (p1)");
                     // At this stage it is still possible that we get a decline join packet from p2.
                     // In that case we must revert to the waiting menu.

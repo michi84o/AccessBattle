@@ -499,6 +499,16 @@ namespace AccessBattle.Networking
             }
         }
 
+        public bool SendGameCommand(uint uid, string command)
+        {
+            // TODO wait for response
+            var cmd = new GameCommand { UID = uid, Command = command };
+            Send(JsonConvert.SerializeObject(cmd, _serializerSettings), NetworkPacketType.GameCommand);
+
+
+            return true;
+        }
+
         /// <summary>
         /// Exit a game. If game was active and had not finished, player will loose the game.
         /// </summary>

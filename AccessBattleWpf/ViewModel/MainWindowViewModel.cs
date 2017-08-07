@@ -56,6 +56,7 @@ namespace AccessBattle.Wpf.ViewModel
         WaitForJoinMenuViewModel _waitForJoinVm;
         AcceptJoinMenuViewModel _acceptJoinVm;
         WaitForAcceptMenuViewModel _waitForAccept;
+        DeploymentViewModel _deploymentVm;
 
         public MenuViewModelBase CurrentMenuViewModel
         {
@@ -68,6 +69,7 @@ namespace AccessBattle.Wpf.ViewModel
                     case MenuType.WaitForJoin: return _waitForJoinVm;
                     case MenuType.AcceptJoin: return _acceptJoinVm;
                     case MenuType.WaitForAccept: return _waitForAccept;
+                    case MenuType.Deployment: return _deploymentVm;
                     case MenuType.Welcome:
                     default: return _welcomeVm;
                 }
@@ -100,6 +102,7 @@ namespace AccessBattle.Wpf.ViewModel
             _waitForJoinVm = new WaitForJoinMenuViewModel(this);
             _acceptJoinVm = new AcceptJoinMenuViewModel(this);
             _waitForAccept = new WaitForAcceptMenuViewModel(this);
+            _deploymentVm = new DeploymentViewModel(this);
 
             CurrentMenu = MenuType.Welcome;
 

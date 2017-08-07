@@ -60,6 +60,9 @@
             <DataTemplate DataType="{x:Type viewmodel:WaitForAcceptMenuViewModel}">
                 <local:WaitForAcceptMenu Width="300" Height="200" />
             </DataTemplate>
+            <DataTemplate DataType="{x:Type viewmodel:DeploymentViewModel}">
+                <local:DeploymentView Width="300" Height="120" />
+            </DataTemplate>
 
         </ResourceDictionary>
     </Window.Resources>

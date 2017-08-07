@@ -58,6 +58,7 @@
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Interfaces\IMenuHolder.cs" />
     <Compile Include="ViewModel\AcceptJoinMenuViewModel.cs" />
+    <Compile Include="ViewModel\DeploymentViewModel.cs" />
     <Compile Include="ViewModel\GameViewModel.cs" />
     <Compile Include="ViewModel\MenuViewModelBase.cs" />
     <Compile Include="ViewModel\NetworkGameMenuViewModel.cs" />
@@ -66,6 +67,9 @@
     <Compile Include="ViewModel\WelcomeMenuViewModel.cs" />
     <Compile Include="View\AcceptJoinMenu.xaml.cs">
       <DependentUpon>AcceptJoinMenu.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\DeploymentView.xaml.cs">
+      <DependentUpon>DeploymentView.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\NetworkGameMenu.xaml.cs">
       <DependentUpon>NetworkGameMenu.xaml</DependentUpon>
@@ -84,6 +88,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\BoardFieldView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\DeploymentView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

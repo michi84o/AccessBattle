@@ -85,14 +85,12 @@ namespace AccessBattle.Wpf.ViewModel
                 ParentViewModel.Model.Client.ConfirmJoin(args.Message.UID, true);
                 ParentViewModel.Model.IsPlayerHost = false;
                 ParentViewModel.Model.UID = args.Message.UID;
-                // TODO: Init Game
-                ParentViewModel.CurrentMenu = MenuType.None;
+                ParentViewModel.CurrentMenu = MenuType.Deployment;
                 //MessageBox.Show("TODO: INIT GAME (p2)");
             }
             else if (args.Message.Request == JoinRequestType.Decline) // Declined
             {
                 ParentViewModel.JoiningGame = null;
-
                 ParentViewModel.CurrentMenu = MenuType.NetworkGame;
             }
             else

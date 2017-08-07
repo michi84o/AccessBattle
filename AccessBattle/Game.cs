@@ -210,8 +210,9 @@ namespace AccessBattle
                 if (linkCount != 4 || virusCount != 4) return false;
                 linkCount = 0;
                 virusCount = 0;
-                var y1 = player == 1 ? 0 : 7;
-                var y2 = player == 1 ? 1 : 6;
+                --player; // Working with index !!!
+                var y1 = player == 0 ? 0 : 7;
+                var y2 = player == 0 ? 1 : 6;
                 for (int x = 0; x < 8; ++x)
                 {
                     // Clear stack.
