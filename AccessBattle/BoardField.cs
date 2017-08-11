@@ -55,6 +55,7 @@ namespace AccessBattle
 
         public void Update(Sync sync, PlayerState[] players)
         {
+            // Do not check the coordinates! They might require transformation for player 2!
             Card card;
             if (sync.Card.IsFirewall)
             {

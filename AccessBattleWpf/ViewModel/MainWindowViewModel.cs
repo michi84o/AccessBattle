@@ -22,7 +22,7 @@ namespace AccessBattle.Wpf.ViewModel
         public bool IsPlayerHost
         {
             get { return _model.IsPlayerHost; }
-            set { _model.IsPlayerHost = value; } // Prop change triggered by model
+            set { _model.IsPlayerHost = value; } // Prop change triggered by model and forwarded below
         }
 
         MenuType _currentMenu;

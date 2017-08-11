@@ -1,4 +1,5 @@
 ﻿using AccessBattle.Networking.Packets;
+using AccessBattle.Wpf.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,8 @@ namespace AccessBattle.Wpf.ViewModel
         // TODO: Add a "register remote game" method
         // ==> Maybe just pass a reference to the game model?
 
+        GameModel _model;
+
         GamePhase _phase;
         /// <summary>
         /// Current game phase.
@@ -33,7 +36,7 @@ namespace AccessBattle.Wpf.ViewModel
 
         public BoardField[,] Board { get; private set; }
 
-        public GameViewModel()
+        public GameViewModel(GameModel parent)
         {
             Board = new BoardField[8, 11];
             for (ushort y = 0; y < 11; ++y)
@@ -45,6 +48,7 @@ namespace AccessBattle.Wpf.ViewModel
             _players = new PlayerState[2];
             _players[0] = new PlayerState(1);
             _players[1] = new PlayerState(2);
+            _model = parent;
         }
 
         public void Synchronize(GameSync sync)
@@ -60,7 +64,10 @@ namespace AccessBattle.Wpf.ViewModel
             _players[1].Update(sync.Player2);
             foreach (var field in sync.FieldsWithCards)
             {
-                Board[field.X, field.Y].Update(field, _players);
+                int x = field.X;
+                int y = field.Y;
+                _model.ConvertCoordinates(ref x, ref y);
+                Board[x, y].Update(field, _players);
             }
             Phase = sync.Phase;
         }
