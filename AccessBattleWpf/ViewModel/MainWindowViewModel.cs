@@ -188,33 +188,7 @@ namespace AccessBattle.Wpf.ViewModel
                     if (!Int32.TryParse(indexStr, out index)) return;
                     if (index < 0 || index >= BoardFieldList.Count) return;
 
-                    var field = BoardFieldList[index];
-                    if (index < 64)
-                    {
-                        // Main board field clicked
-                        MessageBox.Show("Main field");
-                    }
-                    else if (index < 72)
-                    {
-                        // Stack p1
-                        MessageBox.Show("Stack P1");
-                    }
-                    else if (index < 80)
-                    {
-                        // Stack p2
-                        MessageBox.Show("Stack P2");
-                    }
-                    else if (index == 83)
-                    {
-                        // Server area p1
-                        MessageBox.Show("Server P1");
-                    }
-                    else if (index == 84)
-                    {
-                        // Server area p2
-                        MessageBox.Show("Server P2");
-                    }
-
+                    _model.HandleFieldSelection(BoardFieldList[index]);
                 }, o =>
                 {
                     return true; // Check is done in execution for performance reasons.

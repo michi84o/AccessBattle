@@ -11,6 +11,7 @@ namespace AccessBattle.Wpf.ViewModel
     public class BoardFieldViewModel : PropChangeNotifier
     {
         BoardField _field;
+        public BoardField Field => _field;
 
         BoardFieldVisualState _visualState = BoardFieldVisualState.Empty;
         public BoardFieldVisualState VisualState
@@ -70,8 +71,8 @@ namespace AccessBattle.Wpf.ViewModel
                     }
                     else if (s.Card is OnlineCard && s.Card.Owner != null)
                     {
-                        var type = ((OnlineCard)s.Card).Type;
-                        switch (type)
+                        var card = s.Card as OnlineCard;
+                        switch (card.Type)
                         {
                             case OnlineCardType.Link:
                                 VisualState = BoardFieldVisualState.Link;
@@ -83,6 +84,10 @@ namespace AccessBattle.Wpf.ViewModel
                                 VisualState = BoardFieldVisualState.Flipped;
                                 break;
                         }
+
+                        if (card.HasBoost)
+                            VisualState |= BoardFieldVisualState.LineBoost;
+
                         var num = s.Card.Owner.PlayerNumber;
                         if (num == 1)
                         {

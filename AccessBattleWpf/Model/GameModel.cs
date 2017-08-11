@@ -83,6 +83,42 @@ namespace AccessBattle.Wpf.Model
             }
         }
 
+        public void HandleFieldSelection(BoardFieldViewModel vm)
+        {
+            if (vm?.Field == null) return;
+            var field = vm.Field;
+            var index = 8 * field.Y + field.X;
+
+            if (index < 64)
+            {
+                // Main board field clicked
+                //MessageBox.Show("Main field");
+                field.Card = new OnlineCard() { HasBoost = true, Owner = _game.Players[0], IsFaceUp = true, Type = OnlineCardType.Link };
+                UiGlobals.Instance.StartFlashing();
+                UiGlobals.Instance.StartMultiOverlayFlashing();
+            }
+            else if (index < 72)
+            {
+                // Stack p1
+                MessageBox.Show("Stack P1");
+            }
+            else if (index < 80)
+            {
+                // Stack p2
+                MessageBox.Show("Stack P2");
+            }
+            else if (index == 83)
+            {
+                // Server area p1
+                MessageBox.Show("Server P1");
+            }
+            else if (index == 84)
+            {
+                // Server area p2
+                MessageBox.Show("Server P2");
+            }
+        }
+
         #region Game Synchronization
 
         void GameSyncReceived(object sender, GameSyncEventArgs e)
