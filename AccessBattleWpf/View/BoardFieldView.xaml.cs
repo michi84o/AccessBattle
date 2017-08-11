@@ -39,7 +39,7 @@ namespace AccessBattle.Wpf.View
                     Clicked?.Invoke(this, EventArgs.Empty);
                     var cmd = Command;
                     if (cmd != null && cmd.CanExecute(CommandParameter))
-                        cmd.Execute(cmd);
+                        cmd.Execute(CommandParameter);
                 }
             };
         }
@@ -57,7 +57,7 @@ namespace AccessBattle.Wpf.View
 
         public object CommandParameter
         {
-            get { return (ICommand)GetValue(CommandParameterProperty); }
+            get { return GetValue(CommandParameterProperty); }
             set { SetValue(CommandParameterProperty, value); }
         }
         public static readonly DependencyProperty CommandParameterProperty = DependencyProperty.Register(

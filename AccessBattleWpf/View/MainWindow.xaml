@@ -110,7 +110,8 @@
                 Grid.Column="1" Grid.ColumnSpan="10"/>
             <local:BoardFieldView
                 Grid.Row="3" Grid.Column="4" Grid.ColumnSpan="4"
-                Margin="0,3,0,14" x:Name="ServerFieldOrange" >
+                Margin="0,3,0,14" x:Name="ServerFieldOrange"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="84">
                 <Viewbox
                     Grid.Row="3" Grid.Column="4" Grid.ColumnSpan="4" Margin="2">
                     <Path RenderTransformOrigin="0.5,0.5"
@@ -125,7 +126,8 @@
             </local:BoardFieldView>
             <local:BoardFieldView
                 Grid.Row="12" Grid.Column="4" Grid.ColumnSpan="4"
-                Margin="0,14,0,3" x:Name="ServerFieldBlue" >
+                Margin="0,14,0,3" x:Name="ServerFieldBlue"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="83">
                 <Viewbox
                     Grid.Row="3" Grid.Column="4" Grid.ColumnSpan="4" Margin="2">
                     <Path RenderTransformOrigin="0.5,0.5"
@@ -138,269 +140,333 @@
 
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[56].VisualState}" FieldCardVisualState="{Binding BoardFieldList[56].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="56"
                 Grid.Row="4" Grid.Column="2"
                 Style="{StaticResource MainField}" FieldBackground="{Binding IsPlayerHost, Converter={StaticResource HostColConvMainInv}}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[57].VisualState}" FieldCardVisualState="{Binding BoardFieldList[57].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="57"
                 Grid.Row="4" Grid.Column="3"
                 Style="{StaticResource MainField}" FieldBackground="{Binding IsPlayerHost, Converter={StaticResource HostColConvMainInv}}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[58].VisualState}" FieldCardVisualState="{Binding BoardFieldList[58].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="58"
                 Grid.Row="4" Grid.Column="4"
                 Style="{StaticResource MainField}" FieldBackground="{Binding IsPlayerHost, Converter={StaticResource HostColConvMainInv}}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[59].VisualState}" FieldCardVisualState="{Binding BoardFieldList[59].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="59"
                 Grid.Row="3" Grid.Column="5"
                 Style="{StaticResource MainField}"
                 Grid.RowSpan="2" VerticalAlignment="Bottom" Height="60"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[60].VisualState}" FieldCardVisualState="{Binding BoardFieldList[60].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="60"
                 Grid.Row="3" Grid.Column="6"
                 Style="{StaticResource MainField}"
                 Grid.RowSpan="2" VerticalAlignment="Bottom" Height="60"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[61].VisualState}" FieldCardVisualState="{Binding BoardFieldList[61].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="61"
                 Grid.Row="4" Grid.Column="7"
                 Style="{StaticResource MainField}" FieldBackground="{Binding IsPlayerHost, Converter={StaticResource HostColConvMainInv}}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[62].VisualState}" FieldCardVisualState="{Binding BoardFieldList[62].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="62"
                 Grid.Row="4" Grid.Column="8"
                 Style="{StaticResource MainField}" FieldBackground="{Binding IsPlayerHost, Converter={StaticResource HostColConvMainInv}}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[63].VisualState}" FieldCardVisualState="{Binding BoardFieldList[63].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="63"
                 Grid.Row="4" Grid.Column="9"
                 Style="{StaticResource MainField}" FieldBackground="{Binding IsPlayerHost, Converter={StaticResource HostColConvMainInv}}"/>
 
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[48].VisualState}" FieldCardVisualState="{Binding BoardFieldList[48].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="48"
                 Grid.Row="5" Grid.Column="2"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[49].VisualState}" FieldCardVisualState="{Binding BoardFieldList[49].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="49"
                 Grid.Row="5" Grid.Column="3"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[50].VisualState}" FieldCardVisualState="{Binding BoardFieldList[50].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="50"
                 Grid.Row="5" Grid.Column="4"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[51].VisualState}" FieldCardVisualState="{Binding BoardFieldList[51].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="51"
                 Grid.Row="5" Grid.Column="5"
                 Style="{StaticResource MainField}" FieldBackground="{Binding IsPlayerHost, Converter={StaticResource HostColConvMainInv}}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[52].VisualState}" FieldCardVisualState="{Binding BoardFieldList[52].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="52"
                 Grid.Row="5" Grid.Column="6"
                 Style="{StaticResource MainField}" FieldBackground="{Binding IsPlayerHost, Converter={StaticResource HostColConvMainInv}}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[53].VisualState}" FieldCardVisualState="{Binding BoardFieldList[53].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="53"
                 Grid.Row="5" Grid.Column="7"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[54].VisualState}" FieldCardVisualState="{Binding BoardFieldList[54].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="54"
                 Grid.Row="5" Grid.Column="8"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[55].VisualState}" FieldCardVisualState="{Binding BoardFieldList[55].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="55"
                 Grid.Row="5" Grid.Column="9"
                 Style="{StaticResource MainField}"/>
 
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[40].VisualState}" FieldCardVisualState="{Binding BoardFieldList[40].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="40"
                 Grid.Row="6" Grid.Column="2"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[41].VisualState}" FieldCardVisualState="{Binding BoardFieldList[41].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="41"
                 Grid.Row="6" Grid.Column="3"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[42].VisualState}" FieldCardVisualState="{Binding BoardFieldList[42].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="42"
                 Grid.Row="6" Grid.Column="4"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[43].VisualState}" FieldCardVisualState="{Binding BoardFieldList[43].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="43"
                 Grid.Row="6" Grid.Column="5"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[44].VisualState}" FieldCardVisualState="{Binding BoardFieldList[44].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="44"
                 Grid.Row="6" Grid.Column="6"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[45].VisualState}" FieldCardVisualState="{Binding BoardFieldList[45].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="45"
                 Grid.Row="6" Grid.Column="7"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[46].VisualState}" FieldCardVisualState="{Binding BoardFieldList[46].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="46"
                 Grid.Row="6" Grid.Column="8"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[47].VisualState}" FieldCardVisualState="{Binding BoardFieldList[47].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="47"
                 Grid.Row="6" Grid.Column="9"
                 Style="{StaticResource MainField}"/>
 
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[32].VisualState}" FieldCardVisualState="{Binding BoardFieldList[32].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="32"
                 Grid.Row="7" Grid.Column="2"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[33].VisualState}" FieldCardVisualState="{Binding BoardFieldList[33].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="33"
                 Grid.Row="7" Grid.Column="3"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[34].VisualState}" FieldCardVisualState="{Binding BoardFieldList[34].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="34"
                 Grid.Row="7" Grid.Column="4"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[35].VisualState}" FieldCardVisualState="{Binding BoardFieldList[35].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="35"
                 Grid.Row="7" Grid.Column="5"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[36].VisualState}" FieldCardVisualState="{Binding BoardFieldList[36].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="36"
                 Grid.Row="7" Grid.Column="6"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[37].VisualState}" FieldCardVisualState="{Binding BoardFieldList[37].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="37"
                 Grid.Row="7" Grid.Column="7"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[38].VisualState}" FieldCardVisualState="{Binding BoardFieldList[38].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="38"
                 Grid.Row="7" Grid.Column="8"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[39].VisualState}" FieldCardVisualState="{Binding BoardFieldList[39].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="39"
                 Grid.Row="7" Grid.Column="9"
                 Style="{StaticResource MainField}"/>
 
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[24].VisualState}" FieldCardVisualState="{Binding BoardFieldList[24].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="24"
                 Grid.Row="8" Grid.Column="2"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[25].VisualState}" FieldCardVisualState="{Binding BoardFieldList[25].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="25"
                 Grid.Row="8" Grid.Column="3"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[26].VisualState}" FieldCardVisualState="{Binding BoardFieldList[26].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="26"
                 Grid.Row="8" Grid.Column="4"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[27].VisualState}" FieldCardVisualState="{Binding BoardFieldList[27].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="27"
                 Grid.Row="8" Grid.Column="5"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[28].VisualState}" FieldCardVisualState="{Binding BoardFieldList[28].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="28"
                 Grid.Row="8" Grid.Column="6"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[29].VisualState}" FieldCardVisualState="{Binding BoardFieldList[29].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="29"
                 Grid.Row="8" Grid.Column="7"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[30].VisualState}" FieldCardVisualState="{Binding BoardFieldList[30].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="30"
                 Grid.Row="8" Grid.Column="8"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[31].VisualState}" FieldCardVisualState="{Binding BoardFieldList[31].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="31"
                 Grid.Row="8" Grid.Column="9"
                 Style="{StaticResource MainField}"/>
 
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[16].VisualState}" FieldCardVisualState="{Binding BoardFieldList[16].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="16"
                 Grid.Row="9" Grid.Column="2"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[17].VisualState}" FieldCardVisualState="{Binding BoardFieldList[17].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="17"
                 Grid.Row="9" Grid.Column="3"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[18].VisualState}" FieldCardVisualState="{Binding BoardFieldList[18].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="18"
                 Grid.Row="9" Grid.Column="4"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[19].VisualState}" FieldCardVisualState="{Binding BoardFieldList[19].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="19"
                 Grid.Row="9" Grid.Column="5"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[20].VisualState}" FieldCardVisualState="{Binding BoardFieldList[20].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="20"
                 Grid.Row="9" Grid.Column="6"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[21].VisualState}" FieldCardVisualState="{Binding BoardFieldList[21].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="21"
                 Grid.Row="9" Grid.Column="7"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[22].VisualState}" FieldCardVisualState="{Binding BoardFieldList[22].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="22"
                 Grid.Row="9" Grid.Column="8"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[23].VisualState}" FieldCardVisualState="{Binding BoardFieldList[23].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="23"
                 Grid.Row="9" Grid.Column="9"
                 Style="{StaticResource MainField}"/>
 
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[8].VisualState}" FieldCardVisualState="{Binding BoardFieldList[8].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="8"
                 Grid.Row="10" Grid.Column="2"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[9].VisualState}" FieldCardVisualState="{Binding BoardFieldList[9].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="9"
                 Grid.Row="10" Grid.Column="3"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[10].VisualState}" FieldCardVisualState="{Binding BoardFieldList[10].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="10"
                 Grid.Row="10" Grid.Column="4"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[11].VisualState}" FieldCardVisualState="{Binding BoardFieldList[11].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="11"
                 Grid.Row="10" Grid.Column="5"
                 Style="{StaticResource MainField}" FieldBackground="{Binding IsPlayerHost, Converter={StaticResource HostColConvMain}}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[12].VisualState}" FieldCardVisualState="{Binding BoardFieldList[12].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="12"
                 Grid.Row="10" Grid.Column="6"
                 Style="{StaticResource MainField}" FieldBackground="{Binding IsPlayerHost, Converter={StaticResource HostColConvMain}}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[13].VisualState}" FieldCardVisualState="{Binding BoardFieldList[13].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="13"
                 Grid.Row="10" Grid.Column="7"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[14].VisualState}" FieldCardVisualState="{Binding BoardFieldList[14].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="14"
                 Grid.Row="10" Grid.Column="8"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[15].VisualState}" FieldCardVisualState="{Binding BoardFieldList[15].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="15"
                 Grid.Row="10" Grid.Column="9"
                 Style="{StaticResource MainField}"/>
 
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[0].VisualState}" FieldCardVisualState="{Binding BoardFieldList[0].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="0"
                 Grid.Row="11" Grid.Column="2"
                 Style="{StaticResource MainField}" FieldBackground="{Binding IsPlayerHost, Converter={StaticResource HostColConvMain}}" />
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[1].VisualState}" FieldCardVisualState="{Binding BoardFieldList[1].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="1"
                 Grid.Row="11" Grid.Column="3"
                 Style="{StaticResource MainField}" FieldBackground="{Binding IsPlayerHost, Converter={StaticResource HostColConvMain}}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[2].VisualState}" FieldCardVisualState="{Binding BoardFieldList[2].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="2"
                 Grid.Row="11" Grid.Column="4"
                 Style="{StaticResource MainField}" FieldBackground="{Binding IsPlayerHost, Converter={StaticResource HostColConvMain}}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[3].VisualState}" FieldCardVisualState="{Binding BoardFieldList[3].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="3"
                 Grid.Row="11" Grid.Column="5" IsExitFlipped="True"
                 Style="{StaticResource MainField}"
                 Grid.RowSpan="2" VerticalAlignment="Top" Height="60"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[4].VisualState}" FieldCardVisualState="{Binding BoardFieldList[4].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="4"
                 Grid.Row="11" Grid.Column="6" IsExitFlipped="True"
                 Style="{StaticResource MainField}"
                 Grid.RowSpan="2" VerticalAlignment="Top" Height="60"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[5].VisualState}" FieldCardVisualState="{Binding BoardFieldList[5].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="5"
                 Grid.Row="11" Grid.Column="7"
                 Style="{StaticResource MainField}" FieldBackground="{Binding IsPlayerHost, Converter={StaticResource HostColConvMain}}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[6].VisualState}" FieldCardVisualState="{Binding BoardFieldList[6].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="6"
                 Grid.Row="11" Grid.Column="8"
                 Style="{StaticResource MainField}" FieldBackground="{Binding IsPlayerHost, Converter={StaticResource HostColConvMain}}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[7].VisualState}" FieldCardVisualState="{Binding BoardFieldList[7].CardVisualState}"
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="7"
                 Grid.Row="11" Grid.Column="9"
                 Style="{StaticResource MainField}" FieldBackground="{Binding IsPlayerHost, Converter={StaticResource HostColConvMain}}"/>
 
@@ -414,10 +480,14 @@
                     <ColumnDefinition/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <local:BoardFieldView Grid.Column="0" FieldVisualState="{Binding BoardFieldList[72].VisualState}" FieldCardVisualState="{Binding BoardFieldList[72].CardVisualState}" Style="{StaticResource StackField}" IsCardFlipped="True"/>
-                <local:BoardFieldView Grid.Column="1" FieldVisualState="{Binding BoardFieldList[73].VisualState}" FieldCardVisualState="{Binding BoardFieldList[73].CardVisualState}" Style="{StaticResource StackField}" IsCardFlipped="True"/>
-                <local:BoardFieldView Grid.Column="2" FieldVisualState="{Binding BoardFieldList[74].VisualState}" FieldCardVisualState="{Binding BoardFieldList[74].CardVisualState}" Style="{StaticResource StackField}" IsCardFlipped="True"/>
-                <local:BoardFieldView Grid.Column="3" FieldVisualState="{Binding BoardFieldList[75].VisualState}" FieldCardVisualState="{Binding BoardFieldList[75].CardVisualState}" Style="{StaticResource StackField}" IsCardFlipped="True"/>
+                <local:BoardFieldView Grid.Column="0" FieldVisualState="{Binding BoardFieldList[72].VisualState}" FieldCardVisualState="{Binding BoardFieldList[72].CardVisualState}" Style="{StaticResource StackField}" IsCardFlipped="True"
+                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="72"/>
+                <local:BoardFieldView Grid.Column="1" FieldVisualState="{Binding BoardFieldList[73].VisualState}" FieldCardVisualState="{Binding BoardFieldList[73].CardVisualState}" Style="{StaticResource StackField}" IsCardFlipped="True"
+                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="73"/>
+                <local:BoardFieldView Grid.Column="2" FieldVisualState="{Binding BoardFieldList[74].VisualState}" FieldCardVisualState="{Binding BoardFieldList[74].CardVisualState}" Style="{StaticResource StackField}" IsCardFlipped="True"
+                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="74"/>
+                <local:BoardFieldView Grid.Column="3" FieldVisualState="{Binding BoardFieldList[75].VisualState}" FieldCardVisualState="{Binding BoardFieldList[75].CardVisualState}" Style="{StaticResource StackField}" IsCardFlipped="True"
+                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="75"/>
             </Grid>
 
             <Grid
@@ -428,10 +498,14 @@
                     <ColumnDefinition/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <local:BoardFieldView Grid.Column="0" FieldVisualState="{Binding BoardFieldList[76].VisualState}" FieldCardVisualState="{Binding BoardFieldList[76].CardVisualState}" Style="{StaticResource StackField}" IsCardFlipped="True"/>
-                <local:BoardFieldView Grid.Column="1" FieldVisualState="{Binding BoardFieldList[77].VisualState}" FieldCardVisualState="{Binding BoardFieldList[77].CardVisualState}" Style="{StaticResource StackField}" IsCardFlipped="True"/>
-                <local:BoardFieldView Grid.Column="2" FieldVisualState="{Binding BoardFieldList[78].VisualState}" FieldCardVisualState="{Binding BoardFieldList[78].CardVisualState}" Style="{StaticResource StackField}" IsCardFlipped="True"/>
-                <local:BoardFieldView Grid.Column="3" FieldVisualState="{Binding BoardFieldList[79].VisualState}" FieldCardVisualState="{Binding BoardFieldList[79].CardVisualState}" Style="{StaticResource StackField}" IsCardFlipped="True"/>
+                <local:BoardFieldView Grid.Column="0" FieldVisualState="{Binding BoardFieldList[76].VisualState}" FieldCardVisualState="{Binding BoardFieldList[76].CardVisualState}" Style="{StaticResource StackField}" IsCardFlipped="True"
+                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="76"/>
+                <local:BoardFieldView Grid.Column="1" FieldVisualState="{Binding BoardFieldList[77].VisualState}" FieldCardVisualState="{Binding BoardFieldList[77].CardVisualState}" Style="{StaticResource StackField}" IsCardFlipped="True"
+                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="77"/>
+                <local:BoardFieldView Grid.Column="2" FieldVisualState="{Binding BoardFieldList[78].VisualState}" FieldCardVisualState="{Binding BoardFieldList[78].CardVisualState}" Style="{StaticResource StackField}" IsCardFlipped="True"
+                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="78"/>
+                <local:BoardFieldView Grid.Column="3" FieldVisualState="{Binding BoardFieldList[79].VisualState}" FieldCardVisualState="{Binding BoardFieldList[79].CardVisualState}" Style="{StaticResource StackField}" IsCardFlipped="True"
+                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="79"/>
             </Grid>
 
             <Grid
@@ -442,10 +516,14 @@
                     <ColumnDefinition/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <local:BoardFieldView Grid.Column="0" FieldVisualState="{Binding BoardFieldList[68].VisualState}" FieldCardVisualState="{Binding BoardFieldList[68].CardVisualState}" Style="{StaticResource StackField}"/>
-                <local:BoardFieldView Grid.Column="1" FieldVisualState="{Binding BoardFieldList[69].VisualState}" FieldCardVisualState="{Binding BoardFieldList[69].CardVisualState}" Style="{StaticResource StackField}"/>
-                <local:BoardFieldView Grid.Column="2" FieldVisualState="{Binding BoardFieldList[70].VisualState}" FieldCardVisualState="{Binding BoardFieldList[70].CardVisualState}" Style="{StaticResource StackField}"/>
-                <local:BoardFieldView Grid.Column="3" FieldVisualState="{Binding BoardFieldList[71].VisualState}" FieldCardVisualState="{Binding BoardFieldList[71].CardVisualState}" Style="{StaticResource StackField}"/>
+                <local:BoardFieldView Grid.Column="0" FieldVisualState="{Binding BoardFieldList[68].VisualState}" FieldCardVisualState="{Binding BoardFieldList[68].CardVisualState}" Style="{StaticResource StackField}"
+                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="68"/>
+                <local:BoardFieldView Grid.Column="1" FieldVisualState="{Binding BoardFieldList[69].VisualState}" FieldCardVisualState="{Binding BoardFieldList[69].CardVisualState}" Style="{StaticResource StackField}"
+                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="69"/>
+                <local:BoardFieldView Grid.Column="2" FieldVisualState="{Binding BoardFieldList[70].VisualState}" FieldCardVisualState="{Binding BoardFieldList[70].CardVisualState}" Style="{StaticResource StackField}"
+                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="70"/>
+                <local:BoardFieldView Grid.Column="3" FieldVisualState="{Binding BoardFieldList[71].VisualState}" FieldCardVisualState="{Binding BoardFieldList[71].CardVisualState}" Style="{StaticResource StackField}"
+                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="71"/>
             </Grid>
 
             <Button
@@ -461,10 +539,14 @@
                     <ColumnDefinition/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <local:BoardFieldView Grid.Column="0" FieldVisualState="{Binding BoardFieldList[64].VisualState}" FieldCardVisualState="{Binding BoardFieldList[64].CardVisualState}" Style="{StaticResource StackField}"/>
-                <local:BoardFieldView Grid.Column="1" FieldVisualState="{Binding BoardFieldList[65].VisualState}" FieldCardVisualState="{Binding BoardFieldList[65].CardVisualState}" Style="{StaticResource StackField}"/>
-                <local:BoardFieldView Grid.Column="2" FieldVisualState="{Binding BoardFieldList[66].VisualState}" FieldCardVisualState="{Binding BoardFieldList[66].CardVisualState}" Style="{StaticResource StackField}"/>
-                <local:BoardFieldView Grid.Column="3" FieldVisualState="{Binding BoardFieldList[67].VisualState}" FieldCardVisualState="{Binding BoardFieldList[67].CardVisualState}" Style="{StaticResource StackField}"/>
+                <local:BoardFieldView Grid.Column="0" FieldVisualState="{Binding BoardFieldList[64].VisualState}" FieldCardVisualState="{Binding BoardFieldList[64].CardVisualState}" Style="{StaticResource StackField}"
+                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="64"/>
+                <local:BoardFieldView Grid.Column="1" FieldVisualState="{Binding BoardFieldList[65].VisualState}" FieldCardVisualState="{Binding BoardFieldList[65].CardVisualState}" Style="{StaticResource StackField}"
+                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="65"/>
+                <local:BoardFieldView Grid.Column="2" FieldVisualState="{Binding BoardFieldList[66].VisualState}" FieldCardVisualState="{Binding BoardFieldList[66].CardVisualState}" Style="{StaticResource StackField}"
+                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="66"/>
+                <local:BoardFieldView Grid.Column="3" FieldVisualState="{Binding BoardFieldList[67].VisualState}" FieldCardVisualState="{Binding BoardFieldList[67].CardVisualState}" Style="{StaticResource StackField}"
+                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="67"/>
             </Grid>
 
             <!-- Overlay dialogues -->

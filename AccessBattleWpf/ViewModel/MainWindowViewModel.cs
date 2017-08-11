@@ -114,6 +114,10 @@ namespace AccessBattle.Wpf.ViewModel
                     BoardFieldList.Add(_boardFields[x, y]);
                 }
 
+            // Server area p1 is at index 83, p2 at 84
+
+            #region Set default visual states
+
             _boardFields[3, 0].DefaultVisualState = BoardFieldVisualState.Exit;
             _boardFields[4, 0].DefaultVisualState = BoardFieldVisualState.Exit;
 
@@ -138,6 +142,7 @@ namespace AccessBattle.Wpf.ViewModel
             _boardFields[6, 9].DefaultVisualState = BoardFieldVisualState.Virus;
             _boardFields[7, 9].DefaultVisualState = BoardFieldVisualState.Virus; // 79
 
+            #endregion
 
             for (int y = 0; y < 11; ++y)
                 for (int x = 0; x < 8; ++x)
@@ -163,6 +168,57 @@ namespace AccessBattle.Wpf.ViewModel
                     return
                        (IsPlayerHost && _model.Game.Phase == GamePhase.Player1Turn) ||
                       (!IsPlayerHost && _model.Game.Phase == GamePhase.Player2Turn);
+                });
+            }
+        }
+
+        public ICommand BoardFieldClickedCommand
+        {
+            get
+            {
+                return new RelayCommand(o =>
+                {
+                    //if (!(_model.Game.Phase == GamePhase.Deployment) &&
+                    //   !(IsPlayerHost && _model.Game.Phase == GamePhase.Player1Turn) &&
+                    //  !(!IsPlayerHost && _model.Game.Phase == GamePhase.Player2Turn))
+                    //    return;
+                    var indexStr = o as string;
+                    if (string.IsNullOrEmpty(indexStr)) return;
+                    int index;
+                    if (!Int32.TryParse(indexStr, out index)) return;
+                    if (index < 0 || index >= BoardFieldList.Count) return;
+
+                    var field = BoardFieldList[index];
+                    if (index < 64)
+                    {
+                        // Main board field clicked
+                        MessageBox.Show("Main field");
+                    }
+                    else if (index < 72)
+                    {
+                        // Stack p1
+                        MessageBox.Show("Stack P1");
+                    }
+                    else if (index < 80)
+                    {
+                        // Stack p2
+                        MessageBox.Show("Stack P2");
+                    }
+                    else if (index == 83)
+                    {
+                        // Server area p1
+                        MessageBox.Show("Server P1");
+                    }
+                    else if (index == 84)
+                    {
+                        // Server area p2
+                        MessageBox.Show("Server P2");
+                    }
+
+                }, o =>
+                {
+                    return true; // Check is done in execution for performance reasons.
+
                 });
             }
         }
