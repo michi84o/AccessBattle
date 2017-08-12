@@ -14,7 +14,7 @@ a very stupid AI. The final game will be playable over network.
   - [x] Create and join games over server
   - [ ] UI rewrite (WIP)
     - [x] Display Board and cards
-	- [ ] New animation system (WIP)
+	- [x] Animation system
 	- [ ] Menus (WIP)
 	- [ ] Player interaction (WIP)	
   - [x] Synchronize game data between clients

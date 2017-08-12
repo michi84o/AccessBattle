@@ -111,7 +111,13 @@ namespace AccessBattle.Wpf.View
         public static readonly DependencyProperty IsCardFlippedProperty = DependencyProperty.Register(
             nameof(IsCardFlipped), typeof(bool), typeof(BoardFieldView), new PropertyMetadata(false));
 
-
+        public bool IsHighlighted
+        {
+            get { return (bool)GetValue(IsHighlightedProperty); }
+            set { SetValue(IsHighlightedProperty, value); }
+        }
+        public static readonly DependencyProperty IsHighlightedProperty = DependencyProperty.Register(
+            nameof(IsHighlighted), typeof(bool), typeof(BoardFieldView), new PropertyMetadata(false));
 
     }
 }

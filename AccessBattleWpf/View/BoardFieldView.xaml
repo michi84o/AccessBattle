@@ -28,6 +28,8 @@
 
             <converters:BoardFieldVisualStateMultiOverlayConverter x:Key="convMultiOverlay" />
 
+            <converters:BoolVisibilityConverter x:Key="boolVisConv" />
+
             <Style TargetType="Grid" x:Key="MultiOverlayGrid"  >
                 <Style.Triggers>
                     <DataTrigger
@@ -51,7 +53,8 @@
                 <!-- This layer overrides the background when a card is on this field -->
                 <Border Background="{Binding Path=FieldCardVisualState, ElementName=BoardFieldControl, Converter={StaticResource cardConv} }" CornerRadius="2" BorderThickness="2" BorderBrush="Transparent" />
                 <!-- White overlay background for flashing animation -->
-                <Border Background="White" CornerRadius="2" BorderThickness="2" BorderBrush="Transparent" Opacity="{Binding Source={x:Static global:UiGlobals.Instance}, Path=FlashOpacity}"/>
+                <Border Background="White" CornerRadius="2" BorderThickness="2" BorderBrush="Transparent" Opacity="{Binding Source={x:Static global:UiGlobals.Instance}, Path=FlashOpacity}"
+                        Visibility="{Binding Path=IsHighlighted, ElementName=BoardFieldControl, Converter={StaticResource boolVisConv} }"/>
 
                 <!-- The following code defines the different contents this user control can show -->
                 <!-- The visibility of the contents just has to be switched -->

@@ -39,6 +39,13 @@ namespace AccessBattle.Wpf.ViewModel
             set { SetProp(ref _cardVisualState, value); }
         }
 
+        bool _isHighlighted;
+        public bool IsHighlighted
+        {
+            get { return _isHighlighted; }
+            set { SetProp(ref _isHighlighted, value); }
+        }
+
         public void RegisterBoardField(BoardField field)
         {
             if (field == _field) return;

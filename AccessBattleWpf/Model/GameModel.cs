@@ -92,10 +92,11 @@ namespace AccessBattle.Wpf.Model
             if (index < 64)
             {
                 // Main board field clicked
-                //MessageBox.Show("Main field");
-                field.Card = new OnlineCard() { HasBoost = true, Owner = _game.Players[0], IsFaceUp = true, Type = OnlineCardType.Link };
-                UiGlobals.Instance.StartFlashing();
-                UiGlobals.Instance.StartMultiOverlayFlashing();
+                MessageBox.Show("Main field");
+                //field.Card = new OnlineCard { HasBoost = true, Owner = _game.Players[0], IsFaceUp = true, Type = OnlineCardType.Link };
+                //vm.IsHighlighted = true;
+                //UiGlobals.Instance.StartFlashing();
+                //UiGlobals.Instance.StartMultiOverlayFlashing();
             }
             else if (index < 72)
             {
