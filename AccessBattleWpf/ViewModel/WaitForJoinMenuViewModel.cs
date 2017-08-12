@@ -17,7 +17,7 @@ namespace AccessBattle.Wpf.ViewModel
             IMenuHolder parent) : base(parent)
         {
             WeakEventManager<NetworkGameClient, GameJoinRequestedEventArgs>.AddHandler(
-                parent.Model.Client, nameof(parent.Model.Client.GameJoinRequested), JoinRequestedHandler);
+                parent.Game.Client, nameof(parent.Game.Client.GameJoinRequested), JoinRequestedHandler);
 
             _canCancel = true;
         }
@@ -53,7 +53,7 @@ namespace AccessBattle.Wpf.ViewModel
             {
                 return new RelayCommand(o =>
                 {
-                    ParentViewModel.Model.Client.ExitGame(ParentViewModel.Model.UID);
+                    ParentViewModel.Game.Client.ExitGame(ParentViewModel.Game.UID);
                     ParentViewModel.CurrentMenu = MenuType.NetworkGame;
                 }, o => CanCancel);
             }

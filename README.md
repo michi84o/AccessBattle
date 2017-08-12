@@ -10,10 +10,10 @@ It is still in development. Right now you can play against
 a very stupid AI. The final game will be playable over network.
 
 - Estimated completion: End of August 2017
-- Current Status and next steps:
+- Current status and next steps:
   - [x] Create and join games over server
   - [ ] UI rewrite (WIP)
-    - [x] Display Board and cards
+    - [x] Display board and cards
 	- [x] Animation system
 	- [ ] Menus (WIP)
 	- [ ] Player interaction (WIP)	

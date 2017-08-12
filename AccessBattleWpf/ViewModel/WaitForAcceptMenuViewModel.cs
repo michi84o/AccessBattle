@@ -38,7 +38,7 @@ namespace AccessBattle.Wpf.ViewModel
                 {
                     var jg = ParentViewModel.JoiningGame?.UID;
                     if (jg != null)
-                        ParentViewModel.Model.Client.ConfirmJoin(jg.Value, false);
+                        ParentViewModel.Game.Client.ConfirmJoin(jg.Value, false);
                     else
                         ParentViewModel.CurrentMenu = MenuType.NetworkGame;
                 }, o => true);

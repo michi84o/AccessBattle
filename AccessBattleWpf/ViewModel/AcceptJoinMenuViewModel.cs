@@ -17,7 +17,7 @@ namespace AccessBattle.Wpf.ViewModel
             IMenuHolder parent) : base(parent)
         {
             WeakEventManager<NetworkGameClient, GameJoinRequestedEventArgs>.AddHandler(
-               parent.Model.Client, nameof(parent.Model.Client.GameJoinRequested), JoinRequestedHandler);
+               parent.Game.Client, nameof(parent.Game.Client.GameJoinRequested), JoinRequestedHandler);
         }
 
         public override void Activate()
@@ -58,7 +58,7 @@ namespace AccessBattle.Wpf.ViewModel
         void JoinRequestedHandler(object sender, GameJoinRequestedEventArgs args)
         {
             // Special case: Accepted connection but a decline is incoming!
-            if (ParentViewModel.CurrentMenu == MenuType.Deployment && ParentViewModel.Model.Game.Phase == GamePhase.PlayerJoining)
+            if (ParentViewModel.CurrentMenu == MenuType.Deployment && ParentViewModel.Game.Phase == GamePhase.PlayerJoining)
             {
                 lock (_joinMessages)
                 {
@@ -76,9 +76,9 @@ namespace AccessBattle.Wpf.ViewModel
                 ParentViewModel.CurrentMenu != MenuType.AcceptJoin) return;
 
             // Wrong game (TODO: test if this can happen)
-            if (args.Message.UID != ParentViewModel.Model.UID)
+            if (args.Message.UID != ParentViewModel.Game.UID)
             {
-                ParentViewModel.Model.Client.ConfirmJoin(args.Message.UID, false);
+                ParentViewModel.Game.Client.ConfirmJoin(args.Message.UID, false);
                 return;
             }
 
@@ -106,7 +106,7 @@ namespace AccessBattle.Wpf.ViewModel
             {
                 return new RelayCommand(o =>
                 {
-                    ParentViewModel.Model.Client.ConfirmJoin(ParentViewModel.Model.UID, true);
+                    ParentViewModel.Game.Client.ConfirmJoin(ParentViewModel.Game.UID, true);
                     ParentViewModel.CurrentMenu = MenuType.Deployment;
                     //MessageBox.Show("TODO: Init Game (p1)");
                     // At this stage it is still possible that we get a decline join packet from p2.
@@ -128,7 +128,7 @@ namespace AccessBattle.Wpf.ViewModel
             {
                 return new RelayCommand(o =>
                 {
-                    ParentViewModel.Model.Client.ConfirmJoin(ParentViewModel.Model.UID, false);
+                    ParentViewModel.Game.Client.ConfirmJoin(ParentViewModel.Game.UID, false);
                     lock (_joinMessages)
                     {
                         if (_joinMessages.Count > 0)

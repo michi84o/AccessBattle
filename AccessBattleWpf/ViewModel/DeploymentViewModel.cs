@@ -40,7 +40,7 @@ namespace AccessBattle.Wpf.ViewModel
             new RelayCommand( o =>
             {
                 // TODO
-                ParentViewModel.Model.Client.SendGameCommand(ParentViewModel.Model.UID, "dp LLVVVVLL");
+                ParentViewModel.Game.Client.SendGameCommand(ParentViewModel.Game.UID, "dp LLVVVVLL");
 
                 CommandManager.InvalidateRequerySuggested();
             }, o => { return true; }); // TODO

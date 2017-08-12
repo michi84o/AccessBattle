@@ -1,5 +1,4 @@
 ﻿using AccessBattle.Wpf.Interfaces;
-using AccessBattle.Wpf.Model;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,14 +14,13 @@ namespace AccessBattle.Wpf.ViewModel
 {
     public class MainWindowViewModel : PropChangeNotifier, IMenuHolder
     {
-        GameModel _model;
-
-        public GameModel Model => _model;
+        GameViewModel _game;
+        public GameViewModel Game => _game;
 
         public bool IsPlayerHost
         {
-            get { return _model.IsPlayerHost; }
-            set { _model.IsPlayerHost = value; } // Prop change triggered by model and forwarded below
+            get { return _game.IsPlayerHost; }
+            set { _game.IsPlayerHost = value; } // Prop change triggered by model and forwarded below
         }
 
         MenuType _currentMenu;
@@ -39,11 +37,11 @@ namespace AccessBattle.Wpf.ViewModel
                     if (_currentMenu == MenuType.WaitForAccept ||
                         _currentMenu == MenuType.WaitForJoin ||
                         _currentMenu == MenuType.AcceptJoin)
-                        Model.Game.Phase = GamePhase.PlayerJoining;
+                        _game.Phase = GamePhase.PlayerJoining;
                     else if (
                         _currentMenu == MenuType.NetworkGame ||
                         _currentMenu == MenuType.Welcome)
-                        Model.Game.Phase = GamePhase.WaitingForPlayers;
+                        _game.Phase = GamePhase.WaitingForPlayers;
                     lastVm?.Suspend();
                     CurrentMenuViewModel?.Activate();
                 }
@@ -93,8 +91,8 @@ namespace AccessBattle.Wpf.ViewModel
 
         public MainWindowViewModel()
         {
-            _model = new GameModel();
-            _model.PropertyChanged += _model_PropertyChanged;
+            _game = new GameViewModel();
+            _game.PropertyChanged += _model_PropertyChanged;
 
             // Menu view models
             _welcomeVm = new WelcomeMenuViewModel(this);
@@ -146,12 +144,12 @@ namespace AccessBattle.Wpf.ViewModel
 
             for (int y = 0; y < 11; ++y)
                 for (int x = 0; x < 8; ++x)
-                    _boardFields[x, y].RegisterBoardField(_model.Game.Board[x, y]);
+                    _boardFields[x, y].RegisterBoardField(_game.Board[x, y]);
         }
 
         void _model_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(_model.IsPlayerHost))
+            if (e.PropertyName == nameof(_game.IsPlayerHost))
             {
                 OnPropertyChanged(nameof(IsPlayerHost));
             }
@@ -166,8 +164,8 @@ namespace AccessBattle.Wpf.ViewModel
                 }, o =>
                 {
                     return
-                       (IsPlayerHost && _model.Game.Phase == GamePhase.Player1Turn) ||
-                      (!IsPlayerHost && _model.Game.Phase == GamePhase.Player2Turn);
+                       (IsPlayerHost && _game.Phase == GamePhase.Player1Turn) ||
+                      (!IsPlayerHost && _game.Phase == GamePhase.Player2Turn);
                 });
             }
         }
@@ -188,7 +186,7 @@ namespace AccessBattle.Wpf.ViewModel
                     if (!Int32.TryParse(indexStr, out index)) return;
                     if (index < 0 || index >= BoardFieldList.Count) return;
 
-                    _model.HandleFieldSelection(BoardFieldList[index]);
+                    _game.HandleFieldSelection(BoardFieldList[index]);
                 }, o =>
                 {
                     return true; // Check is done in execution for performance reasons.
