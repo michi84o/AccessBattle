@@ -104,7 +104,7 @@ namespace AccessBattle.Wpf.ViewModel
             // index can be calculated as: 8*y + x
 
             var vm = BoardFieldList[index];
-            if (vm == null) return;
+            if (vm == null ||vm.Field == null) return;
 
             if ((!(Phase == GamePhase.Deployment) &&
                !(IsPlayerHost && Phase == GamePhase.Player1Turn) &&
@@ -151,7 +151,16 @@ namespace AccessBattle.Wpf.ViewModel
             else if (Phase == GamePhase.Player1Turn && IsPlayerHost ||
                      Phase == GamePhase.Player2Turn && !IsPlayerHost)
             {
-                MessageBox.Show("Game finally started!");
+                var player = IsPlayerHost ? 1 : 2;
+
+                // Possible actions:
+                // - Move card to empty field
+                // - Move card to opponent card
+                // - Place/Remove Boost
+                // - Place/Remove Firewall
+                // - Move Card to Stack (when on exit field)
+                // - Use Error 404
+                // - Use Virus Check
             }
             return;
 
@@ -245,6 +254,7 @@ namespace AccessBattle.Wpf.ViewModel
                         ClearHighlighting();
                     }
                     _phase = value;
+                    IsActionsMenuVisible = false;
                 });
             }
         }
@@ -297,5 +307,21 @@ namespace AccessBattle.Wpf.ViewModel
         }
 
         #endregion
+
+        bool _isActionsMenuVisible;
+        public bool IsActionsMenuVisible
+        {
+            get { return _isActionsMenuVisible; }
+            set
+            {
+                if (value &&
+                    !(Phase == GamePhase.Player1Turn && IsPlayerHost ||
+                      Phase == GamePhase.Player2Turn && !IsPlayerHost))
+                {
+                    return; // Actions menu can only be opened when it is players turn
+                }
+                SetProp(ref _isActionsMenuVisible, value);
+            }
+        }
     }
 }

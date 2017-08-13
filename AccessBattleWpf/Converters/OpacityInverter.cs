@@ -9,7 +9,7 @@ using System.Windows.Data;
 
 namespace AccessBattle.Wpf.Converters
 {
-    class OpacityInverter : IValueConverter
+    public class OpacityInverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

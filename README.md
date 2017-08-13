@@ -15,15 +15,14 @@ a very stupid AI. The final game will be playable over network.
   - [ ] UI rewrite
     - [x] Display board and cards
     - [x] Animation system
-    - [ ] Menus (WIP)
+    - [ ] Menus
       - [x] Network game
       - [ ] Single player game
         - [ ] AI players
-      - [x] Deploy cards
-      - [ ] Options
-      - [ ] Game over
+      - [ ] In game menus (WIP)
   - [x] Synchronize game data between clients
   - [ ] Game logic rewrite
+    - [x] Join Game phase
     - [x] Deployment phase
     - [ ] Player turn phase (WIP)
     - [ ] Game Over phase

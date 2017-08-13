@@ -22,6 +22,7 @@ namespace AccessBattle.Wpf
         Exit       = 0x080,
         Firewall   = 0x100,
         Flipped    = 0x200,
+        LBoostStat = 0x400, // Static LineBoost display (for menu)
     }
 
     /// <summary>

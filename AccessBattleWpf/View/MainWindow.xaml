@@ -475,6 +475,30 @@
                 Grid.Row="11" Grid.Column="9"
                 Style="{StaticResource MainField}" FieldBackground="{Binding IsPlayerHost, Converter={StaticResource HostColConvMain}}"/>
 
+            <!-- Actions Menu -->
+            <Grid Grid.Row="12" Grid.Column="4" Grid.ColumnSpan="4"
+                Visibility="{Binding IsActionsMenuVisible,Converter={StaticResource VisConv}}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Border
+                    BorderBrush="White" BorderThickness="2" CornerRadius="2"
+                    Grid.ColumnSpan="4" Grid.Column="0" Margin="-4"
+                    Background="Black">
+                </Border>
+                <local:BoardFieldView
+                    Grid.Column="0" FieldVisualState="VirusCheck" FieldBorderBrush="White" Margin="1" />
+                <local:BoardFieldView
+                    Grid.Column="1" FieldVisualState="Firewall" FieldBorderBrush="White" Margin="1" />
+                <local:BoardFieldView
+                    Grid.Column="2" FieldVisualState="LBoostStat" FieldBorderBrush="White" Margin="1" x:Name="LineBoostOption" />
+                <local:BoardFieldView
+                    Grid.Column="3" FieldVisualState="Error404" FieldBorderBrush="White" Margin="1" />
+            </Grid>
+
             <!-- Deployment fields -->
 
             <Grid

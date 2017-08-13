@@ -19,6 +19,7 @@
             <converters:BoardFieldVisualStateVisibilityConverter x:Key="vConvExit" PrimaryState="Exit"/>
             <converters:BoardFieldVisualStateVisibilityConverter x:Key="vConvFlipped" PrimaryState="Flipped"/>
             <converters:BoardFieldVisualStateVisibilityConverter x:Key="vConvLineBoost" PrimaryState="LineBoost"/>
+            <converters:BoardFieldVisualStateVisibilityConverter x:Key="vConvLineBoostStat" PrimaryState="LBoostStat"/>
 
             <converters:BoardFieldCardVisualStateBrushConverter x:Key="cardConv"/>
             <converters:BoardFieldCardVisualStateBrushConverter x:Key="cardConvPath" PathColorMode="True" />
@@ -244,6 +245,38 @@
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
                             Text=" 101010 " TextAlignment="Center" />
+                    </Viewbox>
+                </Grid>
+
+                <!-- Static Line Boost Field for actions menu, no opacity animation -->
+                <Grid
+                    Visibility="{Binding Path=FieldVisualState, ElementName=BoardFieldControl, Converter={StaticResource vConvLineBoostStat}}"
+                    Margin="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height=".8*"/>
+                        <RowDefinition Height=".1*"/>
+                        <RowDefinition Height=".3*"/>
+                    </Grid.RowDefinitions>
+                    <Viewbox Margin="2" Grid.Row="0" Grid.RowSpan="2" >
+                        <Path
+                    Margin="1"
+                    Fill="White"
+                    Stroke="White" StrokeThickness="1"
+                    Data="{StaticResource LineBoostPath}"/>
+                    </Viewbox>
+                    <Viewbox Grid.Row="1" Grid.RowSpan="2" VerticalAlignment="Top">
+                        <TextBlock Margin="0"
+                        FontSize="10" Foreground="White"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Text="  Line      " TextAlignment="Center" />
+                    </Viewbox>
+                    <Viewbox Grid.Row="2" VerticalAlignment="Bottom">
+                        <TextBlock Margin="0"
+                        FontSize="10" Foreground="White"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Text="    Boost  " TextAlignment="Center" />
                     </Viewbox>
                 </Grid>
 

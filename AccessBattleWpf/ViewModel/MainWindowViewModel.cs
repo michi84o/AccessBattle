@@ -176,6 +176,16 @@ namespace AccessBattle.Wpf.ViewModel
                 else if (_game.Phase == GamePhase.Player1Turn || _game.Phase == GamePhase.Player2Turn)
                     CurrentMenu = MenuType.None;
             }
+            else if (e.PropertyName == nameof(_game.IsActionsMenuVisible))
+            {
+                OnPropertyChanged(nameof(IsActionsMenuVisible));
+            }
+        }
+
+        public bool IsActionsMenuVisible
+        {
+            get { return _game.IsActionsMenuVisible; }
+            set { _game.IsActionsMenuVisible = value; }
         }
 
         public ICommand ActionsCommand
@@ -184,6 +194,7 @@ namespace AccessBattle.Wpf.ViewModel
             {
                 return new RelayCommand(o =>
                 {
+                    IsActionsMenuVisible = !IsActionsMenuVisible;
                 }, o =>
                 {
                     return
