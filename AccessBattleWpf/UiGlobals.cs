@@ -42,6 +42,7 @@ namespace AccessBattle.Wpf
 
         public void StartFlashing()
         {
+            StopFlashing();
             var animation = new DoubleAnimation(0, 1, TimeSpan.FromSeconds(1))
             {
                 AutoReverse = true,
@@ -63,8 +64,20 @@ namespace AccessBattle.Wpf
 
         #region Multi-Overlay Opacity Flash
 
+        Storyboard _multiOverlayFlashingStoryboard;
+
+        public void StopMultiOverlayFlashing()
+        {
+            if (_multiOverlayFlashingStoryboard != null)
+            {
+                _multiOverlayFlashingStoryboard.Stop(this);
+                _multiOverlayFlashingStoryboard = null;
+            }
+        }
+
         public void StartMultiOverlayFlashing()
         {
+            StopMultiOverlayFlashing();
             var animation1 = new DoubleAnimation(0, 1, TimeSpan.FromSeconds(1))
             {
                 BeginTime= TimeSpan.FromSeconds(0)
@@ -73,7 +86,7 @@ namespace AccessBattle.Wpf
             {
                 BeginTime = TimeSpan.FromSeconds(2)
             };
-            var storyboard = new Storyboard
+            _multiOverlayFlashingStoryboard = new Storyboard
             {
                 Duration = TimeSpan.FromSeconds(6),
                 RepeatBehavior = RepeatBehavior.Forever
@@ -82,9 +95,9 @@ namespace AccessBattle.Wpf
             Storyboard.SetTargetProperty(animation1, new PropertyPath(nameof(MultiOverlayOpacity)));
             Storyboard.SetTarget(animation2, this);
             Storyboard.SetTargetProperty(animation2, new PropertyPath(nameof(MultiOverlayOpacity)));
-            storyboard.Children.Add(animation1);
-            storyboard.Children.Add(animation2);
-            storyboard.Begin(this, true);
+            _multiOverlayFlashingStoryboard.Children.Add(animation1);
+            _multiOverlayFlashingStoryboard.Children.Add(animation2);
+            _multiOverlayFlashingStoryboard.Begin(this, true);
         }
 
         public double MultiOverlayOpacity

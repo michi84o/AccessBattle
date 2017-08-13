@@ -124,6 +124,18 @@ namespace AccessBattle.Networking
         }
     }
 
+    public class GameCommandEventArgs : EventArgs
+    {
+        public uint UID { get; private set; }
+        public string Command { get; private set; }
+
+        public GameCommandEventArgs(GameCommand cmd)
+        {
+            UID = cmd.UID;
+            Command = cmd.Command;
+        }
+    }
+
     /// <summary>
     /// Class for network clients. Used for communication with the server.
     /// </summary>
@@ -151,6 +163,10 @@ namespace AccessBattle.Networking
         /// TODO: This is strange design. There might be a more elegant way.
         /// </summary>
         public event EventHandler<GameJoinRequestedEventArgs> ConfirmJoinCalled;
+        /// <summary>
+        /// Response to a game command received from server.
+        /// </summary>
+        public event EventHandler<GameCommandEventArgs> GameCommandReceived;
 
         bool? _serverRequiresLogin;
         /// <summary>
@@ -499,14 +515,40 @@ namespace AccessBattle.Networking
             }
         }
 
-        public bool SendGameCommand(uint uid, string command)
+        /// <summary>
+        /// Sends game command to server.
+        /// </summary>
+        /// <param name="uid">UID of game.</param>
+        /// <param name="command">The game command.</param>
+        /// <returns></returns>
+        public async Task<bool> SendGameCommand(uint uid, string command)
         {
-            // TODO wait for response
             var cmd = new GameCommand { UID = uid, Command = command };
-            Send(JsonConvert.SerializeObject(cmd, _serializerSettings), NetworkPacketType.GameCommand);
 
-
-            return true;
+            // Catch the event for receiving the server response.
+            GameCommandEventArgs result = null;
+            var source = new TaskCompletionSource<GameCommandEventArgs>();
+            EventHandler<GameCommandEventArgs> handler = (sender, args) =>
+            {
+                result = args;
+                source.TrySetResult(args);
+            };
+            // In case no answer was received, we have to cancel
+            using (var ct = new CancellationTokenSource(NetworkTimeout * 1000))
+            {
+                ct.Token.Register(() => source.TrySetResult(null));
+                try
+                {
+                    GameCommandReceived += handler;
+                    if (Send(JsonConvert.SerializeObject(cmd, _serializerSettings), NetworkPacketType.GameCommand))
+                    {
+                        result = await source.Task;
+                    }
+                }
+                catch (Exception e) { Log.WriteLine("NetworkGameClient::SendGameCommand(): " + e.Message); }
+                finally { GameCommandReceived -= handler; }
+            }
+            return result?.Command == "OK";
         }
 
         /// <summary>
@@ -735,6 +777,23 @@ namespace AccessBattle.Networking
                         Log.WriteLine("NetworkGameClient: Received GameSync message could not be read." + e.Message);
                     }
                     break;
+                case NetworkPacketType.GameCommand:
+                    try
+                    {
+                        var eMsg = JsonConvert.DeserializeObject<GameCommand>(Encoding.ASCII.GetString(data));
+                        if (eMsg != null)
+                        {
+                            var handler = GameCommandReceived;
+                            if (handler != null)
+                            {
+                                handler(this, new GameCommandEventArgs(eMsg));
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Log.WriteLine("NetworkGameClient: Received GameSync message could not be read." + e.Message);
+                    }
                     break;
                 default:
                     Log.WriteLine("NetworkGameClient: Packet type " + packet.PacketType + " not recognized!");

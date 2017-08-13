@@ -1,14 +1,19 @@
 ﻿using AccessBattle.Networking;
 using AccessBattle.Networking.Packets;
+using AccessBattle.Wpf.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 
 // TODO: Behavior when opponent disconnects
 // TODO: Option to give up game
+// TODO: Add a "register local game" method
+// TODO: Add a "register remote game" method
+// ==> Maybe just pass a reference to the game model?
 
 namespace AccessBattle.Wpf.ViewModel
 {
@@ -19,6 +24,8 @@ namespace AccessBattle.Wpf.ViewModel
     /// </summary>
     public class GameViewModel : PropChangeNotifier, IBoardGame
     {
+        IMenuHolder _parent;
+
         uint _uid;
         /// <summary>
         /// Unique ID of the current game. Used for network games.
@@ -38,8 +45,6 @@ namespace AccessBattle.Wpf.ViewModel
             get { return _isPlayerHost; }
             set { SetProp(ref _isPlayerHost, value); }
         }
-
-
 
         public void ConvertCoordinates(ref int x, ref int y)
         {
@@ -74,22 +79,96 @@ namespace AccessBattle.Wpf.ViewModel
             }
         }
 
+        // This field must only be changed in the HandleFieldSelection method!
+        // Allowed range: -1 to (BoardFieldList.Count-1)
+        int _selectedField = -1;
+
+        public bool CanConfirmDeploy =>
+            Phase == GamePhase.Deployment &&
+            BoardFields[0, 0].HasCard &&
+            BoardFields[1, 0].HasCard &&
+            BoardFields[2, 0].HasCard &&
+            BoardFields[3, 1].HasCard &&
+            BoardFields[4, 1].HasCard &&
+            BoardFields[5, 0].HasCard &&
+            BoardFields[6, 0].HasCard &&
+            BoardFields[7, 0].HasCard;
 
 
-        public void HandleFieldSelection(BoardFieldViewModel vm)
+        public event EventHandler CardMoved;
+
+        public void HandleFieldSelection(int index)
         {
-            if (vm?.Field == null) return;
-            var field = vm.Field;
-            var index = 8 * field.Y + field.X;
+            if (index < 0 || index >= BoardFieldList.Count) return;
+
+            // index can be calculated as: 8*y + x
+
+            var vm = BoardFieldList[index];
+            if (vm == null) return;
+
+            if ((!(Phase == GamePhase.Deployment) &&
+               !(IsPlayerHost && Phase == GamePhase.Player1Turn) &&
+               !(!IsPlayerHost && Phase == GamePhase.Player2Turn))) return;
+
+            // In this mode we do not send packets to server while moving cards
+            if (Phase == GamePhase.Deployment)
+            {
+                if (_parent.CurrentMenu != MenuType.Deployment) return; // Already deployed
+                if (!vm.IsDeploymentField && vm.Field.Y != 8 ||
+                    (_selectedField < 0 && !vm.HasCard))
+                {
+                    ClearHighlighting();
+                    _selectedField = -1;
+                    return;
+                }
+                if (_selectedField < 0)
+                {
+                    _selectedField = index;
+                    // Highlight all empty deployment fields
+                    for (int x = 0; x <= 7; ++x)
+                    {
+                        var y = 0;
+                        if (x == 3 || x == 4) y = 1;
+                        BoardFields[x, y].IsHighlighted = !BoardFields[x, y].HasCard;
+                    }
+                    vm.IsHighlighted = false;
+                    return;
+                }
+                // Move card. If target field already has card, switch them
+                var source = BoardFieldList[_selectedField];
+                var sourceCard = source.Field.Card;
+                var targetCard = vm.Field.Card;
+                vm.Field.Card = sourceCard;
+                source.Field.Card = targetCard;
+                ClearHighlighting();
+                _selectedField = -1;
+                OnPropertyChanged(nameof(CanConfirmDeploy));
+                CommandManager.InvalidateRequerySuggested();
+                return;
+            }
+            // Player turn:
+            return;
 
             if (index < 64)
             {
                 // Main board field clicked
-                MessageBox.Show("Main field");
-                //field.Card = new OnlineCard { HasBoost = true, Owner = _game.Players[0], IsFaceUp = true, Type = OnlineCardType.Link };
-                //vm.IsHighlighted = true;
-                //UiGlobals.Instance.StartFlashing();
-                //UiGlobals.Instance.StartMultiOverlayFlashing();
+                if (_selectedField < 0)
+                {
+                    _selectedField = index;
+                    return;
+                }
+                if (_selectedField == index)
+                {
+                    _selectedField = -1;
+                    return;
+                }
+                if (_selectedField < 0 || _selectedField > BoardFieldList.Count) return;
+                // Send movement request to server
+                var from = BoardFieldList[_selectedField];
+                if (from == null || from.Field == null || vm.Field == null) return;
+                _client.SendGameCommand(_uid, string.Format("mv {0},{1},{2},{3}",
+                    from.Field.X, from.Field.Y, vm.Field.X, vm.Field.Y ));
+                _selectedField = -1;
             }
             else if (index < 72)
             {
@@ -113,6 +192,15 @@ namespace AccessBattle.Wpf.ViewModel
             }
         }
 
+        /// <summary>
+        /// Disable all flashing
+        /// </summary>
+        void ClearHighlighting()
+        {
+            foreach (var field in BoardFieldList)
+                field.IsHighlighted = false;
+        }
+
         #region Game Synchronization
 
         void GameSyncReceived(object sender, GameSyncEventArgs e)
@@ -133,10 +221,6 @@ namespace AccessBattle.Wpf.ViewModel
 
         #region Game
 
-        // TODO: Add a "register local game" method
-        // TODO: Add a "register remote game" method
-        // ==> Maybe just pass a reference to the game model?
-
         GamePhase _phase;
         /// <summary>
         /// Current game phase.
@@ -144,16 +228,32 @@ namespace AccessBattle.Wpf.ViewModel
         public GamePhase Phase
         {
             get { return _phase; }
-            set { SetProp(ref _phase, value); }
+            set
+            {
+                SetProp(_phase, value, ()=>
+                {
+                    if ((_phase == GamePhase.Deployment || _phase == GamePhase.Player1Turn || _phase == GamePhase.Player2Turn)
+                      && !(value == GamePhase.Deployment || value == GamePhase.Player1Turn || value == GamePhase.Player2Turn))
+                    {
+                        ClearHighlighting();
+                    }
+                    _phase = value;
+                });
+            }
         }
 
         PlayerState[] _players;
         public PlayerState[] Players => _players;
 
+        public List<BoardFieldViewModel> BoardFieldList { get; private set; }
+        public BoardFieldViewModel[,] BoardFields { get; private set; }
         public BoardField[,] Board { get; private set; }
 
-        public GameViewModel()
+        public GameViewModel(IMenuHolder parent)
         {
+            _parent = parent;
+            BoardFieldList = new List<BoardFieldViewModel>();
+            BoardFields = new BoardFieldViewModel[8, 11];
             Board = new BoardField[8, 11];
             for (ushort y = 0; y < 11; ++y)
                 for (ushort x = 0; x < 8; ++x)

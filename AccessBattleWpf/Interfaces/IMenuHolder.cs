@@ -20,5 +20,6 @@ namespace AccessBattle.Wpf.Interfaces
         MenuType CurrentMenu { get; set; }
         GameViewModel Game { get; }
         GameInfo JoiningGame { get; set; }
+        bool IsBusy { get; set; }
     }
 }

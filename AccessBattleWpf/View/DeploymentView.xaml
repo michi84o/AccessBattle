@@ -47,7 +47,7 @@
                         VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5" />
                 </Grid>
                 <Button
-                    Grid.Row="2" Command="{Binding ConnectToServerCommand}"
+                    Grid.Row="2" Command="{Binding ConfirmCommand}"
                     Content="Confirm"  Margin="60,5,60,5"
                     />
             </Grid>

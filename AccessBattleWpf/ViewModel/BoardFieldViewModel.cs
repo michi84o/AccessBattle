@@ -39,6 +39,12 @@ namespace AccessBattle.Wpf.ViewModel
             set { SetProp(ref _cardVisualState, value); }
         }
 
+        public bool HasCard => _field?.Card != null;
+        public bool IsDeploymentField =>
+            _field != null &&
+            (Field.Y == 0 && Field.X != 3 && Field.X != 4 ||
+             Field.Y == 1 && (Field.X == 3 || Field.X == 4));
+
         bool _isHighlighted;
         public bool IsHighlighted
         {
@@ -71,6 +77,8 @@ namespace AccessBattle.Wpf.ViewModel
             {
                 if (e.PropertyName == nameof(s.Card))
                 {
+                    OnPropertyChanged(nameof(HasCard));
+
                     if (s.Card == null)
                     {
                         VisualState = BoardFieldVisualState.Empty;

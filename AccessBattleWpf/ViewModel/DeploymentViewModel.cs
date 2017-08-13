@@ -14,21 +14,56 @@ namespace AccessBattle.Wpf.ViewModel
         public DeploymentViewModel(
             IMenuHolder parent) : base(parent)
         {
+            parent.Game.CardMoved += (sender, args) =>
+            {
+                if (ParentViewModel.Game.Phase != GamePhase.Deployment) return;
+                OnPropertyChanged(nameof(LinkCardsLeft));
+                OnPropertyChanged(nameof(VirusCardsLeft));
+            };
         }
 
         public int LinkCardsLeft
         {
-            get { return 0; } // TODO
+            get
+            {
+                int num = 0;
+                for (int x = 0; x <= 7; ++x)
+                {
+                    int y = 0;
+                    if (x == 3 || x == 4) y = 1;
+                    var card = ParentViewModel.Game.BoardFields[x, y].Field.Card as OnlineCard;
+                    if (card?.Type == OnlineCardType.Link)
+                    {
+                        ++num;
+                    }
+                }
+                return num;
+            }
         }
 
         public int VirusCardsLeft
         {
-            get { return 0; } // TODO
+            get
+            {
+                int num = 0;
+                for (int x = 0; x <= 7; ++x)
+                {
+                    int y = 0;
+                    if (x == 3 || x == 4) y = 1;
+                    var card = ParentViewModel.Game.BoardFields[x, y].Field.Card as OnlineCard;
+                    if (card?.Type == OnlineCardType.Virus)
+                    {
+                        ++num;
+                    }
+                }
+                return num;
+            }
         }
 
         public override void Activate()
         {
-
+            OnPropertyChanged(nameof(LinkCardsLeft));
+            OnPropertyChanged(nameof(VirusCardsLeft));
         }
 
         public override void Suspend()
@@ -36,13 +71,43 @@ namespace AccessBattle.Wpf.ViewModel
 
         }
 
-        public ICommand ConnectToServerCommand =>
-            new RelayCommand( o =>
+        public ICommand ConfirmCommand =>
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+            new RelayCommand(async o =>
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
             {
-                // TODO
-                ParentViewModel.Game.Client.SendGameCommand(ParentViewModel.Game.UID, "dp LLVVVVLL");
-
-                CommandManager.InvalidateRequerySuggested();
-            }, o => { return true; }); // TODO
+                if (ParentViewModel.IsBusy) return;
+                ParentViewModel.IsBusy = true;
+                try
+                {
+                    // Build command
+                    var cmd = new StringBuilder("dp ");
+                    for (int x = 0; x <= 7; ++x)
+                    {
+                        int y = 0;
+                        if (x == 3 || x == 4) y = 1;
+                        var card = ParentViewModel.Game.BoardFields[x, y].Field.Card as OnlineCard;
+                        if (card == null)
+                        {
+                            Log.WriteLine("A card is missing at field " + x + "," + y);
+                            return;
+                        }
+                        cmd.Append(card.Type == OnlineCardType.Link ? "L" : "V");
+                    }
+                    ParentViewModel.IsBusy = true;
+                    var result = await ParentViewModel.Game.Client.SendGameCommand(ParentViewModel.Game.UID, cmd.ToString());
+                    if (!result) Log.WriteLine("DeploymentViewModel: Sending game command failed!");
+                    else ParentViewModel.CurrentMenu = MenuType.None;
+                }
+                catch (Exception)
+                {
+                    return;
+                }
+                finally
+                {
+                    ParentViewModel.IsBusy = false;
+                    CommandManager.InvalidateRequerySuggested();
+                }
+            }, o => { return ParentViewModel.Game.CanConfirmDeploy && !ParentViewModel.IsBusy; });
     }
 }

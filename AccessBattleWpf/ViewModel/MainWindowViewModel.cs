@@ -23,6 +23,12 @@ namespace AccessBattle.Wpf.ViewModel
             set { _game.IsPlayerHost = value; } // Prop change triggered by model and forwarded below
         }
 
+        /// <summary>
+        /// Used to lock the UI while waiting from answer of the server.
+        /// Should only be accessed from UI thread.
+        /// </summary>
+        public bool IsBusy { get; set; }
+
         MenuType _currentMenu;
         public MenuType CurrentMenu
         {
@@ -76,7 +82,7 @@ namespace AccessBattle.Wpf.ViewModel
 
         #region Board Field Visual States
 
-        BoardFieldViewModel[,] _boardFields = new BoardFieldViewModel[8, 11];
+        public BoardFieldViewModel[,] BoardFields => _game.BoardFields;
 
         /// <summary>
         /// This is a one-dimensional list that can be used in XAML code.
@@ -85,13 +91,13 @@ namespace AccessBattle.Wpf.ViewModel
         /// item 0 is field [0,0], item 1 is field [1,0], item 8 is field [1,0].
         /// The length of this list is 88.
         /// </summary>
-        public List<BoardFieldViewModel> BoardFieldList { get; private set; }
+        public List<BoardFieldViewModel> BoardFieldList => _game.BoardFieldList;
 
         #endregion
 
         public MainWindowViewModel()
         {
-            _game = new GameViewModel();
+            _game = new GameViewModel(this);
             _game.PropertyChanged += _model_PropertyChanged;
 
             // Menu view models
@@ -104,47 +110,50 @@ namespace AccessBattle.Wpf.ViewModel
 
             CurrentMenu = MenuType.Welcome;
 
-            BoardFieldList = new List<BoardFieldViewModel>();
             for (int y = 0; y < 11; ++y)
                 for (int x = 0; x < 8; ++x)
                 {
-                    _boardFields[x, y] = new BoardFieldViewModel();
-                    BoardFieldList.Add(_boardFields[x, y]);
+                    BoardFields[x, y] = new BoardFieldViewModel();
+                    BoardFieldList.Add(BoardFields[x, y]);
                 }
 
             // Server area p1 is at index 83, p2 at 84
 
             #region Set default visual states
 
-            _boardFields[3, 0].DefaultVisualState = BoardFieldVisualState.Exit;
-            _boardFields[4, 0].DefaultVisualState = BoardFieldVisualState.Exit;
+            BoardFields[3, 0].DefaultVisualState = BoardFieldVisualState.Exit;
+            BoardFields[4, 0].DefaultVisualState = BoardFieldVisualState.Exit;
 
-            _boardFields[3, 7].DefaultVisualState = BoardFieldVisualState.Exit;
-            _boardFields[4, 7].DefaultVisualState = BoardFieldVisualState.Exit;
+            BoardFields[3, 7].DefaultVisualState = BoardFieldVisualState.Exit;
+            BoardFields[4, 7].DefaultVisualState = BoardFieldVisualState.Exit;
 
             // Stack
-            _boardFields[0, 8].DefaultVisualState = BoardFieldVisualState.Link; // 64
-            _boardFields[1, 8].DefaultVisualState = BoardFieldVisualState.Link;
-            _boardFields[2, 8].DefaultVisualState = BoardFieldVisualState.Link;
-            _boardFields[3, 8].DefaultVisualState = BoardFieldVisualState.Link;
-            _boardFields[4, 8].DefaultVisualState = BoardFieldVisualState.Virus; // 68
-            _boardFields[5, 8].DefaultVisualState = BoardFieldVisualState.Virus;
-            _boardFields[6, 8].DefaultVisualState = BoardFieldVisualState.Virus;
-            _boardFields[7, 8].DefaultVisualState = BoardFieldVisualState.Virus;
-            _boardFields[0, 9].DefaultVisualState = BoardFieldVisualState.Link; // 72
-            _boardFields[1, 9].DefaultVisualState = BoardFieldVisualState.Link;
-            _boardFields[2, 9].DefaultVisualState = BoardFieldVisualState.Link;
-            _boardFields[3, 9].DefaultVisualState = BoardFieldVisualState.Link;
-            _boardFields[4, 9].DefaultVisualState = BoardFieldVisualState.Virus; // 76
-            _boardFields[5, 9].DefaultVisualState = BoardFieldVisualState.Virus;
-            _boardFields[6, 9].DefaultVisualState = BoardFieldVisualState.Virus;
-            _boardFields[7, 9].DefaultVisualState = BoardFieldVisualState.Virus; // 79
+            BoardFields[0, 8].DefaultVisualState = BoardFieldVisualState.Link; // 64
+            BoardFields[1, 8].DefaultVisualState = BoardFieldVisualState.Link;
+            BoardFields[2, 8].DefaultVisualState = BoardFieldVisualState.Link;
+            BoardFields[3, 8].DefaultVisualState = BoardFieldVisualState.Link;
+            BoardFields[4, 8].DefaultVisualState = BoardFieldVisualState.Virus; // 68
+            BoardFields[5, 8].DefaultVisualState = BoardFieldVisualState.Virus;
+            BoardFields[6, 8].DefaultVisualState = BoardFieldVisualState.Virus;
+            BoardFields[7, 8].DefaultVisualState = BoardFieldVisualState.Virus;
+            BoardFields[0, 9].DefaultVisualState = BoardFieldVisualState.Link; // 72
+            BoardFields[1, 9].DefaultVisualState = BoardFieldVisualState.Link;
+            BoardFields[2, 9].DefaultVisualState = BoardFieldVisualState.Link;
+            BoardFields[3, 9].DefaultVisualState = BoardFieldVisualState.Link;
+            BoardFields[4, 9].DefaultVisualState = BoardFieldVisualState.Virus; // 76
+            BoardFields[5, 9].DefaultVisualState = BoardFieldVisualState.Virus;
+            BoardFields[6, 9].DefaultVisualState = BoardFieldVisualState.Virus;
+            BoardFields[7, 9].DefaultVisualState = BoardFieldVisualState.Virus; // 79
 
             #endregion
 
             for (int y = 0; y < 11; ++y)
                 for (int x = 0; x < 8; ++x)
-                    _boardFields[x, y].RegisterBoardField(_game.Board[x, y]);
+                    BoardFields[x, y].RegisterBoardField(_game.Board[x, y]);
+
+            // Animates two double values for flashing and alternating card states (Boost)
+            UiGlobals.Instance.StartFlashing();
+            UiGlobals.Instance.StartMultiOverlayFlashing();
         }
 
         void _model_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -176,17 +185,11 @@ namespace AccessBattle.Wpf.ViewModel
             {
                 return new RelayCommand(o =>
                 {
-                    //if (!(_model.Game.Phase == GamePhase.Deployment) &&
-                    //   !(IsPlayerHost && _model.Game.Phase == GamePhase.Player1Turn) &&
-                    //  !(!IsPlayerHost && _model.Game.Phase == GamePhase.Player2Turn))
-                    //    return;
                     var indexStr = o as string;
                     if (string.IsNullOrEmpty(indexStr)) return;
                     int index;
                     if (!Int32.TryParse(indexStr, out index)) return;
-                    if (index < 0 || index >= BoardFieldList.Count) return;
-
-                    _game.HandleFieldSelection(BoardFieldList[index]);
+                    _game.HandleFieldSelection(index);
                 }, o =>
                 {
                     return true; // Check is done in execution for performance reasons.
