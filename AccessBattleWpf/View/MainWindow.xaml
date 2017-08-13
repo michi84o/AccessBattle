@@ -61,7 +61,10 @@
                 <local:WaitForAcceptMenu Width="300" Height="200" />
             </DataTemplate>
             <DataTemplate DataType="{x:Type viewmodel:DeploymentViewModel}">
-                <local:DeploymentView Width="300" Height="120" />
+                <local:DeploymentView Width="300" Height="128" />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewmodel:OpponentTurnViewModel}">
+                <local:OpponentTurnView Width="240" Height="40" />
             </DataTemplate>
 
         </ResourceDictionary>

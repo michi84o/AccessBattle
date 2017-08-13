@@ -11,14 +11,22 @@ a very stupid AI. The final game will be playable over network.
 
 - Estimated completion: End of August 2017
 - Current status and next steps:
-  - [x] Create and join games over server
-  - [ ] UI rewrite (WIP)
+  - [x] Create and join games over server (library functions)
+  - [ ] UI rewrite
     - [x] Display board and cards
-	- [x] Animation system
-	- [ ] Menus (WIP)
-	- [ ] Player interaction (WIP)	
+    - [x] Animation system
+    - [ ] Menus (WIP)
+      - [x] Network game
+      - [ ] Single player game
+        - [ ] AI players
+      - [x] Deploy cards
+      - [ ] Options
+      - [ ] Game over
   - [x] Synchronize game data between clients
-  - [ ] Game logic rewrite (WIP)
+  - [ ] Game logic rewrite
+    - [x] Deployment phase
+    - [ ] Player turn phase (WIP)
+    - [ ] Game Over phase
 
 The main game engine is inside a separate DLL so that people
 can program their own user interface for it. The DLL should

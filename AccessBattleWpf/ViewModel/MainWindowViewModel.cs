@@ -63,6 +63,7 @@ namespace AccessBattle.Wpf.ViewModel
         AcceptJoinMenuViewModel _acceptJoinVm;
         WaitForAcceptMenuViewModel _waitForAccept;
         DeploymentViewModel _deploymentVm;
+        OpponentTurnViewModel _opponentTurnVm;
 
         public MenuViewModelBase CurrentMenuViewModel
         {
@@ -76,6 +77,7 @@ namespace AccessBattle.Wpf.ViewModel
                     case MenuType.AcceptJoin: return _acceptJoinVm;
                     case MenuType.WaitForAccept: return _waitForAccept;
                     case MenuType.Deployment: return _deploymentVm;
+                    case MenuType.OpponentTurn: return _opponentTurnVm;
                     case MenuType.Welcome:
                     default: return _welcomeVm;
                 }
@@ -109,6 +111,7 @@ namespace AccessBattle.Wpf.ViewModel
             _acceptJoinVm = new AcceptJoinMenuViewModel(this);
             _waitForAccept = new WaitForAcceptMenuViewModel(this);
             _deploymentVm = new DeploymentViewModel(this);
+            _opponentTurnVm = new OpponentTurnViewModel(this);
 
             CurrentMenu = MenuType.Welcome;
 
@@ -163,6 +166,15 @@ namespace AccessBattle.Wpf.ViewModel
             if (e.PropertyName == nameof(_game.IsPlayerHost))
             {
                 OnPropertyChanged(nameof(IsPlayerHost));
+            }
+            else if (e.PropertyName == nameof(_game.Phase))
+            {
+                if (_game.IsPlayerHost && _game.Phase == GamePhase.Player2Turn)
+                    CurrentMenu = MenuType.OpponentTurn;
+                else if (!_game.IsPlayerHost && _game.Phase == GamePhase.Player1Turn)
+                    CurrentMenu = MenuType.OpponentTurn;
+                else if (_game.Phase == GamePhase.Player1Turn || _game.Phase == GamePhase.Player2Turn)
+                    CurrentMenu = MenuType.None;
             }
         }
 

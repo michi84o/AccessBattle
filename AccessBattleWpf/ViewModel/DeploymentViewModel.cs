@@ -14,61 +14,14 @@ namespace AccessBattle.Wpf.ViewModel
         public DeploymentViewModel(
             IMenuHolder parent) : base(parent)
         {
-            parent.Game.CardMoved += (sender, args) =>
-            {
-                if (ParentViewModel.Game.Phase != GamePhase.Deployment) return;
-                OnPropertyChanged(nameof(LinkCardsLeft));
-                OnPropertyChanged(nameof(VirusCardsLeft));
-            };
-        }
-
-        public int LinkCardsLeft
-        {
-            get
-            {
-                int num = 0;
-                for (int x = 0; x <= 7; ++x)
-                {
-                    int y = 0;
-                    if (x == 3 || x == 4) y = 1;
-                    var card = ParentViewModel.Game.BoardFields[x, y].Field.Card as OnlineCard;
-                    if (card?.Type == OnlineCardType.Link)
-                    {
-                        ++num;
-                    }
-                }
-                return 4 - num;
-            }
-        }
-
-        public int VirusCardsLeft
-        {
-            get
-            {
-                int num = 0;
-                for (int x = 0; x <= 7; ++x)
-                {
-                    int y = 0;
-                    if (x == 3 || x == 4) y = 1;
-                    var card = ParentViewModel.Game.BoardFields[x, y].Field.Card as OnlineCard;
-                    if (card?.Type == OnlineCardType.Virus)
-                    {
-                        ++num;
-                    }
-                }
-                return 4 - num;
-            }
         }
 
         public override void Activate()
         {
-            OnPropertyChanged(nameof(LinkCardsLeft));
-            OnPropertyChanged(nameof(VirusCardsLeft));
         }
 
         public override void Suspend()
         {
-
         }
 
         public ICommand ConfirmCommand =>

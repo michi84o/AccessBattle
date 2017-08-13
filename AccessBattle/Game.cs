@@ -108,7 +108,7 @@ namespace AccessBattle
                 for (int y = 0; y < 10; ++y)
                     Board[x, y].Card = null;
 
-            // Place cards on stack for deployment
+            // Place cards on deployment fields
             // Half of the cards are link, other half are virus
             for (int p = 0; p < 2; ++p)
             {
@@ -116,13 +116,18 @@ namespace AccessBattle
                 {
                     PlayerOnlineCards[p, c].Type = OnlineCardType.Link;
                     PlayerOnlineCards[p, c].IsFaceUp = false;
-                    Board[c, 8 + p].Card = PlayerOnlineCards[p, c];
                 }
                 for (int c = 4; c < 8; ++c)
                 {
                     PlayerOnlineCards[p, c].Type = OnlineCardType.Virus;
                     PlayerOnlineCards[p, c].IsFaceUp = false;
-                    Board[c, 8 + p].Card = PlayerOnlineCards[p, c];
+                }
+                for (int i=0; i<=7; ++i)
+                {
+                    var y = p == 0 ? 0 : 7;
+                    if (i == 3 || i == 4) y += (p == 0 ? 1 : -1);
+                    var x = (p == 0 ? 7 - i : i);
+                    Board[i, y].Card = PlayerOnlineCards[p, x];
                 }
             }
             _hasDeployed[0] = false;
@@ -220,11 +225,12 @@ namespace AccessBattle
                 for (int x = 0; x < 8; ++x)
                 {
                     // Clear stack.
-                    Board[x, 8 + player].Card = null;
+                    //Board[x, 8 + player].Card = null; stack not used for depl. anymore
                     // Place card
                     int y = (x == 3 || x == 4) ? y2 : y1;
                     int offset = layout[x] == OnlineCardType.Link ? linkCount++ : (4 + virusCount++);
-                    Board[x, y].Card = PlayerOnlineCards[player, offset];
+                    var xx = player == 0 ? x : 7 - x;
+                    Board[xx, y].Card = PlayerOnlineCards[player, offset];
                 }
                 _hasDeployed[player] = true;
                 if (_hasDeployed[0] && _hasDeployed[1])

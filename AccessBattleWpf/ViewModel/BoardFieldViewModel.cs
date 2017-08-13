@@ -49,7 +49,14 @@ namespace AccessBattle.Wpf.ViewModel
         public bool IsHighlighted
         {
             get { return _isHighlighted; }
-            set { SetProp(ref _isHighlighted, value); }
+            set
+            {
+                if (SetProp(ref _isHighlighted, value))
+                {
+                    if (value && !UiGlobals.Instance.IsFlashing)
+                        UiGlobals.Instance.StartFlashing();
+                }
+            }
         }
 
         public void RegisterBoardField(BoardField field)

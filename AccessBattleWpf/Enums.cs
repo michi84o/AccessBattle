@@ -42,6 +42,7 @@ namespace AccessBattle.Wpf
         WaitForJoin,
         WaitForAccept,
         AcceptJoin,
-        Deployment
+        Deployment,
+        OpponentTurn
     }
 }

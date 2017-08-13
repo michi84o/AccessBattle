@@ -40,6 +40,8 @@ namespace AccessBattle.Wpf
             set { SetValue(FlashOpacityProperty, value); }
         }
 
+        public bool IsFlashing { get; private set; }
+
         public void StartFlashing()
         {
             StopFlashing();
@@ -49,12 +51,14 @@ namespace AccessBattle.Wpf
                 RepeatBehavior = RepeatBehavior.Forever
             };
             BeginAnimation(FlashOpacityProperty, animation);
+            IsFlashing = true;
         }
 
         public void StopFlashing()
         {
             BeginAnimation(FlashOpacityProperty, null);
             FlashOpacity = 0.0;
+            IsFlashing = false;
         }
 
         public static readonly DependencyProperty FlashOpacityProperty = DependencyProperty.Register(

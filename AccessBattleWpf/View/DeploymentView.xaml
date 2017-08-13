@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:AccessBattle.Wpf.View"
              FontFamily="../ExternalResources/#Silkscreen"
-             Foreground="DarkGray" Width="300" Height="120">
+             Foreground="DarkGray" Width="300" Height="128">
     <Border
         CornerRadius="4" BorderBrush="White" BorderThickness="2"
         Background="Black" >
@@ -19,37 +19,15 @@
                 <TextBlock
                     Grid.Row="0"
                     Text="Deployment" FontSize="28"
-                    VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5" />
-                <Grid
-                    Grid.Row="1" HorizontalAlignment="Center">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="10"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock
-                        Grid.Row="1" Grid.Column="0"
-                        Text="Link" FontSize="20"
-                        VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5" />
-                    <TextBlock
-                        Grid.Row="1" Grid.Column="1"
-                        Text="{Binding LinkCardsLeft}" FontSize="20"
-                        VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5" />
-                    <TextBlock
-                        Grid.Row="1" Grid.Column="3"
-                        Text="Virus" FontSize="20"
-                        VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5" />
-                    <TextBlock
-                        Grid.Row="1" Grid.Column="4"
-                        Text="{Binding VirusCardsLeft}" FontSize="20"
-                        VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5" />
-                </Grid>
+                    VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,5,5,0" />
+                <TextBlock
+                    Grid.Row="1"
+                    Text="Click two cards&#x0d;&#x0a;to swap their positions" FontSize="16"
+                    TextAlignment="Center"
+                    VerticalAlignment="Center" HorizontalAlignment="Center" Margin="5,0,5,5" />
                 <Button
                     Grid.Row="2" Command="{Binding ConfirmCommand}"
-                    Content="Confirm"  Margin="60,5,60,5"
-                    />
+                    Content="Confirm"  Margin="60,5,60,5" />
             </Grid>
         </Grid>
     </Border>

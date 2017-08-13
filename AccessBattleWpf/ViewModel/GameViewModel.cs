@@ -113,9 +113,9 @@ namespace AccessBattle.Wpf.ViewModel
             // In this mode we do not send packets to server while moving cards
             if (Phase == GamePhase.Deployment)
             {
+                #region Deployment
                 if (_parent.CurrentMenu != MenuType.Deployment) return; // Already deployed
-                if (!vm.IsDeploymentField && vm.Field.Y != 8 ||
-                    (_selectedField < 0 && !vm.HasCard))
+                if (!vm.IsDeploymentField || (_selectedField < 0 && !vm.HasCard))
                 {
                     ClearHighlighting();
                     _selectedField = -1;
@@ -124,12 +124,12 @@ namespace AccessBattle.Wpf.ViewModel
                 if (_selectedField < 0)
                 {
                     _selectedField = index;
-                    // Highlight all empty deployment fields
+                    // Highlight all other deployment fields
                     for (int x = 0; x <= 7; ++x)
                     {
                         var y = 0;
                         if (x == 3 || x == 4) y = 1;
-                        BoardFields[x, y].IsHighlighted = !BoardFields[x, y].HasCard;
+                        BoardFields[x, y].IsHighlighted = (8 * y + x) != index;
                     }
                     vm.IsHighlighted = false;
                     return;
@@ -146,51 +146,56 @@ namespace AccessBattle.Wpf.ViewModel
                 CardMoved?.Invoke(this, EventArgs.Empty);
                 CommandManager.InvalidateRequerySuggested();
                 return;
+                #endregion
             }
-            // Player turn:
+            else if (Phase == GamePhase.Player1Turn && IsPlayerHost ||
+                     Phase == GamePhase.Player2Turn && !IsPlayerHost)
+            {
+                MessageBox.Show("Game finally started!");
+            }
             return;
 
-            if (index < 64)
-            {
-                // Main board field clicked
-                if (_selectedField < 0)
-                {
-                    _selectedField = index;
-                    return;
-                }
-                if (_selectedField == index)
-                {
-                    _selectedField = -1;
-                    return;
-                }
-                if (_selectedField < 0 || _selectedField > BoardFieldList.Count) return;
-                // Send movement request to server
-                var from = BoardFieldList[_selectedField];
-                if (from == null || from.Field == null || vm.Field == null) return;
-                _client.SendGameCommand(_uid, string.Format("mv {0},{1},{2},{3}",
-                    from.Field.X, from.Field.Y, vm.Field.X, vm.Field.Y ));
-                _selectedField = -1;
-            }
-            else if (index < 72)
-            {
-                // Stack p1
-                MessageBox.Show("Stack P1");
-            }
-            else if (index < 80)
-            {
-                // Stack p2
-                MessageBox.Show("Stack P2");
-            }
-            else if (index == 83)
-            {
-                // Server area p1
-                MessageBox.Show("Server P1");
-            }
-            else if (index == 84)
-            {
-                // Server area p2
-                MessageBox.Show("Server P2");
-            }
+            //if (index < 64)
+            //{
+            //    // Main board field clicked
+            //    if (_selectedField < 0)
+            //    {
+            //        _selectedField = index;
+            //        return;
+            //    }
+            //    if (_selectedField == index)
+            //    {
+            //        _selectedField = -1;
+            //        return;
+            //    }
+            //    if (_selectedField < 0 || _selectedField > BoardFieldList.Count) return;
+            //    // Send movement request to server
+            //    var from = BoardFieldList[_selectedField];
+            //    if (from == null || from.Field == null || vm.Field == null) return;
+            //    _client.SendGameCommand(_uid, string.Format("mv {0},{1},{2},{3}",
+            //        from.Field.X, from.Field.Y, vm.Field.X, vm.Field.Y ));
+            //    _selectedField = -1;
+            //}
+            //else if (index < 72)
+            //{
+            //    // Stack p1
+            //    MessageBox.Show("Stack P1");
+            //}
+            //else if (index < 80)
+            //{
+            //    // Stack p2
+            //    MessageBox.Show("Stack P2");
+            //}
+            //else if (index == 83)
+            //{
+            //    // Server area p1
+            //    MessageBox.Show("Server P1");
+            //}
+            //else if (index == 84)
+            //{
+            //    // Server area p2
+            //    MessageBox.Show("Server P2");
+            //}
         }
 
         /// <summary>
@@ -200,6 +205,7 @@ namespace AccessBattle.Wpf.ViewModel
         {
             foreach (var field in BoardFieldList)
                 field.IsHighlighted = false;
+            UiGlobals.Instance.StopFlashing();
         }
 
         #region Game Synchronization
@@ -287,6 +293,7 @@ namespace AccessBattle.Wpf.ViewModel
                 Board[x, y].Update(field, _players);
             }
             Phase = sync.Phase;
+            CommandManager.InvalidateRequerySuggested(); // Confirm button on deployment field does not get enabled
         }
 
         #endregion
