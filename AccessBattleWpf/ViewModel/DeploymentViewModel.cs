@@ -37,7 +37,7 @@ namespace AccessBattle.Wpf.ViewModel
                         ++num;
                     }
                 }
-                return num;
+                return 4 - num;
             }
         }
 
@@ -56,7 +56,7 @@ namespace AccessBattle.Wpf.ViewModel
                         ++num;
                     }
                 }
-                return num;
+                return 4 - num;
             }
         }
 

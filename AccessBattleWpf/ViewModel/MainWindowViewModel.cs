@@ -10,6 +10,8 @@ using System.Windows.Input;
 using AccessBattle.Networking;
 using AccessBattle.Networking.Packets;
 
+// TODO: Add optional Textchat
+
 namespace AccessBattle.Wpf.ViewModel
 {
     public class MainWindowViewModel : PropChangeNotifier, IMenuHolder

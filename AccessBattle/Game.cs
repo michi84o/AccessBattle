@@ -69,6 +69,8 @@ namespace AccessBattle
             protected set { SetProp(ref _phase, value); }
         }
 
+        bool[] _hasDeployed = new bool[2];
+
         PlayerState[] _players;
         /// <summary>
         /// Player related data.
@@ -123,6 +125,8 @@ namespace AccessBattle
                     Board[c, 8 + p].Card = PlayerOnlineCards[p, c];
                 }
             }
+            _hasDeployed[0] = false;
+            _hasDeployed[1] = false;
             Phase = GamePhase.Deployment;
         }
 
@@ -222,6 +226,9 @@ namespace AccessBattle
                     int offset = layout[x] == OnlineCardType.Link ? linkCount++ : (4 + virusCount++);
                     Board[x, y].Card = PlayerOnlineCards[player, offset];
                 }
+                _hasDeployed[player] = true;
+                if (_hasDeployed[0] && _hasDeployed[1])
+                    BeginTurns();
                 return true;
             }
             #endregion

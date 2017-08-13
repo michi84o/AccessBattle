@@ -538,6 +538,7 @@ namespace AccessBattle.Networking
                             NetworkGame game;
                             if (GetGameAndPlayers(cmdMsg.UID, out game, out p1, out p2) && (p1 == player || p2 == player))
                             {
+                                var oldPhase = game.Phase;
                                 var result = game.ExecuteCommand(cmdMsg.Command, p1 == player ? 1 : 2);
                                 var response = new GameCommand
                                 {
@@ -545,6 +546,10 @@ namespace AccessBattle.Networking
                                     Command = result ? "OK" : "FAIL"
                                 };
                                 Send(JsonConvert.SerializeObject(response, _serializerSettings), NetworkPacketType.GameCommand, player.Connection, player.ClientCrypto);
+
+                                if (oldPhase == GamePhase.Deployment && game.Phase == GamePhase.Deployment)
+                                    return; // The following game sync would reset the cards of the player who hasn't deployed yet
+
                                 if (result)
                                 {
                                     var syncP1 = GameSync.FromGame(game, game.UID, 1);

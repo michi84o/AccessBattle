@@ -63,13 +63,13 @@ namespace AccessBattle.Wpf.ViewModel
             else if (y == 8)
             {
                 y = 9;
-                x = 7 - x;
+                //x = 7 - x;
             }
             // Stack P2
             else if (y == 9)
             {
                 y = 8;
-                x = 7 - x;
+                //x = 7 - x;
             }
             // Server area
             else if (y == 10)
@@ -143,6 +143,7 @@ namespace AccessBattle.Wpf.ViewModel
                 ClearHighlighting();
                 _selectedField = -1;
                 OnPropertyChanged(nameof(CanConfirmDeploy));
+                CardMoved?.Invoke(this, EventArgs.Empty);
                 CommandManager.InvalidateRequerySuggested();
                 return;
             }
