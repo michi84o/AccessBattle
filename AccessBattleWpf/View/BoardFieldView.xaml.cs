@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -42,6 +43,27 @@ namespace AccessBattle.Wpf.View
                         cmd.Execute(CommandParameter);
                 }
             };
+
+
+            DependencyPropertyDescriptor
+                .FromProperty(FieldBorderBrushProperty, typeof(BoardFieldView))
+                .AddValueChanged(this, (s, e) =>
+                {
+                    UpdateCurrentFieldBorderBrush();
+                });
+            DependencyPropertyDescriptor
+                .FromProperty(IsSelectedProperty, typeof(BoardFieldView))
+                .AddValueChanged(this, (s, e) =>
+                {
+                    UpdateCurrentFieldBorderBrush();
+                });
+
+            UpdateCurrentFieldBorderBrush();
+        }
+
+        void UpdateCurrentFieldBorderBrush()
+        {
+            CurrentFieldBorderBrush = IsSelected ? Brushes.Lime : FieldBorderBrush;
         }
 
         public event EventHandler Clicked;
@@ -73,11 +95,30 @@ namespace AccessBattle.Wpf.View
 
         public SolidColorBrush FieldBorderBrush
         {
-            get { return (SolidColorBrush)GetValue(FieldBackgroundProperty); }
-            set { SetValue(FieldBackgroundProperty, value); }
+            get { return (SolidColorBrush)GetValue(FieldBorderBrushProperty); }
+            set { SetValue(FieldBorderBrushProperty, value); }
         }
         public static readonly DependencyProperty FieldBorderBrushProperty = DependencyProperty.Register(
             nameof(FieldBorderBrush), typeof(SolidColorBrush), typeof(BoardFieldView), new PropertyMetadata(Brushes.Transparent));
+
+        public SolidColorBrush CurrentFieldBorderBrush
+        {
+            get { return (SolidColorBrush)GetValue(CurrentFieldBorderBrushProperty.DependencyProperty); }
+            protected set { SetValue(CurrentFieldBorderBrushProperty, value); }
+        }
+        public static readonly DependencyPropertyKey CurrentFieldBorderBrushProperty = DependencyProperty.RegisterReadOnly(
+            nameof(CurrentFieldBorderBrush),
+            typeof(SolidColorBrush),
+            typeof(BoardFieldView),
+            new PropertyMetadata(Brushes.Transparent));
+
+        public bool IsSelected
+        {
+            get { return (bool)GetValue(IsSelectedProperty); }
+            set { SetValue(IsSelectedProperty, value); }
+        }
+        public static readonly DependencyProperty IsSelectedProperty = DependencyProperty.Register(
+            nameof(IsSelected), typeof(bool), typeof(BoardFieldView), new PropertyMetadata(false));
 
         public BoardFieldVisualState FieldVisualState
         {

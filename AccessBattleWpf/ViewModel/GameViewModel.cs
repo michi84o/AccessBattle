@@ -99,6 +99,7 @@ namespace AccessBattle.Wpf.ViewModel
 
         public void HandleFieldSelection(int index)
         {
+            if (_parent.IsBusy) return;
             if (index < 0 || index >= BoardFieldList.Count) return;
 
             // index can be calculated as: 8*y + x
@@ -152,15 +153,35 @@ namespace AccessBattle.Wpf.ViewModel
                      Phase == GamePhase.Player2Turn && !IsPlayerHost)
             {
                 var player = IsPlayerHost ? 1 : 2;
-
                 // Possible actions:
-                // - Move card to empty field
-                // - Move card to opponent card
-                // - Place/Remove Boost
-                // - Place/Remove Firewall
-                // - Move Card to Stack (when on exit field)
-                // - Use Error 404
-                // - Use Virus Check
+                #region 1 Select / Deselect card
+                if (_selectedField == index)
+                {
+                    ClearHighlighting();
+                    _selectedField = -1;
+                    return;
+                }
+                if (_selectedField < 0)
+                {
+                    if (!vm.HasCard || vm.Field.Card?.Owner?.PlayerNumber != player) return;
+                    _selectedField = index;
+                }
+                #endregion
+                #region 2 Move card to empty field
+                #endregion
+                #region 3 Move card to opponent card
+                #endregion
+                #region 4 Place/Remove Boost
+                #endregion
+                #region 5 Place/Remove Firewall
+                #endregion
+                #region 6 Move Card to Stack (when on exit field)
+                #endregion
+                #region 7 Use Error 404
+                #endregion
+                #region 8 Use Virus Check
+                #endregion
+
             }
             return;
 

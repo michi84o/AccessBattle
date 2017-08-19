@@ -50,7 +50,7 @@
         <ControlTemplate>
             <Grid>
                 <!-- Background of control -->
-                <Border Background="{Binding Path=FieldBackground, ElementName=BoardFieldControl}" CornerRadius="2"  BorderThickness="2" BorderBrush="{Binding Path=FieldBorderBrush, ElementName=BoardFieldControl}" />
+                <Border Background="{Binding Path=FieldBackground, ElementName=BoardFieldControl}" CornerRadius="2"  BorderThickness="2" BorderBrush="{Binding Path=CurrentFieldBorderBrush, ElementName=BoardFieldControl}" />
                 <!-- This layer overrides the background when a card is on this field -->
                 <Border Background="{Binding Path=FieldCardVisualState, ElementName=BoardFieldControl, Converter={StaticResource cardConv} }" CornerRadius="2" BorderThickness="2" BorderBrush="Transparent" />
                 <!-- White overlay background for flashing animation -->

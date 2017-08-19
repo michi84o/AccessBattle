@@ -10,6 +10,13 @@ namespace AccessBattle.Wpf.ViewModel
 {
     public class BoardFieldViewModel : PropChangeNotifier
     {
+        bool _isSelected;
+        public bool IsSelected
+        {
+            get { return _isSelected; }
+            set { SetProp(ref _isSelected, value); }
+        }
+
         BoardField _field;
         public BoardField Field => _field;
 
