@@ -119,12 +119,13 @@ namespace AccessBattle.Wpf.ViewModel
                 if (!vm.IsDeploymentField || (_selectedField < 0 && !vm.HasCard))
                 {
                     ClearHighlighting();
-                    _selectedField = -1;
+                    ClearFieldSelection();
                     return;
                 }
                 if (_selectedField < 0)
                 {
                     _selectedField = index;
+                    vm.IsSelected = true;
                     // Highlight all other deployment fields
                     for (int x = 0; x <= 7; ++x)
                     {
@@ -142,7 +143,7 @@ namespace AccessBattle.Wpf.ViewModel
                 vm.Field.Card = sourceCard;
                 source.Field.Card = targetCard;
                 ClearHighlighting();
-                _selectedField = -1;
+                ClearFieldSelection();
                 OnPropertyChanged(nameof(CanConfirmDeploy));
                 CardMoved?.Invoke(this, EventArgs.Empty);
                 CommandManager.InvalidateRequerySuggested();
@@ -158,12 +159,13 @@ namespace AccessBattle.Wpf.ViewModel
                 if (_selectedField == index)
                 {
                     ClearHighlighting();
-                    _selectedField = -1;
+                    ClearFieldSelection();
                     return;
                 }
                 if (_selectedField < 0)
                 {
                     if (!vm.HasCard || vm.Field.Card?.Owner?.PlayerNumber != player) return;
+                    vm.IsSelected = true;
                     _selectedField = index;
                 }
                 #endregion
@@ -238,6 +240,13 @@ namespace AccessBattle.Wpf.ViewModel
             UiGlobals.Instance.StopFlashing();
         }
 
+        void ClearFieldSelection()
+        {
+            foreach (var field in BoardFieldList)
+                field.IsSelected = false;
+            _selectedField = -1;
+        }
+
         #region Game Synchronization
 
         void GameSyncReceived(object sender, GameSyncEventArgs e)
@@ -273,6 +282,7 @@ namespace AccessBattle.Wpf.ViewModel
                       && !(value == GamePhase.Deployment || value == GamePhase.Player1Turn || value == GamePhase.Player2Turn))
                     {
                         ClearHighlighting();
+                        ClearFieldSelection();
                     }
                     _phase = value;
                     IsActionsMenuVisible = false;
