@@ -63,6 +63,7 @@
     <Compile Include="ViewModel\MenuViewModelBase.cs" />
     <Compile Include="ViewModel\NetworkGameMenuViewModel.cs" />
     <Compile Include="ViewModel\OpponentTurnViewModel.cs" />
+    <Compile Include="ViewModel\SwitchCards404MenuViewModel.cs" />
     <Compile Include="ViewModel\WaitForAcceptMenuViewModel.cs" />
     <Compile Include="ViewModel\WaitForJoinMenuViewModel.cs" />
     <Compile Include="ViewModel\WelcomeMenuViewModel.cs" />
@@ -77,6 +78,9 @@
     </Compile>
     <Compile Include="View\OpponentTurnView.xaml.cs">
       <DependentUpon>OpponentTurnView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\SwitchCards404Menu.xaml.cs">
+      <DependentUpon>SwitchCards404Menu.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\WaitForAcceptMenu.xaml.cs">
       <DependentUpon>WaitForAcceptMenu.xaml</DependentUpon>
@@ -130,6 +134,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\OpponentTurnView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\SwitchCards404Menu.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

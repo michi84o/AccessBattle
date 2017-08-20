@@ -66,6 +66,9 @@
             <DataTemplate DataType="{x:Type viewmodel:OpponentTurnViewModel}">
                 <local:OpponentTurnView Width="240" Height="40" />
             </DataTemplate>
+            <DataTemplate DataType="{x:Type viewmodel:SwitchCards404MenuViewModel}">
+                <local:SwitchCards404Menu Width="240" Height="40" />
+            </DataTemplate>
 
         </ResourceDictionary>
     </Window.Resources>
@@ -490,13 +493,13 @@
                     Background="Black">
                 </Border>
                 <local:BoardFieldView
-                    Grid.Column="0" FieldVisualState="VirusCheck" FieldBorderBrush="White" Margin="1" />
+                    Grid.Column="0" FieldVisualState="VirusCheck" FieldBorderBrush="White" Margin="1" Command="{Binding ActionItemClickedCommand}" CommandParameter="VirusCheck" IsSelected="{Binding Game.IsVirusCheckSelected}" />
                 <local:BoardFieldView
-                    Grid.Column="1" FieldVisualState="Firewall" FieldBorderBrush="White" Margin="1" />
+                    Grid.Column="1" FieldVisualState="Firewall" FieldBorderBrush="White" Margin="1" Command="{Binding ActionItemClickedCommand}" CommandParameter="Firewall" IsSelected="{Binding Game.IsFirewallSelected}" />
                 <local:BoardFieldView
-                    Grid.Column="2" FieldVisualState="LBoostStat" FieldBorderBrush="White" Margin="1" x:Name="LineBoostOption" />
+                    Grid.Column="2" FieldVisualState="LBoostStat" FieldBorderBrush="White" Margin="1" x:Name="LineBoostOption" Command="{Binding ActionItemClickedCommand}" CommandParameter="LineBoost" IsSelected="{Binding Game.IsLineBoostSelected}" />
                 <local:BoardFieldView
-                    Grid.Column="3" FieldVisualState="Error404" FieldBorderBrush="White" Margin="1" />
+                    Grid.Column="3" FieldVisualState="Error404" FieldBorderBrush="White" Margin="1" Command="{Binding ActionItemClickedCommand}" CommandParameter="Error404" IsSelected="{Binding Game.IsError404Selected}" />
             </Grid>
 
             <!-- Deployment fields -->

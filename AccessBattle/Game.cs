@@ -26,8 +26,9 @@ using System.Threading.Tasks;
 // Player2: Fields (0,9) - (7,9)
 //
 // Additional fields:
-// Player1 Server Area : Field (4,10)
-// Player2 Server Area : Field (5,10)
+// Player1 Server Area : Field (4,10) / index 83
+// Player2 Server Area : Field (5,10) / index 84
+// Earlier versions had the action fields for current player also mapped in this area.
 
 namespace AccessBattle
 {

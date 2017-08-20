@@ -44,6 +44,15 @@ namespace AccessBattle.Wpf
         WaitForAccept,
         AcceptJoin,
         Deployment,
-        OpponentTurn
+        OpponentTurn,
+        SwitchCards // Question for Error 404
+    }
+
+    public enum ActionItem
+    {
+        VirusCheck,
+        Firewall,
+        LineBoost,
+        Error404
     }
 }

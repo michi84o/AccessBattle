@@ -64,6 +64,7 @@ namespace AccessBattle.Wpf.ViewModel
         WaitForAcceptMenuViewModel _waitForAccept;
         DeploymentViewModel _deploymentVm;
         OpponentTurnViewModel _opponentTurnVm;
+        SwitchCards404MenuViewModel _switchCards404Vm;
 
         public MenuViewModelBase CurrentMenuViewModel
         {
@@ -78,6 +79,7 @@ namespace AccessBattle.Wpf.ViewModel
                     case MenuType.WaitForAccept: return _waitForAccept;
                     case MenuType.Deployment: return _deploymentVm;
                     case MenuType.OpponentTurn: return _opponentTurnVm;
+                    case MenuType.SwitchCards: return _switchCards404Vm;
                     case MenuType.Welcome:
                     default: return _welcomeVm;
                 }
@@ -112,13 +114,15 @@ namespace AccessBattle.Wpf.ViewModel
             _waitForAccept = new WaitForAcceptMenuViewModel(this);
             _deploymentVm = new DeploymentViewModel(this);
             _opponentTurnVm = new OpponentTurnViewModel(this);
+            _switchCards404Vm = new SwitchCards404MenuViewModel(this);
 
             CurrentMenu = MenuType.Welcome;
 
             for (int y = 0; y < 11; ++y)
                 for (int x = 0; x < 8; ++x)
                 {
-                    BoardFields[x, y] = new BoardFieldViewModel();
+                    var model = new BoardFieldViewModel();
+                    BoardFields[x, y] = model;
                     BoardFieldList.Add(BoardFields[x, y]);
                 }
 
@@ -218,6 +222,36 @@ namespace AccessBattle.Wpf.ViewModel
                 }, o =>
                 {
                     return true; // Check is done in execution for performance reasons.
+
+                });
+            }
+        }
+
+        public ICommand ActionItemClickedCommand
+        {
+            get
+            {
+                return new RelayCommand(o =>
+                {
+                    var item = o as string;
+                    if (string.IsNullOrEmpty(item)) return;
+                    switch (item)
+                    {
+                        case "VirusCheck":
+                            _game.HandleActionItem(ActionItem.VirusCheck);
+                            break;
+                        case "Firewall":
+                            _game.HandleActionItem(ActionItem.Firewall);
+                            break;
+                        case "LineBoost":
+                            _game.HandleActionItem(ActionItem.LineBoost);
+                            break;
+                        case "Error404":
+                            _game.HandleActionItem(ActionItem.Error404);
+                            break;
+                        default:
+                            break;
+                    }
 
                 });
             }

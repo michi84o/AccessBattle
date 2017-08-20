@@ -15,6 +15,8 @@ using System.Windows.Input;
 // TODO: Add a "register remote game" method
 // ==> Maybe just pass a reference to the game model?
 
+// TODO: Remove action items that cannot be played from UI
+
 namespace AccessBattle.Wpf.ViewModel
 {
     /// <summary>
@@ -82,6 +84,8 @@ namespace AccessBattle.Wpf.ViewModel
         // This field must only be changed in the HandleFieldSelection method!
         // Allowed range: -1 to (BoardFieldList.Count-1)
         int _selectedField = -1;
+        // Only used for Error 404
+        int _secondSelectedField = -1;
 
         public bool CanConfirmDeploy =>
             Phase == GamePhase.Deployment &&
@@ -94,8 +98,116 @@ namespace AccessBattle.Wpf.ViewModel
             BoardFields[6, 0].HasCard &&
             BoardFields[7, 0].HasCard;
 
+        bool _isVirusCheckSelected;
+        public bool IsVirusCheckSelected
+        {
+            get { return _isVirusCheckSelected; }
+            set { SetProp(ref _isVirusCheckSelected, value); }
+        }
+
+        bool _isFirewallSelected;
+        public bool IsFirewallSelected
+        {
+            get { return _isFirewallSelected; }
+            set { SetProp(ref _isFirewallSelected, value); }
+        }
+
+        bool _isLineBoostSelected;
+        public bool IsLineBoostSelected
+        {
+            get { return _isLineBoostSelected; }
+            set { SetProp(ref _isLineBoostSelected, value); }
+        }
+
+        bool _isError404Selected;
+        public bool IsError404Selected
+        {
+            get { return _isError404Selected; }
+            set { SetProp(ref _isError404Selected, value); }
+        }
 
         public event EventHandler CardMoved;
+
+        bool IsAnyActionItemSelected => IsError404Selected || IsLineBoostSelected || IsVirusCheckSelected || IsFirewallSelected;
+
+        public void HandleActionItem(ActionItem item)
+        {
+            if (_parent.IsBusy) return;
+            if (!(IsPlayerHost && Phase == GamePhase.Player1Turn) &&
+                !(!IsPlayerHost && Phase == GamePhase.Player2Turn)) return;
+
+            if (IsAnyActionItemSelected)
+            {
+                ClearFieldSelection();
+                return;
+            }
+
+            var player = IsPlayerHost ? 1 : 2;
+            var pl = Players[player - 1];
+
+            switch (item)
+            {
+                case ActionItem.VirusCheck:
+                    if (pl.DidVirusCheck) return;
+                    IsVirusCheckSelected = true;
+                    break;
+                case ActionItem.Firewall:
+                    // Check if firewall was placed
+                    var firewallCard = BoardFieldList.FirstOrDefault(f => f.Field.Y < 8 && f.HasCard && f.Field.Card is FirewallCard && f.Field.Card.Owner.PlayerNumber == player);
+                    if (firewallCard != null)
+                    {
+                        SendGameCommand(string.Format("fw {0},{1},{2}", firewallCard.Field.X, firewallCard.Field.Y, 0));
+                        return;
+                    }
+                    IsFirewallSelected = true;
+                    break;
+                case ActionItem.LineBoost:
+                    // Check if line boost was placed
+                    // TODO: Access must be synchronized
+                    var lineBoostCard = BoardFieldList.FirstOrDefault(f => f.Field.Y < 8 && f.HasCard && f.Field.Card is OnlineCard && f.Field.Card.Owner.PlayerNumber == player && ((OnlineCard)f.Field.Card).HasBoost);
+                    if (lineBoostCard != null)
+                    {
+                        SendGameCommand(string.Format("bs {0},{1},{2}", lineBoostCard.Field.X, lineBoostCard.Field.Y, 0));
+                        return;
+                    }
+                    IsLineBoostSelected = true;
+                    break;
+                case ActionItem.Error404:
+                    if (pl.Did404NotFound) return;
+                    IsError404Selected = true;
+                    break;
+            }
+        }
+
+        void SendGameCommand(string command)
+        {
+            MessageBox.Show("TODO: Send game command\r\n" + command);
+            //_client.SendGameCommand(UID, command);
+        }
+
+        public void PlayError404(bool switchCards)
+        {
+            BoardFieldViewModel vm1 = null;
+            BoardFieldViewModel vm2 = null;
+            if (_selectedField >= 0 && _selectedField < 64)
+                vm1 = BoardFieldList[_selectedField];
+            if (_secondSelectedField >= 0 && _secondSelectedField < 64)
+                vm2 = BoardFieldList[_secondSelectedField];
+
+            var card1 = vm1.Field.Card;
+            var card2 = vm2.Field.Card;
+            var playerNum = IsPlayerHost ? 1 : 2;
+
+            _parent.CurrentMenu = MenuType.None;
+
+            if (card1?.Owner?.PlayerNumber == playerNum && card2?.Owner?.PlayerNumber == playerNum &&
+                card1 is OnlineCard && card2 is OnlineCard)
+            {
+                SendGameCommand(string.Format("er {0},{1},{2},{3},{4}", vm1.Field.X, vm1.Field.Y, vm2.Field.X, vm2.Field.Y, switchCards ? 1 : 0));
+            }
+            ClearFieldSelection();
+            ClearHighlighting();
+        }
 
         public void HandleFieldSelection(int index)
         {
@@ -105,16 +217,15 @@ namespace AccessBattle.Wpf.ViewModel
             // index can be calculated as: 8*y + x
 
             var vm = BoardFieldList[index];
-            if (vm == null ||vm.Field == null) return;
+            if (vm == null || vm.Field == null) return;
 
-            if ((!(Phase == GamePhase.Deployment) &&
+            if (!(Phase == GamePhase.Deployment) &&
                !(IsPlayerHost && Phase == GamePhase.Player1Turn) &&
-               !(!IsPlayerHost && Phase == GamePhase.Player2Turn))) return;
+               !(!IsPlayerHost && Phase == GamePhase.Player2Turn)) return;
 
             // In this mode we do not send packets to server while moving cards
             if (Phase == GamePhase.Deployment)
             {
-                #region Deployment
                 if (_parent.CurrentMenu != MenuType.Deployment) return; // Already deployed
                 if (!vm.IsDeploymentField || (_selectedField < 0 && !vm.HasCard))
                 {
@@ -148,86 +259,114 @@ namespace AccessBattle.Wpf.ViewModel
                 CardMoved?.Invoke(this, EventArgs.Empty);
                 CommandManager.InvalidateRequerySuggested();
                 return;
-                #endregion
             }
-            else if (Phase == GamePhase.Player1Turn && IsPlayerHost ||
-                     Phase == GamePhase.Player2Turn && !IsPlayerHost)
+            if (Phase == GamePhase.Player1Turn && IsPlayerHost ||
+                Phase == GamePhase.Player2Turn && !IsPlayerHost)
             {
-                var player = IsPlayerHost ? 1 : 2;
-                // Possible actions:
-                #region 1 Select / Deselect card
-                if (_selectedField == index)
+                var playerNum = IsPlayerHost ? 1 : 2;
+                var opponent = IsPlayerHost ? 2 : 1;
+                var player = Players[playerNum - 1]; // is never null
+
+                if (_parent.CurrentMenu == MenuType.SwitchCards)
                 {
-                    ClearHighlighting();
+                    // User tried to play Error 404 but aborted
                     ClearFieldSelection();
+                    ClearHighlighting();
+                    _parent.CurrentMenu = MenuType.None;
                     return;
                 }
+
+                // Action item handling is special. Do it first
+                if (IsAnyActionItemSelected)
+                {
+                    if (_isLineBoostSelected)
+                    {
+                        if (vm.HasCard && vm.Field.Card?.Owner?.PlayerNumber == playerNum)
+                            SendGameCommand(string.Format("bs {0},{1},{2}", vm.Field.X, vm.Field.Y, 1));
+                    }
+                    else if (_isFirewallSelected)
+                    {
+                        if (!vm.HasCard &&
+                            index != 83 && index != 84
+                            && index != 3 && index != 4 && index != 3 + 8 * 7 && index != 4 + 8 * 7)
+                            SendGameCommand(string.Format("fw {0},{1},{2}", vm.Field.X, vm.Field.Y, 1));
+                    }
+                    else if (_isVirusCheckSelected)
+                    {
+                        if (vm.Field?.Card?.Owner.PlayerNumber == opponent)
+                            SendGameCommand(string.Format("vc {0},{1}", vm.Field.X, vm.Field.Y));
+                    }
+                    else if (_isError404Selected)
+                    {
+                        if (vm.Field.Card?.Owner?.PlayerNumber == playerNum && vm.Field.Card is OnlineCard)
+                        {
+                            if (_selectedField < 0)
+                            {
+                                _selectedField = index;
+                                vm.IsSelected = true;
+                                return;
+                            }
+                            // Unselect
+                            if (_selectedField == index)
+                            {
+                                vm.IsSelected = false;
+                                _selectedField = -1;
+                                return;
+                            }
+                            // Second card selected
+                            // Check if first selected field is OK
+                            OnlineCard firstCard = null;
+                            if (_selectedField < BoardFieldList.Count)
+                                firstCard = BoardFieldList[_selectedField].Field.Card as OnlineCard;
+                            if (firstCard != null)
+                            {
+                                vm.IsSelected = true;
+                                _secondSelectedField = index;
+                                _parent.CurrentMenu = MenuType.SwitchCards;
+                                return;
+                            }
+                        }
+                    }
+                    ClearFieldSelection();
+                    ClearHighlighting();
+                    return;
+                }
+
+                // If we reach this point, then no action items are selected
+
+                // If selected field is clicked, deselect it
+                if (_selectedField == index)
+                {
+                    ClearFieldSelection();
+                    ClearHighlighting();
+                    return;
+                }
+
+                // Select field
                 if (_selectedField < 0)
                 {
-                    if (!vm.HasCard || vm.Field.Card?.Owner?.PlayerNumber != player) return;
+                    if (!vm.HasCard || vm.Field.Card?.Owner?.PlayerNumber != playerNum) return;
+                    ClearFieldSelection();
+                    ClearHighlighting();
                     vm.IsSelected = true;
                     _selectedField = index;
+                    return;
                 }
-                #endregion
-                #region 2 Move card to empty field
-                #endregion
-                #region 3 Move card to opponent card
-                #endregion
-                #region 4 Place/Remove Boost
-                #endregion
-                #region 5 Place/Remove Firewall
-                #endregion
-                #region 6 Move Card to Stack (when on exit field)
-                #endregion
-                #region 7 Use Error 404
-                #endregion
-                #region 8 Use Virus Check
-                #endregion
 
+                // Move card
+                if ((index < 64 || index == 83 || index == 84)
+                    && _selectedField < 64)
+                {
+                    var from = BoardFieldList[_selectedField];
+                    // TODO: Ask Game class if move is possible
+                    // TODO: Exclude own exit fields
+                    SendGameCommand(string.Format("mv {0},{1},{2},{3}", from.Field.X, from.Field.Y, vm.Field.X, vm.Field.Y));
+                }
+                // Any other field that was clicked resets the selection
+                ClearFieldSelection();
+                ClearHighlighting();
             }
             return;
-
-            //if (index < 64)
-            //{
-            //    // Main board field clicked
-            //    if (_selectedField < 0)
-            //    {
-            //        _selectedField = index;
-            //        return;
-            //    }
-            //    if (_selectedField == index)
-            //    {
-            //        _selectedField = -1;
-            //        return;
-            //    }
-            //    if (_selectedField < 0 || _selectedField > BoardFieldList.Count) return;
-            //    // Send movement request to server
-            //    var from = BoardFieldList[_selectedField];
-            //    if (from == null || from.Field == null || vm.Field == null) return;
-            //    _client.SendGameCommand(_uid, string.Format("mv {0},{1},{2},{3}",
-            //        from.Field.X, from.Field.Y, vm.Field.X, vm.Field.Y ));
-            //    _selectedField = -1;
-            //}
-            //else if (index < 72)
-            //{
-            //    // Stack p1
-            //    MessageBox.Show("Stack P1");
-            //}
-            //else if (index < 80)
-            //{
-            //    // Stack p2
-            //    MessageBox.Show("Stack P2");
-            //}
-            //else if (index == 83)
-            //{
-            //    // Server area p1
-            //    MessageBox.Show("Server P1");
-            //}
-            //else if (index == 84)
-            //{
-            //    // Server area p2
-            //    MessageBox.Show("Server P2");
-            //}
         }
 
         /// <summary>
@@ -244,7 +383,12 @@ namespace AccessBattle.Wpf.ViewModel
         {
             foreach (var field in BoardFieldList)
                 field.IsSelected = false;
+            IsFirewallSelected = false;
+            IsLineBoostSelected = false;
+            IsVirusCheckSelected = false;
+            IsError404Selected = false;
             _selectedField = -1;
+            _secondSelectedField = -1;
         }
 
         #region Game Synchronization
