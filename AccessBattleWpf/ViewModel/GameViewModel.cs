@@ -41,11 +41,15 @@ namespace AccessBattle.Wpf.ViewModel
         NetworkGameClient _client = new NetworkGameClient();
         public NetworkGameClient Client => _client;
 
-        bool _isPlayerHost = true;
+        bool _isPlayerHost;
         public bool IsPlayerHost
         {
             get { return _isPlayerHost; }
-            set { SetProp(ref _isPlayerHost, value); }
+            set
+            {
+                if (SetProp(ref _isPlayerHost, value))
+                    RegisterBoardToViewModel();
+            }
         }
 
         public void ConvertCoordinates(ref int x, ref int y)
@@ -81,6 +85,23 @@ namespace AccessBattle.Wpf.ViewModel
             }
         }
 
+        void RegisterBoardToViewModel()
+        {
+            lock (Board) // prevents sync while remapping
+            {
+                ClearHighlighting();
+                ClearFieldSelection();
+                for (int y = 0; y < 11; ++y)
+                    for (int x = 0; x < 8; ++x)
+                    {
+                        int xx = x;
+                        int yy = y;
+                        ConvertCoordinates(ref xx, ref yy);
+                        BoardFieldVm[xx, yy].RegisterBoardField(Board[x, y]);
+                    }
+            }
+        }
+
         // This field must only be changed in the HandleFieldSelection method!
         // Allowed range: -1 to (BoardFieldList.Count-1)
         int _selectedField = -1;
@@ -89,14 +110,14 @@ namespace AccessBattle.Wpf.ViewModel
 
         public bool CanConfirmDeploy =>
             Phase == GamePhase.Deployment &&
-            BoardFields[0, 0].HasCard &&
-            BoardFields[1, 0].HasCard &&
-            BoardFields[2, 0].HasCard &&
-            BoardFields[3, 1].HasCard &&
-            BoardFields[4, 1].HasCard &&
-            BoardFields[5, 0].HasCard &&
-            BoardFields[6, 0].HasCard &&
-            BoardFields[7, 0].HasCard;
+            BoardFieldVm[0, 0].HasCard &&
+            BoardFieldVm[1, 0].HasCard &&
+            BoardFieldVm[2, 0].HasCard &&
+            BoardFieldVm[3, 1].HasCard &&
+            BoardFieldVm[4, 1].HasCard &&
+            BoardFieldVm[5, 0].HasCard &&
+            BoardFieldVm[6, 0].HasCard &&
+            BoardFieldVm[7, 0].HasCard;
 
         bool _isVirusCheckSelected;
         public bool IsVirusCheckSelected
@@ -209,6 +230,7 @@ namespace AccessBattle.Wpf.ViewModel
             ClearHighlighting();
         }
 
+        // TODO: Distinguish between Board and BoardFieldVm
         public void HandleFieldSelection(int index)
         {
             if (_parent.IsBusy) return;
@@ -223,11 +245,14 @@ namespace AccessBattle.Wpf.ViewModel
                !(IsPlayerHost && Phase == GamePhase.Player1Turn) &&
                !(!IsPlayerHost && Phase == GamePhase.Player2Turn)) return;
 
+            var playerNum = IsPlayerHost ? 1 : 2;
+            var opponent = IsPlayerHost ? 2 : 1;
+
             // In this mode we do not send packets to server while moving cards
             if (Phase == GamePhase.Deployment)
             {
                 if (_parent.CurrentMenu != MenuType.Deployment) return; // Already deployed
-                if (!vm.IsDeploymentField || (_selectedField < 0 && !vm.HasCard))
+                if (!vm.IsDeploymentField(playerNum) || (_selectedField < 0 && !vm.HasCard))
                 {
                     ClearHighlighting();
                     ClearFieldSelection();
@@ -242,7 +267,7 @@ namespace AccessBattle.Wpf.ViewModel
                     {
                         var y = 0;
                         if (x == 3 || x == 4) y = 1;
-                        BoardFields[x, y].IsHighlighted = (8 * y + x) != index;
+                        BoardFieldVm[x, y].IsHighlighted = (8 * y + x) != index;
                     }
                     vm.IsHighlighted = false;
                     return;
@@ -263,8 +288,6 @@ namespace AccessBattle.Wpf.ViewModel
             if (Phase == GamePhase.Player1Turn && IsPlayerHost ||
                 Phase == GamePhase.Player2Turn && !IsPlayerHost)
             {
-                var playerNum = IsPlayerHost ? 1 : 2;
-                var opponent = IsPlayerHost ? 2 : 1;
                 var player = Players[playerNum - 1]; // is never null
 
                 if (_parent.CurrentMenu == MenuType.SwitchCards)
@@ -350,6 +373,19 @@ namespace AccessBattle.Wpf.ViewModel
                     ClearHighlighting();
                     vm.IsSelected = true;
                     _selectedField = index;
+                    // Update highlighting
+                    if (vm.Field?.Card is OnlineCard)
+                    {
+                        var targets = Game.GetMoveTargetFields(this, vm.Field);
+                        foreach (var target in targets)
+                        {
+                            // Game works with absolute coordinates but we have to change the view:
+                            int x = target.X;
+                            int y = target.Y;
+                            ConvertCoordinates(ref x, ref y);
+                            BoardFieldVm[x, y].IsHighlighted = true;
+                        }
+                    }
                     return;
                 }
 
@@ -438,20 +474,64 @@ namespace AccessBattle.Wpf.ViewModel
         public PlayerState[] Players => _players;
 
         public List<BoardFieldViewModel> BoardFieldList { get; private set; }
-        public BoardFieldViewModel[,] BoardFields { get; private set; }
+        public BoardFieldViewModel[,] BoardFieldVm { get; private set; }
+
+        // This represents the board as it is in the server.
+        // Lower side with Y=0 belongs always to player 1. No rotation.
         public BoardField[,] Board { get; private set; }
 
         public GameViewModel(IMenuHolder parent)
         {
             _parent = parent;
             BoardFieldList = new List<BoardFieldViewModel>();
-            BoardFields = new BoardFieldViewModel[8, 11];
+            BoardFieldVm = new BoardFieldViewModel[8, 11];
             Board = new BoardField[8, 11];
             for (ushort y = 0; y < 11; ++y)
                 for (ushort x = 0; x < 8; ++x)
                 {
                     Board[x, y] = new BoardField(x, y);
                 }
+
+            for (int y = 0; y < 11; ++y)
+                for (int x = 0; x < 8; ++x)
+                {
+                    var model = new BoardFieldViewModel();
+                    BoardFieldVm[x, y] = model;
+                    BoardFieldList.Add(BoardFieldVm[x, y]);
+                }
+
+            _isPlayerHost = true;
+            RegisterBoardToViewModel();
+
+            #region Set default visual states
+
+            // Server area p1 is at index 83, p2 at 84
+
+            BoardFieldVm[3, 0].DefaultVisualState = BoardFieldVisualState.Exit;
+            BoardFieldVm[4, 0].DefaultVisualState = BoardFieldVisualState.Exit;
+
+            BoardFieldVm[3, 7].DefaultVisualState = BoardFieldVisualState.Exit;
+            BoardFieldVm[4, 7].DefaultVisualState = BoardFieldVisualState.Exit;
+
+            // Stack
+            BoardFieldVm[0, 8].DefaultVisualState = BoardFieldVisualState.Link; // 64
+            BoardFieldVm[1, 8].DefaultVisualState = BoardFieldVisualState.Link;
+            BoardFieldVm[2, 8].DefaultVisualState = BoardFieldVisualState.Link;
+            BoardFieldVm[3, 8].DefaultVisualState = BoardFieldVisualState.Link;
+            BoardFieldVm[4, 8].DefaultVisualState = BoardFieldVisualState.Virus; // 68
+            BoardFieldVm[5, 8].DefaultVisualState = BoardFieldVisualState.Virus;
+            BoardFieldVm[6, 8].DefaultVisualState = BoardFieldVisualState.Virus;
+            BoardFieldVm[7, 8].DefaultVisualState = BoardFieldVisualState.Virus;
+            BoardFieldVm[0, 9].DefaultVisualState = BoardFieldVisualState.Link; // 72
+            BoardFieldVm[1, 9].DefaultVisualState = BoardFieldVisualState.Link;
+            BoardFieldVm[2, 9].DefaultVisualState = BoardFieldVisualState.Link;
+            BoardFieldVm[3, 9].DefaultVisualState = BoardFieldVisualState.Link;
+            BoardFieldVm[4, 9].DefaultVisualState = BoardFieldVisualState.Virus; // 76
+            BoardFieldVm[5, 9].DefaultVisualState = BoardFieldVisualState.Virus;
+            BoardFieldVm[6, 9].DefaultVisualState = BoardFieldVisualState.Virus;
+            BoardFieldVm[7, 9].DefaultVisualState = BoardFieldVisualState.Virus; // 79
+
+            #endregion
 
             _players = new PlayerState[2];
             _players[0] = new PlayerState(1);
@@ -461,21 +541,21 @@ namespace AccessBattle.Wpf.ViewModel
 
         public void Synchronize(GameSync sync)
         {
-            // Clear board
-            for (ushort y = 0; y < 11; ++y)
-                for (ushort x = 0; x < 8; ++x)
-                {
-                    Board[x, y].Card = null;
-                }
-            // Update all fields
-            _players[0].Update(sync.Player1);
-            _players[1].Update(sync.Player2);
-            foreach (var field in sync.FieldsWithCards)
+            lock (Board) // we don't want to call this while the board is being rotated
             {
-                int x = field.X;
-                int y = field.Y;
-                ConvertCoordinates(ref x, ref y);
-                Board[x, y].Update(field, _players);
+                // Clear board
+                for (ushort y = 0; y < 11; ++y)
+                    for (ushort x = 0; x < 8; ++x)
+                    {
+                        BoardFieldVm[x, y].Field.Card = null;
+                    }
+                // Update all fields
+                _players[0].Update(sync.Player1);
+                _players[1].Update(sync.Player2);
+                foreach (var field in sync.FieldsWithCards)
+                {
+                    Board[field.X, field.Y].Update(field, _players);
+                }
             }
             Phase = sync.Phase;
             CommandManager.InvalidateRequerySuggested(); // Confirm button on deployment field does not get enabled

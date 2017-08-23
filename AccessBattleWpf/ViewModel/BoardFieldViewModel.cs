@@ -47,10 +47,15 @@ namespace AccessBattle.Wpf.ViewModel
         }
 
         public bool HasCard => _field?.Card != null;
-        public bool IsDeploymentField =>
-            _field != null &&
-            (Field.Y == 0 && Field.X != 3 && Field.X != 4 ||
-             Field.Y == 1 && (Field.X == 3 || Field.X == 4));
+        public bool IsDeploymentField(int playerIndex)
+        {
+            if (_field == null) return false;
+            int y1 = playerIndex == 1 ? 0 : 7;
+            int y2 = playerIndex == 1 ? 1 : 6;
+
+            return (Field.Y == y1 && Field.X != 3 && Field.X != 4 ||
+                    Field.Y == y2 && (Field.X == 3 || Field.X == 4));
+        }
 
         bool _isHighlighted;
         public bool IsHighlighted
@@ -79,6 +84,9 @@ namespace AccessBattle.Wpf.ViewModel
             {
                 WeakEventManager<BoardField, PropertyChangedEventArgs>.AddHandler(
                 _field, nameof(_field.PropertyChanged), Field_PropertyChanged);
+
+                OnPropertyChanged(nameof(Field));
+                Field_PropertyChanged(_field, new PropertyChangedEventArgs(""));
             }
         }
 
@@ -89,7 +97,7 @@ namespace AccessBattle.Wpf.ViewModel
 
             Application.Current.Dispatcher.Invoke(() =>
             {
-                if (e.PropertyName == nameof(s.Card))
+                if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(s.Card))
                 {
                     OnPropertyChanged(nameof(HasCard));
 

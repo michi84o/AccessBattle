@@ -83,7 +83,10 @@ namespace AccessBattle.Wpf.ViewModel
             if (args.Message.Request == JoinRequestType.Accept)
             {
                 ParentViewModel.Game.Client.ConfirmJoin(args.Message.UID, true);
-                ParentViewModel.Game.IsPlayerHost = false;
+
+                // TODO: Work with SynchronizationContext
+                Application.Current.Dispatcher.Invoke(() => { ParentViewModel.Game.IsPlayerHost = false; });
+
                 ParentViewModel.Game.UID = args.Message.UID;
                 ParentViewModel.CurrentMenu = MenuType.Deployment;
                 //MessageBox.Show("TODO: INIT GAME (p2)");

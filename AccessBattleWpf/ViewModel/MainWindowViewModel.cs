@@ -88,8 +88,6 @@ namespace AccessBattle.Wpf.ViewModel
 
         #region Board Field Visual States
 
-        public BoardFieldViewModel[,] BoardFields => _game.BoardFields;
-
         /// <summary>
         /// This is a one-dimensional list that can be used in XAML code.
         /// It maps the internal two-dimensinal list and contains the items row-wise,
@@ -117,49 +115,7 @@ namespace AccessBattle.Wpf.ViewModel
             _switchCards404Vm = new SwitchCards404MenuViewModel(this);
 
             CurrentMenu = MenuType.Welcome;
-
-            for (int y = 0; y < 11; ++y)
-                for (int x = 0; x < 8; ++x)
-                {
-                    var model = new BoardFieldViewModel();
-                    BoardFields[x, y] = model;
-                    BoardFieldList.Add(BoardFields[x, y]);
-                }
-
-            // Server area p1 is at index 83, p2 at 84
-
-            #region Set default visual states
-
-            BoardFields[3, 0].DefaultVisualState = BoardFieldVisualState.Exit;
-            BoardFields[4, 0].DefaultVisualState = BoardFieldVisualState.Exit;
-
-            BoardFields[3, 7].DefaultVisualState = BoardFieldVisualState.Exit;
-            BoardFields[4, 7].DefaultVisualState = BoardFieldVisualState.Exit;
-
-            // Stack
-            BoardFields[0, 8].DefaultVisualState = BoardFieldVisualState.Link; // 64
-            BoardFields[1, 8].DefaultVisualState = BoardFieldVisualState.Link;
-            BoardFields[2, 8].DefaultVisualState = BoardFieldVisualState.Link;
-            BoardFields[3, 8].DefaultVisualState = BoardFieldVisualState.Link;
-            BoardFields[4, 8].DefaultVisualState = BoardFieldVisualState.Virus; // 68
-            BoardFields[5, 8].DefaultVisualState = BoardFieldVisualState.Virus;
-            BoardFields[6, 8].DefaultVisualState = BoardFieldVisualState.Virus;
-            BoardFields[7, 8].DefaultVisualState = BoardFieldVisualState.Virus;
-            BoardFields[0, 9].DefaultVisualState = BoardFieldVisualState.Link; // 72
-            BoardFields[1, 9].DefaultVisualState = BoardFieldVisualState.Link;
-            BoardFields[2, 9].DefaultVisualState = BoardFieldVisualState.Link;
-            BoardFields[3, 9].DefaultVisualState = BoardFieldVisualState.Link;
-            BoardFields[4, 9].DefaultVisualState = BoardFieldVisualState.Virus; // 76
-            BoardFields[5, 9].DefaultVisualState = BoardFieldVisualState.Virus;
-            BoardFields[6, 9].DefaultVisualState = BoardFieldVisualState.Virus;
-            BoardFields[7, 9].DefaultVisualState = BoardFieldVisualState.Virus; // 79
-
-            #endregion
-
-            for (int y = 0; y < 11; ++y)
-                for (int x = 0; x < 8; ++x)
-                    BoardFields[x, y].RegisterBoardField(_game.Board[x, y]);
-
+            
             // Animates two double values for flashing and alternating card states (Boost)
             UiGlobals.Instance.StartFlashing();
             UiGlobals.Instance.StartMultiOverlayFlashing();

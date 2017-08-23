@@ -265,31 +265,39 @@ namespace AccessBattle
             var x = field.X;
             var y = field.Y;
 
-            if (game.Phase == GamePhase.Deployment)
-            {
-                // In this phase you can only move cards between stack and deployment fields.
-                var owner = card.Owner.PlayerNumber;
-                var depFields = new BoardField[16];
-                var y1 = owner == 1 ? 0 : 7;
-                var y2 = owner == 1 ? 1 : 6;
-                var y3 = owner == 1 ? 8 : 9;
-                for (int ix = 0; ix<=7; ++ix)
-                {
-                    // Set deployment fields
-                    if (ix == 3 || ix == 4)
-                        depFields[ix] = game.Board[ix, y2];
-                    else
-                        depFields[ix] = game.Board[ix, y1];
-                    // Set stack fields
-                    depFields[ix+8] = game.Board[ix, y3];
-                }
-                // Select all fields that have no card
-                fields.AddRange(depFields.Where(o => o.Card == null));
-            }
-            else if (game.Phase == GamePhase.Player1Turn || game.Phase == GamePhase.Player2Turn)
-            {
-                var currentPlayer = game.Phase == GamePhase.Player1Turn ? 1 : 2;
+            // Code was written for single player mode.
+            // In online play, the board is flipped for player 2
+            // We cannot transform the coordinates here or everything will be screwed up
+            // Therefore we just invert the player number
+            var currentPlayer = game.Phase == GamePhase.Player1Turn ? 1 : 2;
+            int opponent = game.Phase == GamePhase.Player1Turn ? 2 : 1;
 
+            #region Deployment
+            // THIS CODE IS NOT NEEDED ANYMORE. JUST HERE FOR REFERENCE
+            //if (game.Phase == GamePhase.Deployment)
+            //{
+            //    // In this phase you can only move cards between stack and deployment fields.
+            //    var owner = card.Owner.PlayerNumber;
+            //    var depFields = new BoardField[16];
+            //    var y1 = owner == 1 ? 0 : 7;
+            //    var y2 = owner == 1 ? 1 : 6;
+            //    var y3 = owner == 1 ? 8 : 9;
+            //    for (int ix = 0; ix<=7; ++ix)
+            //    {
+            //        // Set deployment fields
+            //        if (ix == 3 || ix == 4)
+            //            depFields[ix] = game.Board[ix, y2];
+            //        else
+            //            depFields[ix] = game.Board[ix, y1];
+            //        // Set stack fields
+            //        depFields[ix+8] = game.Board[ix, y3];
+            //    }
+            //    // Select all fields that have no card
+            //    fields.AddRange(depFields.Where(o => o.Card == null));
+            //}
+            #endregion
+            if (game.Phase == GamePhase.Player1Turn || game.Phase == GamePhase.Player2Turn)
+            {
                 // without boost there are 4 possible locations
                 var fs = new BoardField[4];
                 if (y > 0 && y <= 7) // Down

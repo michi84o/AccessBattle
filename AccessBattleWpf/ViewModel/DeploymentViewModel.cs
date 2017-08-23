@@ -39,7 +39,7 @@ namespace AccessBattle.Wpf.ViewModel
                     {
                         int y = 0;
                         if (x == 3 || x == 4) y = 1;
-                        var card = ParentViewModel.Game.BoardFields[x, y].Field.Card as OnlineCard;
+                        var card = ParentViewModel.Game.BoardFieldVm[x, y].Field.Card as OnlineCard;
                         if (card == null)
                         {
                             Log.WriteLine("A card is missing at field " + x + "," + y);
