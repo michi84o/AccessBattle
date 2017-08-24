@@ -202,8 +202,20 @@ namespace AccessBattle.Wpf.ViewModel
 
         void SendGameCommand(string command)
         {
-            MessageBox.Show("TODO: Send game command\r\n" + command);
-            //_client.SendGameCommand(UID, command);
+            //MessageBox.Show("TODO: Send game command\r\n" + command);
+            Task.Run(async ()=>
+            {
+                try
+                {
+                    // TODO: SyncronizationContext
+                    Application.Current.Dispatcher.Invoke(() => _parent.IsBusy = true);
+                    await _client.SendGameCommand(UID, command);
+                }
+                finally
+                {
+                    Application.Current.Dispatcher.Invoke(() => _parent.IsBusy = false);
+                }
+            });
         }
 
         public void PlayError404(bool switchCards)
@@ -310,7 +322,7 @@ namespace AccessBattle.Wpf.ViewModel
                     else if (_isFirewallSelected)
                     {
                         if (!vm.HasCard &&
-                            index != 83 && index != 84
+                            index != 84 && index != 85
                             && index != 3 && index != 4 && index != 3 + 8 * 7 && index != 4 + 8 * 7)
                             SendGameCommand(string.Format("fw {0},{1},{2}", vm.Field.X, vm.Field.Y, 1));
                     }
@@ -390,7 +402,7 @@ namespace AccessBattle.Wpf.ViewModel
                 }
 
                 // Move card
-                if ((index < 64 || index == 83 || index == 84)
+                if ((index < 64 || index == 84 || index == 85)
                     && _selectedField < 64)
                 {
                     var from = BoardFieldList[_selectedField];
@@ -440,6 +452,7 @@ namespace AccessBattle.Wpf.ViewModel
                 // TODO: Tell server?
                 return;
             }
+            // TODO: SynchronizationContext
             Application.Current.Dispatcher.Invoke(() => { Synchronize(e.Sync); });
         }
 
@@ -505,7 +518,7 @@ namespace AccessBattle.Wpf.ViewModel
 
             #region Set default visual states
 
-            // Server area p1 is at index 83, p2 at 84
+            // Server area p1 is at index 84, p2 at 85
 
             BoardFieldVm[3, 0].DefaultVisualState = BoardFieldVisualState.Exit;
             BoardFieldVm[4, 0].DefaultVisualState = BoardFieldVisualState.Exit;

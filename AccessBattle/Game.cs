@@ -26,8 +26,8 @@ using System.Threading.Tasks;
 // Player2: Fields (0,9) - (7,9)
 //
 // Additional fields:
-// Player1 Server Area : Field (4,10) / index 83
-// Player2 Server Area : Field (5,10) / index 84
+// Player1 Server Area : Field (4,10) / index 84
+// Player2 Server Area : Field (5,10) / index 85
 // Earlier versions had the action fields for current player also mapped in this area.
 
 namespace AccessBattle
@@ -181,9 +181,24 @@ namespace AccessBattle
             };
         }
 
+        /// <summary>
+        /// Command      Syntax             Example
+        /// -------------------------------------------
+        /// Move         mv x1,y1,x2,y2     mv 0,0,1,0
+        /// Boost        bs x1,y1,e         bs 0,0,1
+        /// Firewall     fw x1,y1,e         fw 0,0,1
+        /// Virus Check  vc x1,y1           vc 0,0
+        /// Error 404    er x1,y1,x2,y2,s   er 0,0,1,1,1
+        /// </summary>
+        /// <param name="command">Command to play.</param>
+        /// <param name="player">Player number.</param>
+        /// <returns></returns>
+        // TODO LOCK ACCESS TOD THIS METHOD !!!
         public bool ExecuteCommand(string command, int player)
         {
             if (player != 1 && player != 2) return false;
+            if (Phase == GamePhase.Player1Turn && player != 1) return false;
+            if (Phase == GamePhase.Player2Turn && player != 2) return false;
             if (string.IsNullOrEmpty(command)) return false;
 
             var cmd = command.Trim();
@@ -240,8 +255,131 @@ namespace AccessBattle
             }
             #endregion
 
+            #region Move command "mv"
+            if (cmd.StartsWith("mv ", StringComparison.InvariantCultureIgnoreCase) && command.Length > 3)
+            {
+                command = command.Substring(3).Trim();
+                var split = command.Split(new[] { ',' });
+                if (split.Length != 4) return false;
+                uint x1, x2, y1, y2;
+                if (!uint.TryParse(split[0], out x1) ||
+                    !uint.TryParse(split[1], out y1) ||
+                    !uint.TryParse(split[2], out x2) ||
+                    !uint.TryParse(split[3], out y2))
+                    return false;
+
+                if (x1 > 7 || x2 > 7 || (y1 > 7 && y1 != 10) || (y2 > 7 && y2 != 10))
+                    return false;
+
+                var field1 = Board[x1, y1];
+                var field2 = Board[x2, y2];
+                var card1 = field1.Card as OnlineCard;
+                if (card1?.Owner?.PlayerNumber != player)
+                    return false;
+
+                if (!GetMoveTargetFields(this, field1).Contains(field2))
+                    return false;
+
+                // Check if card is claimed
+                if (field2.Card != null)
+                {
+                    var card2 = field2.Card as OnlineCard;
+                    if (card2 == null || card2.Owner?.PlayerNumber == player)
+                        return false;
+                    card2.IsFaceUp = true;
+                    PlaceCardOnStack(field2, player);
+                    if (field2.Card != null)
+                    {
+                        // Could not move card, error!
+                        Phase = GamePhase.Aborted;
+                        return true;
+                    }
+                    if (card2.HasBoost)
+                        card2.HasBoost = false;
+                }
+                if (field2.IsServerArea)
+                {
+                    PlaceCardOnStack(field1, player);
+                    if (field1.Card != null)
+                    {
+                        // Could not move card, error!
+                        Phase = GamePhase.Aborted;
+                        return true;
+                    }
+                    if (card1.HasBoost)
+                        card1.HasBoost = false;
+                }
+                field2.Card = field1.Card;
+                field1.Card = null;
+                if (Phase == GamePhase.Player1Turn) Phase = GamePhase.Player2Turn;
+                else if (Phase == GamePhase.Player2Turn) Phase = GamePhase.Player1Turn;
+                return true;
+            }
+            #endregion
 
             return false;
+        }
+
+        void PlaceCardOnStack(BoardField field, int player)
+        {
+            var card = field?.Card as OnlineCard;
+            if (card == null) return;
+            // First 4 fields are reserved for link cards, others for viruses
+            // If a card is not revealed it is treated as a link card
+            int y = player == 1 ? 8 : 9;
+            int stackpos = -1;
+            if (card.IsFaceUp && card.Type == OnlineCardType.Virus)
+            {
+                for (int x = 4; x < 8; ++x)
+                {
+                    if (Board[x, y].Card != null) continue;
+                    stackpos = x;
+                    break;
+                }
+            }
+            if (stackpos == -1)
+            {
+                for (int x = 0; x < 4; ++x)
+                {
+                    if (Board[x, y].Card != null) continue;
+                    stackpos = x;
+                    break;
+                }
+                if (stackpos == -1) // Happens when card.IsFaceUp and card is virus and link stack is full
+                {
+                    for (int x = 4; x < 8; ++x)
+                    {
+                        if (Board[x, y].Card != null) continue;
+                        stackpos = x;
+                        break;
+                    }
+                }
+            }
+            // stackpos must have a value by now or stack is full.
+            // Stack can never be full. If more than 6 cards are on the stack, the game is over
+            if (stackpos == -1)
+            {
+                Log.WriteLine("Game Error! Card cannot be put on stack because it is full");
+                return; // TODO: GAME OVER
+            }
+            Board[stackpos, y].Card = card;
+            field.Card = null;
+
+            // Check if player won or lost
+            int linkCount = 0;
+            int virusCount = 0;
+            for (int x = 0; x < 8; ++x)
+            {
+                var c = Board[x, y].Card as OnlineCard;
+                if (c == null) continue;
+                if (c.Type == OnlineCardType.Link) ++linkCount;
+                if (c.Type == OnlineCardType.Virus) ++virusCount;
+            }
+
+            if (virusCount >= 4)
+                Phase = player == 1 ? GamePhase.Player2Win : GamePhase.Player1Win;
+            if (linkCount >= 4)
+                Phase = player == 1 ? GamePhase.Player1Win : GamePhase.Player2Win;
         }
 
         #region Static Helper Methods

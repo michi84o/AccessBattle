@@ -117,8 +117,8 @@
             <local:BoardFieldView
                 Grid.Row="3" Grid.Column="4" Grid.ColumnSpan="4"
                 Margin="0,3,0,14" x:Name="ServerFieldOrange"
-                Command="{Binding BoardFieldClickedCommand}" CommandParameter="84"
-                IsHighlighted="{Binding BoardFieldList[84].IsHighlighted}">
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="85"
+                IsHighlighted="{Binding BoardFieldList[85].IsHighlighted}">
                 <Viewbox
                     Grid.Row="3" Grid.Column="4" Grid.ColumnSpan="4" Margin="2">
                     <Path RenderTransformOrigin="0.5,0.5"
@@ -134,8 +134,8 @@
             <local:BoardFieldView
                 Grid.Row="12" Grid.Column="4" Grid.ColumnSpan="4"
                 Margin="0,14,0,3" x:Name="ServerFieldBlue"
-                Command="{Binding BoardFieldClickedCommand}" CommandParameter="83"
-                IsHighlighted="{Binding BoardFieldList[83].IsHighlighted}">
+                Command="{Binding BoardFieldClickedCommand}" CommandParameter="84"
+                IsHighlighted="{Binding BoardFieldList[84].IsHighlighted}">
                 <Viewbox
                     Grid.Row="3" Grid.Column="4" Grid.ColumnSpan="4" Margin="2">
                     <Path RenderTransformOrigin="0.5,0.5"

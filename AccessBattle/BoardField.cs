@@ -37,6 +37,9 @@ namespace AccessBattle
         /// <summary>Y Location of this field.</summary>
         public ushort Y { get; private set; }
 
+
+        /// <summary>Checks the coordinates to determine if this field in an server area field.</summary>
+        public bool IsServerArea => Y == 10 && (X == 4 || X == 5);
         /// <summary>Checks the coordinates to determine if this field in an exit field.</summary>
         public bool IsExit => X >= 3 && X <= 4 && (Y == 0 || Y == 7);
         /// <summary>Checks the coordinates to determine if this field in a stack field.</summary>

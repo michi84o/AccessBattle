@@ -21,11 +21,7 @@ namespace AccessBattle.Wpf.ViewModel
         public NetworkGameMenuViewModel(
             IMenuHolder parent) : base(parent)
         {
-            Games = new ObservableCollection<GameInfo>
-            {
-                new GameInfo { UID= 2147483647, Name="MyGame", Player1="Player1" },
-                new GameInfo { UID= 123, Name="Awesome Game", Player1="cvsgsagf 12131fs" }
-            };
+            Games = new ObservableCollection<GameInfo>();
 
             _gamesView = new CollectionViewSource
             {
