@@ -183,15 +183,23 @@ namespace AccessBattle.Wpf.ViewModel
                     IsFirewallSelected = true;
                     break;
                 case ActionItem.LineBoost:
+                    // Get all player online cards
+                    var onlineCards = BoardFieldList.Where(f =>
+                        f.Field?.Y < 8 && f.Field?.Card is OnlineCard &&
+                        f.Field?.Card?.Owner?.PlayerNumber == player).ToList();
+
                     // Check if line boost was placed
-                    // TODO: Access must be synchronized
-                    var lineBoostCard = BoardFieldList.FirstOrDefault(f => f.Field.Y < 8 && f.HasCard && f.Field.Card is OnlineCard && f.Field.Card.Owner.PlayerNumber == player && ((OnlineCard)f.Field.Card).HasBoost);
+                    var lineBoostCard = onlineCards.FirstOrDefault(f => (f.Field?.Card as OnlineCard)?.HasBoost == true);
                     if (lineBoostCard != null)
                     {
                         SendGameCommand(string.Format("bs {0},{1},{2}", lineBoostCard.Field.X, lineBoostCard.Field.Y, 0));
                         return;
                     }
                     IsLineBoostSelected = true;
+                    foreach (var field in onlineCards)
+                    {
+                        field.IsHighlighted = true;
+                    }
                     break;
                 case ActionItem.Error404:
                     if (pl.Did404NotFound) return;

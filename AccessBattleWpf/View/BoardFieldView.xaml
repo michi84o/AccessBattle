@@ -149,6 +149,20 @@
                     </Grid.RenderTransform>
                 </Grid>
 
+                <!-- Flipped Field -->
+                <Grid
+                    Margin="1"
+                    Visibility="{Binding Path=FieldVisualState, ElementName=BoardFieldControl, Converter={StaticResource vConvFlipped}}"
+                    Style="{StaticResource MultiOverlayGrid}">
+                    <Viewbox>
+                        <TextBlock Margin="0"
+                            FontSize="10" Foreground="White"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Text=" 101010 " TextAlignment="Center" />
+                    </Viewbox>
+                </Grid>
+
                 <!-- Virus Check -->
                 <Grid
                     Margin="1"
@@ -233,18 +247,6 @@
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
                             Text="Firewall" />
-                    </Viewbox>
-                </Grid>
-
-                <Grid
-                    Margin="1"
-                    Visibility="{Binding Path=FieldVisualState, ElementName=BoardFieldControl, Converter={StaticResource vConvFlipped}}">
-                    <Viewbox>
-                        <TextBlock Margin="0"
-                            FontSize="10" Foreground="White"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            Text=" 101010 " TextAlignment="Center" />
                     </Viewbox>
                 </Grid>
 

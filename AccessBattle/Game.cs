@@ -117,11 +117,13 @@ namespace AccessBattle
                 {
                     PlayerOnlineCards[p, c].Type = OnlineCardType.Link;
                     PlayerOnlineCards[p, c].IsFaceUp = false;
+                    PlayerOnlineCards[p, c].HasBoost = false;
                 }
                 for (int c = 4; c < 8; ++c)
                 {
                     PlayerOnlineCards[p, c].Type = OnlineCardType.Virus;
                     PlayerOnlineCards[p, c].IsFaceUp = false;
+                    PlayerOnlineCards[p, c].HasBoost = false;
                 }
                 for (int i=0; i<=7; ++i)
                 {
@@ -179,6 +181,12 @@ namespace AccessBattle
                 new FirewallCard { Owner = _players[0] },
                 new FirewallCard { Owner = _players[1] },
             };
+        }
+
+        void SwitchPlayerTurnPhase()
+        {
+            if (Phase == GamePhase.Player1Turn) Phase = GamePhase.Player2Turn;
+            else if (Phase == GamePhase.Player2Turn) Phase = GamePhase.Player1Turn;
         }
 
         /// <summary>
@@ -311,8 +319,59 @@ namespace AccessBattle
                 }
                 field2.Card = field1.Card;
                 field1.Card = null;
-                if (Phase == GamePhase.Player1Turn) Phase = GamePhase.Player2Turn;
-                else if (Phase == GamePhase.Player2Turn) Phase = GamePhase.Player1Turn;
+                SwitchPlayerTurnPhase();
+                return true;
+            }
+            #endregion
+
+            #region Boost command "bs"
+            // TODO Command with 'enabled=0' does not need coordinates
+            if (command.StartsWith("bs ", StringComparison.InvariantCultureIgnoreCase) && command.Length > 3)
+            {
+                command = command.Substring(3).Trim();
+                var split = command.Split(new[] { ',' });
+                if (split.Length != 3) return false;
+
+                uint x1, y1, enabled;
+                if (!uint.TryParse(split[0], out x1) ||
+                    !uint.TryParse(split[1], out y1) ||
+                    !uint.TryParse(split[2], out enabled))
+                    return false;
+
+                if (x1 > 7 || y1 > 7 || enabled > 1)
+                    return false;
+
+                var field1 = Board[x1, y1];
+                var card1 = field1.Card as OnlineCard;
+                if (card1?.Owner?.PlayerNumber != player)
+                    return false;
+
+                OnlineCard boostedCard = null;
+                for (int i = 0; i < 8; ++i)
+                {
+                    var card = PlayerOnlineCards[player - 1, i];
+                    if (card.HasBoost)
+                    {
+                        boostedCard = card;
+                        break;
+                    }
+                }
+
+                if (enabled == 1)
+                {
+                    if (boostedCard != null)
+                        return false; // Boost already placed
+                    card1.HasBoost = true;
+                    SwitchPlayerTurnPhase();
+                    return true;
+                }
+
+                // enabled == 0
+                if (boostedCard != card1)
+                    return false; // wrong card selected
+
+                card1.HasBoost = false;
+                SwitchPlayerTurnPhase();
                 return true;
             }
             #endregion
