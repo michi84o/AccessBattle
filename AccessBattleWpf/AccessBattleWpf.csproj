@@ -70,8 +70,12 @@
     <Compile Include="View\AcceptJoinMenu.xaml.cs">
       <DependentUpon>AcceptJoinMenu.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\CenteredAdorner.cs" />
     <Compile Include="View\DeploymentView.xaml.cs">
       <DependentUpon>DeploymentView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\ErrorNotification.xaml.cs">
+      <DependentUpon>ErrorNotification.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\NetworkGameMenu.xaml.cs">
       <DependentUpon>NetworkGameMenu.xaml</DependentUpon>
@@ -100,6 +104,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\DeploymentView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ErrorNotification.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -160,6 +160,7 @@ namespace AccessBattle.Wpf.ViewModel
             if (IsAnyActionItemSelected)
             {
                 ClearFieldSelection();
+                ClearHighlighting();
                 return;
             }
 
@@ -217,7 +218,11 @@ namespace AccessBattle.Wpf.ViewModel
                 {
                     // TODO: SyncronizationContext
                     Application.Current.Dispatcher.Invoke(() => _parent.IsBusy = true);
-                    await _client.SendGameCommand(UID, command);
+                    var result = await _client.SendGameCommand(UID, command);
+                    if (result) IsActionsMenuVisible = false;
+                    // TODO: Use SynchronizationContext
+                    if (!result)
+                        _parent.ShowError?.Invoke("Error");
                 }
                 finally
                 {
@@ -251,6 +256,7 @@ namespace AccessBattle.Wpf.ViewModel
         }
 
         // TODO: Distinguish between Board and BoardFieldVm
+        // TODO: lock access to prevent changes while synchronizing
         public void HandleFieldSelection(int index)
         {
             if (_parent.IsBusy) return;
@@ -336,12 +342,12 @@ namespace AccessBattle.Wpf.ViewModel
                     }
                     else if (_isVirusCheckSelected)
                     {
-                        if (vm.Field?.Card?.Owner.PlayerNumber == opponent)
+                        if (!player.DidVirusCheck && vm.Field?.Card?.Owner.PlayerNumber == opponent && vm.Field.Card is OnlineCard)
                             SendGameCommand(string.Format("vc {0},{1}", vm.Field.X, vm.Field.Y));
                     }
                     else if (_isError404Selected)
                     {
-                        if (vm.Field.Card?.Owner?.PlayerNumber == playerNum && vm.Field.Card is OnlineCard)
+                        if (!player.Did404NotFound && vm.Field.Card?.Owner?.PlayerNumber == playerNum && vm.Field.Card is OnlineCard)
                         {
                             if (_selectedField < 0)
                             {

@@ -25,6 +25,40 @@ namespace AccessBattle.Wpf.View
         public MainWindow()
         {
             InitializeComponent();
+            ViewModel.ShowError = ShowError;
+
+            //Loaded += (s, a) => { Task.Delay(3000).ContinueWith(o => ShowError()); };
         }
+
+        #region Error Adorner
+
+        void ShowError(string message = "Error")
+        {
+            Application.Current.Dispatcher.BeginInvoke((Action)(() =>
+            {
+                var layer = AdornerLayer.GetAdornerLayer(MainGrid);
+                if (layer == null) return;
+
+                var adorner = new CenteredAdorner(MainGrid);
+                var notification = new ErrorNotification();
+                notification.TextBlock.Text = message;
+                adorner.Child = notification;
+
+                layer.Add(adorner);
+
+                notification.Loaded += (s, a) =>
+                {
+                    Task.Delay(2500).ContinueWith(o =>
+                    {
+                        Application.Current.Dispatcher.BeginInvoke((Action)(() =>
+                        {
+                            layer.Remove(adorner);
+                        }));
+                    });
+                };
+            }), null);
+
+        }
+        #endregion
     }
 }

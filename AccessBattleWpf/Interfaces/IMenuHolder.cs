@@ -21,5 +21,6 @@ namespace AccessBattle.Wpf.Interfaces
         GameViewModel Game { get; }
         GameInfo JoiningGame { get; set; }
         bool IsBusy { get; set; }
+        Action<string> ShowError { get; }
     }
 }

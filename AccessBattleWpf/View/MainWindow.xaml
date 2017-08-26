@@ -11,7 +11,7 @@
         Width="424" Height="646"
         Background="Black">
     <Window.DataContext>
-        <viewmodel:MainWindowViewModel/>
+        <viewmodel:MainWindowViewModel x:Name="ViewModel"/>
     </Window.DataContext>
     <Window.Resources>
         <ResourceDictionary>
@@ -73,7 +73,7 @@
         </ResourceDictionary>
     </Window.Resources>
     <Viewbox Stretch="Uniform">
-        <Grid>
+        <Grid x:Name="MainGrid">
             <!--16 rows-->
             <Grid.RowDefinitions>
                 <RowDefinition Name="RowEdgeUpper" Height="0"/>

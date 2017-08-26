@@ -25,6 +25,8 @@ namespace AccessBattle.Wpf.ViewModel
             set { _game.IsPlayerHost = value; } // Prop change triggered by model and forwarded below
         }
 
+        public Action<string> ShowError { get; set; }
+
         /// <summary>
         /// Used to lock the UI while waiting from answer of the server.
         /// Should only be accessed from UI thread.
@@ -115,7 +117,7 @@ namespace AccessBattle.Wpf.ViewModel
             _switchCards404Vm = new SwitchCards404MenuViewModel(this);
 
             CurrentMenu = MenuType.Welcome;
-            
+
             // Animates two double values for flashing and alternating card states (Boost)
             UiGlobals.Instance.StartFlashing();
             UiGlobals.Instance.StartMultiOverlayFlashing();

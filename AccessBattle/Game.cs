@@ -423,7 +423,7 @@ namespace AccessBattle
 
             #region Virus Check command "vc"
 
-            if (command.StartsWith("bs ", StringComparison.InvariantCultureIgnoreCase) && command.Length > 3)
+            if (command.StartsWith("vc ", StringComparison.InvariantCultureIgnoreCase) && command.Length > 3)
             {
                 command = command.Substring(3).Trim();
                 var split = command.Split(new[] { ',' });
@@ -437,6 +437,18 @@ namespace AccessBattle
                 if (x1 > 7 || y1 > 7)
                     return false;
 
+                if (Players[player - 1].DidVirusCheck)
+                    return false;
+
+                var field1 = Board[x1, y1];
+                var card1 = field1.Card as OnlineCard;
+
+                if (card1 == null || card1.Owner?.PlayerNumber == player || card1.IsFaceUp)
+                    return false;
+
+                card1.IsFaceUp = true;
+                Players[player - 1].DidVirusCheck = true;
+                return true;
             }
 
             #endregion
