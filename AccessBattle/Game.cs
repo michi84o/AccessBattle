@@ -409,15 +409,47 @@ namespace AccessBattle
                         }
 
                     field1.Card = PlayerFirewallCards[player - 1];
+                    SwitchPlayerTurnPhase();
                     return true;
                 }
 
                 // enabled == 0
                 if (!(card1 is FirewallCard) || card1.Owner?.PlayerNumber != player) return false;
                 field1.Card = null;
-
+                SwitchPlayerTurnPhase();
+                return true;
             }
             #endregion
+
+            #region Virus Check command "vc"
+
+            if (command.StartsWith("bs ", StringComparison.InvariantCultureIgnoreCase) && command.Length > 3)
+            {
+                command = command.Substring(3).Trim();
+                var split = command.Split(new[] { ',' });
+                if (split.Length != 2) return false;
+
+                uint x1, y1;
+                if (!uint.TryParse(split[0], out x1) ||
+                    !uint.TryParse(split[1], out y1))
+                    return false;
+
+                if (x1 > 7 || y1 > 7)
+                    return false;
+
+            }
+
+            #endregion
+
+            #region Error 404 command "er"
+
+            if (command.StartsWith("er ", StringComparison.InvariantCultureIgnoreCase) && command.Length > 3)
+            {
+
+            }
+
+            #endregion
+
             return false;
         }
 
