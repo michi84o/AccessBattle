@@ -376,6 +376,48 @@ namespace AccessBattle
             }
             #endregion
 
+            #region Firewall command "fw"
+            if (cmd.StartsWith("fw ", StringComparison.InvariantCulture) && command.Length > 3)
+            {
+                command = command.Substring(3).Trim();
+                var split = command.Split(new[] { ',' });
+                if (split.Length != 3) return false;
+
+                uint x1, y1, enabled;
+                if (!uint.TryParse(split[0], out x1) ||
+                    !uint.TryParse(split[1], out y1) ||
+                    !uint.TryParse(split[2], out enabled))
+                    return false;
+
+                if (x1 > 7 || y1 > 7 || enabled > 1)
+                    return false;
+
+                var field1 = Board[x1, y1];
+                var card1 = field1.Card;
+
+                if (enabled == 1)
+                {
+                    if (card1 != null) return false; // Can only place on empty field
+
+                    // Make sure firewall card wasn't already placed
+                    for (int x = 0; x < 8; ++x)
+                        for (int y = 0; y < 8; ++y)
+                        {
+                            var card = Board[x, y].Card;
+                            if (card?.Owner.PlayerNumber != player) continue;
+                            if (card is FirewallCard) return false; // card already placed
+                        }
+
+                    field1.Card = PlayerFirewallCards[player - 1];
+                    return true;
+                }
+
+                // enabled == 0
+                if (!(card1 is FirewallCard) || card1.Owner?.PlayerNumber != player) return false;
+                field1.Card = null;
+
+            }
+            #endregion
             return false;
         }
 

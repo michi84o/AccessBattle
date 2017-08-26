@@ -106,25 +106,32 @@ namespace AccessBattle.Wpf.ViewModel
                         VisualState = BoardFieldVisualState.Empty;
                         CardVisualState = BoardFieldCardVisualState.Empty;
                     }
-                    else if (s.Card is OnlineCard && s.Card.Owner != null)
+                    else if (s.Card.Owner != null)
                     {
-                        var card = s.Card as OnlineCard;
-                        switch (card.Type)
+                        if (s.Card is OnlineCard)
                         {
-                            case OnlineCardType.Link:
-                                VisualState = BoardFieldVisualState.Link;
-                                break;
-                            case OnlineCardType.Virus:
-                                VisualState = BoardFieldVisualState.Virus;
-                                break;
-                            default:
-                                VisualState = BoardFieldVisualState.Flipped;
-                                break;
+                            var card = s.Card as OnlineCard;
+                            switch (card.Type)
+                            {
+                                case OnlineCardType.Link:
+                                    VisualState = BoardFieldVisualState.Link;
+                                    break;
+                                case OnlineCardType.Virus:
+                                    VisualState = BoardFieldVisualState.Virus;
+                                    break;
+                                default:
+                                    VisualState = BoardFieldVisualState.Flipped;
+                                    break;
+                            }
+
+                            if (card.HasBoost)
+                                VisualState |= BoardFieldVisualState.LineBoost;
+
                         }
-
-                        if (card.HasBoost)
-                            VisualState |= BoardFieldVisualState.LineBoost;
-
+                        else if (s.Card is FirewallCard)
+                        {
+                            VisualState = BoardFieldVisualState.Firewall;
+                        }
                         var num = s.Card.Owner.PlayerNumber;
                         if (num == 1)
                         {

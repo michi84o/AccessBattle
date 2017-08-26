@@ -18,18 +18,7 @@ namespace AccessBattle
         public Card Card
         {
             get { return _card; }
-            set
-            {
-                SetProp(ref _card, value);
-                //SetProp(_card, value, ()=>
-                //{
-                //    _card = value;
-                //    if (value != null)
-                //    {
-                //        value.Location = this;
-                //    }
-                //});
-            }
+            set { SetProp(ref _card, value); }
         }
 
         /// <summary>X Location of this field.</summary>
@@ -62,7 +51,10 @@ namespace AccessBattle
             Card card;
             if (sync.Card.IsFirewall)
             {
-                card = new FirewallCard();
+                card = new FirewallCard
+                {
+                    Owner = sync.Card.Owner == 1 ? players[0] : players[1]
+                };
             }
             else
             {
