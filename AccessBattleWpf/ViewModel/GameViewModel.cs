@@ -564,6 +564,17 @@ namespace AccessBattle.Wpf.ViewModel
             _players[0] = new PlayerState(1);
             _players[1] = new PlayerState(2);
             _client.GameSyncReceived += GameSyncReceived;
+            _players[0].PropertyChanged += PlayerPropChanged;
+            _players[1].PropertyChanged += PlayerPropChanged;
+        }
+
+        void PlayerPropChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            var empty = string.IsNullOrEmpty(e.PropertyName);
+            if (empty || e.PropertyName == nameof(PlayerState.Did404NotFound))
+                OnPropertyChanged(nameof(CanUse404NotFound));
+            if (empty || e.PropertyName == nameof(PlayerState.DidVirusCheck))
+                OnPropertyChanged(nameof(CanUseVirusCheck));
         }
 
         public void Synchronize(GameSync sync)
@@ -605,5 +616,8 @@ namespace AccessBattle.Wpf.ViewModel
                 SetProp(ref _isActionsMenuVisible, value);
             }
         }
+
+        public bool CanUseVirusCheck => !Players[IsPlayerHost ? 0 : 1].DidVirusCheck;
+        public bool CanUse404NotFound => !Players[IsPlayerHost ? 0 : 1].Did404NotFound;
     }
 }

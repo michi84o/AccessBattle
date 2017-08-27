@@ -493,13 +493,15 @@
                     Background="Black">
                 </Border>
                 <local:BoardFieldView
-                    Grid.Column="0" FieldVisualState="VirusCheck" FieldBorderBrush="White" Margin="1" Command="{Binding ActionItemClickedCommand}" CommandParameter="VirusCheck" IsSelected="{Binding Game.IsVirusCheckSelected}" />
+                    Grid.Column="0" FieldVisualState="VirusCheck" FieldBorderBrush="White" Margin="1" Command="{Binding ActionItemClickedCommand}" CommandParameter="VirusCheck" IsSelected="{Binding Game.IsVirusCheckSelected}"
+                    Visibility="{Binding Game.CanUseVirusCheck, Converter={StaticResource VisConv}}" />
                 <local:BoardFieldView
                     Grid.Column="1" FieldVisualState="Firewall" FieldBorderBrush="White" Margin="1" Command="{Binding ActionItemClickedCommand}" CommandParameter="Firewall" IsSelected="{Binding Game.IsFirewallSelected}" />
                 <local:BoardFieldView
                     Grid.Column="2" FieldVisualState="LBoostStat" FieldBorderBrush="White" Margin="1" x:Name="LineBoostOption" Command="{Binding ActionItemClickedCommand}" CommandParameter="LineBoost" IsSelected="{Binding Game.IsLineBoostSelected}" />
                 <local:BoardFieldView
-                    Grid.Column="3" FieldVisualState="Error404" FieldBorderBrush="White" Margin="1" Command="{Binding ActionItemClickedCommand}" CommandParameter="Error404" IsSelected="{Binding Game.IsError404Selected}" />
+                    Grid.Column="3" FieldVisualState="Error404" FieldBorderBrush="White" Margin="1" Command="{Binding ActionItemClickedCommand}" CommandParameter="Error404" IsSelected="{Binding Game.IsError404Selected}"
+                    Visibility="{Binding Game.CanUse404NotFound, Converter={StaticResource VisConv}}"/>
             </Grid>
 
             <!-- Deployment fields -->

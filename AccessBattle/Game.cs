@@ -434,10 +434,10 @@ namespace AccessBattle
                     !uint.TryParse(split[1], out y1))
                     return false;
 
-                if (x1 > 7 || y1 > 7)
+                if (Players[player - 1].DidVirusCheck)
                     return false;
 
-                if (Players[player - 1].DidVirusCheck)
+                if (x1 > 7 || y1 > 7)
                     return false;
 
                 var field1 = Board[x1, y1];
@@ -448,6 +448,7 @@ namespace AccessBattle
 
                 card1.IsFaceUp = true;
                 Players[player - 1].DidVirusCheck = true;
+                SwitchPlayerTurnPhase();
                 return true;
             }
 
@@ -457,7 +458,44 @@ namespace AccessBattle
 
             if (command.StartsWith("er ", StringComparison.InvariantCultureIgnoreCase) && command.Length > 3)
             {
+                command = command.Substring(3).Trim();
+                var split = command.Split(new[] { ',' });
+                if (split.Length != 5) return false;
 
+                uint x1, y1, x2, y2, switchCards;
+                if (!uint.TryParse(split[0], out x1) ||
+                    !uint.TryParse(split[1], out y1) ||
+                    !uint.TryParse(split[2], out x2) ||
+                    !uint.TryParse(split[3], out y2) ||
+                    !uint.TryParse(split[4], out switchCards))
+                    return false;
+
+                if (Players[player - 1].Did404NotFound)
+                    return false;
+
+                if (x1 > 7 || y1 > 7 || x2 > 7 || y2 > 7 || switchCards > 1)
+                    return false;
+
+                var field1 = Board[x1, y1];
+                var field2 = Board[x2, y2];
+                var card1 = field1.Card as OnlineCard;
+                var card2 = field2.Card as OnlineCard;
+
+                if (card1?.Owner?.PlayerNumber != player || card2?.Owner?.PlayerNumber != player)
+                    return false;
+
+                card1.IsFaceUp = false;
+                card2.IsFaceUp = false;
+
+                if (switchCards == 1)
+                {
+                    field1.Card = card2;
+                    field2.Card = card1;
+                }
+
+                Players[player - 1].Did404NotFound = true;
+                SwitchPlayerTurnPhase();
+                return true;
             }
 
             #endregion

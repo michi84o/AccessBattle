@@ -5,8 +5,24 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:AccessBattle.Wpf.View"
              FontFamily="../ExternalResources/#Silkscreen"
-             Foreground="DarkGray" Width="240" Height="40"
-             Opacity=".6">
+             Foreground="DarkGray" Width="240" Height="40" Opacity=".6">
+    <!--TODO Decide if fade-in animation will be used -->
+    <!--<UserControl.Style>
+        <Style>
+            <Style.Triggers>
+                <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation BeginTime="0" Duration="00:00:00.25" Storyboard.TargetProperty="Opacity"  From="0" To=".6"  />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+                <Trigger Property="FrameworkElement.Visibility" Value="Collapsed">
+                    <Setter Property="FrameworkElement.Opacity" Value="0"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Style>-->
     <Border
         CornerRadius="4" BorderBrush="White" BorderThickness="2"
         Background="Black" >

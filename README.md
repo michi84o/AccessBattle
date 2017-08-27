@@ -10,6 +10,10 @@ It is still in development. Right now you can play against
 a very stupid AI. The final game will be playable over network.
 
 - Estimated completion: End of August 2017
+  - Update 2017-08-27: Multiplayer is playable, but...
+    - The Game Over notification is missing.
+    - Server user management not active. Server accepts any user.
+  - Singleplayer will be finished much later
 - Current status and next steps:
   - [x] Create and join games over server (library functions)
   - [ ] UI rewrite
@@ -24,8 +28,8 @@ a very stupid AI. The final game will be playable over network.
   - [ ] Game logic rewrite
     - [x] Join Game phase
     - [x] Deployment phase
-    - [ ] Player turn phase (WIP)
-    - [ ] Game Over phase
+    - [x] Player turn phase
+    - [ ] Game Over phase (WIP)
 
 The main game engine is inside a separate DLL so that people
 can program their own user interface for it. The DLL should
