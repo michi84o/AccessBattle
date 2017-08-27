@@ -59,6 +59,7 @@
     <Compile Include="Interfaces\IMenuHolder.cs" />
     <Compile Include="ViewModel\AcceptJoinMenuViewModel.cs" />
     <Compile Include="ViewModel\DeploymentViewModel.cs" />
+    <Compile Include="ViewModel\GameOverMenuViewModel.cs" />
     <Compile Include="ViewModel\GameViewModel.cs" />
     <Compile Include="ViewModel\MenuViewModelBase.cs" />
     <Compile Include="ViewModel\NetworkGameMenuViewModel.cs" />
@@ -76,6 +77,9 @@
     </Compile>
     <Compile Include="View\ErrorNotification.xaml.cs">
       <DependentUpon>ErrorNotification.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\GameOverMenu.xaml.cs">
+      <DependentUpon>GameOverMenu.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\NetworkGameMenu.xaml.cs">
       <DependentUpon>NetworkGameMenu.xaml</DependentUpon>
@@ -108,6 +112,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\ErrorNotification.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\GameOverMenu.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -67,6 +67,7 @@ namespace AccessBattle.Wpf.ViewModel
         DeploymentViewModel _deploymentVm;
         OpponentTurnViewModel _opponentTurnVm;
         SwitchCards404MenuViewModel _switchCards404Vm;
+        GameOverMenuViewModel _gameOverVm;
 
         public MenuViewModelBase CurrentMenuViewModel
         {
@@ -82,6 +83,7 @@ namespace AccessBattle.Wpf.ViewModel
                     case MenuType.Deployment: return _deploymentVm;
                     case MenuType.OpponentTurn: return _opponentTurnVm;
                     case MenuType.SwitchCards: return _switchCards404Vm;
+                    case MenuType.GameOver: return _gameOverVm;
                     case MenuType.Welcome:
                     default: return _welcomeVm;
                 }
@@ -115,6 +117,7 @@ namespace AccessBattle.Wpf.ViewModel
             _deploymentVm = new DeploymentViewModel(this);
             _opponentTurnVm = new OpponentTurnViewModel(this);
             _switchCards404Vm = new SwitchCards404MenuViewModel(this);
+            _gameOverVm = new GameOverMenuViewModel(this);
 
             CurrentMenu = MenuType.Welcome;
 
@@ -137,6 +140,25 @@ namespace AccessBattle.Wpf.ViewModel
                     CurrentMenu = MenuType.OpponentTurn;
                 else if (_game.Phase == GamePhase.Player1Turn || _game.Phase == GamePhase.Player2Turn)
                     CurrentMenu = MenuType.None;
+                else if (_game.Phase == GamePhase.Player1Win || _game.Phase == GamePhase.Player2Win ||_game.Phase == GamePhase.Aborted)
+                {
+                    if ( CurrentMenu == MenuType.AcceptJoin ||
+                         CurrentMenu == MenuType.Deployment ||
+                         CurrentMenu == MenuType.None ||
+                         CurrentMenu == MenuType.OpponentTurn ||
+                         CurrentMenu == MenuType.SwitchCards ||
+                         CurrentMenu == MenuType.WaitForAccept ||
+                         CurrentMenu == MenuType.WaitForJoin)
+                    {
+                        if (_game.IsPlayerHost && _game.Phase == GamePhase.Player1Win || !_game.IsPlayerHost && _game.Phase == GamePhase.Player2Win)
+                            _gameOverVm.GameOverMessage = "You win!";
+                        else if (_game.Phase != GamePhase.Aborted)
+                            _gameOverVm.GameOverMessage = "You lose!";
+                        else
+                            _gameOverVm.GameOverMessage = "Game aborted!";
+                        CurrentMenu = MenuType.GameOver;
+                    }
+                }
             }
             else if (e.PropertyName == nameof(_game.IsActionsMenuVisible))
             {

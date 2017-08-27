@@ -6,30 +6,23 @@ by the Japanese company '5pb.'.
 AccessBattle is a private fan project and not affiliated with
 '5pb.' in any way.
 
-It is still in development. Right now you can play against
-a very stupid AI. The final game will be playable over network.
+It is still in development. 
+Build v0.1 contains a singleplayer mode with a very stupid AI.
+Build v0.2a is a complete rewrite and contains the alpha of multiplayer mode.
 
-- Estimated completion: End of August 2017
-  - Update 2017-08-27: Multiplayer is playable, but...
-    - The Game Over notification is missing.
-    - Server user management not active. Server accepts any user.
-  - Singleplayer will be finished much later
-- Current status and next steps:
-  - [x] Create and join games over server (library functions)
-  - [ ] UI rewrite
-    - [x] Display board and cards
-    - [x] Animation system
-    - [ ] Menus
-      - [x] Network game
-      - [ ] Single player game
-        - [ ] AI players
-      - [ ] In game menus (WIP)
-  - [x] Synchronize game data between clients
-  - [ ] Game logic rewrite
-    - [x] Join Game phase
-    - [x] Deployment phase
-    - [x] Player turn phase
-    - [ ] Game Over phase (WIP)
+- Current status: Work in progress (taking a break until mid September 2017)
+  - Multiplayer is in alpha. There are some bugs and features are mssing (WIP)
+  - Singleplayer will be implemented later.
+  
+- Known Issues:
+  - Network game menu won't update game list after game finished
+  - Server has no user management yet. Any client is accepted, no passwords.
+  - If you abort during join the menus will be gone
+  - It is currently not possible to leave a game
+  - Game might screw up if one client disconnects
+  - No indication which cards can be seen by opponent
+
+I do not accept pull requests until I have released the first fully working version.
 
 The main game engine is inside a separate DLL so that people
 can program their own user interface for it. The DLL should

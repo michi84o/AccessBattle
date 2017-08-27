@@ -497,6 +497,13 @@ namespace AccessBattle.Wpf.ViewModel
             }
         }
 
+        bool _joinedGame;
+        public bool JoinedGame
+        {
+            get { return _joinedGame; }
+            set { SetProp(ref _joinedGame, value); }
+        }
+
         PlayerState[] _players;
         public PlayerState[] Players => _players;
 
@@ -564,8 +571,19 @@ namespace AccessBattle.Wpf.ViewModel
             _players[0] = new PlayerState(1);
             _players[1] = new PlayerState(2);
             _client.GameSyncReceived += GameSyncReceived;
+            _client.GameExitReceived += GameExitReceived;
             _players[0].PropertyChanged += PlayerPropChanged;
             _players[1].PropertyChanged += PlayerPropChanged;
+        }
+
+        private void GameExitReceived(object sender, EventArgs e)
+        {
+            // TODO: SynchronizationContext
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                JoinedGame = false;
+                UID = 0;
+            });
         }
 
         void PlayerPropChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

@@ -5,3 +5,8 @@ Version 0.1: 2017-02-11
 -----------------------
 You can play against a stupid AI.
 Uploaded it as preview.
+
+Version 0.2a: 2017-08-27
+-----------------------
+First working version multiplayer.
+Also just a preview.

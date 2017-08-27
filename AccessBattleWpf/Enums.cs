@@ -45,7 +45,8 @@ namespace AccessBattle.Wpf
         AcceptJoin,
         Deployment,
         OpponentTurn,
-        SwitchCards // Question for Error 404
+        SwitchCards, // Question for Error 404
+        GameOver
     }
 
     public enum ActionItem

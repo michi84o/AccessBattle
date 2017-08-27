@@ -491,6 +491,16 @@ namespace AccessBattle
                 {
                     field1.Card = card2;
                     field2.Card = card1;
+                    if (card2.HasBoost)
+                    {
+                        card1.HasBoost = true;
+                        card2.HasBoost = false;
+                    }
+                    else if (card1.HasBoost)
+                    {
+                        card1.HasBoost = false;
+                        card2.HasBoost = true;
+                    }
                 }
 
                 Players[player - 1].Did404NotFound = true;
@@ -679,7 +689,7 @@ namespace AccessBattle
                         {
                             // Special case for exit fields:
                             if (y == 0 && f.IsExit && currentPlayer == 2)
-                                fs[1] = game.Board[4, 10];
+                                fs[0] = game.Board[4, 10];
                         }
 
                         if (y >= 0 && y < 7)
@@ -700,6 +710,7 @@ namespace AccessBattle
                         {
                             if (fs[i] == null) continue;
                             if (fs[i].Card != null && fs[i].Card.Owner.PlayerNumber == currentPlayer) continue;
+                            if (fs[i].Card != null && !(fs[i].Card is OnlineCard)) continue; // Can only jump on online cards <- This ignores the firewall card
                             if (fs[i].IsStack) continue;
                             if (fs[i].IsExit)
                             {

@@ -1,0 +1,37 @@
+﻿<UserControl x:Class="AccessBattle.Wpf.View.GameOverMenu"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:AccessBattle.Wpf.View"
+             FontFamily="../ExternalResources/#Silkscreen"
+             Foreground="DarkGray" Width="300" Height="115">
+    <Border
+        CornerRadius="4" BorderBrush="White" BorderThickness="2"
+        Background="Black" >
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock
+                Grid.Row="0" Text="Game Over" FontSize="32" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            <!-- ViewBox for later use when player names are shown -->
+            <Viewbox
+                Grid.Row="1" Height="32">
+                <TextBlock Text="{Binding GameOverMessage}" FontSize="24" VerticalAlignment="Center" HorizontalAlignment="Center" />
+            </Viewbox>
+
+            <Grid
+                Grid.Row="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Command="{Binding RematchCommand}" Content="Rematch" Margin="5"/>
+                <Button Grid.Column="1" Command="{Binding LeaveCommand}" Content="Leave" Margin="5"/>
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>

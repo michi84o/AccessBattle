@@ -156,6 +156,9 @@ namespace AccessBattle.Networking
         public event EventHandler<ServerInfoEventArgs> ServerInfoReceived;
         /// <summary>Received game synchronization packet.</summary>
         public event EventHandler<GameSyncEventArgs> GameSyncReceived;
+        /// <summary>Received game exit. The game on the server was closed.</summary>
+        public event EventHandler GameExitReceived;
+
         /// <summary>
         /// The method ConfirmJoin was called. Used for communication between view models.
         /// The two parameters of ConfirmJoin are encoded in the event args.
@@ -654,9 +657,7 @@ namespace AccessBattle.Networking
                         var glistString = Encoding.ASCII.GetString(data);
                         var glist = JsonConvert.DeserializeObject<List<GameInfo>>(glistString);
                         Log.WriteLine("NetworkGameClient: Received list of games on server. Game count: " + glist.Count);
-                        var gListHandler = GameListReceived;
-                        if (gListHandler != null)
-                            gListHandler(this, new GameListEventArgs(glist));
+                        GameListReceived?.Invoke(this, new GameListEventArgs(glist));
                     }
                     catch (Exception e)
                     {
@@ -679,9 +680,7 @@ namespace AccessBattle.Networking
                             else if (data[0] == 2) error += "Invalid password";
                             else error += "Unknown error";
                         }
-                        var handler = LoggedIn;
-                        if (handler != null)
-                            handler(this, new LoggedInEventArgs(IsLoggedIn == true));
+                        LoggedIn?.Invoke(this, new LoggedInEventArgs(IsLoggedIn == true));
                     }
                     catch (Exception e)
                     {
@@ -697,9 +696,7 @@ namespace AccessBattle.Networking
                         {
                             if (ginfo.UID != 0)
                             {
-                                var gCreatedHandler = GameCreated;
-                                if (gCreatedHandler != null)
-                                    gCreatedHandler(this, new GameCreatedEventArgs(ginfo));
+                                GameCreated?.Invoke(this, new GameCreatedEventArgs(ginfo));
                             }
                         }
                         else
@@ -752,7 +749,10 @@ namespace AccessBattle.Networking
                     try
                     {
                         var eMsg = JsonConvert.DeserializeObject<ExitGame>(Encoding.ASCII.GetString(data));
-
+                        if (eMsg != null)
+                        {
+                            GameExitReceived?.Invoke(this, EventArgs.Empty);
+                        }
                     }
                     catch (Exception e)
                     {
@@ -765,11 +765,7 @@ namespace AccessBattle.Networking
                         var eMsg = JsonConvert.DeserializeObject<GameSync>(Encoding.ASCII.GetString(data));
                         if (eMsg != null)
                         {
-                            var handler = GameSyncReceived;
-                            if (handler != null)
-                            {
-                                handler(this, new GameSyncEventArgs(eMsg));
-                            }
+                            GameSyncReceived?.Invoke(this, new GameSyncEventArgs(eMsg));
                         }
                     }
                     catch (Exception e)
@@ -783,11 +779,7 @@ namespace AccessBattle.Networking
                         var eMsg = JsonConvert.DeserializeObject<GameCommand>(Encoding.ASCII.GetString(data));
                         if (eMsg != null)
                         {
-                            var handler = GameCommandReceived;
-                            if (handler != null)
-                            {
-                                handler(this, new GameCommandEventArgs(eMsg));
-                            }
+                            GameCommandReceived?.Invoke(this, new GameCommandEventArgs(eMsg));
                         }
                     }
                     catch (Exception e)

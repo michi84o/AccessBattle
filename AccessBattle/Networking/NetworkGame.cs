@@ -103,7 +103,8 @@ namespace AccessBattle.Networking
                 if (Players[0]?.Player == player) Phase = GamePhase.Player2Win;
                 if (Players[1]?.Player == player) Phase = GamePhase.Player1Win;
             }
-            else
+
+            if (Phase != GamePhase.Player1Win || Phase != GamePhase.Player2Win)
                 Phase = GamePhase.Aborted;
         }
     }

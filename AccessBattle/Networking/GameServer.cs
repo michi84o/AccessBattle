@@ -507,13 +507,14 @@ namespace AccessBattle.Networking
                             NetworkGame game;
                             if (GetGameAndPlayers(eMsg.UID, out game, out p1, out p2) && (p1 == player || p2 == player))
                             {
-                                // TODO Store old phase to check if further action is required
                                 game.ExitGame(player);
-
-                                // TODO Unsubscribe from change events
                                 Games.Remove(game.UID);
 
-                                // TODO Notify who has won the game
+                                // Notify who has won the game
+                                var syncP1 = GameSync.FromGame(game, game.UID, 1);
+                                var syncP2 = GameSync.FromGame(game, game.UID, 2);
+                                Send(JsonConvert.SerializeObject(syncP1, _serializerSettings), NetworkPacketType.GameSync, p1.Connection, p1.ClientCrypto);
+                                Send(JsonConvert.SerializeObject(syncP2, _serializerSettings), NetworkPacketType.GameSync, p2.Connection, p2.ClientCrypto);
 
                                 var ans = new ExitGame { UID = game.UID };
                                 if (p1 != null)

@@ -69,6 +69,9 @@
             <DataTemplate DataType="{x:Type viewmodel:SwitchCards404MenuViewModel}">
                 <local:SwitchCards404Menu Width="240" Height="40" />
             </DataTemplate>
+            <DataTemplate DataType="{x:Type viewmodel:GameOverMenuViewModel}">
+                <local:GameOverMenu Width="300" Height="115" />
+            </DataTemplate>
 
         </ResourceDictionary>
     </Window.Resources>
