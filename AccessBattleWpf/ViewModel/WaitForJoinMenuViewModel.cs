@@ -1,11 +1,5 @@
 ﻿using AccessBattle.Networking;
-using AccessBattle.Networking.Packets;
 using AccessBattle.Wpf.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -47,16 +41,14 @@ namespace AccessBattle.Wpf.ViewModel
             set { SetProp(ref _canCancel, value); }
         }
 
-        public ICommand CancelCommand
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        public ICommand CancelCommand => new RelayCommand(async o =>
         {
-            get
-            {
-                return new RelayCommand(o =>
-                {
-                    ParentViewModel.Game.Client.ExitGame(ParentViewModel.Game.UID);
-                    ParentViewModel.CurrentMenu = MenuType.NetworkGame;
-                }, o => CanCancel);
-            }
-        }
+            CanCancel = false;
+            await ParentViewModel.Game.Client.ExitGame(ParentViewModel.Game.UID);
+            ParentViewModel.CurrentMenu = MenuType.NetworkGame;
+            CanCancel = true;
+        }, o => CanCancel);
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
@@ -11,7 +12,7 @@ namespace AccessBattle.Networking
     /// <summary>
     /// Base class for networking.
     /// </summary>
-    public abstract class NetworkBase // TODO: Implement INotifyPropertyChanged
+    public abstract class NetworkBase : PropChangeNotifier
     {
         /// <summary>
         /// Default JSON serializer settings.

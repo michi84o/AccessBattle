@@ -15,7 +15,7 @@ Build v0.2a is a complete rewrite and contains the alpha of multiplayer mode.
   - Singleplayer will be implemented later.
   
 - Known Issues:
-  - Network game menu won't update game list after game finished
+  - Network game menu won't update game list after game finished (fixed in code)
   - Server has no user management yet. Any client is accepted, no passwords.
   - If you abort during join the menus will be gone
   - It is currently not possible to leave a game

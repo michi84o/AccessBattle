@@ -14,6 +14,11 @@ namespace AccessBattle.Networking
         object _locker = new object();
 
         /// <summary>
+        /// Used by the server to determine if a rematch was requested.
+        /// </summary>
+        public bool[] RematchRequested { get; } = new bool[] { false, false };
+
+        /// <summary>
         /// Constructor that applies a unique id to the game.
         /// </summary>
         /// <param name="uid">ID of this game.</param>
@@ -98,12 +103,11 @@ namespace AccessBattle.Networking
         /// <param name="player"></param>
         public void ExitGame(IPlayer player)
         {
-            if (Phase == GamePhase.Deployment || Phase == GamePhase.Player1Turn || Phase == GamePhase.Player2Turn)
+            if (Phase == GamePhase.Player1Turn || Phase == GamePhase.Player2Turn)
             {
                 if (Players[0]?.Player == player) Phase = GamePhase.Player2Win;
                 if (Players[1]?.Player == player) Phase = GamePhase.Player1Win;
             }
-
             if (Phase != GamePhase.Player1Win || Phase != GamePhase.Player2Win)
                 Phase = GamePhase.Aborted;
         }

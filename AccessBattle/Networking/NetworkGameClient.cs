@@ -136,6 +136,7 @@ namespace AccessBattle.Networking
         }
     }
 
+    // TODO: UID is now a property. The uid parameters are not required anymore
     /// <summary>
     /// Class for network clients. Used for communication with the server.
     /// </summary>
@@ -171,6 +172,16 @@ namespace AccessBattle.Networking
         /// </summary>
         public event EventHandler<GameCommandEventArgs> GameCommandReceived;
 
+        uint _uid;
+        /// <summary>
+        /// Unique ID of the current game. Used for network games.
+        /// </summary>
+        public uint UID
+        {
+            get { return _uid; }
+            set { SetProp(ref _uid, value); }
+        }
+
         bool? _serverRequiresLogin;
         /// <summary>
         /// True if the currently connected server requires a login with username and password.
@@ -189,10 +200,10 @@ namespace AccessBattle.Networking
             get { return _isConnected; }
             private set
             {
-                _isConnected = value;
-                if (_isConnected == false)
+                if (SetProp(ref _isConnected, value))
                 {
-                    IsLoggedIn = false;
+                    if (_isConnected == false)
+                        IsLoggedIn = false;
                 }
             }
         }
@@ -202,7 +213,14 @@ namespace AccessBattle.Networking
         public bool? IsJoined
         {
             get { return _isJoined; }
-            private set { _isJoined = value; }
+            private set
+            {
+                if (SetProp(ref _isJoined, value))
+                {
+                    if (_isJoined == false)
+                        UID = 0;
+                }
+            }
         }
 
         bool? _isLoggedIn = false;
@@ -212,21 +230,26 @@ namespace AccessBattle.Networking
             get { return _isLoggedIn; }
             private set
             {
-                _isLoggedIn = value;
-                if (IsLoggedIn == false)
+                if (SetProp(ref _isLoggedIn, value))
                 {
-                    IsJoined = false;
+                    if (_isLoggedIn == false)
+                        IsJoined = false;
                 }
             }
         }
 
+        string _loginName;
         /// <summary>Login name</summary>
-        public string LoginName { get; private set; }
+        public string LoginName
+        {
+            get { return _loginName; }
+            private set { SetProp(ref _loginName, value); }
+        }
 
         ByteBuffer _receiveBuffer = new ByteBuffer(4096);
 
         CryptoHelper _encrypter;
-        CancellationTokenSource _encrypterWaiter = null;
+        CancellationTokenSource _encrypterWaiter;
 
         CryptoHelper _decrypter;
         Socket _connection;
@@ -487,14 +510,6 @@ namespace AccessBattle.Networking
             }
         }
 
-        ///// <summary>
-        ///// Sets IsJoined to false.
-        ///// </summary>
-        //public void ResetJoinState()
-        //{
-        //    IsJoined = false;
-        //}
-
         /// <summary>
         /// Used to accept and confirm a join. Used by both players.
         /// </summary>
@@ -559,18 +574,55 @@ namespace AccessBattle.Networking
         /// </summary>
         /// <param name="uid"></param>
         /// <returns>True if request was sent.</returns>
-        public bool ExitGame(uint uid)
+        public async Task<bool> ExitGame(uint uid)
         {
+            var result = false;
+
+            // Catch the event for game exit
+            var source = new TaskCompletionSource<bool>();
+            EventHandler handler = (sender, args) =>
+            {
+                source.TrySetResult(true);
+            };
+
+            // In case no answer was received, we have to cancel
+            using (var ct = new CancellationTokenSource(NetworkTimeout * 1000))
+            {
+                ct.Token.Register(() => source.TrySetResult(false));
+                try
+                {
+                    GameExitReceived += handler;
+                    var pak = new ExitGame { UID = uid };
+                    if (Send(JsonConvert.SerializeObject(pak, _serializerSettings), NetworkPacketType.ExitGame))
+                    {
+                        result = await source.Task;
+                    }
+                }
+                catch (Exception e) { Log.WriteLine("NetworkGameClient::ExitGame(): " + e.Message); }
+                finally { GameExitReceived -= handler; }
+            }
+            if (!result) // Screw it!
+            {
+                UID = 0;
+                IsJoined = false;
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Request the server to rematch
+        /// </summary>
+        /// <returns></returns>
+        public bool Rematch()
+        {
+            if (IsJoined != true) return false;
+            var pak = new Rematch { UID = UID };
             try
             {
-                var pak = new ExitGame { UID = uid };
-                return Send(JsonConvert.SerializeObject(pak, _serializerSettings), NetworkPacketType.ExitGame);
+                return Send(JsonConvert.SerializeObject(pak, _serializerSettings), NetworkPacketType.Rematch);
             }
-            catch (Exception e)
-            {
-                Log.WriteLine("NetworkGameClient::ExitGame(): " + e.Message);
-                return false;
-            }
+            catch (Exception e) { Log.WriteLine("NetworkGameClient::Rematch(): " + e.Message); }
+            return false;
         }
 
         /// <summary>
@@ -713,9 +765,7 @@ namespace AccessBattle.Networking
                         var jMsg = JsonConvert.DeserializeObject<JoinMessage>(Encoding.ASCII.GetString(data));
                         if (jMsg != null)
                         {
-                            var handler = GameJoinRequested;
-                            if (handler != null)
-                                handler(this, new GameJoinRequestedEventArgs(jMsg));
+                            GameJoinRequested?.Invoke(this, new GameJoinRequestedEventArgs(jMsg));
 
                             // If joining and other side declined then set IsJoined to false
                             if (jMsg.Request == JoinRequestType.Decline)
@@ -734,10 +784,8 @@ namespace AccessBattle.Networking
                         var jMsg = JsonConvert.DeserializeObject<ServerInfo>(Encoding.ASCII.GetString(packet.Data));
                         if (jMsg != null)
                         {
-                            var handler = ServerInfoReceived;
-                            if (handler != null)
-                                handler(this, new ServerInfoEventArgs(jMsg));
                             ServerRequiresLogin = jMsg.RequiresLogin;
+                            ServerInfoReceived?.Invoke(this, new ServerInfoEventArgs(jMsg));
                         }
                     }
                     catch (Exception e)
@@ -751,7 +799,12 @@ namespace AccessBattle.Networking
                         var eMsg = JsonConvert.DeserializeObject<ExitGame>(Encoding.ASCII.GetString(data));
                         if (eMsg != null)
                         {
-                            GameExitReceived?.Invoke(this, EventArgs.Empty);
+                            if (eMsg.UID == UID)
+                            {
+                                IsJoined = false;
+                                UID = 0;
+                                GameExitReceived?.Invoke(this, EventArgs.Empty);
+                            }
                         }
                     }
                     catch (Exception e)
@@ -763,7 +816,7 @@ namespace AccessBattle.Networking
                     try
                     {
                         var eMsg = JsonConvert.DeserializeObject<GameSync>(Encoding.ASCII.GetString(data));
-                        if (eMsg != null)
+                        if (eMsg != null && eMsg.UID == UID)
                         {
                             GameSyncReceived?.Invoke(this, new GameSyncEventArgs(eMsg));
                         }
@@ -821,7 +874,6 @@ namespace AccessBattle.Networking
         public void Disconnect()
         {
             if (_connection == null) return;
-            IsLoggedIn = false;
             ServerRequiresLogin = null;
             _encrypter = null;
             try
@@ -835,6 +887,7 @@ namespace AccessBattle.Networking
             {
                 Log.WriteLine("NetworkGameClient: Closing connection caused an exception: " + e.Message);
             }
+            // Implicitly sets IsLoggedIn and IsJoined to false and UID to 0
             IsConnected = false;
             _connection = null;
         }

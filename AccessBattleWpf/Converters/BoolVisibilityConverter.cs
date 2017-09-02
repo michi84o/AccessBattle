@@ -9,6 +9,7 @@ using System.Windows.Data;
 
 namespace AccessBattle.Wpf.Converters
 {
+    [Obsolete("Use built-in BooleanToVisibilityConverter class")]
     public class BoolVisibilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

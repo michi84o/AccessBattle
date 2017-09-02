@@ -40,11 +40,19 @@ namespace AccessBattle.Wpf.ViewModel
             set
             {
                 var lastVm = CurrentMenuViewModel;
+                var lastMenu = _currentMenu;
+
+                System.Diagnostics.Debug.WriteLine("Current Menu: " + lastMenu + " New Menu: " + value + "\r\nStackTrace: " + Environment.StackTrace);
+
                 if (SetProp(ref _currentMenu, value))
                 {
                     OnPropertyChanged(nameof(CurrentMenuViewModel));
 
-                    if (_currentMenu == MenuType.WaitForAccept ||
+                    if (_currentMenu == MenuType.WaitForJoin && lastMenu == MenuType.GameOver)
+                    {
+                        // Do nothing. We are borrowing the menu while waiting for the rematch
+                    }
+                    else if (_currentMenu == MenuType.WaitForAccept ||
                         _currentMenu == MenuType.WaitForJoin ||
                         _currentMenu == MenuType.AcceptJoin)
                         _game.Phase = GamePhase.PlayerJoining;

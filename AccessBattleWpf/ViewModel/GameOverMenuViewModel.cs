@@ -19,22 +19,24 @@ namespace AccessBattle.Wpf.ViewModel
 
         public ICommand RematchCommand => new RelayCommand(o=>
         {
-            // TODO: NOT IMPLEMENTED
-        }, o=>{ return ParentViewModel.Game.JoinedGame && false; });
+            ParentViewModel.CurrentMenu = MenuType.WaitForJoin;
+            if (!ParentViewModel.Game.Client.Rematch())
+                ParentViewModel.CurrentMenu = MenuType.GameOver;
+        }, o=>{ return ParentViewModel.Game.Client.IsJoined == true; });
 
-        public ICommand LeaveCommand => new RelayCommand(o =>
+#pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
+        public ICommand LeaveCommand => new RelayCommand(async o =>
         {
-            ParentViewModel.Game.Client.ExitGame(ParentViewModel.Game.UID);
+            await ParentViewModel.Game.Client.ExitGame(ParentViewModel.Game.UID);
             // TODO: Must be changed for singleplayer
-            // ! UID is set to 0 when exit from server is received
             ParentViewModel.CurrentMenu = MenuType.NetworkGame;
         });
+#pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
 
         public GameOverMenuViewModel(IMenuHolder parent) : base(parent) { }
 
         public override void Activate()
         {
-
         }
 
         public override void Suspend()

@@ -28,14 +28,13 @@ namespace AccessBattle.Wpf.ViewModel
     {
         IMenuHolder _parent;
 
-        uint _uid;
         /// <summary>
         /// Unique ID of the current game. Used for network games.
         /// </summary>
         public uint UID
         {
-            get { return _uid; }
-            set { SetProp(ref _uid, value); }
+            get { return _client.UID; }
+            set { _client.UID = value; }
         }
 
         NetworkGameClient _client = new NetworkGameClient();
@@ -457,15 +456,6 @@ namespace AccessBattle.Wpf.ViewModel
 
         void GameSyncReceived(object sender, GameSyncEventArgs e)
         {
-            if (UID != e.Sync.UID) return; // TODO: Tell server?
-            //_context.Post(o => { _game.Synchronize(e.Sync); }, null);
-
-            if (e.Sync.UID != UID)
-            {
-                Log.WriteLine("GameModel: Error! Server sent GameSync for wrong game! Local UID: " + UID + ", server UID: " + e.Sync.UID);
-                // TODO: Tell server?
-                return;
-            }
             // TODO: SynchronizationContext
             Application.Current.Dispatcher.Invoke(() => { Synchronize(e.Sync); });
         }
@@ -491,17 +481,15 @@ namespace AccessBattle.Wpf.ViewModel
                         ClearHighlighting();
                         ClearFieldSelection();
                     }
+                    if (value == GamePhase.Deployment && (_phase == GamePhase.Player1Win || _phase == GamePhase.Player2Turn || _phase == GamePhase.Aborted))
+                    {
+                        _parent.CurrentMenu = MenuType.Deployment;
+                    }
+
                     _phase = value;
                     IsActionsMenuVisible = false;
                 });
             }
-        }
-
-        bool _joinedGame;
-        public bool JoinedGame
-        {
-            get { return _joinedGame; }
-            set { SetProp(ref _joinedGame, value); }
         }
 
         PlayerState[] _players;
@@ -571,20 +559,17 @@ namespace AccessBattle.Wpf.ViewModel
             _players[0] = new PlayerState(1);
             _players[1] = new PlayerState(2);
             _client.GameSyncReceived += GameSyncReceived;
-            _client.GameExitReceived += GameExitReceived;
             _players[0].PropertyChanged += PlayerPropChanged;
             _players[1].PropertyChanged += PlayerPropChanged;
+
+            _client.PropertyChanged += (s, a) =>
+            {
+                var empty = string.IsNullOrEmpty(a.PropertyName);
+                if (empty || a.PropertyName == nameof(UID))
+                    OnPropertyChanged(nameof(UID));
+            };
         }
 
-        private void GameExitReceived(object sender, EventArgs e)
-        {
-            // TODO: SynchronizationContext
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                JoinedGame = false;
-                UID = 0;
-            });
-        }
 
         void PlayerPropChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {

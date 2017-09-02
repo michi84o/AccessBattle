@@ -70,6 +70,7 @@ namespace AccessBattle.Wpf.ViewModel
             }
         }
 
+        // TODO: part of this could be moved to NetworkGameClient. Setting UID for example
         void JoinRequestedHandler(object sender, GameJoinRequestedEventArgs args)
         {
             if (args.Message.UID != ParentViewModel.JoiningGame?.UID) return;

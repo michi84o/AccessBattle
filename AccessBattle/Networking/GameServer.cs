@@ -311,6 +311,17 @@ namespace AccessBattle.Networking
             return false;
         }
 
+
+        void KickPlayerOut(NetworkPlayer player, uint uid)
+        {
+            try
+            {
+                var ans = new ExitGame { UID = uid };
+                Send(JsonConvert.SerializeObject(ans, _serializerSettings), NetworkPacketType.ExitGame, player.Connection, player.ClientCrypto);
+            }
+            catch (Exception)  { return; }
+        }
+
         /// <summary>
         /// Processes the received packets.
         /// </summary>
@@ -522,11 +533,46 @@ namespace AccessBattle.Networking
                                 if (p2 != null)
                                     Send(JsonConvert.SerializeObject(ans, _serializerSettings), NetworkPacketType.ExitGame, p2.Connection, p2.ClientCrypto);
                             }
+                            else KickPlayerOut(player, eMsg.UID);
                         }
                     }
                     catch (Exception ex)
                     {
                         Log.WriteLine("GameServer: Received ExitGame packet of player " + player.UID + " could not be read! " + ex.Message);
+                    }
+                    break;
+                case NetworkPacketType.Rematch:
+                    try
+                    {
+                        var eMsg = JsonConvert.DeserializeObject<Rematch>(Encoding.ASCII.GetString(data));
+                        if (eMsg != null)
+                        {
+                            NetworkPlayer p1, p2;
+                            NetworkGame game;
+                            if (GetGameAndPlayers(eMsg.UID, out game, out p1, out p2) && (p1 == player || p2 == player))
+                            {
+                                if (player == p1)
+                                    game.RematchRequested[0] = true;
+                                if (player == p2)
+                                    game.RematchRequested[1] = true;
+
+                                if (game.RematchRequested[0] && game.RematchRequested[1])
+                                {
+                                    game.RematchRequested[0] = false;
+                                    game.RematchRequested[1] = false;
+                                    game.InitGame();
+                                    var syncP1 = GameSync.FromGame(game, game.UID, 1);
+                                    var syncP2 = GameSync.FromGame(game, game.UID, 2);
+                                    Send(JsonConvert.SerializeObject(syncP1, _serializerSettings), NetworkPacketType.GameSync, p1.Connection, p1.ClientCrypto);
+                                    Send(JsonConvert.SerializeObject(syncP2, _serializerSettings), NetworkPacketType.GameSync, p2.Connection, p2.ClientCrypto);
+                                }
+                            }
+                            else KickPlayerOut(player, eMsg.UID);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.WriteLine("GameServer: Received Rematch packet of player " + player.UID + " could not be read! " + ex.Message);
                     }
                     break;
                 case NetworkPacketType.GameCommand:
@@ -559,6 +605,7 @@ namespace AccessBattle.Networking
                                     Send(JsonConvert.SerializeObject(syncP2, _serializerSettings), NetworkPacketType.GameSync, p2.Connection, p2.ClientCrypto);
                                 }
                             }
+                            else KickPlayerOut(player, cmdMsg.UID);
                         }
                     }
                     catch (Exception ex)

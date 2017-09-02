@@ -64,6 +64,7 @@
     <Compile Include="Networking\Packets\GameInfo.cs" />
     <Compile Include="Networking\Packets\JoinMessage.cs" />
     <Compile Include="Networking\Packets\Login.cs" />
+    <Compile Include="Networking\Packets\Rematch.cs" />
     <Compile Include="Networking\Packets\ServerInfo.cs" />
     <Compile Include="PlayerState.cs" />
     <Compile Include="PropChangeNotifier.cs" />

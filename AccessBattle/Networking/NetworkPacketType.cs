@@ -16,6 +16,7 @@
         public const byte GameSync = 0x07;
         public const byte GameCommand = 0x08;
         public const byte ExitGame = 0x09;
+        public const byte Rematch = 0x0A;
 
         /// <summary>Information about server.</summary>
         public const byte ServerInfo = 0xFE;

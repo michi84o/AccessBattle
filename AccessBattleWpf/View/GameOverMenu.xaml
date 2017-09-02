@@ -6,6 +6,11 @@
              xmlns:local="clr-namespace:AccessBattle.Wpf.View"
              FontFamily="../ExternalResources/#Silkscreen"
              Foreground="DarkGray" Width="300" Height="115">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <BooleanToVisibilityConverter x:Key="visconv" />
+        </ResourceDictionary>
+    </UserControl.Resources>
     <Border
         CornerRadius="4" BorderBrush="White" BorderThickness="2"
         Background="Black" >
@@ -29,7 +34,7 @@
                     <ColumnDefinition/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" Command="{Binding RematchCommand}" Content="Rematch" Margin="5"/>
+                <Button Grid.Column="0" Command="{Binding RematchCommand}" Content="Rematch" Margin="5" Visibility="{Binding ParentViewModel.Game.Client.IsJoined, Converter={StaticResource visconv}}" />
                 <Button Grid.Column="1" Command="{Binding LeaveCommand}" Content="Leave" Margin="5"/>
             </Grid>
         </Grid>
