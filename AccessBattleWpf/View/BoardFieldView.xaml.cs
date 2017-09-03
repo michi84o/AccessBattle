@@ -120,6 +120,14 @@ namespace AccessBattle.Wpf.View
         public static readonly DependencyProperty IsSelectedProperty = DependencyProperty.Register(
             nameof(IsSelected), typeof(bool), typeof(BoardFieldView), new PropertyMetadata(false));
 
+        public bool IsVisibleToOpponent
+        {
+            get { return (bool)GetValue(IsVisibleToOpponentProperty); }
+            set { SetValue(IsVisibleToOpponentProperty, value); }
+        }
+        public static readonly DependencyProperty IsVisibleToOpponentProperty = DependencyProperty.Register(
+            nameof(IsVisibleToOpponent), typeof(bool), typeof(BoardFieldView), new PropertyMetadata(false));
+
         public BoardFieldVisualState FieldVisualState
         {
             get { return (BoardFieldVisualState)GetValue(BoardFieldVisualStateProperty); }

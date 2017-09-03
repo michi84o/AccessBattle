@@ -28,6 +28,22 @@ namespace AccessBattle.Wpf.View
             ViewModel.ShowError = ShowError;
 
             //Loaded += (s, a) => { Task.Delay(3000).ContinueWith(o => ShowError()); };
+            //ViewModel.CurrentMenu = MenuType.None;
+            //Loaded += (s, a) => {
+            //    Task.Delay(3000).ContinueWith(o =>
+            //    {
+            //        for (int i = 0; i < 80; ++i)
+            //        {
+            //            Application.Current.Dispatcher.Invoke(() =>
+            //            {
+            //                ViewModel.BoardFieldList[i].IsVisibleToOpponent = true;
+            //                if (i > 0)
+            //                    ViewModel.BoardFieldList[i - 1].IsVisibleToOpponent = false;
+            //            });
+            //            Task.Delay(250).Wait();
+            //        }
+            //    });
+            //};
         }
 
         #region Error Adorner

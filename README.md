@@ -20,7 +20,7 @@ Build v0.2a is a complete rewrite and contains the alpha of multiplayer mode.
   - If you abort during join the menus will be gone
   - It is currently not possible to leave a game
   - Game might screw up if one client disconnects
-  - No indication which cards can be seen by opponent
+  - No indication which cards can be seen by opponent (fixed in code)
 
 I do not accept pull requests until I have released the first fully working version.
 

@@ -318,6 +318,20 @@
                     </Viewbox>
                 </Grid>
 
+                <Canvas
+                    Visibility="{Binding Path=IsVisibleToOpponent, ElementName=BoardFieldControl, Converter={StaticResource boolVisConv} }"
+                    Margin="1" >
+                    <Path
+                         Stroke="White" StrokeThickness="1" Margin="-0.25,0,0.25,0">
+                        <!--<Path.Data>M4,9 A 6,3 0 1 0 19,9 M4,9 A 6,3 0 1 1 19,9</Path.Data>-->
+                        <Path.Data>
+                            M2,4 A 4,2 0 1 0 10,4
+                            M2,4 A 4,2 0 1 1 10,4
+                        </Path.Data>
+                    </Path>
+                    <Ellipse Fill="White" Width="4" Height="4" Canvas.Left="4" Canvas.Top="2" />
+                </Canvas>
+
                 <!-- If someone adds custom content (like the server field) -->
                 <ContentPresenter Content="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Content}" />
             </Grid>

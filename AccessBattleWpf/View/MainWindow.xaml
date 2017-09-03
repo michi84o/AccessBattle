@@ -152,333 +152,333 @@
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[56].VisualState}" FieldCardVisualState="{Binding BoardFieldList[56].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="56" IsHighlighted="{Binding BoardFieldList[56].IsHighlighted}"
-                Grid.Row="4" Grid.Column="2" IsSelected="{Binding  BoardFieldList[56].IsSelected}"
+                Grid.Row="4" Grid.Column="2" IsSelected="{Binding BoardFieldList[56].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[56].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}" FieldBackground="{Binding IsPlayerHost, Converter={StaticResource HostColConvMainInv}}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[57].VisualState}" FieldCardVisualState="{Binding BoardFieldList[57].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="57" IsHighlighted="{Binding BoardFieldList[57].IsHighlighted}"
-                Grid.Row="4" Grid.Column="3" IsSelected="{Binding  BoardFieldList[57].IsSelected}"
+                Grid.Row="4" Grid.Column="3" IsSelected="{Binding BoardFieldList[57].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[57].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}" FieldBackground="{Binding IsPlayerHost, Converter={StaticResource HostColConvMainInv}}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[58].VisualState}" FieldCardVisualState="{Binding BoardFieldList[58].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="58" IsHighlighted="{Binding BoardFieldList[58].IsHighlighted}"
-                Grid.Row="4" Grid.Column="4" IsSelected="{Binding  BoardFieldList[58].IsSelected}"
+                Grid.Row="4" Grid.Column="4" IsSelected="{Binding BoardFieldList[58].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[58].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}" FieldBackground="{Binding IsPlayerHost, Converter={StaticResource HostColConvMainInv}}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[59].VisualState}" FieldCardVisualState="{Binding BoardFieldList[59].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="59" IsHighlighted="{Binding BoardFieldList[59].IsHighlighted}"
-                Grid.Row="3" Grid.Column="5" IsSelected="{Binding  BoardFieldList[59].IsSelected}"
+                Grid.Row="3" Grid.Column="5" IsSelected="{Binding BoardFieldList[59].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[59].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"
                 Grid.RowSpan="2" VerticalAlignment="Bottom" Height="60"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[60].VisualState}" FieldCardVisualState="{Binding BoardFieldList[60].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="60" IsHighlighted="{Binding BoardFieldList[60].IsHighlighted}"
-                Grid.Row="3" Grid.Column="6" IsSelected="{Binding  BoardFieldList[60].IsSelected}"
+                Grid.Row="3" Grid.Column="6" IsSelected="{Binding BoardFieldList[60].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[60].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"
                 Grid.RowSpan="2" VerticalAlignment="Bottom" Height="60"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[61].VisualState}" FieldCardVisualState="{Binding BoardFieldList[61].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="61" IsHighlighted="{Binding BoardFieldList[61].IsHighlighted}"
-                Grid.Row="4" Grid.Column="7" IsSelected="{Binding  BoardFieldList[61].IsSelected}"
+                Grid.Row="4" Grid.Column="7" IsSelected="{Binding BoardFieldList[61].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[61].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}" FieldBackground="{Binding IsPlayerHost, Converter={StaticResource HostColConvMainInv}}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[62].VisualState}" FieldCardVisualState="{Binding BoardFieldList[62].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="62" IsHighlighted="{Binding BoardFieldList[62].IsHighlighted}"
-                Grid.Row="4" Grid.Column="8" IsSelected="{Binding  BoardFieldList[62].IsSelected}"
+                Grid.Row="4" Grid.Column="8" IsSelected="{Binding BoardFieldList[62].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[62].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}" FieldBackground="{Binding IsPlayerHost, Converter={StaticResource HostColConvMainInv}}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[63].VisualState}" FieldCardVisualState="{Binding BoardFieldList[63].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="63" IsHighlighted="{Binding BoardFieldList[63].IsHighlighted}"
-                Grid.Row="4" Grid.Column="9" IsSelected="{Binding  BoardFieldList[63].IsSelected}"
+                Grid.Row="4" Grid.Column="9" IsSelected="{Binding BoardFieldList[63].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[63].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}" FieldBackground="{Binding IsPlayerHost, Converter={StaticResource HostColConvMainInv}}"/>
 
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[48].VisualState}" FieldCardVisualState="{Binding BoardFieldList[48].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="48" IsHighlighted="{Binding BoardFieldList[48].IsHighlighted}"
-                Grid.Row="5" Grid.Column="2" IsSelected="{Binding  BoardFieldList[48].IsSelected}"
+                Grid.Row="5" Grid.Column="2" IsSelected="{Binding BoardFieldList[48].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[48].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[49].VisualState}" FieldCardVisualState="{Binding BoardFieldList[49].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="49" IsHighlighted="{Binding BoardFieldList[49].IsHighlighted}"
-                Grid.Row="5" Grid.Column="3" IsSelected="{Binding  BoardFieldList[49].IsSelected}"
+                Grid.Row="5" Grid.Column="3" IsSelected="{Binding BoardFieldList[49].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[49].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[50].VisualState}" FieldCardVisualState="{Binding BoardFieldList[50].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="50" IsHighlighted="{Binding BoardFieldList[50].IsHighlighted}"
-                Grid.Row="5" Grid.Column="4" IsSelected="{Binding  BoardFieldList[50].IsSelected}"
+                Grid.Row="5" Grid.Column="4" IsSelected="{Binding BoardFieldList[50].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[50].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[51].VisualState}" FieldCardVisualState="{Binding BoardFieldList[51].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="51" IsHighlighted="{Binding BoardFieldList[51].IsHighlighted}"
-                Grid.Row="5" Grid.Column="5" IsSelected="{Binding  BoardFieldList[51].IsSelected}"
+                Grid.Row="5" Grid.Column="5" IsSelected="{Binding BoardFieldList[51].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[51].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}" FieldBackground="{Binding IsPlayerHost, Converter={StaticResource HostColConvMainInv}}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[52].VisualState}" FieldCardVisualState="{Binding BoardFieldList[52].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="52" IsHighlighted="{Binding BoardFieldList[52].IsHighlighted}"
-                Grid.Row="5" Grid.Column="6" IsSelected="{Binding  BoardFieldList[52].IsSelected}"
+                Grid.Row="5" Grid.Column="6" IsSelected="{Binding BoardFieldList[52].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[52].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}" FieldBackground="{Binding IsPlayerHost, Converter={StaticResource HostColConvMainInv}}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[53].VisualState}" FieldCardVisualState="{Binding BoardFieldList[53].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="53" IsHighlighted="{Binding BoardFieldList[53].IsHighlighted}"
-                Grid.Row="5" Grid.Column="7" IsSelected="{Binding  BoardFieldList[53].IsSelected}"
+                Grid.Row="5" Grid.Column="7" IsSelected="{Binding BoardFieldList[53].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[53].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[54].VisualState}" FieldCardVisualState="{Binding BoardFieldList[54].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="54" IsHighlighted="{Binding BoardFieldList[54].IsHighlighted}"
-                Grid.Row="5" Grid.Column="8" IsSelected="{Binding  BoardFieldList[54].IsSelected}"
+                Grid.Row="5" Grid.Column="8" IsSelected="{Binding BoardFieldList[54].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[54].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[55].VisualState}" FieldCardVisualState="{Binding BoardFieldList[55].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="55" IsHighlighted="{Binding BoardFieldList[55].IsHighlighted}"
-                Grid.Row="5" Grid.Column="9" IsSelected="{Binding  BoardFieldList[55].IsSelected}"
+                Grid.Row="5" Grid.Column="9" IsSelected="{Binding BoardFieldList[55].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[55].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
 
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[40].VisualState}" FieldCardVisualState="{Binding BoardFieldList[40].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="40" IsHighlighted="{Binding BoardFieldList[40].IsHighlighted}"
-                Grid.Row="6" Grid.Column="2" IsSelected="{Binding  BoardFieldList[40].IsSelected}"
+                Grid.Row="6" Grid.Column="2" IsSelected="{Binding BoardFieldList[40].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[40].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[41].VisualState}" FieldCardVisualState="{Binding BoardFieldList[41].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="41" IsHighlighted="{Binding BoardFieldList[41].IsHighlighted}"
-                Grid.Row="6" Grid.Column="3" IsSelected="{Binding  BoardFieldList[41].IsSelected}"
+                Grid.Row="6" Grid.Column="3" IsSelected="{Binding BoardFieldList[41].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[41].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[42].VisualState}" FieldCardVisualState="{Binding BoardFieldList[42].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="42" IsHighlighted="{Binding BoardFieldList[42].IsHighlighted}"
-                Grid.Row="6" Grid.Column="4" IsSelected="{Binding  BoardFieldList[42].IsSelected}"
+                Grid.Row="6" Grid.Column="4" IsSelected="{Binding BoardFieldList[42].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[42].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[43].VisualState}" FieldCardVisualState="{Binding BoardFieldList[43].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="43" IsHighlighted="{Binding BoardFieldList[43].IsHighlighted}"
-                Grid.Row="6" Grid.Column="5" IsSelected="{Binding  BoardFieldList[43].IsSelected}"
+                Grid.Row="6" Grid.Column="5" IsSelected="{Binding BoardFieldList[43].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[43].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[44].VisualState}" FieldCardVisualState="{Binding BoardFieldList[44].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="44" IsHighlighted="{Binding BoardFieldList[44].IsHighlighted}"
-                Grid.Row="6" Grid.Column="6" IsSelected="{Binding  BoardFieldList[44].IsSelected}"
+                Grid.Row="6" Grid.Column="6" IsSelected="{Binding BoardFieldList[44].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[44].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[45].VisualState}" FieldCardVisualState="{Binding BoardFieldList[45].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="45" IsHighlighted="{Binding BoardFieldList[45].IsHighlighted}"
-                Grid.Row="6" Grid.Column="7" IsSelected="{Binding  BoardFieldList[45].IsSelected}"
+                Grid.Row="6" Grid.Column="7" IsSelected="{Binding BoardFieldList[45].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[45].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[46].VisualState}" FieldCardVisualState="{Binding BoardFieldList[46].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="46" IsHighlighted="{Binding BoardFieldList[46].IsHighlighted}"
-                Grid.Row="6" Grid.Column="8" IsSelected="{Binding  BoardFieldList[46].IsSelected}"
+                Grid.Row="6" Grid.Column="8" IsSelected="{Binding BoardFieldList[46].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[46].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[47].VisualState}" FieldCardVisualState="{Binding BoardFieldList[47].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="47" IsHighlighted="{Binding BoardFieldList[47].IsHighlighted}"
-                Grid.Row="6" Grid.Column="9" IsSelected="{Binding  BoardFieldList[47].IsSelected}"
+                Grid.Row="6" Grid.Column="9" IsSelected="{Binding BoardFieldList[47].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[47].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
 
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[32].VisualState}" FieldCardVisualState="{Binding BoardFieldList[32].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="32" IsHighlighted="{Binding BoardFieldList[32].IsHighlighted}"
-                Grid.Row="7" Grid.Column="2" IsSelected="{Binding  BoardFieldList[32].IsSelected}"
+                Grid.Row="7" Grid.Column="2" IsSelected="{Binding BoardFieldList[32].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[32].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[33].VisualState}" FieldCardVisualState="{Binding BoardFieldList[33].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="33" IsHighlighted="{Binding BoardFieldList[33].IsHighlighted}"
-                Grid.Row="7" Grid.Column="3" IsSelected="{Binding  BoardFieldList[33].IsSelected}"
+                Grid.Row="7" Grid.Column="3" IsSelected="{Binding BoardFieldList[33].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[33].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[34].VisualState}" FieldCardVisualState="{Binding BoardFieldList[34].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="34" IsHighlighted="{Binding BoardFieldList[34].IsHighlighted}"
-                Grid.Row="7" Grid.Column="4" IsSelected="{Binding  BoardFieldList[34].IsSelected}"
+                Grid.Row="7" Grid.Column="4" IsSelected="{Binding BoardFieldList[34].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[34].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[35].VisualState}" FieldCardVisualState="{Binding BoardFieldList[35].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="35" IsHighlighted="{Binding BoardFieldList[35].IsHighlighted}"
-                Grid.Row="7" Grid.Column="5" IsSelected="{Binding  BoardFieldList[35].IsSelected}"
+                Grid.Row="7" Grid.Column="5" IsSelected="{Binding BoardFieldList[35].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[35].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[36].VisualState}" FieldCardVisualState="{Binding BoardFieldList[36].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="36" IsHighlighted="{Binding BoardFieldList[36].IsHighlighted}"
-                Grid.Row="7" Grid.Column="6" IsSelected="{Binding  BoardFieldList[36].IsSelected}"
+                Grid.Row="7" Grid.Column="6" IsSelected="{Binding BoardFieldList[36].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[36].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[37].VisualState}" FieldCardVisualState="{Binding BoardFieldList[37].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="37" IsHighlighted="{Binding BoardFieldList[37].IsHighlighted}"
-                Grid.Row="7" Grid.Column="7" IsSelected="{Binding  BoardFieldList[37].IsSelected}"
+                Grid.Row="7" Grid.Column="7" IsSelected="{Binding BoardFieldList[37].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[37].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[38].VisualState}" FieldCardVisualState="{Binding BoardFieldList[38].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="38" IsHighlighted="{Binding BoardFieldList[38].IsHighlighted}"
-                Grid.Row="7" Grid.Column="8" IsSelected="{Binding  BoardFieldList[38].IsSelected}"
+                Grid.Row="7" Grid.Column="8" IsSelected="{Binding BoardFieldList[38].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[38].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[39].VisualState}" FieldCardVisualState="{Binding BoardFieldList[39].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="39" IsHighlighted="{Binding BoardFieldList[39].IsHighlighted}"
-                Grid.Row="7" Grid.Column="9" IsSelected="{Binding  BoardFieldList[39].IsSelected}"
+                Grid.Row="7" Grid.Column="9" IsSelected="{Binding BoardFieldList[39].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[39].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
 
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[24].VisualState}" FieldCardVisualState="{Binding BoardFieldList[24].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="24" IsHighlighted="{Binding BoardFieldList[24].IsHighlighted}"
-                Grid.Row="8" Grid.Column="2" IsSelected="{Binding  BoardFieldList[24].IsSelected}"
+                Grid.Row="8" Grid.Column="2" IsSelected="{Binding BoardFieldList[24].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[24].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[25].VisualState}" FieldCardVisualState="{Binding BoardFieldList[25].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="25" IsHighlighted="{Binding BoardFieldList[25].IsHighlighted}"
-                Grid.Row="8" Grid.Column="3" IsSelected="{Binding  BoardFieldList[25].IsSelected}"
+                Grid.Row="8" Grid.Column="3" IsSelected="{Binding BoardFieldList[25].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[25].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[26].VisualState}" FieldCardVisualState="{Binding BoardFieldList[26].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="26" IsHighlighted="{Binding BoardFieldList[26].IsHighlighted}"
-                Grid.Row="8" Grid.Column="4" IsSelected="{Binding  BoardFieldList[26].IsSelected}"
+                Grid.Row="8" Grid.Column="4" IsSelected="{Binding BoardFieldList[26].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[26].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[27].VisualState}" FieldCardVisualState="{Binding BoardFieldList[27].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="27" IsHighlighted="{Binding BoardFieldList[27].IsHighlighted}"
-                Grid.Row="8" Grid.Column="5" IsSelected="{Binding  BoardFieldList[27].IsSelected}"
+                Grid.Row="8" Grid.Column="5" IsSelected="{Binding BoardFieldList[27].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[27].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[28].VisualState}" FieldCardVisualState="{Binding BoardFieldList[28].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="28" IsHighlighted="{Binding BoardFieldList[28].IsHighlighted}"
-                Grid.Row="8" Grid.Column="6" IsSelected="{Binding  BoardFieldList[28].IsSelected}"
+                Grid.Row="8" Grid.Column="6" IsSelected="{Binding BoardFieldList[28].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[28].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[29].VisualState}" FieldCardVisualState="{Binding BoardFieldList[29].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="29" IsHighlighted="{Binding BoardFieldList[29].IsHighlighted}"
-                Grid.Row="8" Grid.Column="7" IsSelected="{Binding  BoardFieldList[29].IsSelected}"
+                Grid.Row="8" Grid.Column="7" IsSelected="{Binding BoardFieldList[29].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[29].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[30].VisualState}" FieldCardVisualState="{Binding BoardFieldList[30].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="30" IsHighlighted="{Binding BoardFieldList[30].IsHighlighted}"
-                Grid.Row="8" Grid.Column="8" IsSelected="{Binding  BoardFieldList[30].IsSelected}"
+                Grid.Row="8" Grid.Column="8" IsSelected="{Binding BoardFieldList[30].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[30].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[31].VisualState}" FieldCardVisualState="{Binding BoardFieldList[31].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="31" IsHighlighted="{Binding BoardFieldList[31].IsHighlighted}"
-                Grid.Row="8" Grid.Column="9" IsSelected="{Binding  BoardFieldList[31].IsSelected}"
+                Grid.Row="8" Grid.Column="9" IsSelected="{Binding BoardFieldList[31].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[31].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
 
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[16].VisualState}" FieldCardVisualState="{Binding BoardFieldList[16].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="16" IsHighlighted="{Binding BoardFieldList[16].IsHighlighted}"
-                Grid.Row="9" Grid.Column="2" IsSelected="{Binding  BoardFieldList[16].IsSelected}"
+                Grid.Row="9" Grid.Column="2" IsSelected="{Binding BoardFieldList[16].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[16].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[17].VisualState}" FieldCardVisualState="{Binding BoardFieldList[17].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="17" IsHighlighted="{Binding BoardFieldList[17].IsHighlighted}"
-                Grid.Row="9" Grid.Column="3" IsSelected="{Binding  BoardFieldList[17].IsSelected}"
+                Grid.Row="9" Grid.Column="3" IsSelected="{Binding BoardFieldList[17].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[17].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[18].VisualState}" FieldCardVisualState="{Binding BoardFieldList[18].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="18" IsHighlighted="{Binding BoardFieldList[18].IsHighlighted}"
-                Grid.Row="9" Grid.Column="4" IsSelected="{Binding  BoardFieldList[18].IsSelected}"
+                Grid.Row="9" Grid.Column="4" IsSelected="{Binding BoardFieldList[18].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[18].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[19].VisualState}" FieldCardVisualState="{Binding BoardFieldList[19].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="19" IsHighlighted="{Binding BoardFieldList[19].IsHighlighted}"
-                Grid.Row="9" Grid.Column="5" IsSelected="{Binding  BoardFieldList[19].IsSelected}"
+                Grid.Row="9" Grid.Column="5" IsSelected="{Binding BoardFieldList[19].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[19].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[20].VisualState}" FieldCardVisualState="{Binding BoardFieldList[20].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="20" IsHighlighted="{Binding BoardFieldList[20].IsHighlighted}"
-                Grid.Row="9" Grid.Column="6" IsSelected="{Binding  BoardFieldList[20].IsSelected}"
+                Grid.Row="9" Grid.Column="6" IsSelected="{Binding BoardFieldList[20].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[20].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[21].VisualState}" FieldCardVisualState="{Binding BoardFieldList[21].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="21" IsHighlighted="{Binding BoardFieldList[21].IsHighlighted}"
-                Grid.Row="9" Grid.Column="7" IsSelected="{Binding  BoardFieldList[21].IsSelected}"
+                Grid.Row="9" Grid.Column="7" IsSelected="{Binding BoardFieldList[21].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[21].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[22].VisualState}" FieldCardVisualState="{Binding BoardFieldList[22].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="22" IsHighlighted="{Binding BoardFieldList[22].IsHighlighted}"
-                Grid.Row="9" Grid.Column="8"  IsSelected="{Binding  BoardFieldList[22].IsSelected}"
+                Grid.Row="9" Grid.Column="8"  IsSelected="{Binding BoardFieldList[22].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[22].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[23].VisualState}" FieldCardVisualState="{Binding BoardFieldList[23].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="23" IsHighlighted="{Binding BoardFieldList[23].IsHighlighted}"
-                Grid.Row="9" Grid.Column="9" IsSelected="{Binding  BoardFieldList[23].IsSelected}"
+                Grid.Row="9" Grid.Column="9" IsSelected="{Binding BoardFieldList[23].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[23].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
 
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[8].VisualState}" FieldCardVisualState="{Binding BoardFieldList[8].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="8" IsHighlighted="{Binding BoardFieldList[8].IsHighlighted}"
-                Grid.Row="10" Grid.Column="2" IsSelected="{Binding  BoardFieldList[8].IsSelected}"
+                Grid.Row="10" Grid.Column="2" IsSelected="{Binding BoardFieldList[8].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[8].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[9].VisualState}" FieldCardVisualState="{Binding BoardFieldList[9].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="9" IsHighlighted="{Binding BoardFieldList[9].IsHighlighted}"
-                Grid.Row="10" Grid.Column="3"  IsSelected="{Binding  BoardFieldList[9].IsSelected}"
+                Grid.Row="10" Grid.Column="3"  IsSelected="{Binding BoardFieldList[9].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[9].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[10].VisualState}" FieldCardVisualState="{Binding BoardFieldList[10].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="10" IsHighlighted="{Binding BoardFieldList[10].IsHighlighted}"
-                Grid.Row="10" Grid.Column="4" IsSelected="{Binding  BoardFieldList[10].IsSelected}"
+                Grid.Row="10" Grid.Column="4" IsSelected="{Binding BoardFieldList[10].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[10].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[11].VisualState}" FieldCardVisualState="{Binding BoardFieldList[11].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="11" IsHighlighted="{Binding BoardFieldList[11].IsHighlighted}"
-                Grid.Row="10" Grid.Column="5" IsSelected="{Binding  BoardFieldList[11].IsSelected}"
+                Grid.Row="10" Grid.Column="5" IsSelected="{Binding BoardFieldList[11].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[11].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}" FieldBackground="{Binding IsPlayerHost, Converter={StaticResource HostColConvMain}}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[12].VisualState}" FieldCardVisualState="{Binding BoardFieldList[12].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="12" IsHighlighted="{Binding BoardFieldList[12].IsHighlighted}"
-                Grid.Row="10" Grid.Column="6" IsSelected="{Binding  BoardFieldList[12].IsSelected}"
+                Grid.Row="10" Grid.Column="6" IsSelected="{Binding BoardFieldList[12].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[12].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}" FieldBackground="{Binding IsPlayerHost, Converter={StaticResource HostColConvMain}}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[13].VisualState}" FieldCardVisualState="{Binding BoardFieldList[13].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="13" IsHighlighted="{Binding BoardFieldList[13].IsHighlighted}"
-                Grid.Row="10" Grid.Column="7" IsSelected="{Binding  BoardFieldList[13].IsSelected}"
+                Grid.Row="10" Grid.Column="7" IsSelected="{Binding BoardFieldList[13].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[13].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[14].VisualState}" FieldCardVisualState="{Binding BoardFieldList[14].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="14" IsHighlighted="{Binding BoardFieldList[14].IsHighlighted}"
-                Grid.Row="10" Grid.Column="8" IsSelected="{Binding  BoardFieldList[14].IsSelected}"
+                Grid.Row="10" Grid.Column="8" IsSelected="{Binding BoardFieldList[14].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[14].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[15].VisualState}" FieldCardVisualState="{Binding BoardFieldList[15].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="15" IsHighlighted="{Binding BoardFieldList[15].IsHighlighted}"
-                Grid.Row="10" Grid.Column="9" IsSelected="{Binding  BoardFieldList[15].IsSelected}"
+                Grid.Row="10" Grid.Column="9" IsSelected="{Binding BoardFieldList[15].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[15].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"/>
 
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[0].VisualState}" FieldCardVisualState="{Binding BoardFieldList[0].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="0" IsHighlighted="{Binding BoardFieldList[0].IsHighlighted}"
-                Grid.Row="11" Grid.Column="2" IsSelected="{Binding  BoardFieldList[0].IsSelected}"
+                Grid.Row="11" Grid.Column="2" IsSelected="{Binding BoardFieldList[0].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[0].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}" FieldBackground="{Binding IsPlayerHost, Converter={StaticResource HostColConvMain}}" />
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[1].VisualState}" FieldCardVisualState="{Binding BoardFieldList[1].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="1" IsHighlighted="{Binding BoardFieldList[1].IsHighlighted}"
-                Grid.Row="11" Grid.Column="3" IsSelected="{Binding  BoardFieldList[1].IsSelected}"
+                Grid.Row="11" Grid.Column="3" IsSelected="{Binding BoardFieldList[1].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[1].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}" FieldBackground="{Binding IsPlayerHost, Converter={StaticResource HostColConvMain}}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[2].VisualState}" FieldCardVisualState="{Binding BoardFieldList[2].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="2" IsHighlighted="{Binding BoardFieldList[2].IsHighlighted}"
-                Grid.Row="11" Grid.Column="4" IsSelected="{Binding  BoardFieldList[2].IsSelected}"
+                Grid.Row="11" Grid.Column="4" IsSelected="{Binding BoardFieldList[2].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[2].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}" FieldBackground="{Binding IsPlayerHost, Converter={StaticResource HostColConvMain}}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[3].VisualState}" FieldCardVisualState="{Binding BoardFieldList[3].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="3" IsHighlighted="{Binding BoardFieldList[3].IsHighlighted}"
-                Grid.Row="11" Grid.Column="5" IsExitFlipped="True" IsSelected="{Binding  BoardFieldList[3].IsSelected}"
+                Grid.Row="11" Grid.Column="5" IsExitFlipped="True" IsSelected="{Binding BoardFieldList[3].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[3].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"
                 Grid.RowSpan="2" VerticalAlignment="Top" Height="60"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[4].VisualState}" FieldCardVisualState="{Binding BoardFieldList[4].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="4" IsHighlighted="{Binding BoardFieldList[4].IsHighlighted}"
-                Grid.Row="11" Grid.Column="6" IsExitFlipped="True" IsSelected="{Binding  BoardFieldList[4].IsSelected}"
+                Grid.Row="11" Grid.Column="6" IsExitFlipped="True" IsSelected="{Binding BoardFieldList[4].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[4].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}"
                 Grid.RowSpan="2" VerticalAlignment="Top" Height="60"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[5].VisualState}" FieldCardVisualState="{Binding BoardFieldList[5].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="5" IsHighlighted="{Binding BoardFieldList[5].IsHighlighted}"
-                Grid.Row="11" Grid.Column="7" IsSelected="{Binding  BoardFieldList[5].IsSelected}"
+                Grid.Row="11" Grid.Column="7" IsSelected="{Binding BoardFieldList[5].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[5].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}" FieldBackground="{Binding IsPlayerHost, Converter={StaticResource HostColConvMain}}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[6].VisualState}" FieldCardVisualState="{Binding BoardFieldList[6].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="6" IsHighlighted="{Binding BoardFieldList[6].IsHighlighted}"
-                Grid.Row="11" Grid.Column="8" IsSelected="{Binding  BoardFieldList[6].IsSelected}"
+                Grid.Row="11" Grid.Column="8" IsSelected="{Binding BoardFieldList[6].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[6].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}" FieldBackground="{Binding IsPlayerHost, Converter={StaticResource HostColConvMain}}"/>
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[7].VisualState}" FieldCardVisualState="{Binding BoardFieldList[7].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="7" IsHighlighted="{Binding BoardFieldList[7].IsHighlighted}"
-                Grid.Row="11" Grid.Column="9" IsSelected="{Binding  BoardFieldList[7].IsSelected}"
+                Grid.Row="11" Grid.Column="9" IsSelected="{Binding BoardFieldList[7].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[7].IsVisibleToOpponent}"
                 Style="{StaticResource MainField}" FieldBackground="{Binding IsPlayerHost, Converter={StaticResource HostColConvMain}}"/>
 
             <!-- Actions Menu -->
@@ -518,13 +518,13 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <local:BoardFieldView Grid.Column="0" FieldVisualState="{Binding BoardFieldList[72].VisualState}" FieldCardVisualState="{Binding BoardFieldList[72].CardVisualState}" Style="{StaticResource StackField}" IsCardFlipped="True"
-                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="72" IsHighlighted="{Binding BoardFieldList[72].IsHighlighted}"  IsSelected="{Binding  BoardFieldList[72].IsSelected}" />
+                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="72" IsHighlighted="{Binding BoardFieldList[72].IsHighlighted}"  IsSelected="{Binding BoardFieldList[72].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[72].IsVisibleToOpponent}" />
                 <local:BoardFieldView Grid.Column="1" FieldVisualState="{Binding BoardFieldList[73].VisualState}" FieldCardVisualState="{Binding BoardFieldList[73].CardVisualState}" Style="{StaticResource StackField}" IsCardFlipped="True"
-                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="73" IsHighlighted="{Binding BoardFieldList[73].IsHighlighted}"  IsSelected="{Binding  BoardFieldList[73].IsSelected}" />
+                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="73" IsHighlighted="{Binding BoardFieldList[73].IsHighlighted}"  IsSelected="{Binding BoardFieldList[73].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[73].IsVisibleToOpponent}" />
                 <local:BoardFieldView Grid.Column="2" FieldVisualState="{Binding BoardFieldList[74].VisualState}" FieldCardVisualState="{Binding BoardFieldList[74].CardVisualState}" Style="{StaticResource StackField}" IsCardFlipped="True"
-                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="74" IsHighlighted="{Binding BoardFieldList[74].IsHighlighted}"  IsSelected="{Binding  BoardFieldList[74].IsSelected}" />
+                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="74" IsHighlighted="{Binding BoardFieldList[74].IsHighlighted}"  IsSelected="{Binding BoardFieldList[74].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[74].IsVisibleToOpponent}" />
                 <local:BoardFieldView Grid.Column="3" FieldVisualState="{Binding BoardFieldList[75].VisualState}" FieldCardVisualState="{Binding BoardFieldList[75].CardVisualState}" Style="{StaticResource StackField}" IsCardFlipped="True"
-                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="75" IsHighlighted="{Binding BoardFieldList[75].IsHighlighted}"  IsSelected="{Binding  BoardFieldList[75].IsSelected}" />
+                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="75" IsHighlighted="{Binding BoardFieldList[75].IsHighlighted}"  IsSelected="{Binding BoardFieldList[75].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[75].IsVisibleToOpponent}" />
             </Grid>
 
             <Grid
@@ -536,13 +536,13 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <local:BoardFieldView Grid.Column="0" FieldVisualState="{Binding BoardFieldList[76].VisualState}" FieldCardVisualState="{Binding BoardFieldList[76].CardVisualState}" Style="{StaticResource StackField}" IsCardFlipped="True"
-                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="76" IsHighlighted="{Binding BoardFieldList[76].IsHighlighted}"  IsSelected="{Binding  BoardFieldList[76].IsSelected}" />
+                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="76" IsHighlighted="{Binding BoardFieldList[76].IsHighlighted}"  IsSelected="{Binding BoardFieldList[76].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[76].IsVisibleToOpponent}" />
                 <local:BoardFieldView Grid.Column="1" FieldVisualState="{Binding BoardFieldList[77].VisualState}" FieldCardVisualState="{Binding BoardFieldList[77].CardVisualState}" Style="{StaticResource StackField}" IsCardFlipped="True"
-                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="77" IsHighlighted="{Binding BoardFieldList[77].IsHighlighted}"  IsSelected="{Binding  BoardFieldList[77].IsSelected}" />
+                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="77" IsHighlighted="{Binding BoardFieldList[77].IsHighlighted}"  IsSelected="{Binding BoardFieldList[77].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[77].IsVisibleToOpponent}" />
                 <local:BoardFieldView Grid.Column="2" FieldVisualState="{Binding BoardFieldList[78].VisualState}" FieldCardVisualState="{Binding BoardFieldList[78].CardVisualState}" Style="{StaticResource StackField}" IsCardFlipped="True"
-                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="78" IsHighlighted="{Binding BoardFieldList[78].IsHighlighted}"  IsSelected="{Binding  BoardFieldList[78].IsSelected}" />
+                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="78" IsHighlighted="{Binding BoardFieldList[78].IsHighlighted}"  IsSelected="{Binding BoardFieldList[78].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[78].IsVisibleToOpponent}" />
                 <local:BoardFieldView Grid.Column="3" FieldVisualState="{Binding BoardFieldList[79].VisualState}" FieldCardVisualState="{Binding BoardFieldList[79].CardVisualState}" Style="{StaticResource StackField}" IsCardFlipped="True"
-                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="79" IsHighlighted="{Binding BoardFieldList[79].IsHighlighted}"  IsSelected="{Binding  BoardFieldList[79].IsSelected}" />
+                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="79" IsHighlighted="{Binding BoardFieldList[79].IsHighlighted}"  IsSelected="{Binding BoardFieldList[79].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[79].IsVisibleToOpponent}" />
             </Grid>
 
             <Grid
@@ -554,13 +554,13 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <local:BoardFieldView Grid.Column="0" FieldVisualState="{Binding BoardFieldList[68].VisualState}" FieldCardVisualState="{Binding BoardFieldList[68].CardVisualState}" Style="{StaticResource StackField}"
-                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="68" IsHighlighted="{Binding BoardFieldList[68].IsHighlighted}" IsSelected="{Binding  BoardFieldList[68].IsSelected}"/>
+                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="68" IsHighlighted="{Binding BoardFieldList[68].IsHighlighted}" IsSelected="{Binding BoardFieldList[68].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[68].IsVisibleToOpponent}" />
                 <local:BoardFieldView Grid.Column="1" FieldVisualState="{Binding BoardFieldList[69].VisualState}" FieldCardVisualState="{Binding BoardFieldList[69].CardVisualState}" Style="{StaticResource StackField}"
-                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="69" IsHighlighted="{Binding BoardFieldList[69].IsHighlighted}" IsSelected="{Binding  BoardFieldList[69].IsSelected}" />
+                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="69" IsHighlighted="{Binding BoardFieldList[69].IsHighlighted}" IsSelected="{Binding BoardFieldList[69].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[69].IsVisibleToOpponent}" />
                 <local:BoardFieldView Grid.Column="2" FieldVisualState="{Binding BoardFieldList[70].VisualState}" FieldCardVisualState="{Binding BoardFieldList[70].CardVisualState}" Style="{StaticResource StackField}"
-                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="70" IsHighlighted="{Binding BoardFieldList[70].IsHighlighted}" IsSelected="{Binding  BoardFieldList[70].IsSelected}" />
+                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="70" IsHighlighted="{Binding BoardFieldList[70].IsHighlighted}" IsSelected="{Binding BoardFieldList[70].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[70].IsVisibleToOpponent}" />
                 <local:BoardFieldView Grid.Column="3" FieldVisualState="{Binding BoardFieldList[71].VisualState}" FieldCardVisualState="{Binding BoardFieldList[71].CardVisualState}" Style="{StaticResource StackField}"
-                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="71" IsHighlighted="{Binding BoardFieldList[71].IsHighlighted}" IsSelected="{Binding  BoardFieldList[71].IsSelected}" />
+                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="71" IsHighlighted="{Binding BoardFieldList[71].IsHighlighted}" IsSelected="{Binding BoardFieldList[71].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[71].IsVisibleToOpponent}" />
             </Grid>
 
             <Button
@@ -577,13 +577,13 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <local:BoardFieldView Grid.Column="0" FieldVisualState="{Binding BoardFieldList[64].VisualState}" FieldCardVisualState="{Binding BoardFieldList[64].CardVisualState}" Style="{StaticResource StackField}"
-                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="64" IsHighlighted="{Binding BoardFieldList[64].IsHighlighted}" IsSelected="{Binding  BoardFieldList[64].IsSelected}" />
+                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="64" IsHighlighted="{Binding BoardFieldList[64].IsHighlighted}" IsSelected="{Binding BoardFieldList[64].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[64].IsVisibleToOpponent}"/>
                 <local:BoardFieldView Grid.Column="1" FieldVisualState="{Binding BoardFieldList[65].VisualState}" FieldCardVisualState="{Binding BoardFieldList[65].CardVisualState}" Style="{StaticResource StackField}"
-                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="65" IsHighlighted="{Binding BoardFieldList[65].IsHighlighted}" IsSelected="{Binding  BoardFieldList[65].IsSelected}" />
+                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="65" IsHighlighted="{Binding BoardFieldList[65].IsHighlighted}" IsSelected="{Binding BoardFieldList[65].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[65].IsVisibleToOpponent}" />
                 <local:BoardFieldView Grid.Column="2" FieldVisualState="{Binding BoardFieldList[66].VisualState}" FieldCardVisualState="{Binding BoardFieldList[66].CardVisualState}" Style="{StaticResource StackField}"
-                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="66" IsHighlighted="{Binding BoardFieldList[66].IsHighlighted}" IsSelected="{Binding  BoardFieldList[66].IsSelected}" />
+                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="66" IsHighlighted="{Binding BoardFieldList[66].IsHighlighted}" IsSelected="{Binding BoardFieldList[66].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[66].IsVisibleToOpponent}" />
                 <local:BoardFieldView Grid.Column="3" FieldVisualState="{Binding BoardFieldList[67].VisualState}" FieldCardVisualState="{Binding BoardFieldList[67].CardVisualState}" Style="{StaticResource StackField}"
-                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="67" IsHighlighted="{Binding BoardFieldList[67].IsHighlighted}" IsSelected="{Binding  BoardFieldList[67].IsSelected}" />
+                                      Command="{Binding BoardFieldClickedCommand}" CommandParameter="67" IsHighlighted="{Binding BoardFieldList[67].IsHighlighted}" IsSelected="{Binding BoardFieldList[67].IsSelected}" IsVisibleToOpponent="{Binding BoardFieldList[67].IsVisibleToOpponent}" />
             </Grid>
 
             <!-- Overlay dialogues -->

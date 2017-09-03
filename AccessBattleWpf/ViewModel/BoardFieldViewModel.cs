@@ -20,6 +20,13 @@ namespace AccessBattle.Wpf.ViewModel
         BoardField _field;
         public BoardField Field => _field;
 
+        bool _isVisibleToOpponent;
+        public bool IsVisibleToOpponent
+        {
+            get { return _isVisibleToOpponent; }
+            set { SetProp(ref _isVisibleToOpponent, value); }
+        }
+
         BoardFieldVisualState _visualState = BoardFieldVisualState.Empty;
         public BoardFieldVisualState VisualState
         {
@@ -105,6 +112,7 @@ namespace AccessBattle.Wpf.ViewModel
                     {
                         VisualState = BoardFieldVisualState.Empty;
                         CardVisualState = BoardFieldCardVisualState.Empty;
+                        IsVisibleToOpponent = false;
                     }
                     else if (s.Card.Owner != null)
                     {
@@ -127,6 +135,7 @@ namespace AccessBattle.Wpf.ViewModel
                             if (card.HasBoost)
                                 VisualState |= BoardFieldVisualState.LineBoost;
 
+                            IsVisibleToOpponent = card.IsFaceUp;
                         }
                         else if (s.Card is FirewallCard)
                         {
