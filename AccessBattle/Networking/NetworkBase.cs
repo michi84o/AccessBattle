@@ -88,7 +88,16 @@ namespace AccessBattle.Networking
             args.UserToken = token;
 
             args.Completed += Receive_Completed;
-            connection.ReceiveAsync(args);
+            try
+            {
+                connection.ReceiveAsync(args);
+            }
+            catch (Exception)
+            {
+                // object disposed exception when connection is closed
+                // TODO: Close connection ???
+                return;
+            }
         }
 
         /// <summary>

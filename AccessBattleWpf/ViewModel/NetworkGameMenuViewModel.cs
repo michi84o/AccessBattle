@@ -3,12 +3,15 @@ using AccessBattle.Networking.Packets;
 using AccessBattle.Wpf.Extensions;
 using AccessBattle.Wpf.Interfaces;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
@@ -16,7 +19,7 @@ using System.Windows.Input;
 
 namespace AccessBattle.Wpf.ViewModel
 {
-    public class NetworkGameMenuViewModel : MenuViewModelBase
+    public class NetworkGameMenuViewModel : MenuViewModelBase, INotifyDataErrorInfo
     {
         public NetworkGameMenuViewModel(
             IMenuHolder parent) : base(parent)
@@ -221,14 +224,22 @@ namespace AccessBattle.Wpf.ViewModel
         public bool RequiresPassword
         {
             get { return _requiresPassword; }
-            set { SetProp(ref _requiresPassword, value); }
+            set
+            {
+                if (SetProp(ref _requiresPassword, value))
+                    Validate();
+            }
         }
 
         string _loginName;
         public string LoginName
         {
             get { return _loginName; }
-            set { SetProp(ref _loginName, value); }
+            set
+            {
+                if (SetProp(ref _loginName, value))
+                    Validate();
+            }
         }
 
         bool _isCreatingGame;
@@ -428,6 +439,81 @@ namespace AccessBattle.Wpf.ViewModel
             }
         }
 
+
         #endregion
+
+        #region Error Validation
+
+        void Validate([CallerMemberName] string propertyName = null)
+        {
+            List<string> errors;
+            if (!_errors.TryGetValue(propertyName, out errors))
+            {
+                errors = new List<string>();
+                _errors[propertyName] = errors;
+            }
+
+            StringBuilder builder;
+
+            switch (propertyName)
+            {
+                case nameof(LoginName):
+                    errors.Clear();
+                    if (LoginName?.Length > 0 && !Regex.IsMatch(LoginName, @"^[\x20-\x7E]+$"))
+                        errors.Add("Invalid symbols");
+                    if (LoginName?.Length > 32)
+                        errors.Add("Max length is 32");
+                    ErrorText = "";
+                    builder = new StringBuilder();
+                    builder.Append(ErrorText);
+                    foreach (var str in errors)
+                        builder.Append(str + "\r\n");
+                    ErrorText = builder.ToString().TrimEnd(new[] { '\r', '\n' });
+                    break;
+                case nameof(LoginPassword):
+                    errors.Clear();
+                    if (LoginPassword?.ConvertToUnsecureString()?.Length > 0 && !Regex.IsMatch(LoginPassword?.ConvertToUnsecureString() ?? "", @"^[\x20-\x7E]+$"))
+                        errors.Add("Invalid symbols");
+                    if (LoginPassword?.ConvertToUnsecureString()?.Length > 32)
+                        errors.Add("Max length is 32");
+                    ErrorText = "";
+                    builder = new StringBuilder();
+                    builder.Append(ErrorText);
+                    foreach (var str in errors)
+                        builder.Append(str + "\r\n");
+                    ErrorText = builder.ToString().TrimEnd(new[] { '\r', '\n' });
+                    break;
+            }
+
+            HasErrors = _errors.Any(o => o.Value?.Count > 0);
+            ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
+        }
+
+        string _errorText;
+        public string ErrorText
+        {
+            get => _errorText;
+            set { SetProp(ref _errorText, value); }
+        }
+
+        bool _hasErrors;
+        public bool HasErrors
+        {
+            get => _hasErrors;
+            set { SetProp(ref _hasErrors, value); }
+        }
+        public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
+        Dictionary<string, List<string>> _errors = new Dictionary<string, List<string>>();
+        public IEnumerable GetErrors(string propertyName)
+        {
+            if (string.IsNullOrEmpty(propertyName)) return new List<string>();
+            List<string> errors;
+            if (!_errors.TryGetValue(propertyName, out errors))
+                return new List<string>();
+            return errors;
+        }
+
+        #endregion
+
     }
 }

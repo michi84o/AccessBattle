@@ -26,6 +26,7 @@ namespace AccessBattle.Wpf.View
         {
             InitializeComponent();
             ViewModel.ShowError = ShowError;
+            //(new TextBox).Valoda
 
             //Loaded += (s, a) => { Task.Delay(3000).ContinueWith(o => ShowError()); };
             //ViewModel.CurrentMenu = MenuType.None;

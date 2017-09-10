@@ -55,6 +55,7 @@
     </ApplicationDefinition>
     <Compile Include="Converters\BoolInverter.cs" />
     <Compile Include="Converters\BoolVisibilityConverter.cs" />
+    <Compile Include="Converters\ListToStringConverter.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Interfaces\IMenuHolder.cs" />
     <Compile Include="ViewModel\AcceptJoinMenuViewModel.cs" />

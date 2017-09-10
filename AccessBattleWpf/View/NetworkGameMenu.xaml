@@ -98,7 +98,7 @@
                             />
                         <TextBox
                             Grid.Row="1" Grid.Column="1"
-                            Text="{Binding LoginName, UpdateSourceTrigger=PropertyChanged}" Foreground="Yellow" Margin="3"
+                            Text="{Binding LoginName, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" Foreground="Yellow" Margin="3"
                             KeyUp="TextBox_KeyUp"
                             />
                         <TextBlock
