@@ -83,6 +83,7 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
@@ -112,10 +113,11 @@
                             PasswordChanged="PasswordBox_PasswordChanged" Foreground="Yellow" Margin="3"
                             KeyUp="TextBox_KeyUp"
                             />
+                        <TextBlock Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="1" Text="{Binding ErrorText}" Foreground="Red" Visibility="{Binding HasErrors, Converter={StaticResource visconv}}" Margin="3,0,3,0" />
                         <Button
-                            Grid.Row="3" Grid.Column="0" Content="Cancel" Margin="3" Command="{Binding CancelLoginCommand}"/>
+                            Grid.Row="4" Grid.Column="0" Content="Cancel" Margin="3" Command="{Binding CancelLoginCommand}"/>
                         <Button
-                            Grid.Row="3" Grid.Column="1" Content="OK" Margin="3" Command="{Binding LoginCommand}"/>
+                            Grid.Row="4" Grid.Column="1" Content="OK" Margin="3" Command="{Binding LoginCommand}"/>
                     </Grid>
                 </Border>
                 <Button Grid.Row="2" Content="Join Selected game" Margin="3" Command="{Binding JoinNetworkGameCommand}"/>

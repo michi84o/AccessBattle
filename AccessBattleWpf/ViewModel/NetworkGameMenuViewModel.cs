@@ -334,7 +334,7 @@ namespace AccessBattle.Wpf.ViewModel
                 IsConnecting = true;
                 var result = await ParentViewModel.Game.Client.Connect(IpAddress, Port);
                 IsConnecting = false;
-                IsLoggingIn = true;
+                IsLoggingIn = result;
                 CommandManager.InvalidateRequerySuggested();
             }, o => { return CanConnect; });
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
@@ -421,7 +421,7 @@ namespace AccessBattle.Wpf.ViewModel
                         _gameListUpdateTimer.Change(0, System.Threading.Timeout.Infinite);
                     }
                     CommandManager.InvalidateRequerySuggested();
-                }, o => !string.IsNullOrEmpty(LoginName) && IsLoggingIn && ParentViewModel.Game.Client.IsConnected == true && !_sendingLogin);
+                }, o => !string.IsNullOrEmpty(LoginName) && IsLoggingIn && ParentViewModel.Game.Client.IsConnected == true && !_sendingLogin && !HasPropError(nameof(LoginName)) && !HasPropError(nameof(LoginPassword)));
             }
         }
 
@@ -512,6 +512,8 @@ namespace AccessBattle.Wpf.ViewModel
                 return new List<string>();
             return errors;
         }
+
+        bool HasPropError(string propertyName) => _errors.TryGetValue(propertyName, out List<string> errors) && errors?.Count > 0;
 
         #endregion
 

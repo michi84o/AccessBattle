@@ -143,7 +143,7 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-            <Setter Property="Validation.ErrorTemplate">
+            <!--<Setter Property="Validation.ErrorTemplate">
                 <Setter.Value>
                     <ControlTemplate>
                         <Border
@@ -164,7 +164,7 @@
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
-            </Setter>
+            </Setter>-->
         </Style>
 
         <Style TargetType="{x:Type Button}">
