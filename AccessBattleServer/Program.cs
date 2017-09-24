@@ -13,6 +13,14 @@ namespace AccessBattleServer
 
         static void Main(string[] args)
         {
+            // Testcode
+            //string hash, salt;
+            //PasswordHasher.GetNewHash("passw0rd", out hash, out salt);
+            //Console.WriteLine(hash);
+            //Console.WriteLine(salt);
+            //Console.WriteLine(PasswordHasher.VerifyHash("passw0rd", hash, salt));
+            // ----------------
+
             Log.SetMode(LogMode.Console);
             Log.Priority = LogPriority.Information;
 

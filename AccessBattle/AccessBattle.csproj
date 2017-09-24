@@ -66,6 +66,7 @@
     <Compile Include="Networking\Packets\Login.cs" />
     <Compile Include="Networking\Packets\Rematch.cs" />
     <Compile Include="Networking\Packets\ServerInfo.cs" />
+    <Compile Include="Networking\PasswordHasher.cs" />
     <Compile Include="PlayerState.cs" />
     <Compile Include="PropChangeNotifier.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -18,12 +18,9 @@ Build v0.3a is a complete rewrite and contains the alpha of multiplayer mode.
   
 - Known Issues:
   - Server has no user management yet. Any client is accepted, no passwords.
-  - If you abort during join the menus will be gone
   - It is currently not possible to leave a game
   - Game might screw up if one client disconnects
   - Rematch does not work sometimes
-
-
 
 The main game engine is inside a separate DLL so that people
 can program their own user interface for it. The DLL should
@@ -41,6 +38,8 @@ Third party notices:
 This program uses the following external sources.
 - Silkscreen font by Jason Kottke
 - Newtonsoft.Json by James Newton-King
+
+Warning! This program uses encryption for the connection to the server. Please check if this is legal in your country before using this program.
 
 Special thanks:
 5pb. and Nitroplus for creating Steins;Gate

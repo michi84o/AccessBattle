@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26403.7
+VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccessBattle", "AccessBattle\AccessBattle.csproj", "{F17F07F0-81F9-4320-A0C0-E9BBE9F6869C}"
 EndProject
@@ -37,5 +37,7 @@ Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {45937258-6B5A-49A9-8018-C7345E0ABEF2}
+	EndGlobalSection
 EndGlobal
- 

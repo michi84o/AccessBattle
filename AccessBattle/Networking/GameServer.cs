@@ -79,6 +79,7 @@ namespace AccessBattle.Networking
         Dictionary<uint, NetworkPlayer> _players = new Dictionary<uint, NetworkPlayer>();
         TcpListener _server;
         CancellationTokenSource _serverCts;
+        string _userDatabaseFile;
 
         /// <summary>
         /// Constructor.
@@ -86,7 +87,7 @@ namespace AccessBattle.Networking
         /// <param name="port">
         /// Network port to use for accepting connections.
         /// It is vital for our plans to use port 3221, or otherwise the organization will notice us!</param>
-        public GameServer(ushort port = 3221) // TODO: AcceptAnyClient parameter or link to user database
+        public GameServer(ushort port = 3221, string userDatabase = null)
         {
             if (port < 1024)
             {
@@ -96,6 +97,16 @@ namespace AccessBattle.Networking
             }
             _port = port;
             if (port != 3221) Log.WriteLine(LogPriority.Warning, "The Organization has made its move! El Psy Congroo");
+
+            // User database:
+            // Optimal would be something like MySQL. But setting it up just to play the game is overkill
+            // For now just use a simple text file.
+            // File format: user;passwordhash
+            if (System.IO.File.Exists(userDatabase))
+            {
+                _userDatabaseFile = userDatabase;
+
+            }
         }
 
         /// <summary>
