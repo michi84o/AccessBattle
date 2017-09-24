@@ -322,7 +322,11 @@ namespace AccessBattle.Wpf.ViewModel
         public string NewGameText
         {
             get { return _newGameText; }
-            set { SetProp(ref _newGameText, value); }
+            set
+            {
+                if (SetProp(ref _newGameText, value))
+                    Validate();
+            }
         }
 
         #region Commands
@@ -362,7 +366,8 @@ namespace AccessBattle.Wpf.ViewModel
                     return
                     !string.IsNullOrEmpty(NewGameText) &&
                     ParentViewModel.Game.Client.IsLoggedIn == true &&
-                    !IsConnecting && !IsLoggingIn && !IsCreatingGame && !IsJoiningGame;
+                    !IsConnecting && !IsLoggingIn && !IsCreatingGame && !IsJoiningGame
+                    && !HasPropError(nameof(NewGameText));
                 });
             }
         }
@@ -483,6 +488,20 @@ namespace AccessBattle.Wpf.ViewModel
                         builder.Append(str + "\r\n");
                     ErrorText = builder.ToString().TrimEnd(new[] { '\r', '\n' });
                     break;
+                case nameof(NewGameText):
+                    errors.Clear();
+                    builder = new StringBuilder();
+                    if (NewGameText?.Length > 0 && !Regex.IsMatch(NewGameText, @"^[\x20-\x7E]+$"))
+                        errors.Add("Invalid symbols");
+                    if (NewGameText?.Length > 32)
+                        errors.Add("Max length is 32");
+                    builder = new StringBuilder();
+                    GameTextErrorText = "";
+                    builder.Append(ErrorText);
+                    foreach (var str in errors)
+                        builder.Append(str + "\r\n");
+                    GameTextErrorText = builder.ToString().TrimEnd(new[] { '\r', '\n' });
+                    break;
             }
 
             HasErrors = _errors.Any(o => o.Value?.Count > 0);
@@ -496,12 +515,20 @@ namespace AccessBattle.Wpf.ViewModel
             set { SetProp(ref _errorText, value); }
         }
 
+        string _gameTextErrorText;
+        public string GameTextErrorText
+        {
+            get => _gameTextErrorText;
+            set { SetProp(ref _gameTextErrorText, value); }
+        }
+
         bool _hasErrors;
         public bool HasErrors
         {
             get => _hasErrors;
             set { SetProp(ref _hasErrors, value); }
         }
+
         public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
         Dictionary<string, List<string>> _errors = new Dictionary<string, List<string>>();
         public IEnumerable GetErrors(string propertyName)

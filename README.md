@@ -11,7 +11,7 @@ Build v0.1 contains a singleplayer mode with a very stupid AI.
 Build v0.2a is a complete rewrite and contains the alpha of multiplayer mode.
 
 - Current status: Work in progress (taking a break until mid September 2017)
-  - Multiplayer is in alpha. There are some bugs and features are mssing (WIP)
+  - Multiplayer is in alpha. There are some bugs and features are missing (WIP)
   - Singleplayer will be implemented later.
   
 - Known Issues:

@@ -10,6 +10,7 @@
     <UserControl.Resources>
         <converters:BoolVisibilityConverter x:Key="visconv" />
         <converters:BoolInverter x:Key="boolinv" />
+        <converters:StringVisibilityConverter x:Key="strVisConv" />
     </UserControl.Resources>
     <Border
         CornerRadius="4" BorderBrush="White" BorderThickness="2"
@@ -113,7 +114,7 @@
                             PasswordChanged="PasswordBox_PasswordChanged" Foreground="Yellow" Margin="3"
                             KeyUp="TextBox_KeyUp"
                             />
-                        <TextBlock Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="1" Text="{Binding ErrorText}" Foreground="Red" Visibility="{Binding HasErrors, Converter={StaticResource visconv}}" Margin="3,0,3,0" />
+                        <TextBlock Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="1" Text="{Binding ErrorText}" Foreground="Red" Visibility="{Binding ErrorText, Converter={StaticResource strVisConv}}" Margin="3,0,3,0" />
                         <Button
                             Grid.Row="4" Grid.Column="0" Content="Cancel" Margin="3" Command="{Binding CancelLoginCommand}"/>
                         <Button
@@ -132,15 +133,20 @@
                 </Grid>
                 <Grid
                     Grid.Row="4">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="80" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="65" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="New Game" Margin="3,0,0,0" VerticalAlignment="Center" />
-                    <TextBox   Grid.Column="1" Text="{Binding NewGameText, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,3,0" VerticalAlignment="Stretch" IsEnabled="{Binding IsCreatingGame, Converter={StaticResource boolinv}}" />
-                    <Button    Grid.Column="2" Content="Create" Margin="0,0,3,0" FontSize="14" VerticalAlignment="Stretch"
+                    <TextBlock Grid.Column="0" Grid.Row="0" Text="New Game" Margin="3,0,0,0" VerticalAlignment="Center" />
+                    <TextBox   Grid.Column="1" Grid.Row="0" Text="{Binding NewGameText, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,3,0" VerticalAlignment="Stretch" IsEnabled="{Binding IsCreatingGame, Converter={StaticResource boolinv}}" />
+                    <Button    Grid.Column="2" Grid.Row="0" Content="Create" Margin="0,0,3,0" FontSize="14" VerticalAlignment="Stretch"
                                Command="{Binding CreateNetworkGameCommand}"/>
+                    <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding GameTextErrorText}" Foreground="Red" Visibility="{Binding GameTextErrorText, Converter={StaticResource strVisConv}}" Margin="3,0,3,0" />
                 </Grid>
                 <Button
                     Grid.Row="5" Content="Back" Margin="3" Command="{Binding ShowWelcomeMenuCommand}"/>
