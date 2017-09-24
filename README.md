@@ -22,6 +22,7 @@ Build v0.2a is a complete rewrite and contains the alpha of multiplayer mode.
   - Game might screw up if one client disconnects
   - No indication which cards can be seen by opponent (fixed in code)
   - Created game is not joined if Non-ASCII characters were used for its name (WIP)
+  - Rematch does not work sometimes
 
 I do not accept pull requests until I have released the first fully working version.
 

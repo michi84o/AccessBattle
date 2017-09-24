@@ -69,7 +69,7 @@ namespace AccessBattle.Networking
             }
             catch (Exception e)
             {
-                Log.WriteLine(_className + ": Error sending data: " + e.Message);
+                Log.WriteLine(LogPriority.Error, _className + ": Error sending data: " + e.Message);
                 return false;
             }
         }

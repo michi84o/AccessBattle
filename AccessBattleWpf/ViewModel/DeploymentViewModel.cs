@@ -42,14 +42,14 @@ namespace AccessBattle.Wpf.ViewModel
                         var card = ParentViewModel.Game.BoardFieldVm[x, y].Field.Card as OnlineCard;
                         if (card == null)
                         {
-                            Log.WriteLine("A card is missing at field " + x + "," + y);
+                            Log.WriteLine(LogPriority.Warning, "A card is missing at field " + x + "," + y);
                             return;
                         }
                         cmd.Append(card.Type == OnlineCardType.Link ? "L" : "V");
                     }
                     ParentViewModel.IsBusy = true;
                     var result = await ParentViewModel.Game.Client.SendGameCommand(ParentViewModel.Game.UID, cmd.ToString());
-                    if (!result) Log.WriteLine("DeploymentViewModel: Sending game command failed!");
+                    if (!result) Log.WriteLine(LogPriority.Error, "DeploymentViewModel: Sending game command failed!");
                     else ParentViewModel.CurrentMenu = MenuType.None;
                 }
                 catch (Exception)

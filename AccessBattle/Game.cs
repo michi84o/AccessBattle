@@ -190,6 +190,20 @@ namespace AccessBattle
         }
 
         /// <summary>
+        /// Instantly ends game. Used for debugging.
+        /// </summary>
+        /// <param name="player"></param>
+        public void Win(int player)
+        {
+            if (player == 1)
+                Phase = GamePhase.Player1Win;
+            else if (player == 2)
+                Phase = GamePhase.Player2Win;
+            else
+                Phase = GamePhase.Aborted;
+        }
+
+        /// <summary>
         /// Command      Syntax             Example
         /// -------------------------------------------
         /// Move         mv x1,y1,x2,y2     mv 0,0,1,0
@@ -552,7 +566,7 @@ namespace AccessBattle
             // Stack can never be full. If more than 6 cards are on the stack, the game is over
             if (stackpos == -1)
             {
-                Log.WriteLine("Game Error! Card cannot be put on stack because it is full");
+                Log.WriteLine(LogPriority.Error, "Game Error! Card cannot be put on stack because it is full");
                 return; // TODO: GAME OVER
             }
             Board[stackpos, y].Card = card;

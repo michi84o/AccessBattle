@@ -95,7 +95,7 @@ namespace AccessBattle.Networking
                 port = 3221; // OSH MK UF A 2010
             }
             _port = port;
-            if (port != 3221) Log.WriteLine("The Organization has made its move! El Psy Congroo");
+            if (port != 3221) Log.WriteLine(LogPriority.Warning, "The Organization has made its move! El Psy Congroo");
         }
 
         /// <summary>
@@ -120,9 +120,9 @@ namespace AccessBattle.Networking
             _serverCts.Cancel();
             _server.Stop();
             try { _serverThread.Join(10000); }
-            catch (Exception e) { Log.WriteLine("Server thread join error: " + e); }
+            catch (Exception e) { Log.WriteLine(LogPriority.Error, "Server thread join error: " + e); }
             try { _serverThread.Abort(); }
-            catch (Exception e) { Log.WriteLine("Server thread abort failed " + e); }
+            catch (Exception e) { Log.WriteLine(LogPriority.Error, "Server thread abort failed " + e); }
             _server = null;
 
             // No try catch here. If this goes wrong we should restart the server.
@@ -176,10 +176,10 @@ namespace AccessBattle.Networking
 
                             var serverCrypto = new CryptoHelper();
                             // Send public key. There is one key-pair for every client!
-                            Log.WriteLine("GameServer: Sending public key...");
+                            Log.WriteLine(LogPriority.Verbose, "GameServer: Sending public key...");
                             if (!Send(serverCrypto.GetPublicKey(), NetworkPacketType.PublicKey, socket))
                             {
-                                Log.WriteLine("GameServer: Sending public key failed! Disconnecting...");
+                                Log.WriteLine(LogPriority.Error, "GameServer: Sending public key failed! Disconnecting...");
                                 socket.Dispose();
                             }
                             else
@@ -204,15 +204,15 @@ namespace AccessBattle.Networking
                     }
                     catch (Exception e)
                     {
-                        Log.WriteLine("GameServer: Unknown exception while waiting for clients: " + e);
+                        Log.WriteLine(LogPriority.Error, "GameServer: Unknown exception while waiting for clients: " + e);
                         continue;
                     }
                 }
-                Log.WriteLine("GameServer: Wait for clients was cancelled.");
+                Log.WriteLine(LogPriority.Warning, "GameServer: Wait for clients was cancelled.");
             }
             catch (ThreadAbortException)
             {
-                Log.WriteLine("GameServer: ListenForClients aborted!");
+                Log.WriteLine(LogPriority.Warning, "GameServer: ListenForClients aborted!");
             }
         }
 
@@ -232,7 +232,7 @@ namespace AccessBattle.Networking
                 if (e.SocketError != SocketError.Success)
                 {
                     // Will be hit after client disconnect
-                    Log.WriteLine("GameServer: Receive for client (UID:" + e.UserToken + ") not successful: " + e.SocketError);
+                    Log.WriteLine(LogPriority.Error, "GameServer: Receive for client (UID:" + e.UserToken + ") not successful: " + e.SocketError);
                     // Remove client...
                     lock(Players)
                     {
@@ -247,7 +247,7 @@ namespace AccessBattle.Networking
                     //Log.WriteLine("GameServer: Received data from client, UID: " + e.UserToken);
                     if (!Players.TryGetValue((uint)e.UserToken, out player))
                     {
-                        Log.WriteLine("GameServer: Client with UID " + e.UserToken + " does not exist");
+                        Log.WriteLine(LogPriority.Warning, "GameServer: Client with UID " + e.UserToken + " does not exist");
                         return;
                     }
                     // Process the packet ======================================
@@ -267,7 +267,7 @@ namespace AccessBattle.Networking
                         }
                         else
                         {
-                            Log.WriteLine("GameServer: Could not parse packet!");
+                            Log.WriteLine(LogPriority.Error, "GameServer: Could not parse packet!");
                         }
                     }
                     // =========================================================
@@ -311,7 +311,6 @@ namespace AccessBattle.Networking
             return false;
         }
 
-
         void KickPlayerOut(NetworkPlayer player, uint uid)
         {
             try
@@ -320,6 +319,18 @@ namespace AccessBattle.Networking
                 Send(JsonConvert.SerializeObject(ans, _serializerSettings), NetworkPacketType.ExitGame, player.Connection, player.ClientCrypto);
             }
             catch (Exception)  { return; }
+        }
+
+        public void Win(int player, uint key)
+        {
+            NetworkGame game;
+            NetworkPlayer p1, p2;
+            if (!GetGameAndPlayers(key, out game, out p1, out p2)) return;
+            game.Win(player);
+            var syncP1 = GameSync.FromGame(game, game.UID, 1);
+            var syncP2 = GameSync.FromGame(game, game.UID, 2);
+            Send(JsonConvert.SerializeObject(syncP1, _serializerSettings), NetworkPacketType.GameSync, p1.Connection, p1.ClientCrypto);
+            Send(JsonConvert.SerializeObject(syncP2, _serializerSettings), NetworkPacketType.GameSync, p2.Connection, p2.ClientCrypto);
         }
 
         /// <summary>
@@ -336,7 +347,7 @@ namespace AccessBattle.Networking
                 data = player.ServerCrypto.Decrypt(packet.Data);
                 if (data == null)
                 {
-                    Log.WriteLine("GameServer: Error! Could not decrypt message of client " + player.UID);
+                    Log.WriteLine(LogPriority.Error, "GameServer: Error! Could not decrypt message of client " + player.UID);
                     // TODO: Notify client or close connection?
                     return;
                 }
@@ -344,7 +355,7 @@ namespace AccessBattle.Networking
 
             if (packet.PacketType > NetworkPacketType.ClientLogin && !player.IsLoggedIn)
             {
-                Log.WriteLine("GameServer: Player " + player.UID + " is not logged it but tried to send packet of type " + packet.PacketType + ". Packet is ignored!");
+                Log.WriteLine(LogPriority.Information, "GameServer: Player " + player.UID + " is not logged it but tried to send packet of type " + packet.PacketType + ". Packet is ignored!");
                 return;
             }
 
@@ -353,16 +364,16 @@ namespace AccessBattle.Networking
                 case NetworkPacketType.PublicKey:
                     try
                     {
-                        Log.WriteLine("GameServer: Received public key of player " + player.UID);
+                        Log.WriteLine(LogPriority.Debug, "GameServer: Received public key of player " + player.UID);
                         player.ClientCrypto = new CryptoHelper(Encoding.ASCII.GetString(data));
                     }
                     catch (Exception ex)
                     {
-                        Log.WriteLine("GameServer: Received public key of player " + player.UID + " is invalid! " + ex.Message);
+                        Log.WriteLine(LogPriority.Warning, "GameServer: Received public key of player " + player.UID + " is invalid! " + ex.Message);
                     }
                     break;
                 case NetworkPacketType.ListGames:
-                    Log.WriteLine("GameServer: Player " + player.UID + " requesting game list");
+                    Log.WriteLine(LogPriority.Debug, "GameServer: Player " + player.UID + " requesting game list");
                     var glist = Games.Select(kv => kv.Value).Where(v => v.Phase == GamePhase.WaitingForPlayers && v.Players[1].Player == null && v.UID != 0).ToList();
                     var info = new List<GameInfo>();
                     foreach (var game in glist)
@@ -380,7 +391,7 @@ namespace AccessBattle.Networking
                         {
                             player.Name = login.Name.ToUpper();
                             player.IsLoggedIn = true;
-                            Log.WriteLine("GameServer: Player " + (player.Name ?? "?") + " (" + player.UID + ") logged in successfully!");
+                            Log.WriteLine(LogPriority.Verbose, "GameServer: Player " + (player.Name ?? "?") + " (" + player.UID + ") logged in successfully!");
                             // TODO Check AcceptAnyClient variable and compare with whitelist
                             Send(new byte[] { 0 }, NetworkPacketType.ClientLogin, player.Connection, player.ClientCrypto);
                         }
@@ -389,7 +400,7 @@ namespace AccessBattle.Networking
                     }
                     catch (Exception ex)
                     {
-                        Log.WriteLine("GameServer: Received login of player " + player.UID + " could not be read!" + ex.Message);
+                        Log.WriteLine(LogPriority.Error, "GameServer: Received login of player " + player.UID + " could not be read!" + ex.Message);
                     }
                     break;
                 case NetworkPacketType.CreateGame:
@@ -398,7 +409,7 @@ namespace AccessBattle.Networking
                         var ginfo = JsonConvert.DeserializeObject<GameInfo>(Encoding.ASCII.GetString(data));
                         if (ginfo != null)
                         {
-                            Log.WriteLine("GameServer: Received CreateGame packet from player " + player.UID + ": [" + ginfo.Name.ToUpper() + "/" + ginfo.UID + "/" + ginfo.Player1.ToUpper() + "]");
+                            Log.WriteLine(LogPriority.Debug, "GameServer: Received CreateGame packet from player " + player.UID + ": [" + ginfo.Name.ToUpper() + "/" + ginfo.UID + "/" + ginfo.Player1.ToUpper() + "]");
                             uint uid;
                             lock (Games)
                             {
@@ -408,6 +419,7 @@ namespace AccessBattle.Networking
                                 game.Players[0].Name = player.Name; // Ignore name from packet or people start faking names
                                 game.Name = ginfo.Name.ToUpper();
                                 Games.Add(uid, game);
+                                Log.WriteLine(LogPriority.Information, "GameServer: Player " + player.UID + " created game " + game.UID + " ("+ ginfo.Name +")");
                                 player.CurrentGame = game;
                             }
                             ginfo.UID = uid;
@@ -415,12 +427,12 @@ namespace AccessBattle.Networking
                         }
                         else
                         {
-                            Log.WriteLine("GameServer: Received CreateGame packet of player " + player.UID + " could not be read!");
+                            Log.WriteLine(LogPriority.Error, "GameServer: Received CreateGame packet of player " + player.UID + " could not be read!");
                         }
                     }
                     catch (Exception ex)
                     {
-                        Log.WriteLine("GameServer: Received CreateGame packet of player " + player.UID + " could not be read! " + ex.Message);
+                        Log.WriteLine(LogPriority.Debug, "GameServer: Received CreateGame packet of player " + player.UID + " could not be read! " + ex.Message);
                     }
                     break;
                 case NetworkPacketType.JoinGame:
@@ -475,7 +487,7 @@ namespace AccessBattle.Networking
                                     }
                                     else
                                     {
-                                        Log.WriteLine("GameServer: Joining player 2 (" + p2.UID + ") for game " + game.UID + " failed!");
+                                        Log.WriteLine(LogPriority.Error, "GameServer: Joining player 2 (" + p2.UID + ") for game " + game.UID + " failed!");
                                     }
                                 }
                             }
@@ -484,7 +496,7 @@ namespace AccessBattle.Networking
                                 if (player == p1)
                                 {
                                     // Notify p2
-                                    if (p2 == null) Log.WriteLine("GameServer: Player " + player.UID + " sent a decline join, but there is no second player!");
+                                    if (p2 == null) Log.WriteLine(LogPriority.Warning, "GameServer: Player " + player.UID + " sent a decline join, but there is no second player!");
                                     else
                                     {
                                         game.JoinPlayer(p2, false);
@@ -505,7 +517,7 @@ namespace AccessBattle.Networking
                     }
                     catch (Exception ex)
                     {
-                        Log.WriteLine("GameServer: Received JoinGame packet of player " + player.UID + " could not be read! " + ex.Message);
+                        Log.WriteLine(LogPriority.Error, "GameServer: Received JoinGame packet of player " + player.UID + " could not be read! " + ex.Message);
                     }
                     break;
                 case NetworkPacketType.ExitGame:
@@ -538,7 +550,7 @@ namespace AccessBattle.Networking
                     }
                     catch (Exception ex)
                     {
-                        Log.WriteLine("GameServer: Received ExitGame packet of player " + player.UID + " could not be read! " + ex.Message);
+                        Log.WriteLine(LogPriority.Error, "GameServer: Received ExitGame packet of player " + player.UID + " could not be read! " + ex.Message);
                     }
                     break;
                 case NetworkPacketType.Rematch:
@@ -572,7 +584,7 @@ namespace AccessBattle.Networking
                     }
                     catch (Exception ex)
                     {
-                        Log.WriteLine("GameServer: Received Rematch packet of player " + player.UID + " could not be read! " + ex.Message);
+                        Log.WriteLine(LogPriority.Error, "GameServer: Received Rematch packet of player " + player.UID + " could not be read! " + ex.Message);
                     }
                     break;
                 case NetworkPacketType.GameCommand:
@@ -610,7 +622,7 @@ namespace AccessBattle.Networking
                     }
                     catch (Exception ex)
                     {
-                        Log.WriteLine("GameServer: Received GameCommand packet of player " + player.UID + " could not be read! " + ex.Message);
+                        Log.WriteLine(LogPriority.Error, "GameServer: Received GameCommand packet of player " + player.UID + " could not be read! " + ex.Message);
                     }
                     break;
                 default:

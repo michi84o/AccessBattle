@@ -22,6 +22,16 @@ namespace AccessBattle
         File
     }
 
+    public enum LogPriority
+    {
+        Debug = 0,
+        Verbose,
+        Information,
+        Warning,
+        Error,
+        Critical
+    }
+
     // TODO: Implement mode file, use TraceSource class
     /// <summary>
     /// Helper class for logging error and debug messages.
@@ -29,6 +39,8 @@ namespace AccessBattle
     public static class Log
     {
         private static LogMode Mode = LogMode.Debug;
+
+        public static LogPriority Priority = LogPriority.Verbose;
 
         /// <summary>
         /// Set logging mode.
@@ -43,8 +55,10 @@ namespace AccessBattle
         /// <summary>
         /// Adds a new line to the log.
         /// </summary>
-        public static void WriteLine()
+        /// <param name="prio">Log priority.</param>
+        public static void WriteLine(LogPriority prio)
         {
+            if (prio < Priority) return;
             switch (Mode)
             {
                 case LogMode.Console: Console.WriteLine(); break;
@@ -58,8 +72,10 @@ namespace AccessBattle
         /// Writes a line to the log.
         /// </summary>
         /// <param name="message">Message to write.</param>
-        public static void WriteLine(string message)
+        /// <param name="prio">Log priority.</param>
+        public static void WriteLine(LogPriority prio, string message)
         {
+            if (prio < Priority) return;
             switch (Mode)
             {
                 case LogMode.Console: Console.WriteLine(message); break;
@@ -74,8 +90,10 @@ namespace AccessBattle
         /// </summary>
         /// <param name="format">Format string with message to write.</param>
         /// <param name="args">Values for format string.</param>
-        public static void WriteLine(string format, params object[] args)
+        /// <param name="prio">Log priority.</param>
+        public static void WriteLine(LogPriority prio, string format, params object[] args)
         {
+            if (prio < Priority) return;
             switch (Mode)
             {
                 case LogMode.Console: Console.WriteLine(format, args); break;
@@ -89,8 +107,10 @@ namespace AccessBattle
         /// Writes a message to the log.
         /// </summary>
         /// <param name="message">Message to write.</param>
-        public static void Write(string message)
+        /// <param name="prio">Log priority.</param>
+        public static void Write(LogPriority prio, string message)
         {
+            if (prio < Priority) return;
             switch (Mode)
             {
                 case LogMode.Console: Console.Write(message); break;
@@ -105,8 +125,10 @@ namespace AccessBattle
         /// </summary>
         /// <param name="format">Format string with message to write.</param>
         /// <param name="args">Values for format string.</param>
-        public static void Write(string format, params object[] args)
+        /// <param name="prio">Log priority.</param>
+        public static void Write(LogPriority prio, string format, params object[] args)
         {
+            if (prio < Priority) return;
             switch (Mode)
             {
                 case LogMode.Console: Console.Write(format, args); break;

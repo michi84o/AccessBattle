@@ -75,7 +75,7 @@ namespace AccessBattle.Networking
         /// </summary>
         public void PlayTurn()
         {
-            Log.WriteLine("Network Player with UID " + UID + " requested to play turn");
+            Log.WriteLine(LogPriority.Debug, "Network Player with UID " + UID + " requested to play turn");
             // TODO
         }
 
