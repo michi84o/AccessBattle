@@ -12,7 +12,7 @@ I do not accept pull requests until I have released the first fully working vers
 Build v0.1 contains a singleplayer mode with a very stupid AI.
 Build v0.3a is a complete rewrite and contains the alpha of multiplayer mode.
 
-- Current status: Work in progress (taking a break until mid September 2017)
+- Current status: Work in progress
   - Multiplayer is in alpha. There are some bugs and features are missing (WIP)
   - Singleplayer will be implemented later.
   
