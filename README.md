@@ -18,7 +18,7 @@ Build v0.3a is a complete rewrite and contains the alpha of multiplayer mode.
   - Singleplayer: April 2018
   - Documentation: August 2018 (only if I see someone actually using this code)
   
-  - Known Issues:
+- Known Issues:
   - Server has no user management yet. Any client is accepted, no passwords.
   - It is currently not possible to leave a game
   - Game might screw up if one client disconnects
