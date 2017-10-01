@@ -6,9 +6,6 @@ by the Japanese company '5pb.'.
 AccessBattle is a private fan project and not affiliated with
 '5pb.' in any way.
 
-It is still in development. 
-I do not accept pull requests until I have released the first fully working version.
-
 Build v0.1 contains a singleplayer mode with a very stupid AI.
 Build v0.3a is a complete rewrite and contains the alpha of multiplayer mode.
 
@@ -16,7 +13,12 @@ Build v0.3a is a complete rewrite and contains the alpha of multiplayer mode.
   - Multiplayer is in alpha. There are some bugs and features are missing (WIP)
   - Singleplayer will be implemented later.
   
-- Known Issues:
+- Roadmap
+  - User Interface + Multiplayer finished: January 2018
+  - Singleplayer: April 2018
+  - Documentation: August 2018 (only if I see someone actually using this code)
+  
+  - Known Issues:
   - Server has no user management yet. Any client is accepted, no passwords.
   - It is currently not possible to leave a game
   - Game might screw up if one client disconnects
@@ -40,6 +42,10 @@ This program uses the following external sources.
 - Newtonsoft.Json by James Newton-King
 
 Warning! This program uses encryption for the connection to the server. Please check if this is legal in your country before using this program.
+
+This software is GPL v3 licensed! If you use any of the code you must release your code under GPL v3 as well.
+I'm NOT taking donations of any kind.
+I do not accept pull requests until I have released version 1.0.
 
 Special thanks:
 5pb. and Nitroplus for creating Steins;Gate

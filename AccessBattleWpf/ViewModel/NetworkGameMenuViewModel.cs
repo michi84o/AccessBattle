@@ -1,6 +1,5 @@
 ﻿using AccessBattle.Networking;
 using AccessBattle.Networking.Packets;
-using AccessBattle.Wpf.Extensions;
 using AccessBattle.Wpf.Interfaces;
 using System;
 using System.Collections;

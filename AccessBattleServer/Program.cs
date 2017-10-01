@@ -26,7 +26,9 @@ namespace AccessBattleServer
 
             try
             {
-                _server = new GameServer();
+                var userDb = new TextFileUserDatabaseProvider("userdb.txt");
+
+                _server = new GameServer(userDatabase: userDb);
                 _server.Start();
 
                 Console.WriteLine("Game Server started");
@@ -34,14 +36,16 @@ namespace AccessBattleServer
                 string line;
                 while ((line = Console.ReadLine()) != "exit")
                 {
+                    bool ok = false;
                     line = line.Trim();
                     if (line == ("list"))
                     {
                         var games = _server.Games.ToList();
                         foreach (var game in games)
                             Console.WriteLine(game.Key + " - " + game.Value.Name);
+                        ok = true;
                     }
-                    if (line.StartsWith("debug ", StringComparison.Ordinal))
+                    else if (line.StartsWith("debug ", StringComparison.Ordinal))
                     {
                         var sp = line.Split(' ');
                         if (sp.Length == 4)
@@ -53,7 +57,6 @@ namespace AccessBattleServer
                                 if (spx.Length != 2) continue;
                                 if (spx[0] == "key")
                                 {
-
                                     if (!uint.TryParse(spx[1], out k)) continue;
                                 }
                                 else if (spx[0] == "name")
@@ -64,8 +67,27 @@ namespace AccessBattleServer
                                 int p;
                                 if (!int.TryParse(sp[3], out p)) continue;
                                 _server.Win(p, k);
+                                ok = true;
                             }
                         }
+                    }
+                    else if (line.StartsWith("add user ", StringComparison.Ordinal))
+                    {
+                        var spl = line.Split(' ');
+                        if (spl.Length == 4)
+                        {
+                            var pw = new System.Security.SecureString();
+                            foreach (var c in spl[3]) pw.AppendChar(c);
+                            if (userDb.AddUserAsync(spl[2], pw).GetAwaiter().GetResult())
+                                Console.WriteLine("user added");
+                            else Console.WriteLine("add failed");
+                            ok = true;
+                        }
+                    }
+
+                    if (!ok)
+                    {
+                        Console.WriteLine("error");
                     }
                 }
             }

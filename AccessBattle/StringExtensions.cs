@@ -6,10 +6,15 @@ using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AccessBattle.Wpf.Extensions
+namespace AccessBattle
 {
     public static class StringExtensions
     {
+        /// <summary>
+        /// Converts secure string to unsecure string. Use with caution!
+        /// </summary>
+        /// <param name="securePassword"></param>
+        /// <returns></returns>
         public static string ConvertToUnsecureString(this SecureString securePassword)
         {
             if (securePassword == null)

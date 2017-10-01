@@ -47,6 +47,7 @@
     <Compile Include="Card.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="IBoardGame.cs" />
+    <Compile Include="Networking\IUserDatabaseProvider.cs" />
     <Compile Include="Networking\Packets\GameCommand.cs" />
     <Compile Include="Networking\Packets\GameSync.cs" />
     <Compile Include="IPlayer.cs" />
@@ -70,6 +71,7 @@
     <Compile Include="PlayerState.cs" />
     <Compile Include="PropChangeNotifier.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StringExtensions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
