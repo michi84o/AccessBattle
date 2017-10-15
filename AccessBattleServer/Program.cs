@@ -22,7 +22,7 @@ namespace AccessBattleServer
             // ----------------
 
             bool acceptAny = false;
-            string dbPath = null;
+            string dbPath = "userdb.txt";
 
             // Read command line params
             for (int i = 0; i<args.Length; ++i)
@@ -39,6 +39,7 @@ namespace AccessBattleServer
                 if (arg == "acceptany")
                 {
                     acceptAny = true;
+                    continue;
                 }
                 if (arg.StartsWith("usrdb=", StringComparison.Ordinal))
                 {
@@ -46,6 +47,7 @@ namespace AccessBattleServer
                     if (spl.Length == 2)
                     {
                         dbPath = spl[1].Trim(new[] { '\"' });
+                        continue;
                     }
                     else
                     {
@@ -82,7 +84,7 @@ namespace AccessBattleServer
 
             try
             {
-                var userDb = new TextFileUserDatabaseProvider("userdb.txt");
+                var userDb = new TextFileUserDatabaseProvider(dbPath);
 
                 _server = new GameServer(userDatabase: userDb)
                 {
