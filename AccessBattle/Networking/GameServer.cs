@@ -62,16 +62,24 @@ namespace AccessBattle.Networking
     public class GameServer : NetworkBase
     {
         /// <summary>List of current games.</summary>
-        public Dictionary<uint, NetworkGame> Games { get { return _games; } }
+        public Dictionary<uint, NetworkGame> Games => _games;
 
         /// <summary>List of currently connected players.</summary>
-        public Dictionary<uint, NetworkPlayer> Players { get { return _players; } }
+        public Dictionary<uint, NetworkPlayer> Players => _players;
 
         /// <summary>Network port to use for accepting connections.</summary>
-        public ushort Port { get { return _port; } }
+        public ushort Port => _port;
 
-        /// <summary>If true, any client is accepted. Else the database of registered users is used (TODO: NOT IMPLEMENTED).</summary>
-        public bool AcceptAnyClient { get; set; }
+        bool _acceptAnyClient;
+        /// <summary>
+        /// If true, any client is accepted. Else the database of registered users is used.
+        /// If the user database is null, this will always return true.
+        /// </summary>
+        public bool AcceptAnyClient
+        {
+            get => _acceptAnyClient || _userDatabase == null;
+            set { _acceptAnyClient = value; }
+        }
 
         Thread _serverThread;
         ushort _port;
@@ -175,8 +183,8 @@ namespace AccessBattle.Networking
                         {
                             // Send server info
                             Send(JsonConvert.SerializeObject(
-                                new ServerInfo(AcceptAnyClient), _serializerSettings),
-                                NetworkPacketType.ServerInfo, null);
+                                new ServerInfo(!AcceptAnyClient), _serializerSettings),
+                                NetworkPacketType.ServerInfo, socket, null);
 
                             var serverCrypto = new CryptoHelper();
                             // Send public key. There is one key-pair for every client!
@@ -342,6 +350,7 @@ namespace AccessBattle.Networking
         /// </summary>
         /// <param name="packet"></param>
         /// <param name="player"></param>
+        // TODO: Convert to async Task
         void ProcessPacket(NetworkPacket packet, NetworkPlayer player)
         {
             // Decrypt data
@@ -393,10 +402,27 @@ namespace AccessBattle.Networking
                         var login = JsonConvert.DeserializeObject<Login>(Encoding.ASCII.GetString(data));
                         if (login?.Name?.Length > 0)
                         {
+                            // TODO Check AcceptAnyClient variable and compare with whitelist
+                            if (!AcceptAnyClient)
+                            {
+                                var loginResult = _userDatabase.CheckLoginAsync(login.Name, login.Password?.ConvertToSecureString()).GetAwaiter().GetResult(); // TODO: Change to async call later
+                                if (loginResult != 0)
+                                {
+                                    Send(new byte[] { loginResult }, NetworkPacketType.ClientLogin, player.Connection, player.ClientCrypto);
+
+                                    // Disabled this. Would be a dick move to disconnect when a user mistyped his login.
+                                    //lock (Players)
+                                    //{
+                                    //    Players.Remove(player.UID);
+                                    //    player.Connection?.Close();
+                                    //    return;
+                                    //}
+                                }
+                            }
+
                             player.Name = login.Name.ToUpper();
                             player.IsLoggedIn = true;
                             Log.WriteLine(LogPriority.Verbose, "GameServer: Player " + (player.Name ?? "?") + " (" + player.UID + ") logged in successfully!");
-                            // TODO Check AcceptAnyClient variable and compare with whitelist
                             Send(new byte[] { 0 }, NetworkPacketType.ClientLogin, player.Connection, player.ClientCrypto);
                         }
                         else

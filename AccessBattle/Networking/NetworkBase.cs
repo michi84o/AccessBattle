@@ -54,6 +54,7 @@ namespace AccessBattle.Networking
         /// <param name="connection">Connection to use.</param>
         /// <param name="encrypter">Optional encryptor.</param>
         /// <returns>True if send was successful.</returns>
+        // TODO: Convert to async Task<bool>
         protected bool Send(byte[] message, byte packetType, Socket connection, CryptoHelper encrypter = null)
         {
             if (connection == null || !connection.Connected || message == null)
@@ -81,7 +82,7 @@ namespace AccessBattle.Networking
         /// <param name="token">A token to identify the right event. Receive_Completed events with other tokens can be ignored.</param>
         protected void ReceiveAsync(Socket connection, uint token)
         {
-            if (connection == null) return;
+            if (connection?.Connected != true) return;
             var buffer = new byte[256];
             var args = new SocketAsyncEventArgs();
             args.SetBuffer(buffer, 0, buffer.Length);
@@ -92,10 +93,11 @@ namespace AccessBattle.Networking
             {
                 connection.ReceiveAsync(args);
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 // object disposed exception when connection is closed
-                // TODO: Close connection ???
+                // Should not be hit since we check that in the first line
+                Log.WriteLine(LogPriority.Error, _className + ": Error while setting up async receive: " + e.Message);
                 return;
             }
         }

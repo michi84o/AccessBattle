@@ -21,6 +21,62 @@ namespace AccessBattleServer
             //Console.WriteLine(PasswordHasher.VerifyHash("passw0rd", hash, salt));
             // ----------------
 
+            bool acceptAny = false;
+            string dbPath = null;
+
+            // Read command line params
+            for (int i = 0; i<args.Length; ++i)
+            {
+                var arg = args[i];
+                if (!arg.StartsWith("-", StringComparison.Ordinal) && !arg.StartsWith("/", StringComparison.Ordinal))
+                {
+                    Console.WriteLine("Parameters must start with '-' or '/'. Use '-?' to show help.");
+                    return;
+                }
+                if (arg.Length == 1) continue;
+                arg = arg.Substring(1, arg.Length - 1);
+
+                if (arg == "acceptany")
+                {
+                    acceptAny = true;
+                }
+                if (arg.StartsWith("usrdb=", StringComparison.Ordinal))
+                {
+                    var spl = arg.Split('=');
+                    if (spl.Length == 2)
+                    {
+                        dbPath = spl[1].Trim(new[] { '\"' });
+                    }
+                    else
+                    {
+                        Console.WriteLine("Error in parameter 'usrdb'");
+                        return;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine(
+                        "Access Battle Server\r\n\r\n" +
+                        "Usage: AccessBattleServer [-acceptany] [-usrdb=path]\r\n" +
+                        "\r\nOptions:\r\n" +
+                        "\t-acceptany    Accepts any client. Disables user database.\r\n" +
+                        "\t              Clients require no password.\r\n" +
+                        "\t-usrdb=path   Path to text file for user database.\r\n" +
+                        "\t              default path is '.\\userdb.txt'.\r\n" +
+                        "\r\nUsing '/' instead of '-' is allowed.\r\n" +
+                        "\r\nCommands:\r\n" +
+                        "\tlist          List all games\r\n" +
+                        "\tadd user n p  Adds user 'u' with password 'p'\r\n" +
+                        "\t              to the user database\r\n" +
+                        "\tdebug         Debug command. Requires additional parameters.\r\n" +
+                        "\t  win key=1234   1    Let player 1 win. Uses game key.\r\n" +
+                        "\t  win name=gameX 2    Let player 2 win. Uses game name.\r\n" +
+                        "\r\nCurrently only a text based database is supported."
+                        );
+                    return;
+                }
+            }
+
             Log.SetMode(LogMode.Console);
             Log.Priority = LogPriority.Information;
 
@@ -28,10 +84,15 @@ namespace AccessBattleServer
             {
                 var userDb = new TextFileUserDatabaseProvider("userdb.txt");
 
-                _server = new GameServer(userDatabase: userDb);
+                _server = new GameServer(userDatabase: userDb)
+                {
+                    AcceptAnyClient = acceptAny
+                };
                 _server.Start();
 
                 Console.WriteLine("Game Server started");
+                if (acceptAny)
+                    Console.WriteLine("! Any client is accepted");
 
                 string line;
                 while ((line = Console.ReadLine()) != "exit")

@@ -681,7 +681,8 @@ namespace AccessBattle.Networking
             var data = packet.Data;
             if (data != null && data.Length > 0 && packet.PacketType != NetworkPacketType.PublicKey)
             {
-                data = _decrypter.Decrypt(packet.Data);
+                if (packet.PacketType != NetworkPacketType.ServerInfo)
+                    data = _decrypter.Decrypt(packet.Data);
                 if (data == null)
                 {
                     Log.WriteLine(LogPriority.Error, "NetworkGameClient: Error! Could not decrypt message from server");
@@ -701,7 +702,11 @@ namespace AccessBattle.Networking
                         _encrypter = null;
                         Log.WriteLine(LogPriority.Error, "NetworkGameClient: Received key is invalid! " + ex.Message);
                     }
-                    finally { _encrypterWaiter?.Cancel(); }
+#pragma warning disable RECS0022 // A catch clause that catches System.Exception and has an empty body
+#pragma warning disable CC0004 // Catch block cannot be empty
+                    finally { try { _encrypterWaiter?.Cancel(); } catch { /* Ignore*/ } }
+#pragma warning restore CC0004 // Catch block cannot be empty
+#pragma warning restore RECS0022 // A catch clause that catches System.Exception and has an empty body
                     break;
                 case NetworkPacketType.ListGames:
                     try
@@ -730,6 +735,7 @@ namespace AccessBattle.Networking
                             var error = "NetworkGameClient: Login to server failed! ";
                             if (data[0] == 1) error += "Invalid user name";
                             else if (data[0] == 2) error += "Invalid password";
+                            else if (data[0] == 3) error += "Database error";
                             else error += "Unknown error";
                         }
                         LoggedIn?.Invoke(this, new LoggedInEventArgs(IsLoggedIn == true));

@@ -17,9 +17,11 @@ Build v0.3a is a complete rewrite and contains the alpha of multiplayer mode.
   - User Interface + Multiplayer finished: January 2018
   - Singleplayer: April 2018
   - Documentation: August 2018 (only if I see someone actually using this code)
+  - Sorry if this is taking so long. I have a full time job and not much free time.
   
 - Known Issues:
-  - Server has no user management yet. Any client is accepted, no passwords.
+  - v0.3a has no user management. Simple text file user management comes with versiom v0.4a
+  - Same user can login multiple times. Not sure if bug or feature.
   - It is currently not possible to leave a game
   - Game might screw up if one client disconnects
   - Rematch does not work sometimes
@@ -44,7 +46,9 @@ This program uses the following external sources.
 Warning! This program uses encryption for the connection to the server. Please check if this is legal in your country before using this program.
 
 This software is GPL v3 licensed! If you use any of the code you must release your code under GPL v3 as well.
+
 I'm NOT taking donations of any kind.
+
 I do not accept pull requests until I have released version 1.0.
 
 Special thanks:

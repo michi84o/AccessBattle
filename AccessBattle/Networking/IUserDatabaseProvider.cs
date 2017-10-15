@@ -29,8 +29,8 @@ namespace AccessBattle.Networking
         /// </summary>
         /// <param name="user"></param>
         /// <param name="password"></param>
-        /// <returns></returns>
-        Task<bool> CheckLoginAsync(string user, SecureString password);
+        /// <returns>0: Login OK. 1: Invalid user name. 2: Invalid Password. 3: Database Error.</returns>
+        Task<byte> CheckLoginAsync(string user, SecureString password);
 
         /// <summary>
         /// Checks if a user must change his password on next login.
@@ -96,8 +96,9 @@ namespace AccessBattle.Networking
                 string hash, salt;
                 if (!PasswordHasher.GetNewHash(password.ConvertToUnsecureString(), out hash, out salt)) return false;
 
-                allText += user + " " + hash + " " + salt + " 1";
+                allText += user + " " + hash + " " + salt + " 1\n";
 
+                allText.Replace("\n", "\r\n");
                 await Task.Run(() => { File.WriteAllText(_databaseFile, allText); });
 
                 return true;
@@ -109,17 +110,26 @@ namespace AccessBattle.Networking
             finally { semaphoreSlim.Release(); }
         }
 
+        const byte LoginOK = 0;
+        const byte InvalidUser = 1;
+        const byte InvalidPassword = 2;
+        const byte DatabaseError = 3;
+
         /// <summary>
         ///
         /// </summary>
         /// <param name="user"></param>
         /// <param name="password"></param>
-        /// <returns></returns>
-        public async Task<bool> CheckLoginAsync(string user, SecureString password)
+        /// <returns>0: Login OK. 1: Invalid user name. 2: Invalid Password. 3: Database Error.</returns>
+        public async Task<byte> CheckLoginAsync(string user, SecureString password)
         {
             user = user.Trim();
-            if (user.Any(c => c == ' ')) return false;
-            if (!File.Exists(_databaseFile)) return false;
+            if (user.Any(c => c == ' ')) return InvalidUser;
+            if (!File.Exists(_databaseFile))
+            {
+                Log.WriteLine(LogPriority.Error, "Error in text file user database: File does not exist!");
+                return DatabaseError;
+            }
             await semaphoreSlim.WaitAsync();
             try
             {
@@ -128,21 +138,23 @@ namespace AccessBattle.Networking
                 {
                     allText = File.ReadAllText(_databaseFile);
                 });
-                if (allText == null) return false;
+                if (allText == null) return DatabaseError;
 
                 // Check if there is a line that starts with username
                 allText = allText.Replace("\r", "").Replace("\t", "");
                 var lines = allText.Split('\n');
                 var line = lines.FirstOrDefault(l => l.StartsWith(user + " ", StringComparison.Ordinal));
-                if (string.IsNullOrEmpty(line)) return false;
+                if (string.IsNullOrEmpty(line)) return InvalidUser;
                 var linespl = line.Split(' ');
-                if (linespl.Length != 4) return false;
-                if (linespl[0] != user) return false;
-                return PasswordHasher.VerifyHash(password.ConvertToUnsecureString(), linespl[1], linespl[2]);
+                if (linespl.Length != 4) return DatabaseError;
+                if (linespl[0] != user) return DatabaseError;
+                if (PasswordHasher.VerifyHash(password.ConvertToUnsecureString(), linespl[1], linespl[2])) return LoginOK;
+                return InvalidPassword;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return false;
+                Log.WriteLine(LogPriority.Error, "Error in text file user database: " + e);
+                return DatabaseError;
             }
             finally { semaphoreSlim.Release(); }
         }
@@ -177,6 +189,8 @@ namespace AccessBattle.Networking
                     if (!str.StartsWith(user + " ", StringComparison.Ordinal))
                         sb.Append(str + "\n");
                 }
+
+                allText.Replace("\n", "\r\n");
 
                 await Task.Run(() => { File.WriteAllText(_databaseFile, sb.ToString()); });
 

@@ -425,6 +425,7 @@ namespace AccessBattle.Wpf.ViewModel
                         _gameListUpdateTimer.Change(0, System.Threading.Timeout.Infinite);
                     }
                     CommandManager.InvalidateRequerySuggested();
+                    // TODO: We must check if the server is still connected. There is currently no feedback. This must be done directly on the socket.
                 }, o => !string.IsNullOrEmpty(LoginName) && IsLoggingIn && ParentViewModel.Game.Client.IsConnected == true && !_sendingLogin && !HasPropError(nameof(LoginName)) && !HasPropError(nameof(LoginPassword)));
             }
         }

@@ -31,5 +31,20 @@ namespace AccessBattle
                 Marshal.ZeroFreeGlobalAllocUnicode(unmanagedString);
             }
         }
+
+        /// <summary>
+        /// Converts string to secure string. Use with caution!
+        /// </summary>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        public static SecureString ConvertToSecureString(this string password)
+        {
+            var secStr = new SecureString();
+            foreach (char c in password)
+            {
+                secStr.AppendChar(c);
+            }
+            return secStr;
+        }
     }
 }
