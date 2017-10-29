@@ -7,7 +7,7 @@ AccessBattle is a private fan project and not affiliated with
 '5pb.' in any way.
 
 Build v0.1 contains a singleplayer mode with a very stupid AI.
-Build v0.3a is a complete rewrite and contains the alpha of multiplayer mode.
+Build v0.3a+ is a complete rewrite and contains the alpha of multiplayer mode.
 
 - Current status: Work in progress
   - Multiplayer is in alpha. There are some bugs and features are missing (WIP)
@@ -25,6 +25,11 @@ Build v0.3a is a complete rewrite and contains the alpha of multiplayer mode.
   - It is currently not possible to leave a game
   - Game might screw up if one client disconnects
   - Rematch does not work sometimes
+  
+- TODO
+  - Interface for user databse plugins
+  
+![Screenshot of client](Images/screenshot1.png)
 
 The main game engine is inside a separate DLL so that people
 can program their own user interface for it. The DLL should
