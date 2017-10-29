@@ -6,6 +6,8 @@ by the Japanese company '5pb.'.
 AccessBattle is a private fan project and not affiliated with
 '5pb.' in any way.
 
+![Screenshot of client](Images/screenshot1.png)
+
 Build v0.1 contains a singleplayer mode with a very stupid AI.
 Build v0.3a+ is a complete rewrite and contains the alpha of multiplayer mode.
 
@@ -28,8 +30,6 @@ Build v0.3a+ is a complete rewrite and contains the alpha of multiplayer mode.
   
 - TODO
   - Interface for user databse plugins
-  
-![Screenshot of client](Images/screenshot1.png)
 
 The main game engine is inside a separate DLL so that people
 can program their own user interface for it. The DLL should
