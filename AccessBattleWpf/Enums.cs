@@ -23,6 +23,7 @@ namespace AccessBattle.Wpf
         Firewall   = 0x100,
         Flipped    = 0x200,
         LBoostStat = 0x400, // Static LineBoost display (for menu)
+        ExitGame   = 0x800  // Hyperdimension Neptunia
     }
 
     /// <summary>

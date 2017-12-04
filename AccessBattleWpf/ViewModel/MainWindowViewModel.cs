@@ -237,6 +237,9 @@ namespace AccessBattle.Wpf.ViewModel
                         case "Error404":
                             _game.HandleActionItem(ActionItem.Error404);
                             break;
+                        case "ExitGame":
+                            MessageBox.Show("Exit Game was not implemented yet.");
+                            break;
                         default:
                             break;
                     }

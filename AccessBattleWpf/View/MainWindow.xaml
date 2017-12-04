@@ -482,9 +482,11 @@
                 Style="{StaticResource MainField}" FieldBackground="{Binding IsPlayerHost, Converter={StaticResource HostColConvMain}}"/>
 
             <!-- Actions Menu -->
-            <Grid Grid.Row="12" Grid.Column="4" Grid.ColumnSpan="4"
+            <Grid Grid.Row="12" Grid.Column="4" Grid.ColumnSpan="6"
                 Visibility="{Binding IsActionsMenuVisible,Converter={StaticResource VisConv}}">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
                     <ColumnDefinition/>
                     <ColumnDefinition/>
                     <ColumnDefinition/>
@@ -505,6 +507,8 @@
                 <local:BoardFieldView
                     Grid.Column="3" FieldVisualState="Error404" FieldBorderBrush="White" Margin="1" Command="{Binding ActionItemClickedCommand}" CommandParameter="Error404" IsSelected="{Binding Game.IsError404Selected}"
                     Visibility="{Binding Game.CanUse404NotFound, Converter={StaticResource VisConv}}"/>
+                <local:BoardFieldView
+                    Grid.Column="5" FieldVisualState="ExitGame" FieldBorderBrush="White" Margin="1" Command="{Binding ActionItemClickedCommand}" CommandParameter="ExitGame" IsSelected="{Binding Game.IsError404Selected}"/>
             </Grid>
 
             <!-- Deployment fields -->

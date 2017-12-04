@@ -43,6 +43,16 @@
                 M14,1 h-1.5 M14,1 h1.5
                 M14,0 h-.5 M14,0 h.5
         </StreamGeometry>
+        <StreamGeometry x:Key="ExitGamePath">
+            M12.59,0.34 A 10,10 0 1 1 7.41,0.34
+            A 1.05,1.05 180 1 1 7.41,2.43
+            A 8,8 0 1 0 12.59,2.43
+            A 1.05,1.05 180 1 1 12.59,0.34z
+            M9,1 L9,10
+            A 1,1 180 1 0 11,10
+            L 11,1
+            A 1,1 180 1 0 9,1    
+        </StreamGeometry>
 
         <!--<Style TargetType="{x:Type TextBox}">
             <Setter Property="Background" Value="Black"/>
