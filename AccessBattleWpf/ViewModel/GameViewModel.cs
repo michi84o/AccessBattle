@@ -215,7 +215,7 @@ namespace AccessBattle.Wpf.ViewModel
             {
                 try
                 {
-                    // TODO: SyncronizationContext
+                    // TODO: SynchronizationContext
                     Application.Current.Dispatcher.Invoke(() => _parent.IsBusy = true);
                     var result = await _client.SendGameCommand(UID, command);
                     if (result) IsActionsMenuVisible = false;
@@ -617,6 +617,17 @@ namespace AccessBattle.Wpf.ViewModel
                     return; // Actions menu can only be opened when it is players turn
                 }
                 SetProp(ref _isActionsMenuVisible, value);
+                IsExitGameVisible = value;
+            }
+        }
+
+        bool _isExitGameVisible;
+        public bool IsExitGameVisible
+        {
+            get { return _isExitGameVisible; }
+            set
+            {
+                SetProp(ref _isExitGameVisible, value);
             }
         }
 

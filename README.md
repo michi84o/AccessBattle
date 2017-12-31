@@ -30,6 +30,7 @@ Build v0.3a+ is a complete rewrite and contains the alpha of multiplayer mode.
   
 - TODO
   - Interface for user databse plugins
+  - Ping Server, reconnect if required
 
 The main game engine is inside a separate DLL so that people
 can program their own user interface for it. The DLL should
