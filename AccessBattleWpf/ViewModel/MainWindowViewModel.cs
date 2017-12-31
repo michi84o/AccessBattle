@@ -186,12 +186,20 @@ namespace AccessBattle.Wpf.ViewModel
             {
                 return new RelayCommand(o =>
                 {
-                    IsActionsMenuVisible = !IsActionsMenuVisible;
+                    if ((IsPlayerHost && _game.Phase == GamePhase.Player1Turn) ||
+                      (!IsPlayerHost && _game.Phase == GamePhase.Player2Turn))
+                    {
+                        IsActionsMenuVisible = !IsActionsMenuVisible;
+                        _game.IsExitGameVisible = IsActionsMenuVisible;
+                    }
+                    else
+                    {
+                        _game.IsExitGameVisible = !_game.IsExitGameVisible;
+                    }
                 }, o =>
                 {
-                    return
-                       (IsPlayerHost && _game.Phase == GamePhase.Player1Turn) ||
-                      (!IsPlayerHost && _game.Phase == GamePhase.Player2Turn);
+                    return _game.Phase == GamePhase.Player1Turn ||
+                           _game.Phase == GamePhase.Player2Turn;
                 });
             }
         }
