@@ -227,7 +227,7 @@ namespace AccessBattle.Wpf.ViewModel
         {
             get
             {
-                return new RelayCommand(o =>
+                return new RelayCommand(async o =>
                 {
                     var item = o as string;
                     if (string.IsNullOrEmpty(item)) return;
@@ -246,7 +246,7 @@ namespace AccessBattle.Wpf.ViewModel
                             _game.HandleActionItem(ActionItem.Error404);
                             break;
                         case "ExitGame":
-                            MessageBox.Show("Exit Game was not implemented yet.");
+                            await _game.Client.ExitGame(_game.UID);
                             break;
                         default:
                             break;

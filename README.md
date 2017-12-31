@@ -26,7 +26,6 @@ Build v0.3a+ is a complete rewrite and contains the alpha of multiplayer mode.
 - Known Issues:
   - v0.3a has no user management. Simple text file user management comes with versiom v0.4a
   - Same user can login multiple times. Not sure if bug or feature.
-  - It is currently not possible to leave a game
   - Game might screw up if one client disconnects
   - Rematch does not work sometimes
   

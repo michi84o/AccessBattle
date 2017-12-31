@@ -1,12 +1,17 @@
 Change Log
 ==========
 
-Version 0.1: 2017-02-11
+Version 0.5a 2017-31-12
 -----------------------
-You can play against a stupid AI.
-Uploaded it as preview.
+Exit Game Button added.
 
 Version 0.2a: 2017-08-27
 -----------------------
 First working version multiplayer.
 Also just a preview.
+
+Version 0.1: 2017-02-11
+-----------------------
+You can play against a stupid AI.
+Uploaded it as preview.
+
