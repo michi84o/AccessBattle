@@ -5,6 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+// Commands:
+// -usrdb=".\db\db.txt" 
+// -acceptany
+
 namespace AccessBattleServer
 {
     class Program
@@ -70,7 +74,7 @@ namespace AccessBattleServer
                         "\tlist          List all games\r\n" +
                         "\tadd user n p  Adds user 'u' with password 'p'\r\n" +
                         "\t              to the user database\r\n" +
-                        "\tdebug         Debug command. Requires additional parameters.\r\n" +
+                        "\tdebug         Debug command. Requires additional parameters:\r\n" +
                         "\t  win key=1234   1    Let player 1 win. Uses game key.\r\n" +
                         "\t  win name=gameX 2    Let player 2 win. Uses game name.\r\n" +
                         "\r\nCurrently only a text based database is supported."
@@ -81,6 +85,21 @@ namespace AccessBattleServer
 
             Log.SetMode(LogMode.Console);
             Log.Priority = LogPriority.Information;
+
+            // Create userdb folder if not existing
+            Console.WriteLine("Using user database file: " + dbPath);
+            try
+            {
+                var dir = System.IO.Path.GetDirectoryName(dbPath);
+                if (!string.IsNullOrEmpty(dir) && !System.IO.Directory.Exists(dir))
+                {
+                    System.IO.Directory.CreateDirectory(dir);
+                }
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Could not create directory for user database!");
+            }
 
             try
             {
@@ -96,14 +115,31 @@ namespace AccessBattleServer
                 if (acceptAny)
                     Console.WriteLine("! Any client is accepted");
 
+                Console.WriteLine("Type 'help' to show available commands");
+
                 string line;
                 while ((line = Console.ReadLine()) != "exit")
                 {
                     bool ok = false;
                     line = line.Trim();
-                    if (line == ("list"))
+                    if (line == ("help"))
+                    {
+                        Console.WriteLine(
+                            "\tlist          List all games\r\n" +
+                            "\tadd user n p  Adds user 'u' with password 'p'\r\n"+
+                            "\tdebug         Debug command. Requires additional parameters:\r\n" +
+                            "\t  win key=1234   1    Let player 1 win. Uses game key.\r\n" +
+                            "\t  win name=gameX 2    Let player 2 win. Uses game name.");
+                        ok = true;
+                    }
+                    else if (line == ("list"))
                     {
                         var games = _server.Games.ToList();
+                        if (games.Count == 0)
+                        {
+                            Console.WriteLine("There are no games"); ;
+                        }
+                        else 
                         foreach (var game in games)
                             Console.WriteLine(game.Key + " - " + game.Value.Name);
                         ok = true;
