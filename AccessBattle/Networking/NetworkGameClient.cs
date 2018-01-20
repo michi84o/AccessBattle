@@ -479,16 +479,6 @@ namespace AccessBattle.Networking
             return result?.GameInfo;
         }
 
-        async Task<bool> ExecuteGameCommand()
-        {
-            if (IsConnected != true || IsLoggedIn != true) return false;
-
-            // TODO Send packet to server and return answer
-            await Task.Delay(1);
-
-            return false;
-        }
-
         /// <summary>
         /// Request to join a game on the server. Other player has to confirm.
         /// </summary>

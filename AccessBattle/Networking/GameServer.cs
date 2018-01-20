@@ -402,7 +402,6 @@ namespace AccessBattle.Networking
                         var login = JsonConvert.DeserializeObject<Login>(Encoding.ASCII.GetString(data));
                         if (login?.Name?.Length > 0)
                         {
-                            // TODO Check AcceptAnyClient variable and compare with whitelist
                             if (!AcceptAnyClient)
                             {
                                 var loginResult = _userDatabase.CheckLoginAsync(login.Name, login.Password?.ConvertToSecureString()).GetAwaiter().GetResult(); // TODO: Change to async call later

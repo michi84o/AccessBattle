@@ -15,23 +15,26 @@ Build v0.3a+ is a complete rewrite and contains the alpha of multiplayer mode.
 
 - Current status: Work in progress
   - Multiplayer is in alpha. There are some bugs and features are missing (WIP)
-  - Singleplayer will be implemented later.
+  - Singleplayer not implemented, but I started working on AI ideas.
   
 - Roadmap
-  - User Interface + Multiplayer finished: January 2018
-  - Singleplayer: April 2018
-  - Documentation: August 2018 (only if I see someone actually using this code)
+  - ~~User Interface + Multiplayer finished: January 2018~~ (Postponed for now)
+  - Singleplayer: May 2018
+  - Documentation: August 2018 (if I have some free time)
   - Sorry if this is taking so long. I have a full time job and not much free time.
   
 - Known Issues:
   - v0.3a has no user management. Simple text file user management comes with versiom v0.4a
-  - Same user can login multiple times. Not sure if bug or feature.
+  - Same user can login multiple times. Not sure if bug or feature.  
   - Game might screw up if one client disconnects
   - Rematch does not work sometimes
   
 - TODO
   - Interface for user databse plugins
   - Ping Server, reconnect if required
+  - Cleanup inactive games and logins, KeepAlive packets
+  - Matchmaking for random matches
+  
 
 ## Program Structure
   

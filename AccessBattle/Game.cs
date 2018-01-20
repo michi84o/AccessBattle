@@ -339,7 +339,6 @@ namespace AccessBattle
             #endregion
 
             #region Boost command "bs"
-            // TODO Command with 'enabled=0' does not need coordinates
             if (command.StartsWith("bs ", StringComparison.InvariantCultureIgnoreCase) && command.Length > 3)
             {
                 command = command.Substring(3).Trim();
@@ -567,7 +566,8 @@ namespace AccessBattle
             if (stackpos == -1)
             {
                 Log.WriteLine(LogPriority.Error, "Game Error! Card cannot be put on stack because it is full");
-                return; // TODO: GAME OVER
+                Phase = GamePhase.Aborted;
+                return;
             }
             Board[stackpos, y].Card = card;
             field.Card = null;

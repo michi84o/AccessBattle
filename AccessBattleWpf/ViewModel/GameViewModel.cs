@@ -10,7 +10,6 @@ using System.Windows;
 using System.Windows.Input;
 
 // TODO: Behavior when opponent disconnects
-// TODO: Option to give up game
 // TODO: Add a "register local game" method
 // TODO: Add a "register remote game" method
 // ==> Maybe just pass a reference to the game model?
