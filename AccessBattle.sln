@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.12
+VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccessBattle", "AccessBattle\AccessBattle.csproj", "{F17F07F0-81F9-4320-A0C0-E9BBE9F6869C}"
 EndProject
@@ -10,6 +10,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccessBattleTests", "AccessBattleTests\AccessBattleTests.csproj", "{5370C3CC-4251-4B77-BF70-842470012338}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccessBattleWpf", "AccessBattleWpf\AccessBattleWpf.csproj", "{DF72316F-1CCC-4FCE-A42E-03E31790264E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C3860788-4988-49DC-A2DC-3B3D28472798} = {C3860788-4988-49DC-A2DC-3B3D28472798}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccessBattleAI", "AccessBattleAI\AccessBattleAI.csproj", "{C3860788-4988-49DC-A2DC-3B3D28472798}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +38,10 @@ Global
 		{DF72316F-1CCC-4FCE-A42E-03E31790264E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DF72316F-1CCC-4FCE-A42E-03E31790264E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DF72316F-1CCC-4FCE-A42E-03E31790264E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3860788-4988-49DC-A2DC-3B3D28472798}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3860788-4988-49DC-A2DC-3B3D28472798}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3860788-4988-49DC-A2DC-3B3D28472798}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3860788-4988-49DC-A2DC-3B3D28472798}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

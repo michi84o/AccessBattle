@@ -1,5 +1,6 @@
 ﻿using AccessBattle.Networking;
 using AccessBattle.Networking.Packets;
+using AccessBattle.Plugins;
 using AccessBattle.Wpf.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -38,7 +39,7 @@ namespace AccessBattle.Wpf.ViewModel
 
         NetworkGameClient _client = new NetworkGameClient();
         public NetworkGameClient Client => _client;
-
+        
         bool _isPlayerHost;
         public bool IsPlayerHost
         {
@@ -207,26 +208,45 @@ namespace AccessBattle.Wpf.ViewModel
             }
         }
 
+        // TODO: SynchronizationContext
+        public async Task<bool> SendGameCommandAsync(string command)
+        {
+            bool result;
+
+            if (!IsInSinglePlayerMode)
+            {
+                result = await _client.SendGameCommand(UID, command);
+            }
+            else
+            {
+                result = _localGame.ExecuteCommand(command, 1);
+                SyncLocalGame();
+            }
+
+            if (result) IsActionsMenuVisible = false;
+
+            if (!result)
+                _parent.ShowError?.Invoke("Error");
+
+            return result;
+        }
+
+        // Used for HandleActionItem()      
         void SendGameCommand(string command)
         {
-            //MessageBox.Show("TODO: Send game command\r\n" + command);
-            Task.Run(async ()=>
+            Task.Run(async () =>
             {
                 try
                 {
-                    // TODO: SynchronizationContext
-                    Application.Current.Dispatcher.Invoke(() => _parent.IsBusy = true);
-                    var result = await _client.SendGameCommand(UID, command);
-                    if (result) IsActionsMenuVisible = false;
-                    // TODO: Use SynchronizationContext
-                    if (!result)
-                        _parent.ShowError?.Invoke("Error");
+                    _parent.IsBusy = true;
+                    await SendGameCommandAsync(command);
                 }
                 finally
                 {
-                    Application.Current.Dispatcher.Invoke(() => _parent.IsBusy = false);
+                    _parent.IsBusy = false;
+                    CommandManager.InvalidateRequerySuggested();
                 }
-            });
+            });            
         }
 
         public void PlayError404(bool switchCards)
@@ -632,5 +652,32 @@ namespace AccessBattle.Wpf.ViewModel
 
         public bool CanUseVirusCheck => !Players[IsPlayerHost ? 0 : 1].DidVirusCheck;
         public bool CanUse404NotFound => !Players[IsPlayerHost ? 0 : 1].Did404NotFound;
+
+        #region Singleplayer
+
+        bool _isInSinglePlayerMode = false;
+        public bool IsInSinglePlayerMode
+        {
+            get { return _isInSinglePlayerMode; }
+            set { SetProp(ref _isInSinglePlayerMode, value); }
+        }
+
+        public void StartLocalGame()
+        {
+            IsInSinglePlayerMode = true;
+            if (_localGame == null)
+            {
+                _localGame = new Game();
+                // Hook up AI Player
+                var plugins = PluginHandler.Instance.GetPlugins<IAiPlugin>();
+
+            }
+            _localGame.InitGame();
+            SyncLocalGame();
+        }
+        void SyncLocalGame() { Synchronize(GameSync.FromGame(_localGame, 0, 1)); }
+        Game _localGame;
+
+        #endregion
     }
 }

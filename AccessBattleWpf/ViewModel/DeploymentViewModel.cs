@@ -47,8 +47,7 @@ namespace AccessBattle.Wpf.ViewModel
                         }
                         cmd.Append(card.Type == OnlineCardType.Link ? "L" : "V");
                     }
-                    ParentViewModel.IsBusy = true;
-                    var result = await ParentViewModel.Game.Client.SendGameCommand(ParentViewModel.Game.UID, cmd.ToString());
+                    var result = await ParentViewModel.Game.SendGameCommandAsync(cmd.ToString());
                     if (!result) Log.WriteLine(LogPriority.Error, "DeploymentViewModel: Sending game command failed!");
                     else ParentViewModel.CurrentMenu = MenuType.None;
                 }

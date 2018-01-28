@@ -11,3 +11,5 @@
 /PrototypeCode/*.suo
 /PrototypeCode
 /AccessBattleServer/*.user
+/AccessBattleAI/bin
+/AccessBattleAI/obj
