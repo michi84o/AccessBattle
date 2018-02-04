@@ -16,12 +16,11 @@ AccessBattle is a private fan project and not affiliated with
   
 - Roadmap
   - ~~User Interface + Multiplayer finished: January 2018~~ (Postponed for now)
-  - Singleplayer: May 2018
+  - Singleplayer: Add more AI opponents: May 2018
   - Documentation: August 2018 (if I have some free time)
   - Sorry if this is taking so long. I have a full time job and not much free time.
   
 - Known Issues:
-  - v0.3a has no user management. Simple text file user management comes with versiom v0.4a
   - Same user can login multiple times. Not sure if bug or feature.  
   - Game might screw up if one client disconnects
   - Rematch does not work sometimes
