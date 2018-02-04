@@ -47,7 +47,8 @@ namespace AccessBattle.Wpf
         Deployment,
         OpponentTurn,
         SwitchCards, // Question for Error 404
-        GameOver
+        GameOver,
+        AISelect // = Singleplayer Menu
     }
 
     public enum ActionItem

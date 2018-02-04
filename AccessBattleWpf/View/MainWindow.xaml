@@ -72,6 +72,9 @@
             <DataTemplate DataType="{x:Type viewmodel:GameOverMenuViewModel}">
                 <local:GameOverMenu Width="300" Height="115" />
             </DataTemplate>
+            <DataTemplate DataType="{x:Type viewmodel:AISelectionMenuViewModel}">
+                <local:AISelectionMenu Width="300" Height="300" />
+            </DataTemplate>
 
         </ResourceDictionary>
     </Window.Resources>

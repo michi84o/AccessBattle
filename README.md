@@ -30,7 +30,7 @@ Build v0.3a+ is a complete rewrite and contains the alpha of multiplayer mode.
   - Rematch does not work sometimes
   
 - TODO
-  - Interface for user databse plugins
+  - Interface for user database plugins
   - Ping Server, reconnect if required
   - Cleanup inactive games and logins, KeepAlive packets
   - Matchmaking for random matches

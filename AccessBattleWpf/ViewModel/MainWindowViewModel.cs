@@ -76,6 +76,7 @@ namespace AccessBattle.Wpf.ViewModel
         OpponentTurnViewModel _opponentTurnVm;
         SwitchCards404MenuViewModel _switchCards404Vm;
         GameOverMenuViewModel _gameOverVm;
+        AISelectionMenuViewModel _aiSelectVm;
 
         public MenuViewModelBase CurrentMenuViewModel
         {
@@ -92,6 +93,7 @@ namespace AccessBattle.Wpf.ViewModel
                     case MenuType.OpponentTurn: return _opponentTurnVm;
                     case MenuType.SwitchCards: return _switchCards404Vm;
                     case MenuType.GameOver: return _gameOverVm;
+                    case MenuType.AISelect: return _aiSelectVm;
                     case MenuType.Welcome:
                     default: return _welcomeVm;
                 }
@@ -126,6 +128,7 @@ namespace AccessBattle.Wpf.ViewModel
             _opponentTurnVm = new OpponentTurnViewModel(this);
             _switchCards404Vm = new SwitchCards404MenuViewModel(this);
             _gameOverVm = new GameOverMenuViewModel(this);
+            _aiSelectVm = new AISelectionMenuViewModel(this);
 
             CurrentMenu = MenuType.Welcome;
 

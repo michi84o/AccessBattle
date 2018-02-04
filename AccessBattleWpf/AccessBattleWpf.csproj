@@ -59,6 +59,7 @@
     <Compile Include="Converters\StringVisibilityConverter.cs" />
     <Compile Include="Interfaces\IMenuHolder.cs" />
     <Compile Include="ViewModel\AcceptJoinMenuViewModel.cs" />
+    <Compile Include="ViewModel\AISelectionMenuViewModel.cs" />
     <Compile Include="ViewModel\DeploymentViewModel.cs" />
     <Compile Include="ViewModel\GameOverMenuViewModel.cs" />
     <Compile Include="ViewModel\GameViewModel.cs" />
@@ -71,6 +72,9 @@
     <Compile Include="ViewModel\WelcomeMenuViewModel.cs" />
     <Compile Include="View\AcceptJoinMenu.xaml.cs">
       <DependentUpon>AcceptJoinMenu.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\AISelectionMenu.xaml.cs">
+      <DependentUpon>AISelectionMenu.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\CenteredAdorner.cs" />
     <Compile Include="View\DeploymentView.xaml.cs">
@@ -101,6 +105,10 @@
       <DependentUpon>WelcomeMenu.xaml</DependentUpon>
     </Compile>
     <Page Include="View\AcceptJoinMenu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\AISelectionMenu.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

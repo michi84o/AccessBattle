@@ -27,8 +27,7 @@ namespace AccessBattle.Wpf.ViewModel
             {
                 return new RelayCommand(o =>
                 {
-                    ParentViewModel.Game.StartLocalGame();
-                    ParentViewModel.CurrentMenu = MenuType.Deployment;
+                    ParentViewModel.CurrentMenu = MenuType.AISelect;
                 }, o =>
                 {
                     return true;
