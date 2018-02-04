@@ -70,6 +70,7 @@
     <Compile Include="Networking\Packets\ServerInfo.cs" />
     <Compile Include="Networking\PasswordHasher.cs" />
     <Compile Include="PlayerState.cs" />
+    <Compile Include="Plugins\AiBase.cs" />
     <Compile Include="Plugins\IPlugin.cs" />
     <Compile Include="Plugins\PluginHandler.cs" />
     <Compile Include="PropChangeNotifier.cs" />

@@ -10,9 +10,5 @@
         /// <summary>Name of the player.</summary>
         string Name { get; set; }
 
-        /// <summary>
-        /// Notify the player to make his move.
-        /// </summary>
-        void PlayTurn();
     }
 }

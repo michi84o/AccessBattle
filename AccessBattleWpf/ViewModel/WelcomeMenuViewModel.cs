@@ -28,6 +28,7 @@ namespace AccessBattle.Wpf.ViewModel
                 return new RelayCommand(o =>
                 {
                     ParentViewModel.CurrentMenu = MenuType.AISelect;
+                    ParentViewModel.Game.IsInSinglePlayerMode = true;                    
                 }, o =>
                 {
                     return true;
@@ -42,6 +43,7 @@ namespace AccessBattle.Wpf.ViewModel
                 return new RelayCommand(o =>
                 {
                     ParentViewModel.CurrentMenu = MenuType.NetworkGame;
+                    ParentViewModel.Game.IsInSinglePlayerMode = false;
                 });
             }
         }

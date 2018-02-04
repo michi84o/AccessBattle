@@ -11,22 +11,17 @@ using AccessBattle;
 namespace AccessBattleAI
 {
     [Export(typeof(IPlugin))]
-    [ExportMetadata("Name", "AI.Bob")]
-    [ExportMetadata("Description", "Bob is a simple stupid AI that just does random moves.")]
+    [ExportMetadata("Name", "AccessBattle.AI.BAKA")]
+    [ExportMetadata("Description", "BAKA (jap. fool) is a simple stupid AI that just does nearly random moves.")]
     [ExportMetadata("Version", "0.1")]
-    public class Bob : IAiPlugin
+    public class Baka : AiBase 
     {
-        public IPluginMetadata Metadata { get; set; }
+        protected override string _name => "BAKA";
 
-        public string PlayTurn()
+        public override string PlayTurn()
         {
             // TODO
             return "";
-        }
-
-        public void Synchronize(GameSync sync)
-        {
-            
         }
     }
 }

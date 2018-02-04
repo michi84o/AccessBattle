@@ -589,7 +589,6 @@ namespace AccessBattle.Wpf.ViewModel
             };
         }
 
-
         void PlayerPropChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             var empty = string.IsNullOrEmpty(e.PropertyName);
@@ -662,21 +661,21 @@ namespace AccessBattle.Wpf.ViewModel
             set { SetProp(ref _isInSinglePlayerMode, value); }
         }
 
-        public void StartLocalGame()
+        public void StartLocalGame(IAiPlugin aiPlayer)
         {
             IsInSinglePlayerMode = true;
             if (_localGame == null)
             {
-                _localGame = new Game();
-                // Hook up AI Player
-                var plugins = PluginHandler.Instance.GetPlugins<IAiPlugin>();
-
+                _localGame = new LocalGame { AiCommandDelay = 1000 };
+                _localGame.SyncRequired += 
+                    (sender, args) => { Application.Current.Dispatcher.Invoke(() => SyncLocalGame()); };
             }
+            _localGame.SetAi(aiPlayer);            
             _localGame.InitGame();
             SyncLocalGame();
         }
         void SyncLocalGame() { Synchronize(GameSync.FromGame(_localGame, 0, 1)); }
-        Game _localGame;
+        LocalGame _localGame;
 
         #endregion
     }

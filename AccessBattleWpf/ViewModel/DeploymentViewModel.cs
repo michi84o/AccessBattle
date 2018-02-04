@@ -47,9 +47,18 @@ namespace AccessBattle.Wpf.ViewModel
                         }
                         cmd.Append(card.Type == OnlineCardType.Link ? "L" : "V");
                     }
+
+                    // Race condition: SendGameCommandAsync might cause a game update before current menu can be changed
+                    //                 Set Current Menu first and restore it if sending command failed.
+                    var currentMenu = ParentViewModel.CurrentMenu;
+                    ParentViewModel.CurrentMenu = MenuType.OpponentTurn;
                     var result = await ParentViewModel.Game.SendGameCommandAsync(cmd.ToString());
-                    if (!result) Log.WriteLine(LogPriority.Error, "DeploymentViewModel: Sending game command failed!");
-                    else ParentViewModel.CurrentMenu = MenuType.None;
+                    if (!result)
+                    {
+                        ParentViewModel.CurrentMenu = currentMenu;
+                        Log.WriteLine(LogPriority.Error, "DeploymentViewModel: Sending game command failed!");
+                    }
+                    
                 }
                 catch (Exception)
                 {

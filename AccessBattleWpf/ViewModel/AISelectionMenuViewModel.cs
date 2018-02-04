@@ -36,10 +36,7 @@ namespace AccessBattle.Wpf.ViewModel
             var plugins = PluginHandler.Instance.GetPlugins<IAiPlugin>();
             foreach (var plugin in plugins)
             {
-                if (plugin?.Metadata?.Name == null) continue;
-                var container = new AiPluginContainer { Name=plugin.Metadata.Name, Plugin = plugin };
-                if (container.Name.StartsWith("AI."))
-                    container.Name = container.Name.Remove(0, 3);
+                var container = new AiPluginContainer { Name=plugin.Name ?? "???", Plugin = plugin };
                 _plugins.Add(container);
             }
             if (_plugins.Count > 0) SelectedItem = _plugins[0];
@@ -61,7 +58,9 @@ namespace AccessBattle.Wpf.ViewModel
             {
                 return new RelayCommand(o =>
                 {
-                    ParentViewModel.Game.StartLocalGame();
+                    var sel = _selectedItem;
+                    if (sel == null) return;
+                    ParentViewModel.Game.StartLocalGame(sel.Plugin);
                     ParentViewModel.CurrentMenu = MenuType.Deployment;
                 }, o => _selectedItem != null);
             }

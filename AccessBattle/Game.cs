@@ -1,4 +1,6 @@
-﻿using System;
+﻿using AccessBattle.Networking.Packets;
+using AccessBattle.Plugins;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -216,7 +218,7 @@ namespace AccessBattle
         /// <param name="player">Player number.</param>
         /// <returns></returns>
         // TODO LOCK ACCESS TOD THIS METHOD !!!
-        public bool ExecuteCommand(string command, int player)
+        public virtual bool ExecuteCommand(string command, int player)
         {
             if (player != 1 && player != 2) return false;
             if (Phase == GamePhase.Player1Turn && player != 1) return false;
@@ -749,5 +751,68 @@ namespace AccessBattle
         }
 
         #endregion
+    }
+
+    public class LocalGame : Game
+    {
+        IAiPlugin _ai;
+
+        public event EventHandler SyncRequired;
+
+        int _aiCommandDelay;
+        /// <summary>
+        /// If higher than 0, this adds a delay before the AI will make its move.
+        /// </summary>
+        public int AiCommandDelay
+        {
+            get => _aiCommandDelay;
+            set { SetProp(ref _aiCommandDelay, value); }
+        }
+
+        /// <summary>
+        /// Sets AI player. 
+        /// </summary>
+        /// <param name="ai"></param>
+        public void SetAi(IAiPlugin ai)
+        {
+            Players[1].Name = ai.Name;           
+            _ai = ai;
+        }
+
+        /// <summary>
+        /// Executes the command and automatically tells the AI to make its move.
+        /// </summary>
+        /// <param name="command">Command to play.</param>
+        /// <param name="player">Must always be 1. Player 2 is AI.</param>
+        /// <returns></returns>
+        public override bool ExecuteCommand(string command, int player)
+        {
+            if (_ai == null || player != 1) return false;
+
+            var result = base.ExecuteCommand(command, player);
+            if (!result) return false;
+
+            Action aiMove = () =>
+            {
+                // AI Move
+                _ai.Synchronize(GameSync.FromGame(this, 0, 2));
+                var aiCmnd = _ai.PlayTurn();
+                if (!base.ExecuteCommand(aiCmnd, 2))
+                {
+                    Phase = GamePhase.Aborted;
+                }
+                SyncRequired?.Invoke(this, EventArgs.Empty);
+            };
+
+            if (_aiCommandDelay < 1)
+                aiMove();
+            else
+            {
+                SyncRequired?.Invoke(this, EventArgs.Empty);
+                Task.Delay(_aiCommandDelay).ContinueWith((t) => aiMove());
+            }
+
+            return true;
+        }
     }
 }

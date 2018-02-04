@@ -70,15 +70,6 @@ namespace AccessBattle.Networking
             ServerCrypto = serverCrypto;
         }
 
-        /// <summary>
-        /// Notify the player to make his move.
-        /// </summary>
-        public void PlayTurn()
-        {
-            Log.WriteLine(LogPriority.Debug, "Network Player with UID " + UID + " requested to play turn");
-            // TODO
-        }
-
         #region IDisposable
 
         bool disposed = false;

@@ -26,7 +26,8 @@ namespace AccessBattle.Plugins
         public string Version { get; set; }
     }
 
-    public interface IAiPlugin : IPlugin
+    // TODO: Think about using the IPlayer interface
+    public interface IAiPlugin : IPlugin, IPlayer
     {
         string PlayTurn();
         void Synchronize(GameSync sync);

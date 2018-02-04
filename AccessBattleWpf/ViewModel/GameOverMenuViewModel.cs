@@ -28,8 +28,10 @@ namespace AccessBattle.Wpf.ViewModel
         public ICommand LeaveCommand => new RelayCommand(async o =>
         {
             await ParentViewModel.Game.Client.ExitGame(ParentViewModel.Game.UID);
-            // TODO: Must be changed for singleplayer
-            ParentViewModel.CurrentMenu = MenuType.NetworkGame;
+            if (ParentViewModel.Game.IsInSinglePlayerMode)
+                ParentViewModel.CurrentMenu = MenuType.AISelect;
+            else 
+                ParentViewModel.CurrentMenu = MenuType.NetworkGame;
         });
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void
 

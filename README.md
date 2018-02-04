@@ -15,7 +15,7 @@ Build v0.3a+ is a complete rewrite and contains the alpha of multiplayer mode.
 
 - Current status: Work in progress
   - Multiplayer is in alpha. There are some bugs and features are missing (WIP)
-  - Singleplayer not implemented, but I started working on AI ideas.
+  - Currently working on Singleplayer AI
   
 - Roadmap
   - ~~User Interface + Multiplayer finished: January 2018~~ (Postponed for now)
