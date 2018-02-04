@@ -26,6 +26,7 @@ namespace AccessBattleServer
             // ----------------
 
             bool acceptAny = false;
+            ushort port = 3221;
             string dbPath = "userdb.txt";
 
             // Read command line params
@@ -45,7 +46,7 @@ namespace AccessBattleServer
                     acceptAny = true;
                     continue;
                 }
-                if (arg.StartsWith("usrdb=", StringComparison.Ordinal))
+                else if (arg.StartsWith("usrdb=", StringComparison.Ordinal))
                 {
                     var spl = arg.Split('=');
                     if (spl.Length == 2)
@@ -59,25 +60,27 @@ namespace AccessBattleServer
                         return;
                     }
                 }
+                else if (arg.StartsWith("port="))
+                {
+                    var spl = arg.Split('=');
+                    if (spl.Length != 2 || !ushort.TryParse(spl[1], out port))
+                    {
+                        Console.WriteLine("Error in parameter 'port'");
+                        return;
+                    }
+                }
                 else
                 {
                     Console.WriteLine(
                         "Access Battle Server\r\n\r\n" +
                         "Usage: AccessBattleServer [-acceptany] [-usrdb=path]\r\n" +
                         "\r\nOptions:\r\n" +
+                        "\t-port=3221    Define the port to use. Default: 3221\r\n" +
                         "\t-acceptany    Accepts any client. Disables user database.\r\n" +
                         "\t              Clients require no password.\r\n" +
                         "\t-usrdb=path   Path to text file for user database.\r\n" +
                         "\t              default path is '.\\userdb.txt'.\r\n" +
-                        "\r\nUsing '/' instead of '-' is allowed.\r\n" +
-                        "\r\nCommands:\r\n" +
-                        "\tlist          List all games\r\n" +
-                        "\tadd user n p  Adds user 'u' with password 'p'\r\n" +
-                        "\t              to the user database\r\n" +
-                        "\tdebug         Debug command. Requires additional parameters:\r\n" +
-                        "\t  win key=1234   1    Let player 1 win. Uses game key.\r\n" +
-                        "\t  win name=gameX 2    Let player 2 win. Uses game name.\r\n" +
-                        "\r\nCurrently only a text based database is supported."
+                        "\r\nUsing '/' instead of '-' is allowed.\r\n"
                         );
                     return;
                 }
@@ -105,7 +108,7 @@ namespace AccessBattleServer
             {
                 var userDb = new TextFileUserDatabaseProvider(dbPath);
 
-                _server = new GameServer(userDatabase: userDb)
+                _server = new GameServer(port, userDb)
                 {
                     AcceptAnyClient = acceptAny
                 };
@@ -125,6 +128,7 @@ namespace AccessBattleServer
                     if (line == ("help"))
                     {
                         Console.WriteLine(
+                            "\texit          Close this program.\r\n" +
                             "\tlist          List all games\r\n" +
                             "\tadd user n p  Adds user 'u' with password 'p'\r\n"+
                             "\tdebug         Debug command. Requires additional parameters:\r\n" +

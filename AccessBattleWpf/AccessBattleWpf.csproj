@@ -32,6 +32,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>icona.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -206,17 +209,21 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\AccessBattle\AccessBattle.csproj">
       <Project>{f17f07f0-81f9-4320-a0c0-e9bbe9f6869c}</Project>
       <Name>AccessBattle</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="icona.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if $(ConfigurationName) == Debug (
 xcopy /E /Y "$(SolutionDir)AccessBattleAI\bin\Debug\AccessBattleAI.dll" "$(TargetDir)Plugins\"
+) else (
+xcopy /E /Y "$(SolutionDir)AccessBattleAI\bin\Release\AccessBattleAI.dll" "$(TargetDir)Plugins\"
 )</PostBuildEvent>
   </PropertyGroup>
 </Project>

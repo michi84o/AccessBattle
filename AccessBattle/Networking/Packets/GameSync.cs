@@ -59,5 +59,61 @@ namespace AccessBattle.Networking.Packets
             }
             return sync;
         }
+
+        /// <summary>
+        /// Converts the coordinates as if playes switched sides. Converts coordinates and player numbers.
+        /// Used for AI.
+        /// </summary>
+        /// <param name="sync"></param>
+        /// <returns></returns>
+        public static GameSync FlipBoard(GameSync sync, bool isPlayerHost = false)
+        {
+            var s = new GameSync();
+
+            s.Phase = sync.Phase;
+            if (s.Phase == GamePhase.Player1Turn) s.Phase = GamePhase.Player2Turn;
+            else if (s.Phase == GamePhase.Player2Turn) s.Phase = GamePhase.Player1Turn;
+            else if (s.Phase == GamePhase.Player1Win) s.Phase = GamePhase.Player2Win;
+            else if (s.Phase == GamePhase.Player2Win) s.Phase = GamePhase.Player1Win;
+
+            s.Player1 = new PlayerState.Sync
+            {
+                Did404NotFound = sync.Player2.Did404NotFound,
+                DidVirusCheck = sync.Player2.DidVirusCheck,
+                PlayerNumber = sync.Player2.PlayerNumber == 1 ? 2 : 1,
+                Points = sync.Player2.Points
+            };
+            s.Player2 = new PlayerState.Sync
+            {
+                Did404NotFound = sync.Player1.Did404NotFound,
+                DidVirusCheck = sync.Player1.DidVirusCheck,
+                PlayerNumber = sync.Player1.PlayerNumber == 1 ? 2 : 1,
+                Points = sync.Player1.Points
+            };
+
+            s.UID = sync.UID;
+            s.FieldsWithCards = new List<BoardField.Sync>();
+            foreach (var field in sync.FieldsWithCards)
+            {
+                int x = field.X;
+                int y = field.Y;
+                Helpers.ConvertCoordinates(ref x, ref y, isPlayerHost);
+                var bs = new BoardField.Sync
+                {
+                    Card = new Card.Sync
+                    {
+                        HasBoost = field.Card.HasBoost,
+                        IsFaceUp = field.Card.IsFaceUp,
+                        IsFirewall = field.Card.IsFaceUp,
+                        Owner = field.Card.Owner == 1 ? 2 : 1,
+                        Type = field.Card.Type
+                    },
+                    X = (ushort)x,
+                    Y = (ushort)y
+                };
+                s.FieldsWithCards.Add(bs);
+            }
+            return s;
+        }
     }
 }

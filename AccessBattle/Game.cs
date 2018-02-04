@@ -755,7 +755,7 @@ namespace AccessBattle
 
     public class LocalGame : Game
     {
-        IAiPlugin _ai;
+        IArtificialIntelligence _ai;
 
         public event EventHandler SyncRequired;
 
@@ -773,10 +773,11 @@ namespace AccessBattle
         /// Sets AI player. 
         /// </summary>
         /// <param name="ai"></param>
-        public void SetAi(IAiPlugin ai)
+        public void SetAi(IArtificialIntelligence ai, bool isHost=false)
         {
             Players[1].Name = ai.Name;           
             _ai = ai;
+            _ai.IsAiHost = isHost;
         }
 
         /// <summary>
@@ -801,8 +802,19 @@ namespace AccessBattle
                 {
                     Phase = GamePhase.Aborted;
                 }
+
+                // Can happen after Deployment
+                if (Phase == GamePhase.Player2Turn)
+                {
+                    _ai.Synchronize(GameSync.FromGame(this, 0, 2));
+                    aiCmnd = _ai.PlayTurn();
+                    if (!base.ExecuteCommand(aiCmnd, 2))
+                    {
+                        Phase = GamePhase.Aborted;
+                    }
+                }
                 SyncRequired?.Invoke(this, EventArgs.Empty);
-            };
+            };            
 
             if (_aiCommandDelay < 1)
                 aiMove();

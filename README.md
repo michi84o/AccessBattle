@@ -8,14 +8,11 @@ AccessBattle is a private fan project and not affiliated with
 
 ![Screenshot of client](Images/screenshot1.png)
 
-Build v0.1 contains a singleplayer mode with a very stupid AI.
-Build v0.3a+ is a complete rewrite and contains the alpha of multiplayer mode.
-
 ## Status
 
 - Current status: Work in progress
   - Multiplayer is in alpha. There are some bugs and features are missing (WIP)
-  - Currently working on Singleplayer AI
+  - Singleplayer is in alpha. The AI plugin contains one stupid AI opponent. More are to come.
   
 - Roadmap
   - ~~User Interface + Multiplayer finished: January 2018~~ (Postponed for now)

@@ -51,39 +51,6 @@ namespace AccessBattle.Wpf.ViewModel
             }
         }
 
-        public void ConvertCoordinates(ref int x, ref int y)
-        {
-            if (IsPlayerHost) return; // No rotation
-
-            // If player is not host, the board is rotated by 180°
-            // This only affects the board itself
-
-            // Board fields:
-            if (y >= 0 && y <= 7)
-            {
-                x = 7 - x;
-                y = 7 - y;
-            }
-            // Stack P1
-            else if (y == 8)
-            {
-                y = 9;
-                //x = 7 - x;
-            }
-            // Stack P2
-            else if (y == 9)
-            {
-                y = 8;
-                //x = 7 - x;
-            }
-            // Server area
-            else if (y == 10)
-            {
-                if (x == 4) x = 5;
-                else if (x == 5) x = 4;
-            }
-        }
-
         void RegisterBoardToViewModel()
         {
             lock (Board) // prevents sync while remapping
@@ -95,7 +62,7 @@ namespace AccessBattle.Wpf.ViewModel
                     {
                         int xx = x;
                         int yy = y;
-                        ConvertCoordinates(ref xx, ref yy);
+                        Helpers.ConvertCoordinates(ref xx, ref yy, IsPlayerHost);
                         BoardFieldVm[xx, yy].RegisterBoardField(Board[x, y]);
                     }
             }
@@ -426,7 +393,7 @@ namespace AccessBattle.Wpf.ViewModel
                             // Game works with absolute coordinates but we have to change the view:
                             int x = target.X;
                             int y = target.Y;
-                            ConvertCoordinates(ref x, ref y);
+                            Helpers.ConvertCoordinates(ref x, ref y, IsPlayerHost);
                             BoardFieldVm[x, y].IsHighlighted = true;
                         }
                     }
@@ -661,12 +628,12 @@ namespace AccessBattle.Wpf.ViewModel
             set { SetProp(ref _isInSinglePlayerMode, value); }
         }
 
-        public void StartLocalGame(IAiPlugin aiPlayer)
+        public void StartLocalGame(IArtificialIntelligence aiPlayer)
         {
             IsInSinglePlayerMode = true;
             if (_localGame == null)
             {
-                _localGame = new LocalGame { AiCommandDelay = 1000 };
+                _localGame = new LocalGame { AiCommandDelay = 250 };
                 _localGame.SyncRequired += 
                     (sender, args) => { Application.Current.Dispatcher.Invoke(() => SyncLocalGame()); };
             }
@@ -674,7 +641,10 @@ namespace AccessBattle.Wpf.ViewModel
             _localGame.InitGame();
             SyncLocalGame();
         }
-        void SyncLocalGame() { Synchronize(GameSync.FromGame(_localGame, 0, 1)); }
+        void SyncLocalGame()
+        {
+            Synchronize(GameSync.FromGame(_localGame, 0, 1));
+        }
         LocalGame _localGame;
 
         #endregion

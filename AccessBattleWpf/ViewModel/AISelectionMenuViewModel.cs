@@ -10,19 +10,19 @@ using System.Windows.Input;
 
 namespace AccessBattle.Wpf.ViewModel
 {
-    public class AiPluginContainer
+    public class ArtificialIntelligenceContainer
     {
         public string Name { get; set; }
-        public IAiPlugin Plugin { get; set; }
+        public IArtificialIntelligence AI { get; set; }
     }
 
     public class AISelectionMenuViewModel : MenuViewModelBase
     {
-        ObservableCollection<AiPluginContainer> _plugins;
-        public ObservableCollection<AiPluginContainer> Plugins => _plugins;
+        ObservableCollection<ArtificialIntelligenceContainer> _plugins;
+        public ObservableCollection<ArtificialIntelligenceContainer> Plugins => _plugins;
 
-        AiPluginContainer _selectedItem;
-        public AiPluginContainer SelectedItem
+        ArtificialIntelligenceContainer _selectedItem;
+        public ArtificialIntelligenceContainer SelectedItem
         {
             get => _selectedItem;
             set { SetProp(ref _selectedItem, value); }
@@ -32,11 +32,12 @@ namespace AccessBattle.Wpf.ViewModel
         public AISelectionMenuViewModel(
             IMenuHolder parent) : base(parent)
         {
-            _plugins = new ObservableCollection<AiPluginContainer>();
-            var plugins = PluginHandler.Instance.GetPlugins<IAiPlugin>();
+            _plugins = new ObservableCollection<ArtificialIntelligenceContainer>();
+            var plugins = PluginHandler.Instance.GetPlugins<IArtificialIntelligenceFactory>();
             foreach (var plugin in plugins)
             {
-                var container = new AiPluginContainer { Name=plugin.Name ?? "???", Plugin = plugin };
+                var ai = plugin.CreateInstance();
+                var container = new ArtificialIntelligenceContainer { Name= ai.Name ?? "???", AI = ai };
                 _plugins.Add(container);
             }
             if (_plugins.Count > 0) SelectedItem = _plugins[0];
@@ -60,7 +61,7 @@ namespace AccessBattle.Wpf.ViewModel
                 {
                     var sel = _selectedItem;
                     if (sel == null) return;
-                    ParentViewModel.Game.StartLocalGame(sel.Plugin);
+                    ParentViewModel.Game.StartLocalGame(sel.AI);
                     ParentViewModel.CurrentMenu = MenuType.Deployment;
                 }, o => _selectedItem != null);
             }
