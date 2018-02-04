@@ -24,6 +24,7 @@ AccessBattle is a private fan project and not affiliated with
   - Same user can login multiple times. Not sure if bug or feature.  
   - Game might screw up if one client disconnects
   - Rematch does not work sometimes
+  - Exit Game does not work in single player
   
 - TODO
   - Interface for user database plugins
