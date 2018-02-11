@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Baka.cs" />
+    <Compile Include="Mia.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -51,4 +52,11 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>if $(ConfigurationName) == Debug (
+xcopy /E /Y "$(SolutionDir)AccessBattleAI\bin\Debug\AccessBattleAI.dll" "$(SolutionDir)AccessBattleWpf\bin\Debug\Plugins\"
+) else (
+xcopy /E /Y "$(SolutionDir)AccessBattleAI\bin\Release\AccessBattleAI.dll" "$(SolutionDir)AccessBattleWpf\bin\Release\Plugins\"
+)</PostBuildEvent>
+  </PropertyGroup>
 </Project>

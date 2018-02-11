@@ -103,7 +103,6 @@ namespace AccessBattleAI
         {
             // Randomize cards:
             var list = new List<char> { 'V', 'V', 'V', 'V', 'L', 'L', 'L', 'L', };
-            Random rnd = new Random();
             var n = list.Count;
             while (n > 1)
             {
