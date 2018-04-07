@@ -54,12 +54,26 @@ namespace AccessBattle
         bool _isFaceUp, _hasBoost;
         OnlineCardType _type;
 
+        private static bool? _aiDebug;
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public OnlineCard()
+        {
+            if (_aiDebug == null)
+            {
+                var args = Environment.GetCommandLineArgs();
+                _aiDebug = args.Contains("-aidebug");
+            }
+        }
+
         /// <summary>
         /// If true, the card is visible to the opponent.
         /// </summary>
         public bool IsFaceUp
         {
-            get { return _isFaceUp; }
+            get { return (_aiDebug == true) || _isFaceUp; }
             set { SetProp(ref _isFaceUp, value); }
         }
 

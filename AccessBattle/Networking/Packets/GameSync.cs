@@ -104,7 +104,7 @@ namespace AccessBattle.Networking.Packets
                     {
                         HasBoost = field.Card.HasBoost,
                         IsFaceUp = field.Card.IsFaceUp,
-                        IsFirewall = field.Card.IsFaceUp,
+                        IsFirewall = field.Card.IsFirewall,
                         Owner = field.Card.Owner == 1 ? 2 : 1,
                         Type = field.Card.Type
                     },
