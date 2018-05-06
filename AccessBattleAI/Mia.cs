@@ -173,7 +173,7 @@ namespace AccessBattleAI
                 }
             }
             // At the start of the game, the distance sum is about 225
-            score += distanceSum / 100; // 2.2 at start of the game
+            score += distanceSum / 150; // 1.5 at start of the game
 
             foreach (var s in state.NextStates)
             {
