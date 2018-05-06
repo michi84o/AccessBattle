@@ -99,8 +99,6 @@ namespace AccessBattleAI
             //   - Distance to exit: Link
             //   - Distance to opponent cards: Link
             //   - Distance to opponent cards: Virus
-            //   f1, f2, f3 have to be adjusted
-            //   Proposed factors to start with: f1=2, f2=1, f3=1
 
             if (Phase == GamePhase.Deployment)
                 return Deploy();
@@ -154,8 +152,9 @@ namespace AccessBattleAI
                     distanceSum += DistanceToExit(field);
                 }
             }
+            // At the start of the game, the distance sum is about 28
             if (distanceSum < 1) score += 4;
-            else score += 100 / distanceSum;
+            else score += 100 / distanceSum; // 3.6 at start of the game
 
             // 2. Distance of Links and Viruses to Opponent cards
             distanceSum = 0;
@@ -172,8 +171,9 @@ namespace AccessBattleAI
                     else
                         distanceSum -= dst;
                 }
-            }            
-            score += distanceSum / 200;
+            }
+            // At the start of the game, the distance sum is about 225
+            score += distanceSum / 100; // 2.2 at start of the game
 
             foreach (var s in state.NextStates)
             {
