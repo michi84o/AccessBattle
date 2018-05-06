@@ -12,11 +12,11 @@ AccessBattle is a private fan project and not affiliated with
 
 - Current status: Work in progress
   - Multiplayer is in alpha. There are some bugs and features are missing (WIP)
-  - Singleplayer is in alpha. The AI plugin contains one stupid AI opponent. More are to come.
+  - Singleplayer is in alpha. The AI plugin contains two stupid AI opponents.
   
 - Roadmap
   - ~~User Interface + Multiplayer finished: January 2018~~ (Postponed for now)
-  - Singleplayer: Add more AI opponents: May 2018
+  - Singleplayer: Add more AI opponents. Next one is probably a neural network.
   - Documentation: August 2018 (if I have some free time)
   - Sorry if this is taking so long. I have a full time job and not much free time.
   
