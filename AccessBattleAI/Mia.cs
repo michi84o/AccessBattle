@@ -20,11 +20,14 @@ namespace AccessBattleAI
         public IArtificialIntelligence CreateInstance() => new Mia();
     }
 
+    /// <summary>
+    /// Implementation of Mia.
+    /// </summary>
     public class Mia : AiBase
     {
         protected override string _name => "Mia (alpha)";
 
-        Random rnd = new Random();
+        Random _rnd = new Random();
 
         class GameState : IBoardGame
         {
@@ -285,7 +288,7 @@ namespace AccessBattleAI
             while (n > 1)
             {
                 --n;
-                int i = rnd.Next(n + 1);
+                int i = _rnd.Next(n + 1);
                 char c = list[i];
                 list[i] = list[n];
                 list[n] = c;

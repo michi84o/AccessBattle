@@ -43,6 +43,8 @@
   <ItemGroup>
     <Compile Include="Baka.cs" />
     <Compile Include="Mia.cs" />
+    <Compile Include="Models\NeuralNetwork.cs" />
+    <Compile Include="Nou.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
