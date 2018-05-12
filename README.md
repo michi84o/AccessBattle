@@ -40,6 +40,7 @@ can program their own user interface for it. The DLL should
 be compatible with Mono and also run on Linux.
 
 Here is an example of a console based UI:
+
 ![Screenshot of client](Images/console.png)
 
 The user interface is implemented with WPF using .NET 4.5.
