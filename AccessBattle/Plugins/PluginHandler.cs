@@ -77,6 +77,8 @@ namespace AccessBattle.Plugins
 
         public List<T> GetPlugins<T>() where T : IPlugin
         {
+            if (_plugins == null)
+                return new List<T>();
             return _plugins.OfType<T>().Cast<T>().ToList();
         }
     }
