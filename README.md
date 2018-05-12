@@ -39,6 +39,9 @@ The main game engine is inside a separate DLL so that people
 can program their own user interface for it. The DLL should
 be compatible with Mono and also run on Linux.
 
+Here is an example of a console based UI:
+![Screenshot of client](Images/console.png)
+
 The user interface is implemented with WPF using .NET 4.5.
 You need at least Windows Vista SP2, Windows 7 SP1 or newer 
 to use it. I tested it on Windows 7.
