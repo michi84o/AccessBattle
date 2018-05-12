@@ -56,7 +56,7 @@ namespace AccessBattle.Plugins
             try
             {
                 catalog.Catalogs.Add(new DirectoryCatalog(
-                    System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Plugins")));
+                    System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)));
 
                 var container = new CompositionContainer(catalog);
                 container.ComposeParts(this);

@@ -16,6 +16,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccessBattleWpf", "AccessBa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccessBattleAI", "AccessBattleAI\AccessBattleAI.csproj", "{C3860788-4988-49DC-A2DC-3B3D28472798}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccessBattleConsole", "AccessBattleConsole\AccessBattleConsole.csproj", "{FFCE0BDD-D0AC-457C-BFF2-DBA007EE63B7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C3860788-4988-49DC-A2DC-3B3D28472798} = {C3860788-4988-49DC-A2DC-3B3D28472798}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,6 +47,10 @@ Global
 		{C3860788-4988-49DC-A2DC-3B3D28472798}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C3860788-4988-49DC-A2DC-3B3D28472798}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C3860788-4988-49DC-A2DC-3B3D28472798}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FFCE0BDD-D0AC-457C-BFF2-DBA007EE63B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FFCE0BDD-D0AC-457C-BFF2-DBA007EE63B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FFCE0BDD-D0AC-457C-BFF2-DBA007EE63B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FFCE0BDD-D0AC-457C-BFF2-DBA007EE63B7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
