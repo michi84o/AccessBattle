@@ -142,33 +142,119 @@ namespace AccessBattleConsole
             // Draw the board first
             DrawBoard();
 
-            Console.WriteLine("WIP");
+            Console.WriteLine("\nEnter a game command (? for help):");
+            NextAction = HandleGameCommand;
+        }
+
+        static void HandleGameCommand(string str)
+        {
+            if (str == "?")
+            {
+                //Console.
+            }
+        }
+
+        static void DrawStack(int y, bool hideOpponent) // P1: y=8, P2: y=9
+        {
+            var b = CurGame.Board;
+            for (int s = 0; s < 8; ++s)
+            {
+                if (s == 4) Console.Write(" ");
+                var card = b[s, y].Card as OnlineCard;
+                if (card == null)
+                {
+                    Console.Write("_");
+                    continue;
+                }
+                if (card.Type == OnlineCardType.Unknown || hideOpponent && !card.IsFaceUp && card.Owner.PlayerNumber == 2) Console.Write(" X ");
+                else if (card.Type == OnlineCardType.Link) Console.Write("L");
+                else if (card.Type == OnlineCardType.Virus) Console.Write("V");
+                else Console.Write("?");
+
+                var oldCol = Console.ForegroundColor;
+                Console.ForegroundColor = card.Owner.PlayerNumber == 1 ? ConsoleColor.Cyan : ConsoleColor.Red;
+                Console.ForegroundColor = oldCol;
+            }
         }
 
         static void DrawBoard(bool hideOpponent = true)
         {
-            var b = CurGame.Board;
+            var b = CurGame.Board;            
 
-            Console.WriteLine("  Board: V=Virus, L=Link, F=Firewall");
-            Console.WriteLine("  ┌───┬───┬───┬───┬───┬───┬───┬───┐");
-            Console.WriteLine("8 │   │   │   │   │   │   │   │   │");
-            Console.WriteLine("  ├───┼───┼───┼───┼───┼───┼───┼───┤");
-            Console.WriteLine("7 │   │   │   │   │   │   │   │   │");
-            Console.WriteLine("  ├───┼───┼───┼───┼───┼───┼───┼───┤");
-            Console.WriteLine("6 │   │   │   │   │   │   │   │   │");
-            Console.WriteLine("  ├───┼───┼───┼───┼───┼───┼───┼───┤");
-            Console.WriteLine("5 │   │   │   │   │   │   │   │   │");
-            Console.WriteLine("  ├───┼───┼───┼───┼───┼───┼───┼───┤");
-            Console.WriteLine("4 │   │   │   │   │   │   │   │   │");
-            Console.WriteLine("  ├───┼───┼───┼───┼───┼───┼───┼───┤");
-            Console.WriteLine("3 │   │   │   │   │   │   │   │   │");
-            Console.WriteLine("  ├───┼───┼───┼───┼───┼───┼───┼───┤");
-            Console.WriteLine("2 │   │   │   │   │   │   │   │   │");
-            Console.WriteLine("  ├───┼───┼───┼───┼───┼───┼───┼───┤");
-            Console.WriteLine("1 │   │   │   │   │   │   │   │   │");
-            Console.WriteLine("  └───┴───┴───┴───┴───┴───┴───┴───┘");
-            Console.WriteLine("    a   b   c   d   e   f   g   h");
-            Console.WriteLine("");
+            string upper =  "   ┌───┬───┬───┬═══┬═══┬───┬───┬───┐";
+          //string row =     "  │   │   │   │   │   │   │   │   │";
+            string middle = "   ├───┼───┼───┼───┼───┼───┼───┼───┤";
+            string lower =  "   └───┴───┴───┴═══┴═══┴───┴───┴───┘";
+            string xlabel = "     a   b   c   d   e   f   g   h";
+
+            Console.WriteLine(upper);
+            for (int y = 8; y > 0; --y)
+            {
+                Console.Write(" " + y + " │");
+                for (int x = 0; x < 8; ++x)
+                {                    
+                    var card = b[x, y-1].Card;
+                    if (card == null)
+                        Console.Write("   ");
+                    else 
+                    {
+                        var oldCol = Console.ForegroundColor;
+                        Console.ForegroundColor = card.Owner.PlayerNumber == 1 ? ConsoleColor.Cyan : ConsoleColor.Red;
+                        if (card is FirewallCard) Console.Write(" F ");
+                        else
+                        {
+                            var onlCard = card as OnlineCard;
+                            if (onlCard == null) Console.Write("err");
+                            else
+                            {
+                                if (onlCard.Type == OnlineCardType.Unknown || hideOpponent && !onlCard.IsFaceUp && card.Owner.PlayerNumber == 2) Console.Write(" X ");
+                                else if (onlCard.Type == OnlineCardType.Link) Console.Write(" L ");
+                                else if (onlCard.Type == OnlineCardType.Virus) Console.Write(" V ");
+                                else Console.Write("ERR");
+                            }
+                        }
+                        Console.ForegroundColor = oldCol;
+                    }
+                    Console.Write("│");
+                }
+                if (y == 8)
+                {
+                    Console.WriteLine(" Stack: ");
+                    Console.Write(middle + " P2: ");
+                    DrawStack(9, hideOpponent);
+                    Console.WriteLine();
+                }
+                else if (y == 7)
+                {
+                    Console.Write(" P1: ");
+                    DrawStack(8, hideOpponent);
+                    Console.WriteLine();
+                    Console.WriteLine(middle);
+                }
+                else if (y == 6)
+                {
+                    Console.WriteLine(" Game Phase: " + CurGame.Phase);
+                    Console.WriteLine(middle);
+                }
+                else if (y == 2)
+                {
+                    Console.WriteLine(" Board: ");
+                    Console.WriteLine(middle + " X = Unknown");
+                }
+                else if (y == 1)
+                {
+                    Console.WriteLine(" L = Link ");
+                    Console.WriteLine(lower + " V = Virus");
+                }
+                else
+                {
+                    Console.WriteLine();
+                    if (y > 1) Console.WriteLine(middle);
+                }
+            }
+            //Console.WriteLine(lower);
+            Console.WriteLine(xlabel);
+
         }
 
     }

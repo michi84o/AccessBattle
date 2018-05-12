@@ -57,7 +57,7 @@ namespace AccessBattle.Plugins
         {
             Helpers.ConvertCoordinates(ref x0, ref y0, IsAiHost);
             Helpers.ConvertCoordinates(ref x1, ref y1, IsAiHost);
-            return string.Format("mv {0},{1},{2},{3}", x0,y0,x1,y1);
+            return string.Format("mv {0},{1},{2},{3}", x0+1,y0+1,x1+1,y1+1);
         }
 
         protected string PlayBoost(BoardField field, bool place)
@@ -67,7 +67,7 @@ namespace AccessBattle.Plugins
         protected string PlayBoost(int x, int y, bool place)
         {
             Helpers.ConvertCoordinates(ref x, ref y, IsAiHost);
-            return string.Format("bs {0},{1},{2}", x, y, place ? 1 : 0);
+            return string.Format("bs {0},{1},{2}", x+1, y+1, place ? 1 : 0);
         }
 
         protected string PlayFirewall(BoardField field, bool place)
@@ -77,7 +77,7 @@ namespace AccessBattle.Plugins
         protected string PlayFirewall(int x, int y, bool place)
         {
             Helpers.ConvertCoordinates(ref x, ref y, IsAiHost);
-            return string.Format("fw {0},{1},{2}", x, y, place ? 1 : 0);
+            return string.Format("fw {0},{1},{2}", x+1, y+1, place ? 1 : 0);
         }
 
         protected string PlayVirusCheck(BoardField field)
@@ -87,7 +87,7 @@ namespace AccessBattle.Plugins
         protected string PlayVirusCheck(int x, int y)
         {
             Helpers.ConvertCoordinates(ref x, ref y, IsAiHost);
-            return string.Format("vc {0},{1}", x, y);
+            return string.Format("vc {0},{1}", x+1, y+1);
         }
 
         protected string PlayError404(BoardField field1, BoardField field2, bool switchPlaces)
@@ -98,7 +98,7 @@ namespace AccessBattle.Plugins
         {
             Helpers.ConvertCoordinates(ref x0, ref y0, IsAiHost);
             Helpers.ConvertCoordinates(ref x1, ref y1, IsAiHost);
-            return string.Format("er {0},{1},{2},{3},{4}", x0, y0, x1, y1, switchPlaces ? 1 : 0);
+            return string.Format("er {0},{1},{2},{3},{4}", x0+1, y0+1, x1+1, y1+1, switchPlaces ? 1 : 0);
         }
 
         /// <summary>

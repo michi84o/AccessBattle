@@ -205,14 +205,33 @@ namespace AccessBattle
                 Phase = GamePhase.Aborted;
         }
 
+
+        void ReplaceLettersWithNumbers(ref string[] array)
+        {
+            for (int i = 0; i < array.Length; ++i)
+            {
+                array[i] = array[i]
+                    .Replace("a", "1")
+                    .Replace("b", "2")
+                    .Replace("c", "3")
+                    .Replace("d", "4")
+                    .Replace("e", "5")
+                    .Replace("f", "6")
+                    .Replace("g", "7")
+                    .Replace("h", "8");
+            }
+        }
         /// <summary>
         /// Command      Syntax             Example
         /// -------------------------------------------
-        /// Move         mv x1,y1,x2,y2     mv 0,0,1,0
-        /// Boost        bs x1,y1,e         bs 0,0,1
-        /// Firewall     fw x1,y1,e         fw 0,0,1
-        /// Virus Check  vc x1,y1           vc 0,0
-        /// Error 404    er x1,y1,x2,y2,s   er 0,0,1,1,1
+        /// Move         mv x1,y1,x2,y2     mv 1,1,2,1
+        /// Boost        bs x1,y1,e         bs 1,1,1
+        /// Firewall     fw x1,y1,e         fw 1,1,1
+        /// Virus Check  vc x1,y1           vc 1,1
+        /// Error 404    er x1,y1,x2,y2,s   er 1,1,2,2,1
+        /// 
+        /// All coordinates start at 1, not 0. Letters a-h are allowed for x.
+        /// 
         /// </summary>
         /// <param name="command">Command to play.</param>
         /// <param name="player">Player number.</param>
@@ -285,12 +304,16 @@ namespace AccessBattle
                 command = command.Substring(3).Trim();
                 var split = command.Split(new[] { ',' });
                 if (split.Length != 4) return false;
+                ReplaceLettersWithNumbers(ref split);
                 uint x1, x2, y1, y2;
                 if (!uint.TryParse(split[0], out x1) ||
                     !uint.TryParse(split[1], out y1) ||
                     !uint.TryParse(split[2], out x2) ||
                     !uint.TryParse(split[3], out y2))
                     return false;
+
+                // Convert to zero based index:
+                --x1; --x2; --y1; --y2;
 
                 if (x1 > 7 || x2 > 7 || (y1 > 7 && y1 != 10) || (y2 > 7 && y2 != 10))
                     return false;
@@ -347,11 +370,16 @@ namespace AccessBattle
                 var split = command.Split(new[] { ',' });
                 if (split.Length != 3) return false;
 
+                ReplaceLettersWithNumbers(ref split);
+
                 uint x1, y1, enabled;
                 if (!uint.TryParse(split[0], out x1) ||
                     !uint.TryParse(split[1], out y1) ||
                     !uint.TryParse(split[2], out enabled))
                     return false;
+
+                // Convert to zero based index:
+                --x1; --y1;
 
                 if (x1 > 7 || y1 > 7 || enabled > 1)
                     return false;
@@ -398,11 +426,16 @@ namespace AccessBattle
                 var split = command.Split(new[] { ',' });
                 if (split.Length != 3) return false;
 
+                ReplaceLettersWithNumbers(ref split);
+
                 uint x1, y1, enabled;
                 if (!uint.TryParse(split[0], out x1) ||
                     !uint.TryParse(split[1], out y1) ||
                     !uint.TryParse(split[2], out enabled))
                     return false;
+
+                // Convert to zero based index:
+                --x1; --y1;
 
                 if (x1 > 7 || y1 > 7 || enabled > 1)
                     return false;
@@ -444,6 +477,8 @@ namespace AccessBattle
                 var split = command.Split(new[] { ',' });
                 if (split.Length != 2) return false;
 
+                ReplaceLettersWithNumbers(ref split);
+
                 uint x1, y1;
                 if (!uint.TryParse(split[0], out x1) ||
                     !uint.TryParse(split[1], out y1))
@@ -451,6 +486,9 @@ namespace AccessBattle
 
                 if (Players[player - 1].DidVirusCheck)
                     return false;
+
+                // Convert to zero based index:
+                --x1; --y1;
 
                 if (x1 > 7 || y1 > 7)
                     return false;
@@ -477,6 +515,8 @@ namespace AccessBattle
                 var split = command.Split(new[] { ',' });
                 if (split.Length != 5) return false;
 
+                ReplaceLettersWithNumbers(ref split);
+
                 uint x1, y1, x2, y2, switchCards;
                 if (!uint.TryParse(split[0], out x1) ||
                     !uint.TryParse(split[1], out y1) ||
@@ -487,6 +527,9 @@ namespace AccessBattle
 
                 if (Players[player - 1].Did404NotFound)
                     return false;
+
+                // Convert to zero based index:
+                --x1; --x2; --y1; --y2;
 
                 if (x1 > 7 || y1 > 7 || x2 > 7 || y2 > 7 || switchCards > 1)
                     return false;

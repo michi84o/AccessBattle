@@ -144,7 +144,7 @@ namespace AccessBattle.Wpf.ViewModel
                     var firewallCard = BoardFieldList.FirstOrDefault(f => f.Field.Y < 8 && f.HasCard && f.Field.Card is FirewallCard && f.Field.Card.Owner.PlayerNumber == player);
                     if (firewallCard != null)
                     {
-                        SendGameCommand(string.Format("fw {0},{1},{2}", firewallCard.Field.X, firewallCard.Field.Y, 0));
+                        SendGameCommand(string.Format("fw {0},{1},{2}", firewallCard.Field.X+1, firewallCard.Field.Y+1, 0));
                         return;
                     }
                     IsFirewallSelected = true;
@@ -159,7 +159,7 @@ namespace AccessBattle.Wpf.ViewModel
                     var lineBoostCard = onlineCards.FirstOrDefault(f => (f.Field?.Card as OnlineCard)?.HasBoost == true);
                     if (lineBoostCard != null)
                     {
-                        SendGameCommand(string.Format("bs {0},{1},{2}", lineBoostCard.Field.X, lineBoostCard.Field.Y, 0));
+                        SendGameCommand(string.Format("bs {0},{1},{2}", lineBoostCard.Field.X+1, lineBoostCard.Field.Y+1, 0));
                         return;
                     }
                     IsLineBoostSelected = true;
@@ -234,7 +234,7 @@ namespace AccessBattle.Wpf.ViewModel
             if (card1?.Owner?.PlayerNumber == playerNum && card2?.Owner?.PlayerNumber == playerNum &&
                 card1 is OnlineCard && card2 is OnlineCard)
             {
-                SendGameCommand(string.Format("er {0},{1},{2},{3},{4}", vm1.Field.X, vm1.Field.Y, vm2.Field.X, vm2.Field.Y, switchCards ? 1 : 0));
+                SendGameCommand(string.Format("er {0},{1},{2},{3},{4}", vm1.Field.X+1, vm1.Field.Y+1, vm2.Field.X+1, vm2.Field.Y+1, switchCards ? 1 : 0));
             }
             ClearFieldSelection();
             ClearHighlighting();
@@ -316,19 +316,19 @@ namespace AccessBattle.Wpf.ViewModel
                     if (_isLineBoostSelected)
                     {
                         if (vm.HasCard && vm.Field.Card?.Owner?.PlayerNumber == playerNum)
-                            SendGameCommand(string.Format("bs {0},{1},{2}", vm.Field.X, vm.Field.Y, 1));
+                            SendGameCommand(string.Format("bs {0},{1},{2}", vm.Field.X+1, vm.Field.Y+1, 1));
                     }
                     else if (_isFirewallSelected)
                     {
                         if (!vm.HasCard &&
                             index != 84 && index != 85
                             && index != 3 && index != 4 && index != 3 + 8 * 7 && index != 4 + 8 * 7)
-                            SendGameCommand(string.Format("fw {0},{1},{2}", vm.Field.X, vm.Field.Y, 1));
+                            SendGameCommand(string.Format("fw {0},{1},{2}", vm.Field.X+1, vm.Field.Y+1, 1));
                     }
                     else if (_isVirusCheckSelected)
                     {
                         if (!player.DidVirusCheck && vm.Field?.Card?.Owner.PlayerNumber == opponent && vm.Field.Card is OnlineCard)
-                            SendGameCommand(string.Format("vc {0},{1}", vm.Field.X, vm.Field.Y));
+                            SendGameCommand(string.Format("vc {0},{1}", vm.Field.X+1, vm.Field.Y+1));
                     }
                     else if (_isError404Selected)
                     {
@@ -407,7 +407,7 @@ namespace AccessBattle.Wpf.ViewModel
                     var from = BoardFieldList[_selectedField];
                     // TODO: Ask Game class if move is possible
                     // TODO: Exclude own exit fields
-                    SendGameCommand(string.Format("mv {0},{1},{2},{3}", from.Field.X, from.Field.Y, vm.Field.X, vm.Field.Y));
+                    SendGameCommand(string.Format("mv {0},{1},{2},{3}", from.Field.X+1, from.Field.Y+1, vm.Field.X+1, vm.Field.Y+1));
                 }
                 // Any other field that was clicked resets the selection
                 ClearFieldSelection();
