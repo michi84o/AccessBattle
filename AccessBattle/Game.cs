@@ -221,9 +221,26 @@ namespace AccessBattle
                     .Replace("h", "8");
             }
         }
+
+        string ReplaceAltSyntax(string str)
+        {       
+            // TODO: Performance and memory usage ???
+            return str
+                .Replace("a1", "a,1").Replace("b1", "b,1").Replace("c1", "c,1").Replace("d1", "d,1").Replace("e1", "e,1").Replace("f1", "f,1").Replace("g1", "g,1").Replace("h1", "h,1")
+                .Replace("a2", "a,2").Replace("b2", "b,2").Replace("c2", "c,2").Replace("d2", "d,2").Replace("e2", "e,2").Replace("f2", "f,2").Replace("g2", "g,2").Replace("h2", "h,2")
+                .Replace("a3", "a,3").Replace("b3", "b,3").Replace("c3", "c,3").Replace("d3", "d,3").Replace("e3", "e,3").Replace("f3", "f,3").Replace("g3", "g,3").Replace("h3", "h,3")
+                .Replace("a4", "a,4").Replace("b4", "b,4").Replace("c4", "c,4").Replace("d4", "d,4").Replace("e4", "e,4").Replace("f4", "f,4").Replace("g4", "g,4").Replace("h4", "h,4")
+                .Replace("a5", "a,5").Replace("b5", "b,5").Replace("c5", "c,5").Replace("d5", "d,5").Replace("e5", "e,5").Replace("f5", "f,5").Replace("g5", "g,5").Replace("h5", "h,5")
+                .Replace("a6", "a,6").Replace("b6", "b,6").Replace("c6", "c,6").Replace("d6", "d,6").Replace("e6", "e,6").Replace("f6", "f,6").Replace("g6", "g,6").Replace("h6", "h,6")
+                .Replace("a7", "a,7").Replace("b7", "b,7").Replace("c7", "c,7").Replace("d7", "d,7").Replace("e7", "e,7").Replace("f7", "f,7").Replace("g7", "g,7").Replace("h7", "h,7")
+                .Replace("a8", "a,8").Replace("b8", "b,8").Replace("c8", "c,8").Replace("d8", "d,8").Replace("e8", "e,8").Replace("f8", "f,8").Replace("g8", "g,8").Replace("h8", "h,8")
+                ;
+        }
+
         /// <summary>
         /// Command      Syntax             Example
         /// -------------------------------------------
+        /// Deply        dp VVVVLLLL    
         /// Move         mv x1,y1,x2,y2     mv 1,1,2,1
         /// Boost        bs x1,y1,e         bs 1,1,1
         /// Firewall     fw x1,y1,e         fw 1,1,1
@@ -236,9 +253,11 @@ namespace AccessBattle
         /// <param name="command">Command to play.</param>
         /// <param name="player">Player number.</param>
         /// <returns></returns>
-        // TODO LOCK ACCESS TOD THIS METHOD !!!
+        // TODO LOCK ACCESS TOD THIS METHOD !!!        
         public virtual bool ExecuteCommand(string command, int player)
         {
+            command = ReplaceAltSyntax(command);
+
             if (player != 1 && player != 2) return false;
             if (Phase == GamePhase.Player1Turn && player != 1) return false;
             if (Phase == GamePhase.Player2Turn && player != 2) return false;

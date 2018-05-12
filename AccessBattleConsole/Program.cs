@@ -142,6 +142,28 @@ namespace AccessBattleConsole
             // Draw the board first
             DrawBoard();
 
+            if (CurGame.Phase == GamePhase.Player1Win)
+            {
+                Console.WriteLine("\nYou win!");
+            }
+            else if (CurGame.Phase == GamePhase.Player2Win)
+            {
+                Console.WriteLine("\nYou lose!");
+            }
+            else if (CurGame.Phase == GamePhase.Aborted)
+            {
+                Console.WriteLine("\nGame over!");
+            }
+
+            if (CurGame.Phase == GamePhase.Player1Win ||
+                CurGame.Phase == GamePhase.Player2Win ||
+                CurGame.Phase == GamePhase.Aborted)
+            {
+                Console.WriteLine("\nPress enter to return to main menu");
+                CurrentMenu = MenuType.Main;
+                return;
+            }            
+
             Console.WriteLine("\nEnter a game command (? for help):");
             NextAction = HandleGameCommand;
         }
@@ -150,7 +172,30 @@ namespace AccessBattleConsole
         {
             if (str == "?")
             {
-                //Console.
+                Console.WriteLine("Command      Syntax             Example");
+                Console.WriteLine("-------------------------------------------");
+                Console.WriteLine("Deploy       dp card list       dp VVVVLLLL");
+                Console.WriteLine("Move         mv x1,y1,x2,y2     mv a1,b1");
+                Console.WriteLine("Boost        bs x1,y1,e         bs a1,1");
+                Console.WriteLine("Firewall     fw x1,y1,e         fw a1,1");
+                Console.WriteLine("Virus Check  vc x1,y1           vc a1");
+                Console.WriteLine("Error 404    er x1,y1,x2,y2,s   er a1,b2,1");
+                Console.WriteLine();
+                Console.WriteLine("x1;x2 = horizontal coordinate (a-h or 1-8)");
+                Console.WriteLine("y1;y2 = vertical   coordinate (a-h or 1-8)");
+                Console.WriteLine("e=enable: 1=yes, 0=no");
+                Console.WriteLine("s=switch: 1=yes, 0=no");
+                Console.WriteLine();
+                Console.WriteLine("Press enter to continue");
+                Console.ReadLine();
+            }
+            else
+            {
+                if (!CurGame.ExecuteCommand(str, 1))
+                {
+                    Console.WriteLine("Wrong command!");
+                    Thread.Sleep(1000);
+                }
             }
         }
 
@@ -166,7 +211,8 @@ namespace AccessBattleConsole
                     Console.Write("_");
                     continue;
                 }
-                if (card.Type == OnlineCardType.Unknown || hideOpponent && !card.IsFaceUp && card.Owner.PlayerNumber == 2) Console.Write(" X ");
+                if (card.Type == OnlineCardType.Unknown || hideOpponent && !card.IsFaceUp && card.Owner.PlayerNumber == 2)
+                    Console.Write("X");
                 else if (card.Type == OnlineCardType.Link) Console.Write("L");
                 else if (card.Type == OnlineCardType.Virus) Console.Write("V");
                 else Console.Write("?");
@@ -234,6 +280,11 @@ namespace AccessBattleConsole
                 else if (y == 6)
                 {
                     Console.WriteLine(" Game Phase: " + CurGame.Phase);
+                    Console.WriteLine(middle);
+                }
+                else if (y == 3)
+                {
+                    Console.WriteLine(" Server Location: 6,11 ");
                     Console.WriteLine(middle);
                 }
                 else if (y == 2)
