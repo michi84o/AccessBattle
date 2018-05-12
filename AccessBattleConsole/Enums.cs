@@ -10,7 +10,6 @@ namespace AccessBattleConsole
     {
         Main,
         SinglePlayer,
-        SinglePlayerDeploy,
         Game
     }
 

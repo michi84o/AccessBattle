@@ -1,4 +1,5 @@
-﻿using AccessBattle.Plugins;
+﻿using AccessBattle;
+using AccessBattle.Plugins;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +27,7 @@ namespace AccessBattleConsole
         static MenuType CurrentMenu = MenuType.Main;
         static Action<string> NextAction;
         static List<IArtificialIntelligenceFactory> AiPlugins;
+        static Game CurGame;
 
         static void UpdateUI()
         {
@@ -34,18 +36,16 @@ namespace AccessBattleConsole
             {
                 case MenuType.Main:
                     DrawMainMenu();
-                    break;
-                case MenuType.Game:
-                    DrawBoard();
-                    break;
+                    break;                
                 case MenuType.SinglePlayer:
                     DrawSinglePlayer();
                     break;
-                case MenuType.SinglePlayerDeploy:
-                    DrawSinglePlayerDeploy();
+                case MenuType.Game:
+                    DrawGame();
                     break;
                 default:
                     Console.WriteLine("Oops! Nothing to see here");
+                    Thread.Sleep(500);
                     break;
             }
         }
@@ -74,13 +74,12 @@ namespace AccessBattleConsole
                     break;
                 case "2":
                     Console.WriteLine("Not implemented yet!");
-                    Thread.Sleep(2000);
+                    Thread.Sleep(1000);
                     CurrentMenu = MenuType.Main;
                     break;
             }
 
         }
-
 
         static void DrawSinglePlayer()
         {
@@ -119,18 +118,57 @@ namespace AccessBattleConsole
             }
             if (selectedPlugin != null)
             {
-
+                CurrentMenu = MenuType.Game;
+                // Set up Game
+                if (CurGame != null)
+                {
+                    // CurGame.Dispose(); TODO
+                }
+                CurGame = new LocalGame();
+                ((LocalGame)CurGame).SetAi(selectedPlugin.CreateInstance());
+                CurGame.InitGame();
             }
         }
 
-        static void DrawSinglePlayerDeploy()
+        static void DrawGame()
         {
-            Console.WriteLine("Deployment");
+            if (CurGame == null)
+            {
+                Console.WriteLine("Game was not set up properly.\nPress enter to restart.");
+                CurrentMenu = MenuType.Main;                           
+                return;
+            }
+
+            // Draw the board first
+            DrawBoard();
+
+            Console.WriteLine("WIP");
         }
 
-        static void DrawBoard()
+        static void DrawBoard(bool hideOpponent = true)
         {
+            var b = CurGame.Board;
 
+            Console.WriteLine("  Board: V=Virus, L=Link, F=Firewall");
+            Console.WriteLine("  ┌───┬───┬───┬───┬───┬───┬───┬───┐");
+            Console.WriteLine("8 │   │   │   │   │   │   │   │   │");
+            Console.WriteLine("  ├───┼───┼───┼───┼───┼───┼───┼───┤");
+            Console.WriteLine("7 │   │   │   │   │   │   │   │   │");
+            Console.WriteLine("  ├───┼───┼───┼───┼───┼───┼───┼───┤");
+            Console.WriteLine("6 │   │   │   │   │   │   │   │   │");
+            Console.WriteLine("  ├───┼───┼───┼───┼───┼───┼───┼───┤");
+            Console.WriteLine("5 │   │   │   │   │   │   │   │   │");
+            Console.WriteLine("  ├───┼───┼───┼───┼───┼───┼───┼───┤");
+            Console.WriteLine("4 │   │   │   │   │   │   │   │   │");
+            Console.WriteLine("  ├───┼───┼───┼───┼───┼───┼───┼───┤");
+            Console.WriteLine("3 │   │   │   │   │   │   │   │   │");
+            Console.WriteLine("  ├───┼───┼───┼───┼───┼───┼───┼───┤");
+            Console.WriteLine("2 │   │   │   │   │   │   │   │   │");
+            Console.WriteLine("  ├───┼───┼───┼───┼───┼───┼───┼───┤");
+            Console.WriteLine("1 │   │   │   │   │   │   │   │   │");
+            Console.WriteLine("  └───┴───┴───┴───┴───┴───┴───┴───┘");
+            Console.WriteLine("    a   b   c   d   e   f   g   h");
+            Console.WriteLine("");
         }
 
     }

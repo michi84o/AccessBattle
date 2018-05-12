@@ -60,7 +60,7 @@ namespace AccessBattle
     /// <summary>
     /// Contains the complete state of a game.
     /// </summary>
-    public class Game : PropChangeNotifier, IBoardGame
+    public class Game : PropChangeNotifier, IBoardGame // TODO: IDisposeable
     {
         GamePhase _phase;
         /// <summary>
@@ -753,7 +753,7 @@ namespace AccessBattle
         #endregion
     }
 
-    public class LocalGame : Game
+    public class LocalGame : Game 
     {
         IArtificialIntelligence _ai;
 

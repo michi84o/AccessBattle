@@ -634,6 +634,7 @@ namespace AccessBattle.Wpf.ViewModel
             if (_localGame == null)
             {
                 _localGame = new LocalGame { AiCommandDelay = 250 };
+                // TODO: WeakEventManager
                 _localGame.SyncRequired += 
                     (sender, args) => { Application.Current.Dispatcher.Invoke(() => SyncLocalGame()); };
             }
