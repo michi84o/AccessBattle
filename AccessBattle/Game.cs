@@ -817,7 +817,8 @@ namespace AccessBattle
 
     public class LocalGame : Game 
     {
-        IArtificialIntelligence _ai;
+        IArtificialIntelligence _ai1;
+        IArtificialIntelligence _ai2;
 
         public event EventHandler SyncRequired;
 
@@ -835,31 +836,50 @@ namespace AccessBattle
         /// Sets AI player. 
         /// </summary>
         /// <param name="ai"></param>
-        public void SetAi(IArtificialIntelligence ai, bool isHost=false)
+        /// <param name="playerNumber">1 or 2. 1 is host.</param>
+        public void SetAi(IArtificialIntelligence ai, int playerNumber = 2)
         {
-            Players[1].Name = ai.Name;           
-            _ai = ai;
-            _ai.IsAiHost = isHost;
+            if (playerNumber != 1 && playerNumber != 2) throw new ArgumentException("playerNumber must be 1 or 2");
+
+            Players[playerNumber - 1].Name = "";
+            if (playerNumber == 1)
+            {
+                _ai1 = ai;
+                if (ai == null) return;
+                _ai1.IsAiHost = true;
+            }
+            else
+            {
+                _ai2 = ai;
+                if (ai == null) return;
+                _ai2.IsAiHost = false;
+            }
+            Players[playerNumber - 1].Name = ai.Name;
         }
 
         /// <summary>
         /// Executes the command and automatically tells the AI to make its move.
         /// </summary>
         /// <param name="command">Command to play.</param>
-        /// <param name="player">Must always be 1. Player 2 is AI.</param>
+        /// <param name="player">Must always be 1 for human player. Player 2 is AI.</param>
         /// <returns></returns>
         public override bool ExecuteCommand(string command, int player)
         {
-            if (_ai == null || player != 1) return false;
+            if ((player != 1 && _ai1 == null) || _ai2 == null) return false;
 
             var result = base.ExecuteCommand(command, player);
             if (!result) return false;
 
+            if (Phase != GamePhase.Player1Turn &&
+                Phase != GamePhase.Player2Turn && 
+                Phase != GamePhase.Deployment)
+                return result; // Game has finished
+
             Action aiMove = () =>
             {
                 // AI Move
-                _ai.Synchronize(GameSync.FromGame(this, 0, 2));
-                var aiCmnd = _ai.PlayTurn();
+                _ai2.Synchronize(GameSync.FromGame(this, 0, 2));
+                var aiCmnd = _ai2.PlayTurn();
                 if (!base.ExecuteCommand(aiCmnd, 2))
                 {
                     Phase = GamePhase.Aborted;
@@ -868,8 +888,8 @@ namespace AccessBattle
                 // Can happen after Deployment
                 if (Phase == GamePhase.Player2Turn)
                 {
-                    _ai.Synchronize(GameSync.FromGame(this, 0, 2));
-                    aiCmnd = _ai.PlayTurn();
+                    _ai2.Synchronize(GameSync.FromGame(this, 0, 2));
+                    aiCmnd = _ai2.PlayTurn();
                     if (!base.ExecuteCommand(aiCmnd, 2))
                     {
                         Phase = GamePhase.Aborted;
@@ -886,6 +906,25 @@ namespace AccessBattle
                 Task.Delay(_aiCommandDelay).ContinueWith((t) => aiMove());
             }
 
+            return true;
+        }
+
+        /// <summary>
+        /// If an AI player was set as player 1. This will trigger its next move.
+        /// AI player 2 will automatically play its move after player 1.
+        /// </summary>
+        /// <returns></returns>
+        public bool AiPlayer1Move()
+        {
+            if (_ai1 == null || 
+                (Phase != GamePhase.Player1Turn && Phase != GamePhase.Deployment))
+                return false;
+            _ai1.Synchronize(GameSync.FromGame(this, 0, 1));
+            if (!ExecuteCommand(_ai1.PlayTurn(), 1))
+            {
+                Phase = GamePhase.Aborted;
+                return false;
+            }
             return true;
         }
     }

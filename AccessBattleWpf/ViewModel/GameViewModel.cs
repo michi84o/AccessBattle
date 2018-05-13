@@ -628,12 +628,12 @@ namespace AccessBattle.Wpf.ViewModel
             set { SetProp(ref _isInSinglePlayerMode, value); }
         }
 
-        public void StartLocalGame(IArtificialIntelligence aiPlayer)
+        public void StartLocalGame(IArtificialIntelligence aiPlayer, int aiDelayMs = 250)
         {
             IsInSinglePlayerMode = true;
             if (_localGame == null)
             {
-                _localGame = new LocalGame { AiCommandDelay = 250 };
+                _localGame = new LocalGame { AiCommandDelay = aiDelayMs };
                 // TODO: WeakEventManager
                 _localGame.SyncRequired += 
                     (sender, args) => { Application.Current.Dispatcher.Invoke(() => SyncLocalGame()); };

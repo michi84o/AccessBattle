@@ -10,7 +10,8 @@ namespace AccessBattleConsole
     {
         Main,
         SinglePlayer,
-        Game
+        Game,
+        AiBattle,
     }
 
 }

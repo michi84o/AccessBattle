@@ -28,25 +28,36 @@ namespace AccessBattleConsole
         static Action<string> NextAction;
         static List<IArtificialIntelligenceFactory> AiPlugins;
         static Game CurGame;
+        static bool IsAiBattle = false;
+        static bool QuitAiBattleRequested = false;
+        static int Round = 0;
+        static int AiCommandDelay = 0;
 
+        static readonly object UiLock = new object();
         static void UpdateUI()
         {
-            Console.Clear();
-            switch (CurrentMenu)
+            lock (UiLock) // A task might trigger change when game phase changed
             {
-                case MenuType.Main:
-                    DrawMainMenu();
-                    break;                
-                case MenuType.SinglePlayer:
-                    DrawSinglePlayer();
-                    break;
-                case MenuType.Game:
-                    DrawGame();
-                    break;
-                default:
-                    Console.WriteLine("Oops! Nothing to see here");
-                    Thread.Sleep(500);
-                    break;
+                Console.Clear();
+                switch (CurrentMenu)
+                {
+                    case MenuType.Main:
+                        DrawMainMenu();
+                        break;
+                    case MenuType.SinglePlayer:
+                        DrawSinglePlayer();
+                        break;
+                    case MenuType.Game:
+                        DrawGame();
+                        break;
+                    case MenuType.AiBattle:
+                        DrawAiBattle();
+                        break;
+                    default:
+                        Console.WriteLine("Oops! Nothing to see here");
+                        Thread.Sleep(500);
+                        break;
+                }
             }
         }
 
@@ -55,13 +66,14 @@ namespace AccessBattleConsole
             Console.WriteLine("ACCESS BATTLE - Supaa Hacka Edition\n");
         }
 
-
         static void DrawMainMenu()
         {
             Title();
             Console.WriteLine("Select Mode:\n");
             Console.WriteLine("1. Singleplayer");
             Console.WriteLine("2. Multiplayer");
+            Console.WriteLine("3. AI vs AI");
+            Console.WriteLine("\nEnter 'exit' to quit.");
             NextAction = MainMenuApplyChoice;
         }
 
@@ -77,8 +89,21 @@ namespace AccessBattleConsole
                     Thread.Sleep(1000);
                     CurrentMenu = MenuType.Main;
                     break;
+                case "3":
+                    CurrentMenu = MenuType.AiBattle;
+                    break;
             }
 
+        }
+
+        static void DrawAiPluginList()
+        {
+            // TODO: Limit height and enable scrolling or flipping page
+            int i = 0;
+            foreach (var plug in AiPlugins)
+            {
+                Console.WriteLine(++i + ". " + plug.Metadata.Name);
+            }
         }
 
         static void DrawSinglePlayer()
@@ -87,15 +112,11 @@ namespace AccessBattleConsole
 
             Console.WriteLine("0. Return to Main Menu\n");
 
+            Console.WriteLine("Select an AI opponent:\n");
+
             if (AiPlugins == null)
                 AiPlugins =  PluginHandler.Instance.GetPlugins<IArtificialIntelligenceFactory>();
-
-            // TODO: Limit height and enable scrolling or flipping page
-            int i = 0;
-            foreach (var plug in AiPlugins)
-            {
-                Console.WriteLine(++i + ". " + plug.Metadata.Name);
-            }
+            
             NextAction = SinglePlayerApplyChoice;
         }
 
@@ -106,6 +127,7 @@ namespace AccessBattleConsole
                 CurrentMenu = MenuType.Main;
                 return;
             }
+
             IArtificialIntelligenceFactory selectedPlugin = null;
             int i = 0;
             foreach (var plugin in AiPlugins)
@@ -119,15 +141,43 @@ namespace AccessBattleConsole
             if (selectedPlugin != null)
             {
                 CurrentMenu = MenuType.Game;
+                IsAiBattle = false;
                 // Set up Game
-                if (CurGame != null)
-                {
-                    // CurGame.Dispose(); TODO
-                }
-                CurGame = new LocalGame();
+                CleanupGame();
+                CurGame = new LocalGame() { AiCommandDelay = AiCommandDelay };
                 ((LocalGame)CurGame).SetAi(selectedPlugin.CreateInstance());
                 CurGame.InitGame();
+                CurGame.PropertyChanged += CurGame_PropertyChanged;
+                ((LocalGame)CurGame).SyncRequired += Program_SyncRequired;
             }
+        }
+
+        private static void CurGame_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Game.Phase))
+            {
+                UpdateUI();
+
+                var game = sender as Game;
+                var locGame = game as LocalGame;
+
+                if (locGame != null && IsAiBattle && locGame.Phase == GamePhase.Player1Turn && !QuitAiBattleRequested)
+                {
+                    Task.Run(() =>
+                    {
+                        if (AiCommandDelay > 0)
+                            Thread.Sleep(AiCommandDelay);
+                        locGame.AiPlayer1Move();                        
+                    });
+                }                
+            }
+        }
+
+        static void Program_SyncRequired(object sender, EventArgs e)
+        {
+            // Fired when AI player 2 finishes move
+            // Do nothing for now
+            // Let Phase change trigger UI update
         }
 
         static void DrawGame()
@@ -140,7 +190,7 @@ namespace AccessBattleConsole
             }
 
             // Draw the board first
-            DrawBoard();
+            DrawBoard(!IsAiBattle);
 
             if (CurGame.Phase == GamePhase.Player1Win)
             {
@@ -162,14 +212,36 @@ namespace AccessBattleConsole
                 Console.WriteLine("\nPress enter to return to main menu");
                 CurrentMenu = MenuType.Main;
                 return;
-            }            
+            }
 
-            Console.WriteLine("\nEnter a game command (? for help):");
+            if (!IsAiBattle)
+            {
+
+                if (CurGame.Phase == GamePhase.Player2Turn)
+                {
+                    Console.WriteLine("\nPlayer 2 turn, please wait...");
+                }
+                else
+                    Console.WriteLine("\nEnter a game command (? for help):");
+            }
+            else
+            {
+                Console.WriteLine("\nAI Battle. Enter 'quit' to stop game");
+            }
+
             NextAction = HandleGameCommand;
         }
 
         static void HandleGameCommand(string str)
         {
+            if (IsAiBattle)
+            {
+                if (str == "quit")
+                {
+
+                }
+            }
+
             if (str == "?")
             {
                 Console.WriteLine("Command      Syntax             Example");
@@ -190,8 +262,8 @@ namespace AccessBattleConsole
                 Console.ReadLine();
             }
             else
-            {
-                if (!CurGame.ExecuteCommand(str, 1))
+            {                
+                if (CurGame?.ExecuteCommand(str, 1) != true)
                 {
                     Console.WriteLine("Wrong command!");
                     Thread.Sleep(1000);
@@ -252,10 +324,11 @@ namespace AccessBattleConsole
                             var onlCard = card as OnlineCard;
                             if (onlCard == null) Console.Write("err");
                             else
-                            {
-                                if (onlCard.Type == OnlineCardType.Unknown || hideOpponent && !onlCard.IsFaceUp && card.Owner.PlayerNumber == 2) Console.Write(" X ");
-                                else if (onlCard.Type == OnlineCardType.Link) Console.Write(" L ");
-                                else if (onlCard.Type == OnlineCardType.Virus) Console.Write(" V ");
+                            {                                
+                                if (onlCard.Type == OnlineCardType.Unknown || hideOpponent && !onlCard.IsFaceUp && card.Owner.PlayerNumber == 2)
+                                    Console.Write(onlCard.HasBoost ? "-X-" : " X ");
+                                else if (onlCard.Type == OnlineCardType.Link) Console.Write(onlCard.HasBoost ? "-L-" : " L ");
+                                else if (onlCard.Type == OnlineCardType.Virus) Console.Write(onlCard.HasBoost ? "-V-" : " V ");
                                 else Console.Write("ERR");
                             }
                         }
@@ -280,7 +353,7 @@ namespace AccessBattleConsole
                 else if (y == 6)
                 {
                     Console.WriteLine(" Game Phase: " + CurGame.Phase);
-                    Console.WriteLine(middle);
+                    Console.WriteLine(middle + " Round: " + Round);
                 }
                 else if (y == 3)
                 {
@@ -308,5 +381,92 @@ namespace AccessBattleConsole
 
         }
 
+        static void DrawAiBattle()
+        {
+            Console.WriteLine("AI vs AI Mode\n");            
+
+            Console.WriteLine("0. Return to Main Menu\n");
+
+            Console.WriteLine("Select two AI opponents:");
+            Console.WriteLine("Separate choice by comma\n");
+
+            if (AiPlugins == null)
+                AiPlugins = PluginHandler.Instance.GetPlugins<IArtificialIntelligenceFactory>();
+
+            DrawAiPluginList();
+
+            NextAction = AiBattleApplyChoice;
+        }
+
+        static void AiBattleApplyChoice(string str)
+        {
+            if (str == "0")
+            {
+                CurrentMenu = MenuType.Main;
+                return;
+            }
+
+            var spl = str.Split(',');
+
+            if (spl.Length != 2)
+            {
+                Console.WriteLine("Invalid input");
+                Thread.Sleep(1000);
+                return;
+            }
+
+            IArtificialIntelligenceFactory[] factories = new IArtificialIntelligenceFactory[2];
+            for (int n = 0; n < 2; ++n)
+            {
+                int i = 0;
+                foreach (var plugin in AiPlugins)
+                {
+                    var choice = spl[n].Trim();
+                    if (choice == (++i).ToString())
+                    {
+                        factories[n] = plugin;
+                        break;
+                    }
+                }
+            }
+
+            if (factories[0] == null || factories[1] == null)
+            {
+                Console.WriteLine("Invalid choice");
+                Thread.Sleep(1000);
+                return;
+            }
+
+            CurrentMenu = MenuType.Game;
+            IsAiBattle = true;
+            // Set up Game
+            CleanupGame();
+            
+            CurGame = new LocalGame() { AiCommandDelay = 1000 };
+            ((LocalGame)CurGame).SetAi(factories[0].CreateInstance(), 1);
+            ((LocalGame)CurGame).SetAi(factories[1].CreateInstance(), 2);
+            CurGame.InitGame();
+            CurGame.PropertyChanged += CurGame_PropertyChanged;
+            ((LocalGame)CurGame).SyncRequired += Program_SyncRequired;
+            
+            UpdateUI();
+            ++Round;
+            ((LocalGame)CurGame).AiPlayer1Move();
+        }        
+
+        static void CleanupGame()
+        {
+            Round = 0;
+            QuitAiBattleRequested = false;
+            if (CurGame != null)
+            {
+                CurGame.PropertyChanged -= CurGame_PropertyChanged;
+                if (CurGame is LocalGame)
+                {
+                    ((LocalGame)CurGame).SyncRequired -= Program_SyncRequired;
+                }
+                // CurGame.Dispose(); TODO
+            }
+        }
     }
 }

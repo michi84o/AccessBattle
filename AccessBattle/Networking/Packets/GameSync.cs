@@ -66,8 +66,10 @@ namespace AccessBattle.Networking.Packets
         /// </summary>
         /// <param name="sync"></param>
         /// <returns></returns>
-        public static GameSync FlipBoard(GameSync sync, bool isPlayerHost = false)
+        public static GameSync FlipBoard(GameSync sync)
         {
+            bool isPlayerHost = false;
+
             var s = new GameSync();
 
             s.Phase = sync.Phase;

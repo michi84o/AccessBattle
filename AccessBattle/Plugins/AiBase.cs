@@ -110,7 +110,10 @@ namespace AccessBattle.Plugins
             // It is easier for the programmer to 
             // view the board from the perspective of player 1
             // Therefore we flip the coordinates.
-            Sync = GameSync.FlipBoard(sync, IsAiHost);
+            if (!IsAiHost)
+                Sync = GameSync.FlipBoard(sync);
+            else
+                Sync = sync;
             
             // Clear board
             for (ushort y = 0; y < 11; ++y)
