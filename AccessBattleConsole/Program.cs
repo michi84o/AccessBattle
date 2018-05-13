@@ -102,6 +102,8 @@ namespace AccessBattleConsole
 
         static void DrawAiPluginList()
         {
+            if (AiPlugins == null)
+                AiPlugins = PluginHandler.Instance.GetPlugins<IArtificialIntelligenceFactory>();
             // TODO: Limit height and enable scrolling or flipping page
             int i = 0;
             foreach (var plug in AiPlugins)
@@ -118,8 +120,7 @@ namespace AccessBattleConsole
 
             Console.WriteLine("Select an AI opponent:\n");
 
-            if (AiPlugins == null)
-                AiPlugins =  PluginHandler.Instance.GetPlugins<IArtificialIntelligenceFactory>();
+            DrawAiPluginList();
             
             NextAction = SinglePlayerApplyChoice;
         }
