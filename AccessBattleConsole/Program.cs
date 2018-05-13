@@ -34,11 +34,15 @@ namespace AccessBattleConsole
         static int AiCommandDelay = 0;
 
         static readonly object UiLock = new object();
-        static void UpdateUI()
+        static void UpdateUI(bool clear = true)
         {
             lock (UiLock) // A task might trigger change when game phase changed
             {
-                Console.Clear();
+                if (clear)
+                    Console.Clear();
+                else
+                    Console.SetCursorPosition(0, 0);
+
                 switch (CurrentMenu)
                 {
                     case MenuType.Main:
@@ -156,15 +160,16 @@ namespace AccessBattleConsole
         {
             if (e.PropertyName == nameof(Game.Phase))
             {
-                UpdateUI();
+                UpdateUI(CurrentMenu != MenuType.Game);
 
                 var game = sender as Game;
                 var locGame = game as LocalGame;
 
                 if (locGame != null && IsAiBattle && locGame.Phase == GamePhase.Player1Turn && !QuitAiBattleRequested)
                 {
+                    ++Round;
                     Task.Run(() =>
-                    {
+                    {                        
                         if (AiCommandDelay > 0)
                             Thread.Sleep(AiCommandDelay);
                         locGame.AiPlayer1Move();                        
@@ -211,6 +216,7 @@ namespace AccessBattleConsole
             {
                 Console.WriteLine("\nPress enter to return to main menu");
                 CurrentMenu = MenuType.Main;
+                NextAction = null;
                 return;
             }
 
