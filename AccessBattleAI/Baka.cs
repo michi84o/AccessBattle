@@ -56,7 +56,11 @@ namespace AccessBattleAI
             List<BoardField> myCards = MyLinkCards;
             if (rnd.Next(0, 101) <= 40) // 40% Chance to pick virus
                 myCards = MyVirusCards;
-            // There is always at least one card of a type left. Otherwise game is over
+                        
+            // Fix problems if one of the arrays is empty.
+            if (myCards.Count == 0) myCards = MyLinkCards;
+            if (myCards.Count == 0) myCards = MyVirusCards;
+
             var card = myCards[rnd.Next(0, myCards.Count)];
 
             // Just in case card cannot move, reorder myCards:
