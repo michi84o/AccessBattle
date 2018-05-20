@@ -1,5 +1,6 @@
 ﻿using AccessBattle;
 using AccessBattle.Plugins;
+using AccessBattleAI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,8 +13,11 @@ namespace AccessBattleConsole
     class Program
     {
         static void Main(string[] args)
-        {            
+        {
             string line = null;
+
+            if (args.Contains("-trainNou")) { line = EnterNouTrain(); }
+                        
             while (line != "exit")
             {
                 NextAction?.Invoke(line);
@@ -23,6 +27,8 @@ namespace AccessBattleConsole
                 line = Console.ReadLine();                
             }                        
         }
+
+        static bool NouTrainMode = false;
 
         static MenuType CurrentMenu = MenuType.Main;
         static Action<string> NextAction;
@@ -209,12 +215,19 @@ namespace AccessBattleConsole
             else if (CurGame.Phase == GamePhase.Aborted)
             {
                 Console.WriteLine("\nGame over!");
-            }
+            }            
 
             if (CurGame.Phase == GamePhase.Player1Win ||
                 CurGame.Phase == GamePhase.Player2Win ||
-                CurGame.Phase == GamePhase.Aborted)
+                CurGame.Phase == GamePhase.Aborted ||
+                (NouTrainMode && Round > 100))
             {
+                QuitAiBattleRequested = true;
+                if (NouTrainMode)
+                {
+                    NouHandleGameOver();
+                    return;
+                }
                 Console.WriteLine("\nPress enter to return to main menu");
                 CurrentMenu = MenuType.Main;
                 NextAction = null;
@@ -233,7 +246,10 @@ namespace AccessBattleConsole
             }
             else
             {
-                Console.WriteLine("\nAI Battle. Enter 'quit' to stop game");
+                if (CurGame.Phase != GamePhase.Player1Win &&
+                    CurGame.Phase != GamePhase.Player2Win &&
+                    CurGame.Phase != GamePhase.Aborted)
+                    Console.WriteLine("\nAI Battle. Enter 'quit' to stop game");
             }
 
             NextAction = HandleGameCommand;
@@ -245,7 +261,7 @@ namespace AccessBattleConsole
             {
                 if (str == "quit")
                 {
-
+                    QuitAiBattleRequested = true;
                 }
             }
 
@@ -474,6 +490,54 @@ namespace AccessBattleConsole
                 }
                 // CurGame.Dispose(); TODO
             }
+        }
+
+        static string EnterNouTrain()
+        {
+            NouTrainMode = true;
+            NextAction = StartNouTraining;
+            return "";      
+        }
+
+        static int NouTrainCounter = 0;
+        static void StartNouTraining(string str)
+        {
+            CurrentMenu = MenuType.Game;
+            IsAiBattle = true;
+            // Set up Game
+            CleanupGame();
+
+            CurGame = new LocalGame() { AiCommandDelay = 0 };
+
+            var nou1 = new Nou();
+            var nou2 = new Nou();
+
+            // TODO: Load files from disk if existing. 
+            // Use NouTrainCounter. We test N networkd in a row before we sort out the weakest ones.
+            // TODO: Implement Fitness function.
+
+            //if (!System.IO.Directory.Exists("nou"))
+            //    System.IO.Directory.CreateDirectory("nou");
+
+            // TODO: Load last network configurations
+
+            ((LocalGame)CurGame).SetAi(nou1, 1);
+            ((LocalGame)CurGame).SetAi(nou2, 2);
+            CurGame.InitGame();
+            CurGame.PropertyChanged += CurGame_PropertyChanged;
+            ((LocalGame)CurGame).SyncRequired += Program_SyncRequired;
+
+            UpdateUI();
+            ++Round;
+            ((LocalGame)CurGame).AiPlayer1Move();
+        }
+
+        static void NouHandleGameOver()
+        {
+            // TODO
+            Console.WriteLine("\nPress enter to return to main menu");
+            CurrentMenu = MenuType.Main;
+            NextAction = null;
         }
     }
 }

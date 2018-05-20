@@ -661,6 +661,7 @@ namespace AccessBattle
         /// <param name="game"></param>
         /// <param name="field"></param>
         /// <returns></returns>
+        /// <remarks>AiBase classes can call this on themselves since they implement IBoardGame.</remarks>
         public static List<BoardField> GetMoveTargetFields(IBoardGame game, BoardField field)
         {
             var fields = new List<BoardField>();

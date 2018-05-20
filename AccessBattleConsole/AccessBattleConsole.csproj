@@ -52,6 +52,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AccessBattleAI\AccessBattleAI.csproj">
+      <Project>{c3860788-4988-49dc-a2dc-3b3d28472798}</Project>
+      <Name>AccessBattleAI</Name>
+    </ProjectReference>
     <ProjectReference Include="..\AccessBattle\AccessBattle.csproj">
       <Project>{f17f07f0-81f9-4320-a0c0-e9bbe9f6869c}</Project>
       <Name>AccessBattle</Name>

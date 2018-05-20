@@ -53,6 +53,14 @@ namespace AccessBattle.Plugins
         {
             return PlayMove(from.X, from.Y, to.X, to.Y);
         }
+        /// <summary>
+        /// Play move. Coordinates must be zero based and will be converted.
+        /// </summary>
+        /// <param name="x0"></param>
+        /// <param name="y0"></param>
+        /// <param name="x1"></param>
+        /// <param name="y1"></param>
+        /// <returns></returns>
         protected string PlayMove(int x0, int y0, int x1, int y1)
         {
             Helpers.ConvertCoordinates(ref x0, ref y0, IsAiHost);
@@ -64,6 +72,13 @@ namespace AccessBattle.Plugins
         {
             return PlayBoost(field.X, field.Y, place);
         }
+        /// <summary>
+        /// Play boost. Coordinates must be zero based and will be converted.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="place"></param>
+        /// <returns></returns>
         protected string PlayBoost(int x, int y, bool place)
         {
             Helpers.ConvertCoordinates(ref x, ref y, IsAiHost);
@@ -74,6 +89,14 @@ namespace AccessBattle.Plugins
         {
             return PlayFirewall(field.X, field.Y, place);
         }
+
+        /// <summary>
+        /// Play firewall. Coordinates must be zero based and will be converted.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="place"></param>
+        /// <returns></returns>
         protected string PlayFirewall(int x, int y, bool place)
         {
             Helpers.ConvertCoordinates(ref x, ref y, IsAiHost);
@@ -84,6 +107,13 @@ namespace AccessBattle.Plugins
         {
             return PlayVirusCheck(field.X, field.Y);
         }
+
+        /// <summary>
+        /// Play virus check. Coordinates must be zero based and will be converted.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
         protected string PlayVirusCheck(int x, int y)
         {
             Helpers.ConvertCoordinates(ref x, ref y, IsAiHost);
@@ -94,6 +124,16 @@ namespace AccessBattle.Plugins
         {
             return PlayError404(field1.X, field1.Y, field2.X, field2.Y, switchPlaces);
         }
+
+        /// <summary>
+        /// Play error 404. Coordinates must be zero based and will be converted.
+        /// </summary>
+        /// <param name="x0"></param>
+        /// <param name="y0"></param>
+        /// <param name="x1"></param>
+        /// <param name="y1"></param>
+        /// <param name="switchPlaces"></param>
+        /// <returns></returns>
         protected string PlayError404(int x0, int y0, int x1, int y1, bool switchPlaces)
         {
             Helpers.ConvertCoordinates(ref x0, ref y0, IsAiHost);
