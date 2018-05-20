@@ -30,7 +30,7 @@ namespace AccessBattleTests
         [TestMethod]
         public void CheckOutputs()
         {
-            var net = new NeuralNetwork(3,4,2,0);
+            var net = new NeuralNetwork(3, 4, 2, 0);
 
             net.ComputeOutputs();
             PrintNet(net); // Should be 0.5,0.5 at the beginning
@@ -40,7 +40,7 @@ namespace AccessBattleTests
                 net.Mutate();
                 net.ComputeOutputs();
                 PrintNet(net);
-            }            
+            }
         }
 
         // Output can be found in the results of MS Test Explorer when selecting the result.
@@ -48,6 +48,19 @@ namespace AccessBattleTests
         void PrintNet(NeuralNetwork net)
         {
             Console.WriteLine("Neural Network Output: " + net.Outputs[0].ToString(_culture) + ", " + net.Outputs[1].ToString(_culture));
+        }
+
+        [TestMethod]
+        public void SaveFileTest()
+        {
+            var net = new NeuralNetwork(3, 2, 2, 1);
+            net.Mutate();
+
+            Assert.IsTrue(net.SaveAsFile("tmpNet.txt"));
+            var net2 = NeuralNetwork.ReadFromFile("tmpNet.txt");
+            System.IO.File.Delete("tmpNet.txt");
+
+            Assert.IsNotNull(net2);
         }
     }
 }
