@@ -9,7 +9,7 @@ namespace AccessBattle.Plugins
 {
     /// <summary>
     /// Base class for AI. Takes care of the synchronization.
-    /// Converts coordinates internally if AI is player 2, 
+    /// Converts coordinates internally if AI is player 2,
     /// so that the its logic has always the same coordinate system.
     /// </summary>
     public abstract class AiBase : IArtificialIntelligence, IBoardGame
@@ -27,9 +27,32 @@ namespace AccessBattle.Plugins
         protected abstract string _name { get; }
         public string Name { get => _name; set { } }
 
+        /// <summary>
+        /// Virus cards that are currently playable on the field. y below 8.
+        /// </summary>
         protected List<BoardField> MyVirusCards = new List<BoardField>();
+        /// <summary>
+        /// Link cards that are currently playable on the field. y below 8.
+        /// </summary>
         protected List<BoardField> MyLinkCards = new List<BoardField>();
+        /// <summary>
+        /// Opponent online cards that are currently playable on the field. y below 8.
+        /// </summary>
         protected List<BoardField> TheirOnlineCards = new List<BoardField>();
+
+        /// <summary>
+        /// Includes cards that are on the stack.
+        /// </summary>
+        protected List<BoardField> AllMyVirusCards = new List<BoardField>();
+        /// <summary>
+        /// Includes cards that are on the stack.
+        /// </summary>
+        protected List<BoardField> AllMyLinkCards = new List<BoardField>();
+        /// <summary>
+        /// Includes cards that are on the stack.
+        /// </summary>
+        protected List<BoardField> AllTheirOnlineCards = new List<BoardField>();
+
         BoardField myPlacedFirewall;
         BoardField theirPlacedFirewall;
 
@@ -142,19 +165,19 @@ namespace AccessBattle.Plugins
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="sync">GameSync of the current game. Coordinates be flipped internally.</param>
         public void Synchronize(GameSync sync)
         {
-            // It is easier for the programmer to 
+            // It is easier for the programmer to
             // view the board from the perspective of player 1
             // Therefore we flip the coordinates.
             if (!IsAiHost)
                 Sync = GameSync.FlipBoard(sync);
             else
                 Sync = sync;
-            
+
             // Clear board
             for (ushort y = 0; y < 11; ++y)
                 for (ushort x = 0; x < 8; ++x)
@@ -164,6 +187,9 @@ namespace AccessBattle.Plugins
             MyLinkCards.Clear();
             MyVirusCards.Clear();
             TheirOnlineCards.Clear();
+            AllMyLinkCards.Clear();
+            AllMyVirusCards.Clear();
+            AllTheirOnlineCards.Clear();
             myPlacedFirewall = null;
             theirPlacedFirewall = null;
 
@@ -179,26 +205,33 @@ namespace AccessBattle.Plugins
                 int y = field.Y;
                 Board[x, y].Update(field, Players);
 
-                if (y < 8)
+                if (field.Card.Owner == myPlayerNumber)
                 {
-                    if (field.Card.Owner == myPlayerNumber)
+                    if (field.Card.Type == OnlineCardType.Link)
                     {
-                        if (field.Card.Type == OnlineCardType.Link)
-                            MyLinkCards.Add(Board[x, y]);
-                        else if (field.Card.Type == OnlineCardType.Virus)
-                            MyVirusCards.Add(Board[x, y]);
-                        else if (field.Card.IsFirewall)
-                            myPlacedFirewall = Board[x, y];
+                        if (y < 8) MyLinkCards.Add(Board[x, y]);
+                        AllMyLinkCards.Add(Board[x, y]);
+                    }
+                    else if (field.Card.Type == OnlineCardType.Virus)
+                    {
+                        if (y < 8) MyVirusCards.Add(Board[x, y]);
+                        AllMyVirusCards.Add(Board[x, y]);
+                    }
+                    else if (field.Card.IsFirewall)
+                        if (y < 8) myPlacedFirewall = Board[x, y];
+                }
+                else
+                {
+                    if (field.Card.IsFirewall)
+                    {
+                        if (y < 8) theirPlacedFirewall = Board[x, y];
                     }
                     else
                     {
-                        if (field.Card.IsFirewall)
-                            theirPlacedFirewall = Board[x, y];
-                        else
-                            TheirOnlineCards.Add(Board[x, y]);
+                        if (y < 8) TheirOnlineCards.Add(Board[x, y]);
+                        AllTheirOnlineCards.Add(Board[x, y]);
                     }
                 }
-
             }
             Phase = Sync.Phase;
         }

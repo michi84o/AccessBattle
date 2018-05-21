@@ -11,17 +11,20 @@ namespace NeuralNetTrainer
 {
     class Program
     {
+        static uint gen = 0; // Keeps track of generations
+        static int genProgress = 0;
+        static uint maxGen = 0;
         static void Main(string[] args)
         {
             string dir = "Nou_AI";
             string genTxt = dir + "\\gen.txt";
+            string genLogTxt = dir + "\\genLog.txt";
             Func<int, int, string> netFile = (a,b) => { return dir + "\\net" + a + "." + b + ".txt"; };
 
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
 
-            uint gen = 0; // Keeps track of generations
-            if (File.Exists(genTxt)) { int.TryParse(File.ReadAllText(genTxt), out gen); }
+            if (File.Exists(genTxt)) { uint.TryParse(File.ReadAllText(genTxt), out gen); }
 
             Console.WriteLine("NOU AI Trainer\n");
             Console.WriteLine("Current generation: " + gen);
@@ -33,12 +36,13 @@ namespace NeuralNetTrainer
                 Console.ReadKey();
                 return;
             }
+            Console.CursorVisible = false;
 
             var rnd = new Random();
             // We have 50 AIs. All fight 5 random other AIs. Their scores will be summed up.
             int aiCnt = 50; // Should be multiple of battleCnt*2. Not lower than battleCnt*4.
             int battleCnt = 5; // Be carefull when changing this number. Might screw up code below
-            double mutationDelta = 0.00001;
+            double mutationDelta = 0.000001;// initial Mutation is 0.00001;
             var log = new Dictionary<int, TrainingLog>();
             for (int i = 0; i < aiCnt; ++i)
             {
@@ -58,6 +62,8 @@ namespace NeuralNetTrainer
                 }
             }
 
+            genProgress = 0;
+            maxGen = gen + gen2Go;
             // Cycle through all defined generations
             for (int it = 0; it < gen2Go; ++it)
             {
@@ -76,7 +82,7 @@ namespace NeuralNetTrainer
                     for (int i = 0; i < aiCnt / 2; ++i)
                     {
                         sortedList[0].ID = i; // Update ID
-                        log.Add(1, sortedList[0]);
+                        log.Add(i, sortedList[0]);
                     }
                     // 3.
                     for (int i = 5; i < aiCnt / 2; ++i)
@@ -91,12 +97,13 @@ namespace NeuralNetTrainer
                         {
                             var nou = Nou.Copy(log[iAi].AI);
                             nou.Mutate(mutationDelta);
-                            ++nId;
                             log[nId] = new TrainingLog() { ID = nId, AI = nou};
+                            ++nId;
                         }
-                    while (++nId < aiCnt)
+                    while (nId < aiCnt)
                     {
                         log.Add(nId, new TrainingLog { AI = new Nou(), ID = nId });
+                        ++nId;
                     }
                 }
 
@@ -131,7 +138,7 @@ namespace NeuralNetTrainer
                         op.Opponents.Add(aiLog);
                         #endregion
 
-                        // Load net from file if exists
+                        genProgress = (int)(0.5 + 100.0 * ((1.0*it) / gen2Go + (1.0 * ai) / (gen2Go * aiCnt)));
 
                         // Run game:
                         trainer.StartGame(aiLog.AI, op.AI);
@@ -146,6 +153,18 @@ namespace NeuralNetTrainer
                             op.Score += op.AI.Fitness();
                     }
                 }
+
+                // Log score to file
+                ++gen;
+                try
+                {
+                    var genSorted = log.Select(o => o.Value).OrderByDescending(o => o.Score).ToList();
+                    using (var f = File.AppendText(genLogTxt))
+                    {
+                        f.WriteLine("Gen:\t" + gen + "\tScore:\t" + genSorted[0].Score.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                    }
+                }
+                catch { }
             }
 
             // Save all current Nets
@@ -158,6 +177,7 @@ namespace NeuralNetTrainer
             File.WriteAllText(genTxt, gen.ToString());
 
             System.Threading.Thread.Sleep(500); // Wait for UI updates
+            Console.CursorVisible = true;
             Console.WriteLine("Finished. Press any key to exit");
             Console.ReadKey();
         }
@@ -222,13 +242,13 @@ namespace NeuralNetTrainer
                     }
                     else if (y == 6)
                     {
-                        Console.WriteLine(" Game Phase: " + trainer.Game.Phase);
+                        Console.WriteLine(" Game Phase: " + trainer.Game.Phase + " " );
                         Console.WriteLine(middle + " Round: " + trainer.Round);
                     }
-                    else if (y == 3)
+                    else if (y == 5)
                     {
-                        Console.WriteLine("");
-                        Console.WriteLine(middle);
+                        Console.WriteLine(" Generation: " + (gen+1) + "/" + maxGen + "  " );
+                        Console.WriteLine(middle + " Progress: " + genProgress + "%  ");
                     }
                     else if (y == 2)
                     {
@@ -248,9 +268,6 @@ namespace NeuralNetTrainer
                 }
                 //Console.WriteLine(lower);
                 Console.WriteLine(xlabel);
-
-                if (trainer.GameOver)
-                    Console.WriteLine("GAME OVER\n");
             }
         }
 

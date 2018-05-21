@@ -12,7 +12,7 @@ namespace AccessBattleAI
     [Export(typeof(IPlugin))]
     [ExportMetadata("Name", "AccessBattle.AI.Mia")]
     [ExportMetadata("Description", "Mia")]
-    [ExportMetadata("Version", "0.1")]
+    [ExportMetadata("Version", "0.2")]
     public class MiaFactory : IArtificialIntelligenceFactory
     {
         public IPluginMetadata Metadata { get; set; }
@@ -151,13 +151,13 @@ namespace AccessBattleAI
                 }
                 else if (field.Y < 8)
                 {
-                    // Distance to exit                
+                    // Distance to exit
                     distanceSum += DistanceToExit(field);
                 }
             }
             // At the start of the game, the distance sum is about 28
-            if (distanceSum < 1) score += 4;
-            else score += 100 / distanceSum; // 3.6 at start of the game
+            if (distanceSum < 4) distanceSum = 4; // Gives a score of 25
+            score += 100 / distanceSum; // 3.6 at start of the game
 
             // 2. Distance of Links and Viruses to Opponent cards
             distanceSum = 0;
@@ -224,7 +224,7 @@ namespace AccessBattleAI
 
             state.Board[to.X, to.Y].Card = state.Board[from.X, from.Y].Card;
 
-            // Fix OnlineCardFields array      
+            // Fix OnlineCardFields array
             var index = state.OnlineCardFields[from.Card.Owner.PlayerNumber - 1].FindIndex(o=>o.X == from.X && o.Y == from.Y);
             state.OnlineCardFields[from.Card.Owner.PlayerNumber - 1][index] = state.Board[to.X, to.Y];
             state.Board[from.X, from.Y].Card = null;
@@ -249,9 +249,9 @@ namespace AccessBattleAI
 
                     var mv = PlayMove(field, move);
 
-                    // Apply move      
+                    // Apply move
                     MoveCard(nstate, field, move);
-                    
+
                     // Apply all possible opponent moves
                     nstate.Phase = GamePhase.Player2Turn;
                     foreach (var field2 in nstate.OnlineCardFields[1])
@@ -271,7 +271,7 @@ namespace AccessBattleAI
                         }
                     }
                 }
-            }            
+            }
 
             if (++iterationCount < depth)
             {

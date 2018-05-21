@@ -91,15 +91,11 @@ namespace AccessBattleAI
 
             foreach (var field in MyLinkCards)
             {
-                if (field.Y < 8)
-                {
-                    scores.Add(new FieldScore(field));
-                }
+                scores.Add(new FieldScore(field));
             }
             foreach (var field in MyVirusCards)
             {
-                if (field.Y < 8)
-                    scores.Add(new FieldScore(field));
+                scores.Add(new FieldScore(field));
             }
             foreach (var sc in scores)
             {
@@ -314,7 +310,7 @@ namespace AccessBattleAI
             double score = 0;
             // At the start of the game, the distance sum is about 28
             double distanceSum = 0;
-            foreach (var field in MyLinkCards)
+            foreach (var field in AllMyLinkCards)
             {
                 if (field.Y == 8)
                 {
@@ -324,7 +320,7 @@ namespace AccessBattleAI
                 else if (field.Y == 9)
                 {
                     // Card captured by opponent
-                    distanceSum += 15; // Add penalty
+                    distanceSum += 10; // Add penalty
                 }
                 else if (field.Y < 8)
                 {
@@ -334,10 +330,10 @@ namespace AccessBattleAI
                 }
             }
 
-            if (distanceSum < 1) score += 4;
+            if (distanceSum < 4) distanceSum = 4;
             // 3.6 at start of the game
-            else score += 100 / distanceSum;
-            // Score will be between 1.6 and 4.
+            score += 100 / distanceSum;
+            // Score will be between 2.5 and 25.
 
             // Also add a score for captured link cards
             // Player 1 stack: Player1: Fields (0,8) - (7,8)
@@ -348,9 +344,9 @@ namespace AccessBattleAI
                 if (card == null || card.Owner.PlayerNumber == 1) continue;
 
                 // Don't add too much. AI might catch cards by accident
-                if (card.Type == OnlineCardType.Link) score += .4;
+                if (card.Type == OnlineCardType.Link) score *= 1.1; // +10%
                 // Give higher penalty for capturing virus cards
-                if (card.Type == OnlineCardType.Virus) score -= .8;
+                if (card.Type == OnlineCardType.Virus) score *= .8; // -20%
             }
             return score;
         }

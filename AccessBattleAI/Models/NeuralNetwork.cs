@@ -168,7 +168,7 @@ namespace AccessBattleAI.Models
             sb.AppendLine("# This file was automatically generated. Do not change!");
             sb.AppendLine();
             sb.AppendLine("# Number of nodes:");
-            sb.AppendLine("Inputs: " + _numInput));
+            sb.AppendLine("Inputs: " + _numInput);
             sb.AppendLine("Hidden: "+ _numHidden);
             sb.AppendLine("Outputs: "+ _numOutput);
             sb.AppendLine();
