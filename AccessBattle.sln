@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccessBattleConsole", "Acce
 		{C3860788-4988-49DC-A2DC-3B3D28472798} = {C3860788-4988-49DC-A2DC-3B3D28472798}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeuralNetTrainer", "NeuralNetTrainer\NeuralNetTrainer.csproj", "{8518CDE3-907E-4C00-8C1F-1FF93ECB02C2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{FFCE0BDD-D0AC-457C-BFF2-DBA007EE63B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FFCE0BDD-D0AC-457C-BFF2-DBA007EE63B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FFCE0BDD-D0AC-457C-BFF2-DBA007EE63B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8518CDE3-907E-4C00-8C1F-1FF93ECB02C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8518CDE3-907E-4C00-8C1F-1FF93ECB02C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8518CDE3-907E-4C00-8C1F-1FF93ECB02C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8518CDE3-907E-4C00-8C1F-1FF93ECB02C2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

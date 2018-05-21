@@ -37,7 +37,7 @@ namespace AccessBattleTests
 
             for (int i = 0; i < 10; ++i)
             {
-                net.Mutate();
+                net.Mutate(0.00001);
                 net.ComputeOutputs();
                 PrintNet(net);
             }
@@ -54,7 +54,7 @@ namespace AccessBattleTests
         public void SaveFileTest()
         {
             var net = new NeuralNetwork(3, 2, 2, 1);
-            net.Mutate();
+            net.Mutate(0.00001);
 
             Assert.IsTrue(net.SaveAsFile("tmpNet.txt"));
             var net2 = NeuralNetwork.ReadFromFile("tmpNet.txt");

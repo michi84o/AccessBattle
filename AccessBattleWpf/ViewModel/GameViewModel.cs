@@ -186,7 +186,7 @@ namespace AccessBattle.Wpf.ViewModel
             }
             else
             {
-                result = _localGame.ExecuteCommand(command, 1);
+                result = await _localGame.ExecuteCommand(command, 1);
                 SyncLocalGame();
             }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,7 +27,7 @@ namespace AccessBattleAI.Models
         double[] _hBiases; // Hidden node offsets
         double[][] _hoWeights; // Hidden node output weights
 
-        double[] _hOutputs;              
+        double[] _hOutputs;
         double[] _oBiases; // Output node offsets
 
         double[] _outputs;
@@ -36,13 +37,21 @@ namespace AccessBattleAI.Models
         {
             _rnd = new Random();
         }
-        
+
+        static int SeedBase = Environment.TickCount;
+        static readonly object SeedLock = new object();
+
         public NeuralNetwork(int numInput, int numHidden, int numOutput, int? seed = null)
         {
             if (seed != null)
                 _rnd = new Random(seed.Value); // For unit testing
             else
-                _rnd = new Random();
+            {
+                // Default constructor of Random uses Environment.TickCount
+                // This approach tries to counter problems that might occur when multiple instances
+                // are created within the same time frame.
+                lock (SeedLock) { _rnd = new Random((++SeedBase).GetHashCode() ^ Environment.TickCount); }
+            }
 
             _numInput = numInput;
             _numHidden = numHidden;
@@ -68,9 +77,8 @@ namespace AccessBattleAI.Models
             return result;
         }
 
-        public void Mutate()
+        public void Mutate(double delta)
         {
-            double delta = 0.0001;
             // Change the weights and biases slightly
             for (int ni = 0; ni < _numInput; ++ni)
             {
@@ -122,7 +130,7 @@ namespace AccessBattleAI.Models
                 oSums[i] += _oBiases[i];
 
             double[] softOut = Softmax(oSums); // softmax activation does all outputs at once for efficiency
-            Array.Copy(softOut, _outputs, softOut.Length);            
+            Array.Copy(softOut, _outputs, softOut.Length);
         } // ComputeOutputs
 
         static double HyperTanFunction(double x)
@@ -151,6 +159,62 @@ namespace AccessBattleAI.Models
             return result; // now scaled so that xi sum to 1.0
         }
 
+        public string SaveAsString()
+        {
+            var sb = new StringBuilder();
+            var info = System.Globalization.CultureInfo.InvariantCulture;
+
+            sb.AppendLine("# Neural Network Definition");
+            sb.AppendLine("# This file was automatically generated. Do not change!");
+            sb.AppendLine();
+            sb.AppendLine("# Number of nodes:");
+            sb.AppendLine("Inputs: " + _numInput));
+            sb.AppendLine("Hidden: "+ _numHidden);
+            sb.AppendLine("Outputs: "+ _numOutput);
+            sb.AppendLine();
+            sb.AppendLine("# Biases:");
+            sb.Append("BHidden: ");
+            for (int i = 0; i < _hBiases.Length; ++i)
+            {
+                if (i != 0) sb.Append(";");
+                sb.Append(_hBiases[i].ToString(info));
+            }
+            sb.AppendLine();
+            sb.Append("BOutput: ");
+            for (int i = 0; i < _oBiases.Length; ++i)
+            {
+                if (i != 0) sb.Append(";");
+                sb.Append(_oBiases[i].ToString(info));
+            }
+            sb.AppendLine();
+            sb.AppendLine();
+            sb.AppendLine("# Weights:");
+            sb.Append("WHidden: ");
+            for (int i = 0; i < _ihWeights.Length; ++i)
+            {
+                for (int j = 0; j < _ihWeights[0].Length; ++j)
+                {
+                    if (i != 0 || j != 0) sb.Append(";");
+                    sb.Append(_ihWeights[i][j].ToString(info));
+                }
+            }
+            sb.AppendLine();
+            sb.Append("WOutput: ");
+            for (int i = 0; i < _hoWeights.Length; ++i)
+            {
+                for (int j = 0; j < _hoWeights[0].Length; ++j)
+                {
+                    if (i != 0 || j != 0) sb.Append(";");
+                    sb.Append(_hoWeights[i][j].ToString(info));
+                }
+            }
+
+            // The seed is not saved
+
+            sb.AppendLine();
+            return sb.ToString();
+        }
+
         public bool SaveAsFile(string filename)
         {
             try
@@ -159,53 +223,7 @@ namespace AccessBattleAI.Models
                 {
                     var info = System.Globalization.CultureInfo.InvariantCulture;
 
-                    file.WriteLine("# Neural Network Definition");
-                    file.WriteLine("# This file was automatically generated. Do not change!");
-                    file.WriteLine();
-                    file.WriteLine("# Number of nodes:");
-                    file.WriteLine("Inputs: {0}", _numInput);
-                    file.WriteLine("Hidden: {0}", _numHidden);
-                    file.WriteLine("Outputs: {0}", _numOutput);
-                    file.WriteLine();
-                    file.WriteLine("# Biases:");
-                    file.Write("BHidden: ");
-                    for (int i = 0; i < _hBiases.Length; ++i)
-                    {
-                        if (i != 0) file.Write(";");
-                        file.Write(_hBiases[i].ToString(info));
-                    }
-                    file.WriteLine();
-                    file.Write("BOutput: ");
-                    for (int i = 0; i < _oBiases.Length; ++i)
-                    {
-                        if (i != 0) file.Write(";");
-                        file.Write(_oBiases[i].ToString(info));
-                    }
-                    file.WriteLine();
-                    file.WriteLine();
-                    file.WriteLine("# Weights:");
-                    file.Write("WHidden: ");
-                    for (int i = 0; i < _ihWeights.Length; ++i)
-                    {
-                        for (int j = 0; j < _ihWeights[0].Length; ++j)
-                        {
-                            if (i != 0 || j != 0) file.Write(";");
-                            file.Write(_ihWeights[i][j].ToString(info));
-                        }
-                    }
-                    file.WriteLine();
-                    file.Write("WOutput: ");
-                    for (int i = 0; i < _hoWeights.Length; ++i)
-                    {
-                        for (int j = 0; j < _hoWeights[0].Length; ++j)
-                        {
-                            if (i != 0 || j != 0) file.Write(";");
-                            file.Write(_hoWeights[i][j].ToString(info));
-                        }
-                    }
-                    file.WriteLine();
-
-                    // The seed is not saved.
+                    file.Write(SaveAsString());
 
                     file.Flush();
                     file.Close();
@@ -216,20 +234,20 @@ namespace AccessBattleAI.Models
                 AccessBattle.Log.WriteLine(AccessBattle.LogPriority.Error, "Cannot save neural network. " + e.Message);
                 return false;
             }
-            return true;            
+            return true;
         }
 
-        public static NeuralNetwork ReadFromFile(string filename)
+        public static NeuralNetwork ReadFromString(string data)
         {
             var network = new NeuralNetwork();
-            try
+            using (StringReader reader = new StringReader(data))
             {
-                using (System.IO.StreamReader file = new System.IO.StreamReader(filename))
+                try
                 {
                     var info = System.Globalization.CultureInfo.InvariantCulture;
-                    while (!file.EndOfStream)
+                    string line;
+                    while ((line = reader.ReadLine()?.Trim()) != null)
                     {
-                        var line = file.ReadLine().Trim();
                         if (line.StartsWith("#") || string.IsNullOrEmpty(line)) continue;
 
                         if (line.StartsWith("Inputs:"))
@@ -276,7 +294,7 @@ namespace AccessBattleAI.Models
                                     nh = 0;
                                     ++ni;
                                 }
-                            }                           
+                            }
                         }
                         else if (line.StartsWith("WOutput:"))
                         {
@@ -297,23 +315,33 @@ namespace AccessBattleAI.Models
                         }
 
                     }
-                    file.Close();
+                    // We do not do any further validations here. Software will crash soon enough if something was wrong.
+
+                    // Init missing fields
+                    network._inputs = new double[network._numInput];
+                    network._outputs = new double[network._numOutput];
+                    network._hOutputs = new double[network._numHidden];
                 }
+                catch (Exception e)
+                {
+                    AccessBattle.Log.WriteLine(AccessBattle.LogPriority.Error, "Cannot read neural network. " + e.Message);
+                    return null;
+                }
+            }
+            return network;
+        }
 
-                // We do not do any further validations here. Software will crash soon enough if something was wrong.
-
-                // Init missing fields
-                network._inputs = new double[network._numInput];
-                network._outputs = new double[network._numOutput];
-                network._hOutputs = new double[network._numHidden];
-
+        public static NeuralNetwork ReadFromFile(string filename)
+        {
+            try
+            {
+                return ReadFromString(System.IO.File.ReadAllText(filename));
             }
             catch (Exception e)
             {
                 AccessBattle.Log.WriteLine(AccessBattle.LogPriority.Error, "Cannot read neural network. " + e.Message);
                 return null;
             }
-            return network;
         }
     }
 }

@@ -627,7 +627,7 @@ namespace AccessBattle.Networking
                             if (GetGameAndPlayers(cmdMsg.UID, out game, out p1, out p2) && (p1 == player || p2 == player))
                             {
                                 var oldPhase = game.Phase;
-                                var result = game.ExecuteCommand(cmdMsg.Command, p1 == player ? 1 : 2);
+                                var result = game.ExecuteCommand(cmdMsg.Command, p1 == player ? 1 : 2).GetAwaiter().GetResult();
                                 var response = new GameCommand
                                 {
                                     UID = game.UID,

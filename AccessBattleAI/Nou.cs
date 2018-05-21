@@ -30,8 +30,6 @@ namespace AccessBattleAI
     {
         protected override string _name => "Nou";
 
-        Random _rnd = new Random();
-
         NeuralNetwork _net1;
         NeuralNetwork _net2;
 
@@ -41,7 +39,7 @@ namespace AccessBattleAI
         /// <summary>
         /// Read neural network definition from file.
         /// </summary>
-        /// <param name="index">0 for card selection network. 1 for movement netwoek</param>
+        /// <param name="index">0 for card selection network. 1 for movement network</param>
         /// <param name="path">File to load.</param>
         /// <returns></returns>
         public bool ReadFromFile(ushort index, string path)
@@ -71,12 +69,12 @@ namespace AccessBattleAI
             if (_net1 == null)
             {
                 _net1 = new NeuralNetwork(94, 4, 1);
-                _net1.Mutate();
+                _net1.Mutate(0.00001);
             }
             if (_net2 == null)
             {
-                _net2 = new NeuralNetwork(94, 4, 1);
-                _net2.Mutate();
+                _net2 = new NeuralNetwork(94, 4, 12);
+                _net2.Mutate(0.00001);
             }
 
             // Deployment is random.
@@ -109,17 +107,20 @@ namespace AccessBattleAI
                 _net1.ComputeOutputs();
                 sc.Score = _net1.Outputs[0];
             }
-            scores = scores.OrderBy(o => o.Score).ToList();
+            scores = scores.OrderByDescending(o => o.Score).ToList();
 
             BoardField chosenField = null;
-            for (int i = scores.Count - 1; i >= 0; --i)
+            List<BoardField> targetMoves = null;
+            for (int i = 0; i < scores.Count; ++i)
             {
-                if (Game.GetMoveTargetFields(this, scores[i].Field).Count == 0)
+                targetMoves = Game.GetMoveTargetFields(this, scores[i].Field);
+                if (targetMoves.Count == 0)
                     continue;
                 chosenField = scores[i].Field;
                 break;
             }
-            if (chosenField == null) return "???";
+            if (chosenField == null)
+                return "???";
 
             // Action 2: Move
             ApplyInputs(_net2, chosenField);
@@ -127,38 +128,42 @@ namespace AccessBattleAI
             // Mapping is same as Input Array2
             scores.Clear();
             bool hasBoost = (chosenField.Card as OnlineCard)?.HasBoost == true;
-            var targetMoves = Game.GetMoveTargetFields(this, chosenField);
             int x = chosenField.X;
             int y = chosenField.Y;
             for (int i = 0; i < 12; ++i)
             {
                 var rel = InputArray2[i];
                 int absX = x + rel.X;
-                int absY = x + rel.Y;
+                int absY = y + rel.Y;
                 // Skip fields we cannot move to
                 if (!targetMoves.Exists(o => o.X == absX && o.Y == absY))
                     continue;
 
                 scores.Add(new FieldScore(Board[absX, absY]) { Score = _net2.Outputs[i] });
             }
-            scores = scores.OrderBy(o => o.Score).ToList();
+            scores = scores.OrderByDescending(o => o.Score).ToList();
 
             BoardField targetField = null;
-            if (scores.Count > 0) targetField = scores[scores.Count-1].Field;
+            if (scores.Count > 0) targetField = scores[0].Field;
 
-            if (targetField == null) return "???";
+            if (targetField == null)
+                return "???";
             return PlayMove(chosenField, targetField);
         }
 
+        static int SeedBase = Environment.TickCount;
+        static readonly object SeedLock = new object();
         string Deploy()
         {
+            Random rnd;
+            lock (SeedLock) { rnd = new Random((++SeedBase).GetHashCode() ^ Environment.TickCount); }
             // Randomize cards:
             var list = new List<char> { 'V', 'V', 'V', 'V', 'L', 'L', 'L', 'L', };
             var n = list.Count;
             while (n > 1)
             {
                 --n;
-                int i = _rnd.Next(n + 1);
+                int i = rnd.Next(n + 1);
                 char c = list[i];
                 list[i] = list[n];
                 list[n] = c;
@@ -177,7 +182,7 @@ namespace AccessBattleAI
             public int Y;
             public Point(int x, int y) { X = x; Y = y; }
         }
-        
+
         void ApplyInputs(NeuralNetwork net, BoardField field)
         {
             int x = field.X;
@@ -251,6 +256,11 @@ namespace AccessBattleAI
             return Distance(x, y, x < 4 ? 3 : 4, 7);
         }
 
+        double DistanceToExit(BoardField field)
+        {
+            return Distance(field.X, field.Y, field.X < 4 ? 3 : 4, 7);
+        }
+
         double Distance(int x0, int y0, int x1, int y1)
         {
             var dx = x1 - x0;
@@ -261,7 +271,7 @@ namespace AccessBattleAI
         string EnterServer()
         {
             foreach (var link in MyLinkCards)
-            { 
+            {
                 var targets = Game.GetMoveTargetFields(this, link);
                 var t = targets.FirstOrDefault(o => o.Y == 10);
                 if (t != null)
@@ -296,9 +306,70 @@ namespace AccessBattleAI
 
         public double Fitness()
         {
-            // TODO:
-            return 0;
+            // Score the current board:
+            // Calculate the distance of the link cards to the server.
+            // Link cards inside server give extra points.
+            // Captured cards give penalty.
+
+            double score = 0;
+            // At the start of the game, the distance sum is about 28
+            double distanceSum = 0;
+            foreach (var field in MyLinkCards)
+            {
+                if (field.Y == 8)
+                {
+                    // Card reached server. Remove 1
+                    --distanceSum;
+                }
+                else if (field.Y == 9)
+                {
+                    // Card captured by opponent
+                    distanceSum += 15; // Add penalty
+                }
+                else if (field.Y < 8)
+                {
+                    // Distance to exit
+
+                    distanceSum += DistanceToExit(field);
+                }
+            }
+
+            if (distanceSum < 1) score += 4;
+            // 3.6 at start of the game
+            else score += 100 / distanceSum;
+            // Score will be between 1.6 and 4.
+
+            // Also add a score for captured link cards
+            // Player 1 stack: Player1: Fields (0,8) - (7,8)
+            for (int i = 0; i < 8; ++i)
+            {
+                var card = Board[i, 8].Card as OnlineCard;
+                // Ignore own cards. We scored them already
+                if (card == null || card.Owner.PlayerNumber == 1) continue;
+
+                // Don't add too much. AI might catch cards by accident
+                if (card.Type == OnlineCardType.Link) score += .4;
+                // Give higher penalty for capturing virus cards
+                if (card.Type == OnlineCardType.Virus) score -= .8;
+            }
+            return score;
         }
+
+        public void Mutate(double delta)
+        {
+            _net1?.Mutate(delta);
+            _net2?.Mutate(delta);
+        }
+
+        public static Nou Copy(Nou nou)
+        {
+            var newNou = new Nou();
+            newNou._net1 = NeuralNetwork.ReadFromString(nou._net1.SaveAsString());
+            newNou._net2 = NeuralNetwork.ReadFromString(nou._net2.SaveAsString());
+            return newNou;
+        }
+
+
 
     }
 }

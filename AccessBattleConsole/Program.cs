@@ -15,20 +15,15 @@ namespace AccessBattleConsole
         static void Main(string[] args)
         {
             string line = null;
-
-            if (args.Contains("-trainNou")) { line = EnterNouTrain(); }
-                        
             while (line != "exit")
             {
                 NextAction?.Invoke(line);
                 NextAction = null;
                 UpdateUI();
                 Console.WriteLine();
-                line = Console.ReadLine();                
-            }                        
+                line = Console.ReadLine();
+            }
         }
-
-        static bool NouTrainMode = false;
 
         static MenuType CurrentMenu = MenuType.Main;
         static Action<string> NextAction;
@@ -127,7 +122,7 @@ namespace AccessBattleConsole
             Console.WriteLine("Select an AI opponent:\n");
 
             DrawAiPluginList();
-            
+
             NextAction = SinglePlayerApplyChoice;
         }
 
@@ -175,13 +170,8 @@ namespace AccessBattleConsole
                 if (locGame != null && IsAiBattle && locGame.Phase == GamePhase.Player1Turn && !QuitAiBattleRequested)
                 {
                     ++Round;
-                    Task.Run(() =>
-                    {                        
-                        if (AiCommandDelay > 0)
-                            Thread.Sleep(AiCommandDelay);
-                        locGame.AiPlayer1Move();                        
-                    });
-                }                
+                    Task.Run(async () => {  await locGame.AiPlayer1Move(); });
+                }
             }
         }
 
@@ -197,7 +187,7 @@ namespace AccessBattleConsole
             if (CurGame == null)
             {
                 Console.WriteLine("Game was not set up properly.\nPress enter to restart.");
-                CurrentMenu = MenuType.Main;                           
+                CurrentMenu = MenuType.Main;
                 return;
             }
 
@@ -215,19 +205,13 @@ namespace AccessBattleConsole
             else if (CurGame.Phase == GamePhase.Aborted)
             {
                 Console.WriteLine("\nGame over!");
-            }            
+            }
 
             if (CurGame.Phase == GamePhase.Player1Win ||
                 CurGame.Phase == GamePhase.Player2Win ||
-                CurGame.Phase == GamePhase.Aborted ||
-                (NouTrainMode && Round > 100))
+                CurGame.Phase == GamePhase.Aborted)
             {
                 QuitAiBattleRequested = true;
-                if (NouTrainMode)
-                {
-                    NouHandleGameOver();
-                    return;
-                }
                 Console.WriteLine("\nPress enter to return to main menu");
                 CurrentMenu = MenuType.Main;
                 NextAction = null;
@@ -285,8 +269,8 @@ namespace AccessBattleConsole
                 Console.ReadLine();
             }
             else
-            {                
-                if (CurGame?.ExecuteCommand(str, 1) != true)
+            {
+                if (CurGame?.ExecuteCommand(str, 1).GetAwaiter().GetResult() != true)
                 {
                     Console.WriteLine("Wrong command!");
                     Thread.Sleep(1000);
@@ -320,7 +304,7 @@ namespace AccessBattleConsole
 
         static void DrawBoard(bool hideOpponent = true)
         {
-            var b = CurGame.Board;            
+            var b = CurGame.Board;
 
             string upper =  "   ┌───┬───┬───┬═══┬═══┬───┬───┬───┐";
           //string row =     "  │   │   │   │   │   │   │   │   │";
@@ -333,11 +317,11 @@ namespace AccessBattleConsole
             {
                 Console.Write(" " + y + " │");
                 for (int x = 0; x < 8; ++x)
-                {                    
+                {
                     var card = b[x, y-1].Card;
                     if (card == null)
                         Console.Write("   ");
-                    else 
+                    else
                     {
                         var oldCol = Console.ForegroundColor;
                         Console.ForegroundColor = card.Owner.PlayerNumber == 1 ? ConsoleColor.Cyan : ConsoleColor.Red;
@@ -347,7 +331,7 @@ namespace AccessBattleConsole
                             var onlCard = card as OnlineCard;
                             if (onlCard == null) Console.Write("err");
                             else
-                            {                                
+                            {
                                 if (onlCard.Type == OnlineCardType.Unknown || hideOpponent && !onlCard.IsFaceUp && card.Owner.PlayerNumber == 2)
                                     Console.Write(onlCard.HasBoost ? "-X-" : " X ");
                                 else if (onlCard.Type == OnlineCardType.Link) Console.Write(onlCard.HasBoost ? "-L-" : " L ");
@@ -406,7 +390,7 @@ namespace AccessBattleConsole
 
         static void DrawAiBattle()
         {
-            Console.WriteLine("AI vs AI Mode\n");            
+            Console.WriteLine("AI vs AI Mode\n");
 
             Console.WriteLine("0. Return to Main Menu\n");
 
@@ -464,18 +448,18 @@ namespace AccessBattleConsole
             IsAiBattle = true;
             // Set up Game
             CleanupGame();
-            
+
             CurGame = new LocalGame() { AiCommandDelay = 1000 };
             ((LocalGame)CurGame).SetAi(factories[0].CreateInstance(), 1);
             ((LocalGame)CurGame).SetAi(factories[1].CreateInstance(), 2);
             CurGame.InitGame();
             CurGame.PropertyChanged += CurGame_PropertyChanged;
             ((LocalGame)CurGame).SyncRequired += Program_SyncRequired;
-            
+
             UpdateUI();
             ++Round;
-            ((LocalGame)CurGame).AiPlayer1Move();
-        }        
+            Task.Run(async () => await ((LocalGame)CurGame).AiPlayer1Move());
+        }
 
         static void CleanupGame()
         {
@@ -492,52 +476,5 @@ namespace AccessBattleConsole
             }
         }
 
-        static string EnterNouTrain()
-        {
-            NouTrainMode = true;
-            NextAction = StartNouTraining;
-            return "";      
-        }
-
-        static int NouTrainCounter = 0;
-        static void StartNouTraining(string str)
-        {
-            CurrentMenu = MenuType.Game;
-            IsAiBattle = true;
-            // Set up Game
-            CleanupGame();
-
-            CurGame = new LocalGame() { AiCommandDelay = 0 };
-
-            var nou1 = new Nou();
-            var nou2 = new Nou();
-
-            // TODO: Load files from disk if existing. 
-            // Use NouTrainCounter. We test N networkd in a row before we sort out the weakest ones.
-            // TODO: Implement Fitness function.
-
-            //if (!System.IO.Directory.Exists("nou"))
-            //    System.IO.Directory.CreateDirectory("nou");
-
-            // TODO: Load last network configurations
-
-            ((LocalGame)CurGame).SetAi(nou1, 1);
-            ((LocalGame)CurGame).SetAi(nou2, 2);
-            CurGame.InitGame();
-            CurGame.PropertyChanged += CurGame_PropertyChanged;
-            ((LocalGame)CurGame).SyncRequired += Program_SyncRequired;
-
-            UpdateUI();
-            ++Round;
-            ((LocalGame)CurGame).AiPlayer1Move();
-        }
-
-        static void NouHandleGameOver()
-        {
-            // TODO
-            Console.WriteLine("\nPress enter to return to main menu");
-            CurrentMenu = MenuType.Main;
-            NextAction = null;
-        }
     }
 }

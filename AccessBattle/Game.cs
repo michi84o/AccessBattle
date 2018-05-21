@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 // Board is 8x8 using Chess notation
@@ -237,6 +238,7 @@ namespace AccessBattle
                 ;
         }
 
+        SemaphoreSlim _executeLock = new SemaphoreSlim(1, 1);
         /// <summary>
         /// Command      Syntax             Example
         /// -------------------------------------------
@@ -252,342 +254,349 @@ namespace AccessBattle
         /// </summary>
         /// <param name="command">Command to play.</param>
         /// <param name="player">Player number.</param>
-        /// <returns></returns>
-        // TODO LOCK ACCESS TOD THIS METHOD !!!        
-        public virtual bool ExecuteCommand(string command, int player)
+        /// <returns></returns>      
+        public virtual async Task<bool> ExecuteCommand(string command, int player)
         {
-            command = ReplaceAltSyntax(command);
-
-            if (player != 1 && player != 2) return false;
-            if (Phase == GamePhase.Player1Turn && player != 1) return false;
-            if (Phase == GamePhase.Player2Turn && player != 2) return false;
-            if (string.IsNullOrEmpty(command)) return false;
-
-            var cmd = command.Trim();
-
-            #region Deploy Command "dp"
-            // Deployment command is a command that contains 4 'L' and 4 'V' characters.
-            // It corresponds to the 8 cards that will be deployed. The card positions are
-            // counted from left to right on the deployment line.
-            // The command is "dp". Example:
-            // "dp LLVLVVVL"
-            if (cmd.StartsWith("dp ", StringComparison.InvariantCultureIgnoreCase))
+            await _executeLock.WaitAsync();
+            try
             {
-                if (Phase != GamePhase.Deployment) return false;
-                if (cmd.Length < 11) return false;
-                cmd = cmd.Substring(3).Trim();
-                if (cmd.Length != 8) return false;
-                // Verify string
-                int linkCount = 0;
-                int virusCount = 0;
-                var layout = new OnlineCardType[8];
-                for (int i=0; i<8; ++i)
+                command = ReplaceAltSyntax(command);
+
+                if (player != 1 && player != 2) return false;
+                if (Phase == GamePhase.Player1Turn && player != 1) return false;
+                if (Phase == GamePhase.Player2Turn && player != 2) return false;
+                if (string.IsNullOrEmpty(command)) return false;
+
+                var cmd = command.Trim();
+
+                #region Deploy Command "dp"
+                // Deployment command is a command that contains 4 'L' and 4 'V' characters.
+                // It corresponds to the 8 cards that will be deployed. The card positions are
+                // counted from left to right on the deployment line.
+                // The command is "dp". Example:
+                // "dp LLVLVVVL"
+                if (cmd.StartsWith("dp ", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    if (cmd[i] == 'L' || cmd[i] == 'l')
+                    if (Phase != GamePhase.Deployment) return false;
+                    if (cmd.Length < 11) return false;
+                    cmd = cmd.Substring(3).Trim();
+                    if (cmd.Length != 8) return false;
+                    // Verify string
+                    int linkCount = 0;
+                    int virusCount = 0;
+                    var layout = new OnlineCardType[8];
+                    for (int i = 0; i < 8; ++i)
                     {
-                        ++linkCount;
-                        layout[i] = OnlineCardType.Link;
+                        if (cmd[i] == 'L' || cmd[i] == 'l')
+                        {
+                            ++linkCount;
+                            layout[i] = OnlineCardType.Link;
+                        }
+                        else if (cmd[i] == 'V' || cmd[i] == 'v')
+                        {
+                            ++virusCount;
+                            layout[i] = OnlineCardType.Virus;
+                        }
                     }
-                    else if (cmd[i] == 'V' || cmd[i] == 'v')
+                    if (linkCount != 4 || virusCount != 4) return false;
+                    linkCount = 0;
+                    virusCount = 0;
+                    --player; // Working with index !!!
+                    var y1 = player == 0 ? 0 : 7;
+                    var y2 = player == 0 ? 1 : 6;
+                    for (int x = 0; x < 8; ++x)
                     {
-                        ++virusCount;
-                        layout[i] = OnlineCardType.Virus;
+                        // Clear stack.
+                        //Board[x, 8 + player].Card = null; stack not used for depl. anymore
+                        // Place card
+                        int y = (x == 3 || x == 4) ? y2 : y1;
+                        int offset = layout[x] == OnlineCardType.Link ? linkCount++ : (4 + virusCount++);
+                        var xx = player == 0 ? x : 7 - x;
+                        Board[xx, y].Card = PlayerOnlineCards[player, offset];
                     }
+                    _hasDeployed[player] = true;
+                    if (_hasDeployed[0] && _hasDeployed[1])
+                        BeginTurns();
+                    return true;
                 }
-                if (linkCount != 4 || virusCount != 4) return false;
-                linkCount = 0;
-                virusCount = 0;
-                --player; // Working with index !!!
-                var y1 = player == 0 ? 0 : 7;
-                var y2 = player == 0 ? 1 : 6;
-                for (int x = 0; x < 8; ++x)
+                #endregion
+
+                #region Move command "mv"
+                if (cmd.StartsWith("mv ", StringComparison.InvariantCultureIgnoreCase) && command.Length > 3)
                 {
-                    // Clear stack.
-                    //Board[x, 8 + player].Card = null; stack not used for depl. anymore
-                    // Place card
-                    int y = (x == 3 || x == 4) ? y2 : y1;
-                    int offset = layout[x] == OnlineCardType.Link ? linkCount++ : (4 + virusCount++);
-                    var xx = player == 0 ? x : 7 - x;
-                    Board[xx, y].Card = PlayerOnlineCards[player, offset];
-                }
-                _hasDeployed[player] = true;
-                if (_hasDeployed[0] && _hasDeployed[1])
-                    BeginTurns();
-                return true;
-            }
-            #endregion
-
-            #region Move command "mv"
-            if (cmd.StartsWith("mv ", StringComparison.InvariantCultureIgnoreCase) && command.Length > 3)
-            {
-                command = command.Substring(3).Trim();
-                var split = command.Split(new[] { ',' });
-                if (split.Length != 4) return false;
-                ReplaceLettersWithNumbers(ref split);
-                uint x1, x2, y1, y2;
-                if (!uint.TryParse(split[0], out x1) ||
-                    !uint.TryParse(split[1], out y1) ||
-                    !uint.TryParse(split[2], out x2) ||
-                    !uint.TryParse(split[3], out y2))
-                    return false;
-
-                // Convert to zero based index:
-                --x1; --x2; --y1; --y2;
-
-                if (x1 > 7 || x2 > 7 || (y1 > 7 && y1 != 10) || (y2 > 7 && y2 != 10))
-                    return false;
-
-                var field1 = Board[x1, y1];
-                var field2 = Board[x2, y2];
-                var card1 = field1.Card as OnlineCard;
-                if (card1?.Owner?.PlayerNumber != player)
-                    return false;
-
-                if (!GetMoveTargetFields(this, field1).Contains(field2))
-                    return false;
-
-                // Check if card is claimed
-                if (field2.Card != null)
-                {
-                    var card2 = field2.Card as OnlineCard;
-                    if (card2 == null || card2.Owner?.PlayerNumber == player)
+                    command = command.Substring(3).Trim();
+                    var split = command.Split(new[] { ',' });
+                    if (split.Length != 4) return false;
+                    ReplaceLettersWithNumbers(ref split);
+                    uint x1, x2, y1, y2;
+                    if (!uint.TryParse(split[0], out x1) ||
+                        !uint.TryParse(split[1], out y1) ||
+                        !uint.TryParse(split[2], out x2) ||
+                        !uint.TryParse(split[3], out y2))
                         return false;
-                    card2.IsFaceUp = true;
-                    PlaceCardOnStack(field2, player);
+
+                    // Convert to zero based index:
+                    --x1; --x2; --y1; --y2;
+
+                    if (x1 > 7 || x2 > 7 || (y1 > 7 && y1 != 10) || (y2 > 7 && y2 != 10))
+                        return false;
+
+                    var field1 = Board[x1, y1];
+                    var field2 = Board[x2, y2];
+                    var card1 = field1.Card as OnlineCard;
+                    if (card1?.Owner?.PlayerNumber != player)
+                        return false;
+
+                    if (!GetMoveTargetFields(this, field1).Contains(field2))
+                        return false;
+
+                    // Check if card is claimed
                     if (field2.Card != null)
                     {
-                        // Could not move card, error!
-                        Phase = GamePhase.Aborted;
-                        return true;
-                    }
-                    if (card2.HasBoost)
-                        card2.HasBoost = false;
-                }
-                if (field2.IsServerArea)
-                {
-                    PlaceCardOnStack(field1, player);
-                    if (field1.Card != null)
-                    {
-                        // Could not move card, error!
-                        Phase = GamePhase.Aborted;
-                        return true;
-                    }
-                    if (card1.HasBoost)
-                        card1.HasBoost = false;
-                }
-                field2.Card = field1.Card;
-                field1.Card = null;
-                SwitchPlayerTurnPhase();
-                return true;
-            }
-            #endregion
-
-            #region Boost command "bs"
-            if (command.StartsWith("bs ", StringComparison.InvariantCultureIgnoreCase) && command.Length > 3)
-            {
-                command = command.Substring(3).Trim();
-                var split = command.Split(new[] { ',' });
-                if (split.Length != 3) return false;
-
-                ReplaceLettersWithNumbers(ref split);
-
-                uint x1, y1, enabled;
-                if (!uint.TryParse(split[0], out x1) ||
-                    !uint.TryParse(split[1], out y1) ||
-                    !uint.TryParse(split[2], out enabled))
-                    return false;
-
-                // Convert to zero based index:
-                --x1; --y1;
-
-                if (x1 > 7 || y1 > 7 || enabled > 1)
-                    return false;
-
-                var field1 = Board[x1, y1];
-                var card1 = field1.Card as OnlineCard;
-                if (card1?.Owner?.PlayerNumber != player)
-                    return false;
-
-                OnlineCard boostedCard = null;
-                for (int i = 0; i < 8; ++i)
-                {
-                    var card = PlayerOnlineCards[player - 1, i];
-                    if (card.HasBoost)
-                    {
-                        boostedCard = card;
-                        break;
-                    }
-                }
-
-                if (enabled == 1)
-                {
-                    if (boostedCard != null)
-                        return false; // Boost already placed
-                    card1.HasBoost = true;
-                    SwitchPlayerTurnPhase();
-                    return true;
-                }
-
-                // enabled == 0
-                if (boostedCard != card1)
-                    return false; // wrong card selected
-
-                card1.HasBoost = false;
-                SwitchPlayerTurnPhase();
-                return true;
-            }
-            #endregion
-
-            #region Firewall command "fw"
-            if (cmd.StartsWith("fw ", StringComparison.InvariantCulture) && command.Length > 3)
-            {
-                command = command.Substring(3).Trim();
-                var split = command.Split(new[] { ',' });
-                if (split.Length != 3) return false;
-
-                ReplaceLettersWithNumbers(ref split);
-
-                uint x1, y1, enabled;
-                if (!uint.TryParse(split[0], out x1) ||
-                    !uint.TryParse(split[1], out y1) ||
-                    !uint.TryParse(split[2], out enabled))
-                    return false;
-
-                // Convert to zero based index:
-                --x1; --y1;
-
-                if (x1 > 7 || y1 > 7 || enabled > 1)
-                    return false;
-
-                var field1 = Board[x1, y1];
-                var card1 = field1.Card;
-
-                if (enabled == 1)
-                {
-                    if (card1 != null) return false; // Can only place on empty field
-
-                    // Make sure firewall card wasn't already placed
-                    for (int x = 0; x < 8; ++x)
-                        for (int y = 0; y < 8; ++y)
+                        var card2 = field2.Card as OnlineCard;
+                        if (card2 == null || card2.Owner?.PlayerNumber == player)
+                            return false;
+                        card2.IsFaceUp = true;
+                        PlaceCardOnStack(field2, player);
+                        if (field2.Card != null)
                         {
-                            var card = Board[x, y].Card;
-                            if (card?.Owner.PlayerNumber != player) continue;
-                            if (card is FirewallCard) return false; // card already placed
+                            // Could not move card, error!
+                            Phase = GamePhase.Aborted;
+                            return true;
                         }
+                        if (card2.HasBoost)
+                            card2.HasBoost = false;
+                    }
+                    if (field2.IsServerArea)
+                    {
+                        PlaceCardOnStack(field1, player);
+                        if (field1.Card != null)
+                        {
+                            // Could not move card, error!
+                            Phase = GamePhase.Aborted;
+                            return true;
+                        }
+                        if (card1.HasBoost)
+                            card1.HasBoost = false;
+                    }
+                    field2.Card = field1.Card;
+                    field1.Card = null;
+                    SwitchPlayerTurnPhase();
+                    return true;
+                }
+                #endregion
 
-                    field1.Card = PlayerFirewallCards[player - 1];
+                #region Boost command "bs"
+                if (command.StartsWith("bs ", StringComparison.InvariantCultureIgnoreCase) && command.Length > 3)
+                {
+                    command = command.Substring(3).Trim();
+                    var split = command.Split(new[] { ',' });
+                    if (split.Length != 3) return false;
+
+                    ReplaceLettersWithNumbers(ref split);
+
+                    uint x1, y1, enabled;
+                    if (!uint.TryParse(split[0], out x1) ||
+                        !uint.TryParse(split[1], out y1) ||
+                        !uint.TryParse(split[2], out enabled))
+                        return false;
+
+                    // Convert to zero based index:
+                    --x1; --y1;
+
+                    if (x1 > 7 || y1 > 7 || enabled > 1)
+                        return false;
+
+                    var field1 = Board[x1, y1];
+                    var card1 = field1.Card as OnlineCard;
+                    if (card1?.Owner?.PlayerNumber != player)
+                        return false;
+
+                    OnlineCard boostedCard = null;
+                    for (int i = 0; i < 8; ++i)
+                    {
+                        var card = PlayerOnlineCards[player - 1, i];
+                        if (card.HasBoost)
+                        {
+                            boostedCard = card;
+                            break;
+                        }
+                    }
+
+                    if (enabled == 1)
+                    {
+                        if (boostedCard != null)
+                            return false; // Boost already placed
+                        card1.HasBoost = true;
+                        SwitchPlayerTurnPhase();
+                        return true;
+                    }
+
+                    // enabled == 0
+                    if (boostedCard != card1)
+                        return false; // wrong card selected
+
+                    card1.HasBoost = false;
+                    SwitchPlayerTurnPhase();
+                    return true;
+                }
+                #endregion
+
+                #region Firewall command "fw"
+                if (cmd.StartsWith("fw ", StringComparison.InvariantCulture) && command.Length > 3)
+                {
+                    command = command.Substring(3).Trim();
+                    var split = command.Split(new[] { ',' });
+                    if (split.Length != 3) return false;
+
+                    ReplaceLettersWithNumbers(ref split);
+
+                    uint x1, y1, enabled;
+                    if (!uint.TryParse(split[0], out x1) ||
+                        !uint.TryParse(split[1], out y1) ||
+                        !uint.TryParse(split[2], out enabled))
+                        return false;
+
+                    // Convert to zero based index:
+                    --x1; --y1;
+
+                    if (x1 > 7 || y1 > 7 || enabled > 1)
+                        return false;
+
+                    var field1 = Board[x1, y1];
+                    var card1 = field1.Card;
+
+                    if (enabled == 1)
+                    {
+                        if (card1 != null) return false; // Can only place on empty field
+
+                        // Make sure firewall card wasn't already placed
+                        for (int x = 0; x < 8; ++x)
+                            for (int y = 0; y < 8; ++y)
+                            {
+                                var card = Board[x, y].Card;
+                                if (card?.Owner.PlayerNumber != player) continue;
+                                if (card is FirewallCard) return false; // card already placed
+                            }
+
+                        field1.Card = PlayerFirewallCards[player - 1];
+                        SwitchPlayerTurnPhase();
+                        return true;
+                    }
+
+                    // enabled == 0
+                    if (!(card1 is FirewallCard) || card1.Owner?.PlayerNumber != player) return false;
+                    field1.Card = null;
+                    SwitchPlayerTurnPhase();
+                    return true;
+                }
+                #endregion
+
+                #region Virus Check command "vc"
+
+                if (command.StartsWith("vc ", StringComparison.InvariantCultureIgnoreCase) && command.Length > 3)
+                {
+                    command = command.Substring(3).Trim();
+                    var split = command.Split(new[] { ',' });
+                    if (split.Length != 2) return false;
+
+                    ReplaceLettersWithNumbers(ref split);
+
+                    uint x1, y1;
+                    if (!uint.TryParse(split[0], out x1) ||
+                        !uint.TryParse(split[1], out y1))
+                        return false;
+
+                    if (Players[player - 1].DidVirusCheck)
+                        return false;
+
+                    // Convert to zero based index:
+                    --x1; --y1;
+
+                    if (x1 > 7 || y1 > 7)
+                        return false;
+
+                    var field1 = Board[x1, y1];
+                    var card1 = field1.Card as OnlineCard;
+
+                    if (card1 == null || card1.Owner?.PlayerNumber == player || card1.IsFaceUp)
+                        return false;
+
+                    card1.IsFaceUp = true;
+                    Players[player - 1].DidVirusCheck = true;
                     SwitchPlayerTurnPhase();
                     return true;
                 }
 
-                // enabled == 0
-                if (!(card1 is FirewallCard) || card1.Owner?.PlayerNumber != player) return false;
-                field1.Card = null;
-                SwitchPlayerTurnPhase();
-                return true;
-            }
-            #endregion
+                #endregion
 
-            #region Virus Check command "vc"
+                #region Error 404 command "er"
 
-            if (command.StartsWith("vc ", StringComparison.InvariantCultureIgnoreCase) && command.Length > 3)
-            {
-                command = command.Substring(3).Trim();
-                var split = command.Split(new[] { ',' });
-                if (split.Length != 2) return false;
-
-                ReplaceLettersWithNumbers(ref split);
-
-                uint x1, y1;
-                if (!uint.TryParse(split[0], out x1) ||
-                    !uint.TryParse(split[1], out y1))
-                    return false;
-
-                if (Players[player - 1].DidVirusCheck)
-                    return false;
-
-                // Convert to zero based index:
-                --x1; --y1;
-
-                if (x1 > 7 || y1 > 7)
-                    return false;
-
-                var field1 = Board[x1, y1];
-                var card1 = field1.Card as OnlineCard;
-
-                if (card1 == null || card1.Owner?.PlayerNumber == player || card1.IsFaceUp)
-                    return false;
-
-                card1.IsFaceUp = true;
-                Players[player - 1].DidVirusCheck = true;
-                SwitchPlayerTurnPhase();
-                return true;
-            }
-
-            #endregion
-
-            #region Error 404 command "er"
-
-            if (command.StartsWith("er ", StringComparison.InvariantCultureIgnoreCase) && command.Length > 3)
-            {
-                command = command.Substring(3).Trim();
-                var split = command.Split(new[] { ',' });
-                if (split.Length != 5) return false;
-
-                ReplaceLettersWithNumbers(ref split);
-
-                uint x1, y1, x2, y2, switchCards;
-                if (!uint.TryParse(split[0], out x1) ||
-                    !uint.TryParse(split[1], out y1) ||
-                    !uint.TryParse(split[2], out x2) ||
-                    !uint.TryParse(split[3], out y2) ||
-                    !uint.TryParse(split[4], out switchCards))
-                    return false;
-
-                if (Players[player - 1].Did404NotFound)
-                    return false;
-
-                // Convert to zero based index:
-                --x1; --x2; --y1; --y2;
-
-                if (x1 > 7 || y1 > 7 || x2 > 7 || y2 > 7 || switchCards > 1)
-                    return false;
-
-                var field1 = Board[x1, y1];
-                var field2 = Board[x2, y2];
-                var card1 = field1.Card as OnlineCard;
-                var card2 = field2.Card as OnlineCard;
-
-                if (card1?.Owner?.PlayerNumber != player || card2?.Owner?.PlayerNumber != player)
-                    return false;
-
-                card1.IsFaceUp = false;
-                card2.IsFaceUp = false;
-
-                if (switchCards == 1)
+                if (command.StartsWith("er ", StringComparison.InvariantCultureIgnoreCase) && command.Length > 3)
                 {
-                    field1.Card = card2;
-                    field2.Card = card1;
-                    if (card2.HasBoost)
+                    command = command.Substring(3).Trim();
+                    var split = command.Split(new[] { ',' });
+                    if (split.Length != 5) return false;
+
+                    ReplaceLettersWithNumbers(ref split);
+
+                    uint x1, y1, x2, y2, switchCards;
+                    if (!uint.TryParse(split[0], out x1) ||
+                        !uint.TryParse(split[1], out y1) ||
+                        !uint.TryParse(split[2], out x2) ||
+                        !uint.TryParse(split[3], out y2) ||
+                        !uint.TryParse(split[4], out switchCards))
+                        return false;
+
+                    if (Players[player - 1].Did404NotFound)
+                        return false;
+
+                    // Convert to zero based index:
+                    --x1; --x2; --y1; --y2;
+
+                    if (x1 > 7 || y1 > 7 || x2 > 7 || y2 > 7 || switchCards > 1)
+                        return false;
+
+                    var field1 = Board[x1, y1];
+                    var field2 = Board[x2, y2];
+                    var card1 = field1.Card as OnlineCard;
+                    var card2 = field2.Card as OnlineCard;
+
+                    if (card1?.Owner?.PlayerNumber != player || card2?.Owner?.PlayerNumber != player)
+                        return false;
+
+                    card1.IsFaceUp = false;
+                    card2.IsFaceUp = false;
+
+                    if (switchCards == 1)
                     {
-                        card1.HasBoost = true;
-                        card2.HasBoost = false;
+                        field1.Card = card2;
+                        field2.Card = card1;
+                        if (card2.HasBoost)
+                        {
+                            card1.HasBoost = true;
+                            card2.HasBoost = false;
+                        }
+                        else if (card1.HasBoost)
+                        {
+                            card1.HasBoost = false;
+                            card2.HasBoost = true;
+                        }
                     }
-                    else if (card1.HasBoost)
-                    {
-                        card1.HasBoost = false;
-                        card2.HasBoost = true;
-                    }
+
+                    Players[player - 1].Did404NotFound = true;
+                    SwitchPlayerTurnPhase();
+                    return true;
                 }
 
-                Players[player - 1].Did404NotFound = true;
-                SwitchPlayerTurnPhase();
-                return true;
+                #endregion
+
+                return false;
             }
-
-            #endregion
-
-            return false;
+            finally
+            {
+                _executeLock.Release();
+            }
         }
 
         void PlaceCardOnStack(BoardField field, int player)
@@ -864,11 +873,18 @@ namespace AccessBattle
         /// <param name="command">Command to play.</param>
         /// <param name="player">Must always be 1 for human player. Player 2 is AI.</param>
         /// <returns></returns>
-        public override bool ExecuteCommand(string command, int player)
+        /// <remarks>If _aiCommandDelay is set, the AI move will be executed in another thread!</remarks>
+        public override async Task<bool> ExecuteCommand(string command, int player)
         {
             if ((player != 1 && _ai1 == null) || _ai2 == null) return false;
 
-            var result = base.ExecuteCommand(command, player);
+            if (player == 1 && _ai1 != null && _aiCommandDelay > 0)
+            {
+                SyncRequired?.Invoke(this, EventArgs.Empty);
+                await Task.Delay(_aiCommandDelay);
+            }
+
+            var result = await base.ExecuteCommand(command, player);
             if (!result) return false;
 
             if (Phase != GamePhase.Player1Turn &&
@@ -876,36 +892,32 @@ namespace AccessBattle
                 Phase != GamePhase.Deployment)
                 return result; // Game has finished
 
-            Action aiMove = () =>
+            // _ai2 is always set
+            if (_aiCommandDelay > 0)
             {
-                // AI Move
+                SyncRequired?.Invoke(this, EventArgs.Empty);
+                await Task.Delay(_aiCommandDelay);
+            }
+
+            // AI Move
+            _ai2.Synchronize(GameSync.FromGame(this, 0, 2));
+            var aiCmnd = _ai2.PlayTurn();
+            if (!(await base.ExecuteCommand(aiCmnd, 2)))
+            {
+                Phase = GamePhase.Aborted;
+            }
+
+            // Can happen after Deployment
+            if (Phase == GamePhase.Player2Turn)
+            {
                 _ai2.Synchronize(GameSync.FromGame(this, 0, 2));
-                var aiCmnd = _ai2.PlayTurn();
-                if (!base.ExecuteCommand(aiCmnd, 2))
+                aiCmnd = _ai2.PlayTurn();
+                if (!(await base.ExecuteCommand(aiCmnd, 2)))
                 {
                     Phase = GamePhase.Aborted;
                 }
-
-                // Can happen after Deployment
-                if (Phase == GamePhase.Player2Turn)
-                {
-                    _ai2.Synchronize(GameSync.FromGame(this, 0, 2));
-                    aiCmnd = _ai2.PlayTurn();
-                    if (!base.ExecuteCommand(aiCmnd, 2))
-                    {
-                        Phase = GamePhase.Aborted;
-                    }
-                }
-                SyncRequired?.Invoke(this, EventArgs.Empty);
-            };            
-
-            if (_aiCommandDelay < 1)
-                aiMove();
-            else
-            {
-                SyncRequired?.Invoke(this, EventArgs.Empty);
-                Task.Delay(_aiCommandDelay).ContinueWith((t) => aiMove());
             }
+            SyncRequired?.Invoke(this, EventArgs.Empty);
 
             return true;
         }
@@ -915,13 +927,13 @@ namespace AccessBattle
         /// AI player 2 will automatically play its move after player 1.
         /// </summary>
         /// <returns></returns>
-        public bool AiPlayer1Move()
+        public async Task <bool> AiPlayer1Move()
         {
             if (_ai1 == null || 
                 (Phase != GamePhase.Player1Turn && Phase != GamePhase.Deployment))
                 return false;
             _ai1.Synchronize(GameSync.FromGame(this, 0, 1));
-            if (!ExecuteCommand(_ai1.PlayTurn(), 1))
+            if (!(await ExecuteCommand(_ai1.PlayTurn(), 1)))
             {
                 Phase = GamePhase.Aborted;
                 return false;
