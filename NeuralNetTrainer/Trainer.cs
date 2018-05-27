@@ -14,7 +14,7 @@ namespace NeuralNetTrainer
         public Nou P2;
         public LocalGame Game;
         public int Round;
-        const int MaxRound = 200;
+        const int MaxRound = 100;
         public bool GameOver => Round >= MaxRound ||
                     Game.Phase == GamePhase.Aborted ||
                     Game.Phase == GamePhase.Player1Win ||
@@ -55,17 +55,36 @@ namespace NeuralNetTrainer
             //NeedsUiUpdate?.Invoke(this, EventArgs.Empty);
         }
 
+        int _uiUpdateSkip = 0;
+        void OnUiUpdate(bool force)
+        {
+            if (force)
+            {
+                NeedsUiUpdate?.Invoke(this, EventArgs.Empty);
+                return;
+            }
+            if (Game.Phase == GamePhase.Player2Turn && Game.AiCommandDelay < 100)
+                return; // Skip
+            if (Game.AiCommandDelay < 100)
+            {
+                if (++_uiUpdateSkip < 2) return; // Skip
+                _uiUpdateSkip = 0;
+            }
+            NeedsUiUpdate?.Invoke(this, EventArgs.Empty);
+        }
+
         private void Game_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(Game.Phase))
             {
-                NeedsUiUpdate?.Invoke(this, EventArgs.Empty);
+                OnUiUpdate(false);
+
                 if (Game.Phase == GamePhase.Player1Turn && ++Round < MaxRound)
                 {
                     Task.Run(async () => await Game.AiPlayer1Move());
-                }  
+                }
                 if (GameOver)
-                    NeedsUiUpdate?.Invoke(this, EventArgs.Empty);
+                    OnUiUpdate(true);
             }
         }
     }

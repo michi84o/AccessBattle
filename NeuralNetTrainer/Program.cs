@@ -42,7 +42,7 @@ namespace NeuralNetTrainer
             // We have 50 AIs. All fight 5 random other AIs. Their scores will be summed up.
             int aiCnt = 50; // Should be multiple of battleCnt*2. Not lower than battleCnt*4.
             int battleCnt = 5; // Be carefull when changing this number. Might screw up code below
-            double mutationDelta = 0.000001;// initial Mutation is 0.00001;
+            double mutationDelta = Nou.MutateDelta/10;
             var log = new Dictionary<int, TrainingLog>();
             for (int i = 0; i < aiCnt; ++i)
             {

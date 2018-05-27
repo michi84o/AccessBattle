@@ -107,7 +107,11 @@ namespace AccessBattleAI.Models
 
         double RandomBetween(double min, double max) => _rnd.NextDouble() * (max - min) + min;
 
-        public void ComputeOutputs()
+        /// <summary>
+        /// Compute outputs of the net.
+        /// </summary>
+        /// <param name="softmax">If true, the maximum output value will be scaled to 1.</param>
+        public void ComputeOutputs(bool softmax)
         {
             double[] hSums = new double[_numHidden]; // hidden nodes sums scratch array
             double[] oSums = new double[_numOutput]; // output nodes sums
@@ -129,8 +133,15 @@ namespace AccessBattleAI.Models
             for (int i = 0; i < _numOutput; ++i)  // add biases to input-to-hidden sums
                 oSums[i] += _oBiases[i];
 
-            double[] softOut = Softmax(oSums); // softmax activation does all outputs at once for efficiency
-            Array.Copy(softOut, _outputs, softOut.Length);
+            if (softmax)
+            {
+                double[] softOut = Softmax(oSums); // softmax activation does all outputs at once for efficiency
+                Array.Copy(softOut, _outputs, _numOutput);
+            }
+            else
+            {
+                Array.Copy(oSums, _outputs, _numOutput);
+            }
         } // ComputeOutputs
 
         static double HyperTanFunction(double x)

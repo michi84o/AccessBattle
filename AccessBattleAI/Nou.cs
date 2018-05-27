@@ -33,6 +33,8 @@ namespace AccessBattleAI
         NeuralNetwork _net1;
         NeuralNetwork _net2;
 
+        public const double MutateDelta = 0.01;
+
         public NeuralNetwork Net1 => _net1;
         public NeuralNetwork Net2 => _net2;
 
@@ -69,12 +71,12 @@ namespace AccessBattleAI
             if (_net1 == null)
             {
                 _net1 = new NeuralNetwork(94, 4, 1);
-                _net1.Mutate(0.00001);
+                _net1.Mutate(MutateDelta);
             }
             if (_net2 == null)
             {
                 _net2 = new NeuralNetwork(94, 4, 12);
-                _net2.Mutate(0.00001);
+                _net2.Mutate(MutateDelta);
             }
 
             // Deployment is random.
@@ -100,7 +102,7 @@ namespace AccessBattleAI
             foreach (var sc in scores)
             {
                 ApplyInputs(_net1, sc.Field);
-                _net1.ComputeOutputs();
+                _net1.ComputeOutputs(false);
                 sc.Score = _net1.Outputs[0];
             }
             scores = scores.OrderByDescending(o => o.Score).ToList();
@@ -120,7 +122,7 @@ namespace AccessBattleAI
 
             // Action 2: Move
             ApplyInputs(_net2, chosenField);
-            _net2.ComputeOutputs();
+            _net2.ComputeOutputs(false);
             // Mapping is same as Input Array2
             scores.Clear();
             bool hasBoost = (chosenField.Card as OnlineCard)?.HasBoost == true;
@@ -232,7 +234,12 @@ namespace AccessBattleAI
 
                 // Field can be moved to. Assign a value between 0.5 and 1.0 depending on how far it is from the server
                 var distance = DistanceToExit(mv.X, mv.Y);
-                net.Inputs[i + 80] = 1 - 0.4*distance/7; // Largest distance is somewhere between 7 and 9
+                int isExit = (mv.IsExit && mv.Y == 7) ? 5 : 0; // give +5 if exit
+                // Largest distance is somewhere between 7 and 9
+                double distVal = 1 - (0.7 * distance / 7.0); // Gives value between 0.1 and 1
+                distVal *= distVal; // Gives value between 0.01 and 1
+                // Sceond term gives
+                net.Inputs[i + 80] = isExit + 2*distVal; // Added a additional factor of 2
             }
             var myCard = field.Card as OnlineCard;
             if (myCard?.Type == OnlineCardType.Link)
@@ -316,6 +323,7 @@ namespace AccessBattleAI
                 {
                     // Card reached server. Remove 1
                     --distanceSum;
+                    score += 5; // Give some extra reward
                 }
                 else if (field.Y == 9)
                 {
@@ -325,7 +333,6 @@ namespace AccessBattleAI
                 else if (field.Y < 8)
                 {
                     // Distance to exit
-
                     distanceSum += DistanceToExit(field);
                 }
             }
@@ -334,6 +341,34 @@ namespace AccessBattleAI
             // 3.6 at start of the game
             score += 100 / distanceSum;
             // Score will be between 2.5 and 25.
+
+            // Also let the net use the Virus cards:
+            // Distance of Viruses to Opponent cards
+            foreach (var field in AllMyVirusCards)
+            {
+                if (field.Y == 8)
+                {
+                    // Played virus to server. This is already prevented.
+                    // ... just in case:
+                    score -= 10;
+                }
+                else if (field.Y == 9)
+                {
+                    // Player 2 caught a Virus, nice!
+                    score += 5;
+                }
+                else
+                {
+                    // Calculate min distance to opponent cards
+                    double dMin = 7;
+                    foreach (var c in TheirOnlineCards)
+                    {
+                        var dst = Distance(field.X, field.Y, c.X, c.Y);
+                        if (dst < dMin) dst = dMin;
+                    }
+                    score += 1 / dMin; // Give a point if virus near opponent card
+                }
+            }
 
             // Also add a score for captured link cards
             // Player 1 stack: Player1: Fields (0,8) - (7,8)
