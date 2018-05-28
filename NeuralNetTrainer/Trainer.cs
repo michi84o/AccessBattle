@@ -15,11 +15,12 @@ namespace NeuralNetTrainer
         public IArtificialIntelligence P2;
         public LocalGame Game;
         public int Round;
-        const int MaxRound = 100;
+        public static int MaxRound = 100;
         public bool GameOver => Round >= MaxRound ||
                     Game.Phase == GamePhase.Aborted ||
                     Game.Phase == GamePhase.Player1Win ||
                     Game.Phase == GamePhase.Player2Win;
+        public bool Abort;
 
         public event EventHandler NeedsUiUpdate;
 
@@ -64,7 +65,8 @@ namespace NeuralNetTrainer
             {
                 if (Game.Phase == GamePhase.Player1Turn && ++Round < MaxRound)
                 {
-                    Task.Run(Game.AiPlayer1Move);
+                    if (!Abort)
+                        Task.Run(Game.AiPlayer1Move);
                 }
                 NeedsUiUpdate?.Invoke(this, EventArgs.Empty);
             }

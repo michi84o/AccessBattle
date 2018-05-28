@@ -38,6 +38,8 @@ namespace AccessBattleAI
         public NeuralNetwork Net1 => _net1;
         public NeuralNetwork Net2 => _net2;
 
+        public int DeploySeed = 0;
+
         /// <summary>
         /// Read neural network definition from file.
         /// </summary>
@@ -154,7 +156,8 @@ namespace AccessBattleAI
         string Deploy()
         {
             Random rnd;
-            lock (SeedLock) { rnd = new Random((++SeedBase).GetHashCode() ^ Environment.TickCount); }
+            if (DeploySeed != 0) { rnd = new Random(DeploySeed); }
+            else lock (SeedLock) { rnd = new Random((++SeedBase).GetHashCode() ^ Environment.TickCount); }
             // Randomize cards:
             var list = new List<char> { 'V', 'V', 'V', 'V', 'L', 'L', 'L', 'L', };
             var n = list.Count;
@@ -312,52 +315,41 @@ namespace AccessBattleAI
         public double Fitness()
         {
             // Score the current board:
-            // Calculate the distance of the link cards to the server.
-            // Link cards inside server give extra points.
-            // Captured cards give penalty.
-
             double score = 0;
-            // At the start of the game, the distance sum is about 28
-            double distanceSum = 0;
+
+            // Link cards that reached server give 15 points.
+            // Link cards that were capture give -10 points
+            // Give 10 - 'Distance to Exit' for all otther Link cards.
             foreach (var field in AllMyLinkCards)
             {
-                if (field.Y == 8)
+                if (field.Y == 8) // Card reached server
                 {
-                    // Card reached server. Remove 1
-                    --distanceSum;
-                    score += 5; // Give some extra reward
+                    score += 15;
                 }
-                else if (field.Y == 9)
+                else if (field.Y == 9) // Card was captured
                 {
-                    // Card captured by opponent
-                    distanceSum += 10; // Add penalty
-                }
-                else if (field.Y < 8)
-                {
-                    // Distance to exit
-                    distanceSum += DistanceToExit(field);
-                }
-            }
-
-            if (distanceSum < 4) distanceSum = 4;
-            // 3.6 at start of the game
-            score += 100 / distanceSum;
-            // Score will be between 2.5 and 25.
-
-            // Also let the net use the Virus cards:
-            // Distance of Viruses to Opponent cards
-            foreach (var field in AllMyVirusCards)
-            {
-                if (field.Y == 8)
-                {
-                    // Played virus to server. This is already prevented.
-                    // ... just in case:
                     score -= 10;
                 }
-                else if (field.Y == 9)
+                else if (field.Y < 8) // Card is on the field
                 {
-                    // Player 2 caught a Virus, nice!
-                    score += 5;
+                    // Distance to exit
+                    score += 10 - DistanceToExit(field);
+                }
+            } // Best score = 60
+
+            // Virus cards should not enter exit field or server.
+            // Give -20 if exit field is entered, -25 for server.
+            // Give +10 if bait worked and opponent captured virus.
+            // Give 10 - 'Min dist to opponent' for cards on the field.
+            foreach (var field in AllMyVirusCards)
+            {
+                if (field.Y == 8) // Card reached server
+                {
+                    score -= 25;
+                }
+                else if (field.Y == 9) // Captured by opponent
+                {
+                    score += 10;
                 }
                 else
                 {
@@ -368,14 +360,12 @@ namespace AccessBattleAI
                         var dst = Distance(field.X, field.Y, c.X, c.Y);
                         if (dst < dMin) dst = dMin;
                     }
-                    score += 1 / dMin; // Give a point if virus near opponent card
+                    score += 10 - dMin;
                 }
-            }
+            } // Best score = 40 (only of opponent is stupid enough)
 
-            double tenpc = score * 0.1; // 10% of score
-
-            // Also add a score for captured link cards
-            // Player 1 stack: Player1: Fields (0,8) - (7,8)
+            // Give +5 bonus for opponent link cards that have been captured.
+            // Give -10 penalty for opponent virus cards that have been captured.
             for (int i = 0; i < 8; ++i)
             {
                 var card = Board[i, 8].Card as OnlineCard;
@@ -383,10 +373,13 @@ namespace AccessBattleAI
                 if (card == null || card.Owner.PlayerNumber == 1) continue;
 
                 // Don't add too much. AI might catch cards by accident
-                if (card.Type == OnlineCardType.Link) score += tenpc;
+                if (card.Type == OnlineCardType.Link) score += 5;
                 // Give higher penalty for capturing virus cards
-                if (card.Type == OnlineCardType.Virus) score -= tenpc * 2;
-            }
+                if (card.Type == OnlineCardType.Virus) score -= 10;
+            } // Best score = 20
+
+            // Theoretical best score: 120 (cannot be reached within a normal game)
+
             return score;
         }
 

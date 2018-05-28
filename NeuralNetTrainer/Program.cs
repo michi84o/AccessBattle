@@ -43,6 +43,8 @@ namespace NeuralNetTrainer
             }
             Console.CursorVisible = false;
 
+            Trainer.MaxRound = 15;
+
             // We have 50 AIs. All fight the same MIA instance.
             int aiCnt = 50; // Number of AIs per generation
             double mutationDelta = Nou.MutateDelta/10;
@@ -73,6 +75,7 @@ namespace NeuralNetTrainer
                 genProgress = (int)(0.5 + 100.0 * ((1.0 * it) / gen2Go));
 
                 int curGenSeed = rnd.Next();
+                int nouSeed = rnd.Next();
 
                 #region NextGen Prep
                 if (it > 0)
@@ -140,19 +143,21 @@ namespace NeuralNetTrainer
                         trn.AiDelay = 0; // This is the displayed trainer.
                     }
 
-                    var waitHandle = new AutoResetEvent(false);
+                   var waitHandle = new AutoResetEvent(false);
                     EventHandler handler = (s, a) =>
                     {
                         if (trn.GameOver)
-                            try { waitHandle.Set(); } catch { }                    };
-
+                            try { waitHandle.Set(); } catch { }
+                    };
                     trn.NeedsUiUpdate += handler;
 
+                    aiLog.AI.DeploySeed = nouSeed;
                     // Run game:
                     trn.StartGame(aiLog.AI, mia);
 
-                    waitHandle.WaitOne();
+                    waitHandle.WaitOne( 100*Trainer.MaxRound ); // Give 100ms per round
                     trn.NeedsUiUpdate -= handler;
+                    trn.Abort = true;
 
                     if (trn.Game.Phase == GamePhase.Player1Win) { Interlocked.Increment(ref nouWins); }
                     else if (trn.Game.Phase == GamePhase.Player2Win) { Interlocked.Increment(ref miaWins); }
