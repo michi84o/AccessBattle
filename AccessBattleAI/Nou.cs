@@ -192,8 +192,10 @@ namespace AccessBattleAI
                 int ny = y + InputArray1[i].Y;
 
                 // Empty fields get a zero
-                if (nx < 0 || nx > 7 || ny < 0 || ny > 7 || Board[nx, ny].Card == null || Board[nx, ny].Card.Owner.PlayerNumber == 1
-                    || !(Board[nx, ny].Card is OnlineCard))
+                if (nx < 0 || nx > 7 || ny < 0 || ny > 7 ||
+                    Board[nx, ny].Card == null ||
+                    Board[nx, ny].Card.Owner.PlayerNumber == 1 ||
+                    !(Board[nx, ny]?.Card is OnlineCard))
                 {
                     net.Inputs[i] = 0;
                     net.Inputs[i+40] = 0;

@@ -124,53 +124,46 @@ namespace NeuralNetTrainer
                 #endregion
 
                 Trainer trainer = null;
-                using (var tcs = new CancellationTokenSource())
+
+                // Cycle through all AIs
+                Parallel.ForEach(log.Select(o => o.Value), new ParallelOptions() { MaxDegreeOfParallelism = 8 }, (aiLog) =>
                 {
-                    var t = Task.Run(async () =>
+                    Trainer trn = new Trainer();
+
+                    var mia = new Mia();
+                    mia.SetSeed(curGenSeed);
+                    mia.Depth = 1;
+
+                    if (aiLog.ID == 0)
                     {
-                        while (!tcs.IsCancellationRequested)
-                        {
-                            if (trainer != null)
-                                DrawBoard(trainer);
-                            await Task.Delay(200);
-                        }
-                    });
+                        trainer = trn;
+                        trn.AiDelay = 0; // This is the displayed trainer.
+                    }
 
-                    // Cycle through all AIs
-                    Parallel.ForEach(log.Select(o => o.Value), (aiLog) =>
+                    var waitHandle = new AutoResetEvent(false);
+                    EventHandler handler = (s, a) =>
                     {
-                        Trainer trn = new Trainer();
+                        if (trn.GameOver)
+                            try { waitHandle.Set(); } catch { }                    };
 
-                        var mia = new Mia();
-                        mia.SetSeed(curGenSeed);
-                        mia.Depth = 1;
+                    trn.NeedsUiUpdate += handler;
 
-                        if (aiLog.ID == 0)
-                        {
-                            trainer = trn;
-                            trn.AiDelay = 100; // This is the displayed trainer. Make it slower
-                        }
+                    // Run game:
+                    trn.StartGame(aiLog.AI, mia);
 
-                        // Run game:
-                        trn.StartGame(aiLog.AI, mia);
+                    waitHandle.WaitOne();
+                    trn.NeedsUiUpdate -= handler;
 
-                        while (!trn.GameOver)
-                        {
-                            System.Threading.Thread.Sleep(50);
-                        }
+                    if (trn.Game.Phase == GamePhase.Player1Win) { Interlocked.Increment(ref nouWins); }
+                    else if (trn.Game.Phase == GamePhase.Player2Win) { Interlocked.Increment(ref miaWins); }
 
-                        if (trn.Game.Phase == GamePhase.Player1Win) { Interlocked.Increment(ref nouWins); }
-                        else if (trn.Game.Phase == GamePhase.Player2Win) { Interlocked.Increment(ref miaWins); }
+                    // Post Game: Add score
+                    aiLog.Score = aiLog.AI.Fitness();
 
-                        // Post Game: Add score
-                        aiLog.Score = aiLog.AI.Fitness();
+                });
+                genProgress = (int)(0.5 + 100.0 * ((it + 1.0) / gen2Go));
+                if (trainer != null) DrawBoard(trainer);
 
-                    });
-                    tcs.Cancel();
-                    t.Wait();
-                    genProgress = (int)(0.5 + 100.0 * ((it + 1.0) / gen2Go));
-                    if (trainer != null) DrawBoard(trainer);
-                }
                 // Log score to file
                 ++gen;
                 try

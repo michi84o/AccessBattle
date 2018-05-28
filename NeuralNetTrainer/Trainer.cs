@@ -58,36 +58,15 @@ namespace NeuralNetTrainer
             //NeedsUiUpdate?.Invoke(this, EventArgs.Empty);
         }
 
-        //int _uiUpdateSkip = 0;
-        void OnUiUpdate(bool force)
-        {
-            if (force)
-            {
-                NeedsUiUpdate?.Invoke(this, EventArgs.Empty);
-                return;
-            }
-            if (Game.Phase == GamePhase.Player2Turn && Game.AiCommandDelay < 100)
-                return; // Skip
-            //if (Game.AiCommandDelay < 100)
-            //{
-            //    //if (++_uiUpdateSkip < 2) return; // Skip
-            //    //_uiUpdateSkip = 0;
-            //}
-            NeedsUiUpdate?.Invoke(this, EventArgs.Empty);
-        }
-
         private void Game_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(Game.Phase))
             {
-                OnUiUpdate(false);
-
                 if (Game.Phase == GamePhase.Player1Turn && ++Round < MaxRound)
                 {
-                    Task.Run(async () => await Game.AiPlayer1Move());
+                    Task.Run(Game.AiPlayer1Move);
                 }
-                if (GameOver)
-                    OnUiUpdate(true);
+                NeedsUiUpdate?.Invoke(this, EventArgs.Empty);
             }
         }
     }
