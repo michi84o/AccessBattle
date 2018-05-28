@@ -238,7 +238,7 @@ namespace AccessBattleAI
                 // Largest distance is somewhere between 7 and 9
                 double distVal = 1 - (0.7 * distance / 7.0); // Gives value between 0.1 and 1
                 distVal *= distVal; // Gives value between 0.01 and 1
-                // Sceond term gives
+                // Second term gives
                 net.Inputs[i + 80] = isExit + 2*distVal; // Added a additional factor of 2
             }
             var myCard = field.Card as OnlineCard;
@@ -370,6 +370,8 @@ namespace AccessBattleAI
                 }
             }
 
+            double tenpc = score * 0.1; // 10% of score
+
             // Also add a score for captured link cards
             // Player 1 stack: Player1: Fields (0,8) - (7,8)
             for (int i = 0; i < 8; ++i)
@@ -379,9 +381,9 @@ namespace AccessBattleAI
                 if (card == null || card.Owner.PlayerNumber == 1) continue;
 
                 // Don't add too much. AI might catch cards by accident
-                if (card.Type == OnlineCardType.Link) score *= 1.1; // +10%
+                if (card.Type == OnlineCardType.Link) score += tenpc;
                 // Give higher penalty for capturing virus cards
-                if (card.Type == OnlineCardType.Virus) score *= .8; // -20%
+                if (card.Type == OnlineCardType.Virus) score -= tenpc * 2;
             }
             return score;
         }

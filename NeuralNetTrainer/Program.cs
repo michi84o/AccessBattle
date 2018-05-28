@@ -148,9 +148,16 @@ namespace NeuralNetTrainer
                         }
 
                         // Post Game: Add score
-                        aiLog.Score += aiLog.AI.Fitness();
+                        var fitness = aiLog.AI.Fitness();
+                        if (aiLog.Score < fitness)
+                            aiLog.Score = fitness; // Only save max score
+
                         if (op.Opponents.Count <= battleCnt) // Only score the first 5 games
-                            op.Score += op.AI.Fitness();
+                        {
+                            fitness = op.AI.Fitness();
+                            if (op.Score < fitness)
+                                op.Score = fitness;
+                        }
                     }
                 }
 
@@ -173,7 +180,6 @@ namespace NeuralNetTrainer
                 log[i].AI.Net1.SaveAsFile(netFile(i, 0));
                 log[i].AI.Net2.SaveAsFile(netFile(i, 1));
             }
-            gen += gen2Go;
             File.WriteAllText(genTxt, gen.ToString());
 
             System.Threading.Thread.Sleep(500); // Wait for UI updates
@@ -243,7 +249,7 @@ namespace NeuralNetTrainer
                     else if (y == 6)
                     {
                         Console.WriteLine(" Game Phase: " + trainer.Game.Phase + " " );
-                        Console.WriteLine(middle + " Round: " + trainer.Round);
+                        Console.WriteLine(middle + " Round: " + trainer.Round + "  ");
                     }
                     else if (y == 5)
                     {

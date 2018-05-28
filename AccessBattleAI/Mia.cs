@@ -28,6 +28,31 @@ namespace AccessBattleAI
         protected override string _name => "Mia (alpha)";
 
         Random _rnd = new Random();
+        /// <summary>
+        /// Used for debugging. Changes seed of RNG.
+        /// </summary>
+        /// <param name="seed"></param>
+        public void SetSeed(int seed)
+        {
+            _rnd = new Random(seed);
+        }
+
+        int _depth = 2;
+        /// <summary>
+        /// Depth to use for board state prediction.
+        /// A depth of 2 is default. It uses about 2 GB of RAM!!!
+        /// Allowed range: 1-3.
+        /// </summary>
+        public int Depth
+        {
+            get => _depth;
+            set
+            {
+                if (value > 3) _depth = 3;
+                else if (value < 1) _depth = 1;
+                else _depth = value;
+            }
+        }
 
         class GameState : IBoardGame
         {
@@ -112,7 +137,7 @@ namespace AccessBattleAI
             // Create a list of all possible combinations
             var cState = GameState.GameStateFrom(this);
             int variations = 0;
-            GetNextStates(cState, 2, ref variations);
+            GetNextStates(cState, _depth, ref variations);
 
             double score = 0;
             GameState bestState = null;

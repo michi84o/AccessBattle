@@ -32,13 +32,13 @@ namespace AccessBattleTests
         {
             var net = new NeuralNetwork(3, 4, 2, 0);
 
-            net.ComputeOutputs();
+            net.ComputeOutputs(false);
             PrintNet(net); // Should be 0.5,0.5 at the beginning
 
             for (int i = 0; i < 10; ++i)
             {
                 net.Mutate(0.00001);
-                net.ComputeOutputs();
+                net.ComputeOutputs(false);
                 PrintNet(net);
             }
         }

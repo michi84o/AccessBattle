@@ -21,7 +21,7 @@ namespace AccessBattleAI
         public IArtificialIntelligence CreateInstance() => new Baka();
     }
 
-    public class Baka : AiBase 
+    public class Baka : AiBase
     {
         protected override string _name => "BAKA";
 
@@ -56,7 +56,7 @@ namespace AccessBattleAI
             List<BoardField> myCards = MyLinkCards;
             if (rnd.Next(0, 101) <= 40) // 40% Chance to pick virus
                 myCards = MyVirusCards;
-                        
+
             // Fix problems if one of the arrays is empty.
             if (myCards.Count == 0) myCards = MyLinkCards;
             if (myCards.Count == 0) myCards = MyVirusCards;
@@ -85,9 +85,9 @@ namespace AccessBattleAI
                     }
                 }
                 return PlayMove(c, closestMove);
-            }                       
+            }
 
-            // =====================================================================            
+            // =====================================================================
             return "???";
         }
 
