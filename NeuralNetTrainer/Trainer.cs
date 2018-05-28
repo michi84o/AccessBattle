@@ -1,4 +1,5 @@
 ﻿using AccessBattle;
+using AccessBattle.Plugins;
 using AccessBattleAI;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace NeuralNetTrainer
     class Trainer
     {
         public Nou P1;
-        public Nou P2;
+        public IArtificialIntelligence P2;
         public LocalGame Game;
         public int Round;
         const int MaxRound = 100;
@@ -22,7 +23,9 @@ namespace NeuralNetTrainer
 
         public event EventHandler NeedsUiUpdate;
 
-        public void StartGame(Nou p1, Nou p2)
+        public int AiDelay = 0;
+
+        public void StartGame(Nou p1, IArtificialIntelligence p2)
         {
             P1 = p1;
             P2 = p2;
@@ -32,12 +35,12 @@ namespace NeuralNetTrainer
                 Game.SyncRequired -= Game_SyncRequired;
             }
             Round = 0;
-            Game = new LocalGame { AiCommandDelay = 1000 };
+            Game = new LocalGame();
             Game.SetAi(p1, 1);
             Game.SetAi(p2, 2);
             Game.InitGame();
 
-            Game.AiCommandDelay = 0;
+            Game.AiCommandDelay = AiDelay;
 
             Game.PropertyChanged += Game_PropertyChanged;
             Game.SyncRequired += Game_SyncRequired;
@@ -55,7 +58,7 @@ namespace NeuralNetTrainer
             //NeedsUiUpdate?.Invoke(this, EventArgs.Empty);
         }
 
-        int _uiUpdateSkip = 0;
+        //int _uiUpdateSkip = 0;
         void OnUiUpdate(bool force)
         {
             if (force)
@@ -65,11 +68,11 @@ namespace NeuralNetTrainer
             }
             if (Game.Phase == GamePhase.Player2Turn && Game.AiCommandDelay < 100)
                 return; // Skip
-            if (Game.AiCommandDelay < 100)
-            {
-                if (++_uiUpdateSkip < 2) return; // Skip
-                _uiUpdateSkip = 0;
-            }
+            //if (Game.AiCommandDelay < 100)
+            //{
+            //    //if (++_uiUpdateSkip < 2) return; // Skip
+            //    //_uiUpdateSkip = 0;
+            //}
             NeedsUiUpdate?.Invoke(this, EventArgs.Empty);
         }
 

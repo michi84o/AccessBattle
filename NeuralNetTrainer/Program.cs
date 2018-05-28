@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace NeuralNetTrainer
 {
@@ -14,6 +15,10 @@ namespace NeuralNetTrainer
         static uint gen = 0; // Keeps track of generations
         static int genProgress = 0;
         static uint maxGen = 0;
+
+        static int miaWins = 0;
+        static int nouWins = 0;
+
         static void Main(string[] args)
         {
             string dir = "Nou_AI";
@@ -38,19 +43,14 @@ namespace NeuralNetTrainer
             }
             Console.CursorVisible = false;
 
-            var rnd = new Random();
-            // We have 50 AIs. All fight 5 random other AIs. Their scores will be summed up.
-            int aiCnt = 50; // Should be multiple of battleCnt*2. Not lower than battleCnt*4.
-            int battleCnt = 5; // Be carefull when changing this number. Might screw up code below
+            // We have 50 AIs. All fight the same MIA instance.
+            int aiCnt = 50; // Number of AIs per generation
             double mutationDelta = Nou.MutateDelta/10;
             var log = new Dictionary<int, TrainingLog>();
             for (int i = 0; i < aiCnt; ++i)
             {
                 log.Add(i, new TrainingLog { AI = new Nou(), ID = i });
             }
-
-            var trainer = new Trainer();
-            trainer.NeedsUiUpdate += (s, a) => { DrawBoard(trainer); };
 
             // Check if there are saved nets on the hard drive
             if (gen > 0) // Ignore if we start from gen 0
@@ -61,12 +61,20 @@ namespace NeuralNetTrainer
                     log[i].AI.ReadFromFile(1, netFile(i, 1));
                 }
             }
-
+            var rnd = new Random(); // Used for applying seed to MIA.
             genProgress = 0;
             maxGen = gen + gen2Go;
+
+
+
             // Cycle through all defined generations
             for (int it = 0; it < gen2Go; ++it)
             {
+                genProgress = (int)(0.5 + 100.0 * ((1.0 * it) / gen2Go));
+
+                int curGenSeed = rnd.Next();
+
+                #region NextGen Prep
                 if (it > 0)
                 {
                     // Based on 50 AIs with 5 battles:
@@ -81,8 +89,8 @@ namespace NeuralNetTrainer
                     log.Clear();
                     for (int i = 0; i < aiCnt / 2; ++i)
                     {
-                        sortedList[0].ID = i; // Update ID
-                        log.Add(i, sortedList[0]);
+                        sortedList[i].ID = i; // Update ID
+                        log.Add(i, sortedList[i]);
                     }
                     // 3.
                     for (int i = 5; i < aiCnt / 2; ++i)
@@ -107,60 +115,62 @@ namespace NeuralNetTrainer
                     }
                 }
 
-
-                // Reset opponent list and score at the start of each generation
+                // Reset score at the start of each generation
                 for (int ai = 0; ai < aiCnt; ++ai)
                 {
-                    log[ai].Opponents.Clear();
                     log[ai].Score = 0;
                 }
 
-                // Cycle through all AIs
-                for (int ai = 0; ai < aiCnt; ++ai)
-                {
-                    var aiLog = log[ai];
-                    while (aiLog.Opponents.Count < battleCnt)
-                    {
-                        TrainingLog op;
-                        #region Select opponent
-                        // Assign a random AI and start battle
-                        int id = rnd.Next(0, aiCnt);
-                        while (true)
-                        {
-                            if (aiLog.ID != log[id].ID &&
-                                !aiLog.Opponents.Exists(o => o.ID == id))
-                                break;
-                            if (++id >= aiCnt) id = 0;
-                        }
-                        op = log[id];
-                        aiLog.Opponents.Add(op);
-                        // Also log game for opponent:
-                        op.Opponents.Add(aiLog);
-                        #endregion
+                #endregion
 
-                        genProgress = (int)(0.5 + 100.0 * ((1.0*it) / gen2Go + (1.0 * ai) / (gen2Go * aiCnt)));
+                Trainer trainer = null;
+                using (var tcs = new CancellationTokenSource())
+                {
+                    var t = Task.Run(async () =>
+                    {
+                        while (!tcs.IsCancellationRequested)
+                        {
+                            if (trainer != null)
+                                DrawBoard(trainer);
+                            await Task.Delay(200);
+                        }
+                    });
+
+                    // Cycle through all AIs
+                    Parallel.ForEach(log.Select(o => o.Value), (aiLog) =>
+                    {
+                        Trainer trn = new Trainer();
+
+                        var mia = new Mia();
+                        mia.SetSeed(curGenSeed);
+                        mia.Depth = 1;
+
+                        if (aiLog.ID == 0)
+                        {
+                            trainer = trn;
+                            trn.AiDelay = 100; // This is the displayed trainer. Make it slower
+                        }
 
                         // Run game:
-                        trainer.StartGame(aiLog.AI, op.AI);
-                        while (!trainer.GameOver)
+                        trn.StartGame(aiLog.AI, mia);
+
+                        while (!trn.GameOver)
                         {
-                            System.Threading.Thread.Sleep(250);
+                            System.Threading.Thread.Sleep(50);
                         }
+
+                        if (trn.Game.Phase == GamePhase.Player1Win) { Interlocked.Increment(ref nouWins); }
+                        else if (trn.Game.Phase == GamePhase.Player2Win) { Interlocked.Increment(ref miaWins); }
 
                         // Post Game: Add score
-                        var fitness = aiLog.AI.Fitness();
-                        if (aiLog.Score < fitness)
-                            aiLog.Score = fitness; // Only save max score
+                        aiLog.Score = aiLog.AI.Fitness();
 
-                        if (op.Opponents.Count <= battleCnt) // Only score the first 5 games
-                        {
-                            fitness = op.AI.Fitness();
-                            if (op.Score < fitness)
-                                op.Score = fitness;
-                        }
-                    }
+                    });
+                    tcs.Cancel();
+                    t.Wait();
+                    genProgress = (int)(0.5 + 100.0 * ((it + 1.0) / gen2Go));
+                    if (trainer != null) DrawBoard(trainer);
                 }
-
                 // Log score to file
                 ++gen;
                 try
@@ -289,14 +299,24 @@ namespace NeuralNetTrainer
                     Console.Write("_");
                     continue;
                 }
+
+                var oldCol = Console.ForegroundColor;
+                Console.ForegroundColor = card.Owner.PlayerNumber == 1 ? ConsoleColor.Cyan : ConsoleColor.Red;
+
                 if (card.Type == OnlineCardType.Unknown) Console.Write("X");
                 else if (card.Type == OnlineCardType.Link) Console.Write("L");
                 else if (card.Type == OnlineCardType.Virus) Console.Write("V");
                 else Console.Write("?");
 
-                var oldCol = Console.ForegroundColor;
-                Console.ForegroundColor = card.Owner.PlayerNumber == 1 ? ConsoleColor.Cyan : ConsoleColor.Red;
                 Console.ForegroundColor = oldCol;
+            }
+            if (y == 8)
+            {
+                Console.Write(" Nou: " + nouWins + " wins");
+            }
+            else if (y == 9)
+            {
+                Console.Write(" Mia: " + miaWins + " wins");
             }
         }
     }
