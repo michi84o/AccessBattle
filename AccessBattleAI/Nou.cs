@@ -12,10 +12,10 @@ using System.Threading.Tasks;
 
 namespace AccessBattleAI
 {
-    [Export(typeof(IPlugin))]
-    [ExportMetadata("Name", "AccessBattle.AI.Nou")]
-    [ExportMetadata("Description", "Nou 脳 (Brain). A neural network.")]
-    [ExportMetadata("Version", "0.1")]
+    //[Export(typeof(IPlugin))]
+    //[ExportMetadata("Name", "AccessBattle.AI.Nou")]
+    //[ExportMetadata("Description", "Nou 脳 (Brain). A neural network.")]
+    //[ExportMetadata("Version", "0.1")]
     public class NouFactory : IArtificialIntelligenceFactory
     {
         public IPluginMetadata Metadata { get; set; }
