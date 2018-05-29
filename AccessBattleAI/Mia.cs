@@ -12,7 +12,7 @@ namespace AccessBattleAI
     [Export(typeof(IPlugin))]
     [ExportMetadata("Name", "AccessBattle.AI.Mia")]
     [ExportMetadata("Description", "Mia")]
-    [ExportMetadata("Version", "0.2")]
+    [ExportMetadata("Version", "0.3")]
     public class MiaFactory : IArtificialIntelligenceFactory
     {
         public IPluginMetadata Metadata { get; set; }
@@ -40,15 +40,15 @@ namespace AccessBattleAI
         int _depth = 2;
         /// <summary>
         /// Depth to use for board state prediction.
-        /// A depth of 2 is default. It uses about 2 GB of RAM!!!
-        /// Allowed range: 1-3.
+        /// A depth of 2 is default.
+        /// Allowed range: 1-5.
         /// </summary>
         public int Depth
         {
             get => _depth;
             set
             {
-                if (value > 3) _depth = 3;
+                if (value > 5) _depth = 5;
                 else if (value < 1) _depth = 1;
                 else _depth = value;
             }
@@ -56,6 +56,8 @@ namespace AccessBattleAI
 
         class GameState : IBoardGame
         {
+            public double LocalScore = -300;
+
             public PlayerState[] Players { get; private set; }
 
             public BoardField[,] Board { get; private set; }
@@ -154,54 +156,86 @@ namespace AccessBattleAI
             return bestState.Move;
         }
 
-        double CalculateScore(GameState state)
+        void CalculateLocalStore(GameState state)
         {
+            if (state.LocalScore > -299) return; // Already calculated
+
+            // Score the current state:
             double score = 0;
-
-            // 1. Distance of Links to Server
-            double distanceSum = 0;
-            foreach (var field in state.OnlineCardFields[0])
+            // Link cards that reached server give 15 points.
+            // Link cards that were capture give -10 points
+            // Give 10 - 'Distance to Exit' for all otther Link cards.
+            foreach (var field in state.OnlineCardFields[0]
+                .Where(o => (o.Card as OnlineCard)?.Type == OnlineCardType.Link))
             {
-                if ((field.Card as OnlineCard)?.Type != OnlineCardType.Link) continue;
-
-                if (field.Y == 8)
+                if (field.Y == 8) // Card reached server
                 {
-                    // Card reached server. Remove 1
-                    --distanceSum;
+                    score += 15;
                 }
-                else if (field.Y == 9)
+                else if (field.Y == 9) // Card was captured
                 {
-                    // Card captured by opponent
-                    distanceSum += 15; // Add penalty
+                    score -= 10;
                 }
-                else if (field.Y < 8)
+                else if (field.Y < 8) // Card is on the field
                 {
                     // Distance to exit
-                    distanceSum += DistanceToExit(field);
+                    score += 10 - DistanceToExit(field);
                 }
-            }
-            // At the start of the game, the distance sum is about 28
-            if (distanceSum < 4) distanceSum = 4; // Gives a score of 25
-            score += 100 / distanceSum; // 3.6 at start of the game
+            } // Best score = 60
 
-            // 2. Distance of Links and Viruses to Opponent cards
-            distanceSum = 0;
-            foreach (var field in state.OnlineCardFields[0])
+            // Virus cards should not enter exit field or server.
+            // Give -20 if exit field is entered, -25 for server.
+            // Give +10 if bait worked and opponent captured virus.
+            // Give 10 - 'Min dist to opponent' for cards on the field.
+            foreach (var field in state.OnlineCardFields[0]
+                .Where(o => (o.Card as OnlineCard)?.Type == OnlineCardType.Virus))
             {
-                var card = field.Card as OnlineCard;
-                if (card == null) continue; // Should not happen
-
-                foreach (var c1 in state.OnlineCardFields[1])
+                if (field.Y == 8) // Card reached server
                 {
-                    var dst = Distance(field.X, field.Y, c1.X, c1.Y);
-                    if (card.Type == OnlineCardType.Link)
-                        distanceSum += dst*2;
-                    else
-                        distanceSum -= dst;
+                    score -= 25;
                 }
-            }
-            // At the start of the game, the distance sum is about 225
-            score += distanceSum / 150; // 1.5 at start of the game
+                else if (field.Y == 9) // Captured by opponent
+                {
+                    score += 10;
+                }
+                else
+                {
+                    // Calculate min distance to opponent cards
+                    double dMin = 7;
+                    foreach (var c in TheirOnlineCards)
+                    {
+                        var dst = Distance(field.X, field.Y, c.X, c.Y);
+                        if (dst < dMin) dst = dMin;
+                    }
+                    score += 10 - dMin;
+                }
+            } // Best score = 40 (only of opponent is stupid enough)
+
+            // Give +5 bonus for opponent link cards that have been captured.
+            // Give -10 penalty for opponent virus cards that have been captured.
+            for (int i = 0; i < 8; ++i)
+            {
+                var card = state.Board[i, 8].Card as OnlineCard;
+                // Ignore own cards. We scored them already
+                if (card == null || card.Owner.PlayerNumber == 1) continue;
+
+                // Don't add too much. AI might catch cards by accident
+                if (card.Type == OnlineCardType.Link) score += 5;
+                // Give higher penalty for capturing virus cards
+                else if (card.Type == OnlineCardType.Virus) score -= 10;
+                // Unknown cards give the sum of both
+                else score -= 5;
+            } // Best score = 20
+
+            // Theoretical best score: 120 (cannot be reached within a normal game)
+            state.LocalScore = score;
+        }
+
+        double CalculateScore(GameState state)
+        {
+            CalculateLocalStore(state);
+
+            var score = state.LocalScore;
 
             foreach (var s in state.NextStates)
             {
@@ -291,8 +325,25 @@ namespace AccessBattleAI
 
                             nstate2.Phase = GamePhase.Player1Turn;
                             nstate2.Move = mv;
+                            CalculateLocalStore(nstate2);
                             state.NextStates.Add(nstate2);
                             ++variations;
+                        }
+                    }
+
+                    // Only keep the 3 states with the best score and 3 random states
+                    if (state.NextStates.Count > 6)
+                    {
+                        var orderedStates = state.NextStates.OrderByDescending(o => o.LocalScore).ToList();
+                        state.NextStates.Clear();
+                        for (int i = 0; i < 3; ++i) // Adds 3 best
+                        {
+                            state.NextStates.Add(orderedStates[0]); orderedStates.RemoveAt(0);
+                        }
+                        for (int i = 0; i < 3; ++i) // Adds 3 random ones
+                        {
+                            int index = _rnd.Next(0, orderedStates.Count);
+                            state.NextStates.Add(orderedStates[index]); orderedStates.RemoveAt(index);
                         }
                     }
                 }

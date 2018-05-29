@@ -376,6 +376,8 @@ namespace AccessBattleAI
                 if (card.Type == OnlineCardType.Link) score += 5;
                 // Give higher penalty for capturing virus cards
                 if (card.Type == OnlineCardType.Virus) score -= 10;
+                // Unknown cards give the sum of both
+                else score -= 5; // This case should never be hit
             } // Best score = 20
 
             // Theoretical best score: 120 (cannot be reached within a normal game)
