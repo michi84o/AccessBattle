@@ -28,7 +28,7 @@ namespace AccessBattleAI
     /// </summary>
     public class Nou : AiBase
     {
-        protected override string _name => "Nou";
+        protected override string _name => "Nou (neural network)";
 
         NeuralNetwork _net1;
         NeuralNetwork _net2;

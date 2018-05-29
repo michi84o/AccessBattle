@@ -23,7 +23,7 @@ namespace AccessBattleAI
 
     public class Baka : AiBase
     {
-        protected override string _name => "BAKA";
+        protected override string _name => "BAKA (random moves)";
 
         Random rnd = new Random();
 

@@ -39,7 +39,7 @@ namespace AccessBattle.Wpf.ViewModel
 
         NetworkGameClient _client = new NetworkGameClient();
         public NetworkGameClient Client => _client;
-        
+
         bool _isPlayerHost;
         public bool IsPlayerHost
         {
@@ -198,7 +198,7 @@ namespace AccessBattle.Wpf.ViewModel
             return result;
         }
 
-        // Used for HandleActionItem()      
+        // Used for HandleActionItem()
         void SendGameCommand(string command)
         {
             Task.Run(async () =>
@@ -213,7 +213,7 @@ namespace AccessBattle.Wpf.ViewModel
                     _parent.IsBusy = false;
                     CommandManager.InvalidateRequerySuggested();
                 }
-            });            
+            });
         }
 
         public void PlayError404(bool switchCards)
@@ -583,7 +583,8 @@ namespace AccessBattle.Wpf.ViewModel
                     Board[field.X, field.Y].Update(field, _players);
                 }
             }
-            Phase = sync.Phase;
+            // Cause access to UI controls. Must be within UI thread.
+            Application.Current.Dispatcher.Invoke(() => { Phase = sync.Phase; });
             CommandManager.InvalidateRequerySuggested(); // Confirm button on deployment field does not get enabled
         }
 
@@ -635,10 +636,10 @@ namespace AccessBattle.Wpf.ViewModel
             {
                 _localGame = new LocalGame { AiCommandDelay = aiDelayMs };
                 // TODO: WeakEventManager
-                _localGame.SyncRequired += 
+                _localGame.SyncRequired +=
                     (sender, args) => { Application.Current.Dispatcher.Invoke(() => SyncLocalGame()); };
             }
-            _localGame.SetAi(aiPlayer);            
+            _localGame.SetAi(aiPlayer);
             _localGame.InitGame();
             SyncLocalGame();
         }

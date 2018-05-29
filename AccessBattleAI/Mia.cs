@@ -25,7 +25,7 @@ namespace AccessBattleAI
     /// </summary>
     public class Mia : AiBase
     {
-        protected override string _name => "Mia (alpha)";
+        protected override string _name => "Mia (heuristic)";
 
         Random _rnd = new Random();
         /// <summary>
@@ -116,15 +116,12 @@ namespace AccessBattleAI
             }
         }
 
+        bool _hasPlayedVirusCheck = false;
         public override string PlayTurn()
         {
             // Strategy:
             // Try all combination of moves for the next 2 turns
-            // Calculate a score for each combination an choose the best one
-            // Number of possible combinations (the following formulas do not match the numbers in the trials):
-            //   Default: (16 * 4) ^ 2
-            //   Boost: (14*4 + 2*12) ^ 2
-            //   !!! A depth of 3 requires 2 GB of additional RAM !!!
+            // To reduce ram usage only the 6 best subcombinations are used.
             // Score calculation:
             //   - Distance to exit: Link
             //   - Distance to opponent cards: Link
@@ -135,6 +132,40 @@ namespace AccessBattleAI
 
             // Base class converts state of game so AI is always player 1
             if (Phase != GamePhase.Player1Turn) return "???";
+
+            // 10% chance of playing a virus check
+            if (!_hasPlayedVirusCheck && _rnd.NextDouble() <= .15)
+            {
+                var theirCards = TheirOnlineCards.Where(o=> (o.Card as OnlineCard)?.IsFaceUp == false).ToList();
+                if (theirCards.Count > 0)
+                {
+                    _hasPlayedVirusCheck = true;
+                    return PlayVirusCheck(theirCards[_rnd.Next(0, theirCards.Count)]);
+                }
+            }
+
+            // 20% chance of playing a boost
+            if (_rnd.NextDouble() <= 0.2)
+            {
+                // Check if boost is in use
+                if (!MyLinkCards.Any(o => (o.Card as OnlineCard)?.HasBoost == true) &&
+                    !MyVirusCards.Any(o => (o.Card as OnlineCard)?.HasBoost == true))
+                {
+
+                    List<BoardField> cards;
+                    if (_rnd.NextDouble() >= .67) // 33% chance of boosting a virus
+                        cards = MyVirusCards;
+                    else
+                        cards = MyLinkCards;
+
+                    // Check if boost was already played
+                    if (cards.Count > 0)
+                    {
+                        return PlayBoost(cards[_rnd.Next(0, cards.Count)], true);
+                    }
+                }
+
+            }
 
             // Create a list of all possible combinations
             var cState = GameState.GameStateFrom(this);
