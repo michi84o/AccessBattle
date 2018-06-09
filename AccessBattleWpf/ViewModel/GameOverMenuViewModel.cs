@@ -30,7 +30,7 @@ namespace AccessBattle.Wpf.ViewModel
             await ParentViewModel.Game.Client.ExitGame(ParentViewModel.Game.UID);
             if (ParentViewModel.Game.IsInSinglePlayerMode)
                 ParentViewModel.CurrentMenu = MenuType.AISelect;
-            else 
+            else
                 ParentViewModel.CurrentMenu = MenuType.NetworkGame;
         });
 #pragma warning restore RECS0165 // Asynchronous methods should return a Task instead of void

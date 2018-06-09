@@ -115,6 +115,16 @@ namespace AccessBattle.Wpf.ViewModel
 
         public MainWindowViewModel()
         {
+            UiGlobals.TrainAiInBackground = Environment.GetCommandLineArgs().Contains("-trainAI");
+            if (UiGlobals.TrainAiInBackground)
+            {
+                var aiNameArg = Environment.GetCommandLineArgs().FirstOrDefault(o => o.StartsWith("-AIName="));
+                if (aiNameArg != null)
+                {
+                    UiGlobals.TraineeAiName = aiNameArg.Substring("-AIName=".Length);
+                }
+            }
+
             _game = new GameViewModel(this);
             _game.PropertyChanged += _model_PropertyChanged;
 

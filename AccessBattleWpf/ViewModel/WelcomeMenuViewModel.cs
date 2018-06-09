@@ -28,7 +28,7 @@ namespace AccessBattle.Wpf.ViewModel
                 return new RelayCommand(o =>
                 {
                     ParentViewModel.CurrentMenu = MenuType.AISelect;
-                    ParentViewModel.Game.IsInSinglePlayerMode = true;                    
+                    ParentViewModel.Game.IsInSinglePlayerMode = true;
                 }, o =>
                 {
                     return true;

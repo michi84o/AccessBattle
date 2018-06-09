@@ -7,26 +7,35 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AccessBattle.Networking.Packets;
 
 // The configuration of the neural network was created uding a genetic algorithm. (TODO)
 
 namespace AccessBattleAI
 {
-    //[Export(typeof(IPlugin))]
-    //[ExportMetadata("Name", "AccessBattle.AI.Nou")]
-    //[ExportMetadata("Description", "Nou 脳 (Brain). A neural network.")]
-    //[ExportMetadata("Version", "0.1")]
+    [Export(typeof(IPlugin))]
+    [ExportMetadata("Name", "AccessBattle.AI.Nou")]
+    [ExportMetadata("Description", "Nou 脳 (Brain). A neural network.")]
+    [ExportMetadata("Version", "0.1")]
     public class NouFactory : IArtificialIntelligenceFactory
     {
         public IPluginMetadata Metadata { get; set; }
 
-        public IArtificialIntelligence CreateInstance() => new Nou();
+        public IArtificialIntelligence CreateInstance()
+        {
+            var n = new Nou();
+            if (System.IO.File.Exists("NouAi_0.txt"))
+                n.ReadFromFile(0, "NouAi_0.txt");
+            if (System.IO.File.Exists("NouAi_1.txt"))
+                n.ReadFromFile(0, "NouAi_1.txt");
+            return n;
+        }
     }
 
     /// <summary>
     /// Implementation of Nou.
     /// </summary>
-    public class Nou : AiBase
+    public class Nou : AiBase, ITrainableAI
     {
         protected override string _name => "Nou (neural network)";
 
@@ -39,6 +48,11 @@ namespace AccessBattleAI
         public NeuralNetwork Net2 => _net2;
 
         public int DeploySeed = 0;
+
+        const int InputsNet = 94;
+        const int HiddenNet = 4;
+        const int OutputsNet1 = 1;
+        const int OutputsNet2 = 12;
 
         /// <summary>
         /// Read neural network definition from file.
@@ -399,7 +413,91 @@ namespace AccessBattleAI
             return newNou;
         }
 
+        void ReplaceLettersWithNumbers(ref string[] array)
+        {
+            for (int i = 0; i < array.Length; ++i)
+            {
+                array[i] = array[i]
+                    .Replace("a", "1")
+                    .Replace("b", "2")
+                    .Replace("c", "3")
+                    .Replace("d", "4")
+                    .Replace("e", "5")
+                    .Replace("f", "6")
+                    .Replace("g", "7")
+                    .Replace("h", "8");
+            }
+        }
 
+        public void Train(GameSync sync, string command)
+        {
+            Synchronize(sync);
 
+            if (_net1 == null)
+            {
+                _net1 = new NeuralNetwork(94, 4, 1);
+                _net1.Mutate(MutateDelta);
+            }
+            if (_net2 == null)
+            {
+                _net2 = new NeuralNetwork(94, 4, 12);
+                _net2.Mutate(MutateDelta);
+            }
+
+            // Deployment is random
+            // and net cannot play any cards.
+            if (!command.StartsWith("mv", StringComparison.InvariantCultureIgnoreCase)
+                || command.Length < 4) return;
+            command = command.Substring(3).Trim();
+            var split = command.Split(new[] { ',' });
+            if (split.Length != 4) return;
+            ReplaceLettersWithNumbers(ref split);
+            uint x1, x2, y1, y2;
+            if (!uint.TryParse(split[0], out x1) ||
+                !uint.TryParse(split[1], out y1) ||
+                !uint.TryParse(split[2], out x2) ||
+                !uint.TryParse(split[3], out y2))
+                return;
+            // Convert to zero based index:
+            --x1; --x2; --y1; --y2;
+            if (x1 > 7 || x2 > 7 || (y1 > 7 && y1 != 10) || (y2 > 7 && y2 != 10))
+                return;
+
+            // We cannot train net1. It's output has no definite value that could be
+            // calculated. We must implement a scoring model first.
+
+            // Train Net 2:
+            var field1 = Board[x1, y1];
+            ApplyInputs(Net2, field1);
+
+            double[] expectedOutput = new double[12];
+            int relX = (int)x2 - (int)x1;
+            int relY = (int)y2 - (int)y1;
+            int i = 0;
+            bool found = false;
+            for (; i < 12 && !found; ++i)
+            {
+                if (InputArray2[i].X == relX && InputArray2[i].Y == relY)
+                {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) return; // Bad!
+            expectedOutput[i] = 1;
+
+            double[][] trainData = new double[1][];
+            trainData[0] = new double[InputsNet + OutputsNet2];
+            Array.Copy(Net2.Inputs, trainData[0], InputsNet);
+            Array.Copy(
+                expectedOutput, 0,
+                trainData[0], InputsNet,
+                OutputsNet2);
+
+            Net2.Train(trainData, 50, 0.05, 0.01);
+            Net2.SaveAsFile("NouAi_1.txt");
+            //if (!System.IO.File.Exists("NouAi_0.txt"))
+            //    Net1.SaveAsFile("NouAi_0.txt");
+        }
     }
 }

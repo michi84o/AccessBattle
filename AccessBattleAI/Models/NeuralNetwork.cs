@@ -67,6 +67,15 @@ namespace AccessBattleAI.Models
             _oBiases = new double[numOutput];
 
             _outputs = new double[numOutput];
+
+            // back-prop related arrays below
+            hGrads = new double[numHidden];
+            oGrads = new double[numOutput];
+
+            _ihPrevWeightsDelta = MakeMatrix(numInput, numHidden);
+            _hPrevBiasesDelta = new double[numHidden];
+            _hoPrevWeightsDelta = MakeMatrix(numHidden, numOutput);
+            _oPrevBiasesDelta = new double[numOutput];
         }
 
         static double[][] MakeMatrix(int rows, int cols) // helper for ctor
@@ -354,5 +363,154 @@ namespace AccessBattleAI.Models
                 return null;
             }
         }
+
+        #region Backpropagation
+
+        // back-prop specific arrays (these could be local to UpdateWeights)
+        private double[] oGrads; // output gradients for back-propagation
+        private double[] hGrads; // hidden gradients for back-propagation
+
+        // back-prop momentum specific arrays (necessary as class members)
+        private double[][] _ihPrevWeightsDelta;  // for momentum with back-propagation
+        private double[] _hPrevBiasesDelta;
+        private double[][] _hoPrevWeightsDelta;
+        private double[] _oPrevBiasesDelta;
+
+        private void UpdateWeights(double[] tValues, double learnRate, double momentum)
+        {
+            // update the weights and biases using back-propagation, with target values, eta (learning rate), alpha (momentum)
+            // assumes that SetWeights and ComputeOutputs have been called and so all the internal arrays and matrices have values (other than 0.0)
+            if (tValues.Length != _numOutput)
+                throw new Exception("target values not same Length as output in UpdateWeights");
+
+            // 1. compute output gradients
+            for (int i = 0; i < oGrads.Length; ++i)
+            {
+                double derivative = (1 - _outputs[i]) * _outputs[i]; // derivative of softmax = (1 - y) * y (same as log-sigmoid)
+                oGrads[i] = derivative * (tValues[i] - _outputs[i]); // 'mean squared error version' includes (1-y)(y) derivative
+                                                                    //oGrads[i] = (tValues[i] - outputs[i]); // cross-entropy version drops (1-y)(y) term! See http://www.cs.mcgill.ca/~dprecup/courses/ML/Lectures/ml-lecture05.pdf page 25.
+            }
+
+            // 2. compute hidden gradients
+            for (int i = 0; i < hGrads.Length; ++i)
+            {
+                double derivative = (1 - _hOutputs[i]) * (1 + _hOutputs[i]); // derivative of tanh = (1 - y) * (1 + y)
+                double sum = 0.0;
+                for (int j = 0; j < _numOutput; ++j) // each hidden delta is the sum of numOutput terms
+                {
+                    double x = oGrads[j] * _hoWeights[i][j];
+                    sum += x;
+                }
+                hGrads[i] = derivative * sum;
+            }
+
+            // 3a. update hidden weights (gradients must be computed right-to-left but weights can be updated in any order)
+            for (int i = 0; i < _ihWeights.Length; ++i) // 0..2 (3)
+            {
+                for (int j = 0; j < _ihWeights[0].Length; ++j) // 0..3 (4)
+                {
+                    double delta = learnRate * hGrads[j] * _inputs[i]; // compute the new delta
+                    _ihWeights[i][j] += delta; // update. note we use '+' instead of '-'. this can be very tricky.
+                    _ihWeights[i][j] += momentum * _ihPrevWeightsDelta[i][j]; // add momentum using previous delta. on first pass old value will be 0.0 but that's OK.
+                    _ihPrevWeightsDelta[i][j] = delta; // don't forget to save the delta for momentum
+                }
+            }
+
+            // 3b. update hidden biases
+            for (int i = 0; i < _hBiases.Length; ++i)
+            {
+                double delta = learnRate * hGrads[i] * 1.0; // the 1.0 is the constant input for any bias; could leave out
+                _hBiases[i] += delta;
+                _hBiases[i] += momentum * _hPrevBiasesDelta[i]; // momentum
+                _hPrevBiasesDelta[i] = delta; // don't forget to save the delta
+            }
+
+            // 4. update hidden-output weights
+            for (int i = 0; i < _hoWeights.Length; ++i)
+            {
+                for (int j = 0; j < _hoWeights[0].Length; ++j)
+                {
+                    double delta = learnRate * oGrads[j] * _hOutputs[i];  // see above: hOutputs are inputs to the nn outputs
+                    _hoWeights[i][j] += delta;
+                    _hoWeights[i][j] += momentum * _hoPrevWeightsDelta[i][j]; // momentum
+                    _hoPrevWeightsDelta[i][j] = delta; // save
+                }
+            }
+
+            // 4b. update output biases
+            for (int i = 0; i < _oBiases.Length; ++i)
+            {
+                double delta = learnRate * oGrads[i] * 1.0;
+                _oBiases[i] += delta;
+                _oBiases[i] += momentum * _oPrevBiasesDelta[i]; // momentum
+                _oPrevBiasesDelta[i] = delta; // save
+            }
+        } // UpdateWeights
+
+        // ----------------------------------------------------------------------------------------
+
+        // train data: { in, in, in, ... ,  out, out, ... } // It's combined data.
+        // It's a list of dataset arrays to pass multiple datasets at once.
+        public void Train(double[][] trainData, int maxEprochs, double learnRate, double momentum)
+        {
+            // train a back-prop style NN classifier using learning rate and momentum
+            int epoch = 0;
+            double[] tValues = new double[_numOutput]; // target values
+
+            int[] sequence = new int[trainData.Length];
+            for (int i = 0; i < sequence.Length; ++i)
+                sequence[i] = i;
+
+            while (epoch < maxEprochs)
+            {
+                double mse = MeanSquaredError(trainData);
+                if (mse < 0.001) break; // consider passing value in as parameter
+
+                Shuffle(sequence); // visit each training data in random order
+                for (int i = 0; i < trainData.Length; ++i)
+                {
+                    int idx = sequence[i];
+                    Array.Copy(trainData[idx], _inputs, _numInput); // more flexible might be a 'GetInputsAndTargets()'
+                    Array.Copy(trainData[idx], _numInput, tValues, 0, _numOutput);
+                    ComputeOutputs(true);
+                    UpdateWeights(tValues, learnRate, momentum); // use curr outputs and targets and back-prop to find better weights
+                } // each training tuple
+                ++epoch;
+            }
+        } // Train
+
+        void Shuffle(int[] sequence)
+        {
+            for (int i = 0; i < sequence.Length; ++i)
+            {
+                int r = _rnd.Next(i, sequence.Length);
+                int tmp = sequence[r];
+                sequence[r] = sequence[i];
+                sequence[i] = tmp;
+            }
+        }
+
+        private double MeanSquaredError(double[][] trainData) // used as a training stopping condition
+        {
+            // average squared error per training tuple
+            double sumSquaredError = 0.0;
+            double[] tValues = new double[_numOutput]; // last numOutput values
+
+            for (int i = 0; i < trainData.Length; ++i) // walk thru each training case. looks like (6.9 3.2 5.7 2.3) (0 0 1)  where the parens are not really there
+            {
+                Array.Copy(trainData[i], _inputs, _numInput); // get xValues. more flexible would be a 'GetInputsAndTargets()'
+                Array.Copy(trainData[i], _numInput, tValues, 0, _numOutput); // get target values
+                ComputeOutputs(true); // compute output using current weights
+                for (int j = 0; j < _numOutput; ++j)
+                {
+                    double err = tValues[j] - _outputs[j];
+                    sumSquaredError += err * err;
+                }
+            }
+
+            return sumSquaredError / trainData.Length;
+        }
+
+        #endregion
     }
 }

@@ -179,13 +179,43 @@ namespace AccessBattle.Wpf.ViewModel
         public async Task<bool> SendGameCommandAsync(string command)
         {
             bool result;
-
             if (!IsInSinglePlayerMode)
             {
                 result = await _client.SendGameCommand(UID, command);
             }
             else
             {
+                // Currently AI Training is only supported in Singleplayer mode.
+                // Code may later be moved up and modified to work also in online mode.
+
+                // AI Training block.
+                if (UiGlobals.TrainAiInBackground)
+                {
+                    // Load AI if not already done
+                    if (UiGlobals.TraineeAi == null)
+                    {
+                        // Try to get a trainable AI intance
+                        var aiPlugs = PluginHandler.Instance.GetPlugins<IArtificialIntelligenceFactory>();
+                        var fac = aiPlugs.FirstOrDefault(o => o.Metadata.Name == UiGlobals.TraineeAiName);
+                        if (fac != null)
+                        {
+                            UiGlobals.TraineeAi = fac.CreateInstance() as ITrainableAI;
+                            if (UiGlobals.TraineeAi != null)
+                            {
+                                UiGlobals.TraineeAi.IsAiHost = true;
+                            }
+                        }
+                    }
+                    if (UiGlobals.TraineeAi == null)
+                    {
+                        UiGlobals.TrainAiInBackground = false;
+                    }
+                    else // Do the training
+                    {
+                        UiGlobals.TraineeAi.Train(GameSync.FromGame(_localGame, 0, 1), command);
+                    }
+                }
+
                 result = await _localGame.ExecuteCommand(command, 1);
                 SyncLocalGame();
             }

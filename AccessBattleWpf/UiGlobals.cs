@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AccessBattle.Plugins;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -84,7 +85,7 @@ namespace AccessBattle.Wpf
             StopMultiOverlayFlashing();
             var animation1 = new DoubleAnimation(0, 1, TimeSpan.FromSeconds(1))
             {
-                BeginTime= TimeSpan.FromSeconds(0)
+                BeginTime = TimeSpan.FromSeconds(0)
             };
             var animation2 = new DoubleAnimation(1, 0, TimeSpan.FromSeconds(1))
             {
@@ -112,6 +113,18 @@ namespace AccessBattle.Wpf
 
         public static readonly DependencyProperty MultiOverlayOpacityProperty = DependencyProperty.Register(
             nameof(MultiOverlayOpacity), typeof(double), typeof(UiGlobals), new PropertyMetadata(0.0));
+
+        #endregion
+
+        #region Neural Network Training
+
+        /// <summary>
+        /// If Game was started with parameter '-trainAI'
+        /// Example: -trainAI -AIName=AccessBattle.AI.Nou
+        /// </summary>
+        public static bool TrainAiInBackground { get; set; }
+        public static ITrainableAI TraineeAi { get; set; }
+        public static string TraineeAiName { get; set; }
 
         #endregion
     }
