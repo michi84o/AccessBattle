@@ -27,7 +27,7 @@ namespace AccessBattleAI
             if (System.IO.File.Exists("NouAi_0.txt"))
                 n.ReadFromFile(0, "NouAi_0.txt");
             if (System.IO.File.Exists("NouAi_1.txt"))
-                n.ReadFromFile(0, "NouAi_1.txt");
+                n.ReadFromFile(1, "NouAi_1.txt");
             return n;
         }
     }
@@ -50,7 +50,7 @@ namespace AccessBattleAI
         public int DeploySeed = 0;
 
         const int InputsNet = 94;
-        const int HiddenNet = 4;
+        const int HiddenNet = 10;
         const int OutputsNet1 = 1;
         const int OutputsNet2 = 12;
 
@@ -86,12 +86,12 @@ namespace AccessBattleAI
 
             if (_net1 == null)
             {
-                _net1 = new NeuralNetwork(94, 4, 1);
+                _net1 = new NeuralNetwork(InputsNet, HiddenNet, OutputsNet1);
                 _net1.Mutate(MutateDelta);
             }
             if (_net2 == null)
             {
-                _net2 = new NeuralNetwork(94, 4, 12);
+                _net2 = new NeuralNetwork(InputsNet, HiddenNet, OutputsNet2);
                 _net2.Mutate(MutateDelta);
             }
 
@@ -399,10 +399,12 @@ namespace AccessBattleAI
             return score;
         }
 
-        public void Mutate(double delta)
+        public void Mutate(double delta, byte mutateFlags = 3)
         {
-            _net1?.Mutate(delta);
-            _net2?.Mutate(delta);
+            if ((mutateFlags & 1) > 0)
+                _net1?.Mutate(delta);
+            if ((mutateFlags & 2) > 0)
+                _net2?.Mutate(delta);
         }
 
         public static Nou Copy(Nou nou)
@@ -435,12 +437,12 @@ namespace AccessBattleAI
 
             if (_net1 == null)
             {
-                _net1 = new NeuralNetwork(94, 4, 1);
+                _net1 = new NeuralNetwork(InputsNet, HiddenNet,OutputsNet1);
                 _net1.Mutate(MutateDelta);
             }
             if (_net2 == null)
             {
-                _net2 = new NeuralNetwork(94, 4, 12);
+                _net2 = new NeuralNetwork(InputsNet, HiddenNet, OutputsNet2);
                 _net2.Mutate(MutateDelta);
             }
 

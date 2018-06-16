@@ -56,7 +56,7 @@ namespace AccessBattleAI
 
         class GameState : IBoardGame
         {
-            public double LocalScore = -300;
+            public double LocalScore = -500;
 
             public PlayerState[] Players { get; private set; }
 
@@ -172,8 +172,8 @@ namespace AccessBattleAI
             int variations = 0;
             GetNextStates(cState, _depth, ref variations);
 
-            double score = 0;
-            GameState bestState = null;
+            double score = -1000; // Some scores are negative!
+            GameState bestState = cState.NextStates[0]; // prevent null referenc exception on really bad scores
             foreach (var s in cState.NextStates)
             {
                 var sc = CalculateScore(s);
@@ -189,7 +189,7 @@ namespace AccessBattleAI
 
         void CalculateLocalStore(GameState state)
         {
-            if (state.LocalScore > -299) return; // Already calculated
+            if (state.LocalScore > -499) return; // Already calculated
 
             // Score the current state:
             double score = 0;

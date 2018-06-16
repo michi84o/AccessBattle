@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
+using AccessBattle.Networking.Packets;
 
 namespace NeuralNetTrainer
 {
@@ -21,6 +22,20 @@ namespace NeuralNetTrainer
 
         static void Main(string[] args)
         {
+            Console.WriteLine("NOU AI Trainer\n");
+            Console.WriteLine("Select mode: ");
+            Console.WriteLine("\t1: Genetic algorithm against MIA AI. (default)");
+            Console.WriteLine("\t2: Backproagation learning from MIA AI.");
+            var usrInput = Console.ReadLine();
+
+            if (usrInput == "2")
+            {
+                BackPropTraining();
+                return;
+            }
+            Console.Clear();
+            Console.WriteLine("NOU AI Trainer\n");
+
             string dir = "Nou_AI";
             string genTxt = dir + "\\gen.txt";
             string genLogTxt = dir + "\\genLog.txt";
@@ -31,7 +46,6 @@ namespace NeuralNetTrainer
 
             if (File.Exists(genTxt)) { uint.TryParse(File.ReadAllText(genTxt), out gen); }
 
-            Console.WriteLine("NOU AI Trainer\n");
             Console.WriteLine("Current generation: " + gen);
             Console.WriteLine("Please enter number of iterations: ");
             var inp = Console.ReadLine();
@@ -49,9 +63,10 @@ namespace NeuralNetTrainer
             int aiCnt = 50; // Number of AIs per generation
             double mutationDelta = Nou.MutateDelta/10;
             var log = new Dictionary<int, TrainingLog>();
+            var fac = new NouFactory(); // Loads pretrained NouAi_0.txt
             for (int i = 0; i < aiCnt; ++i)
             {
-                log.Add(i, new TrainingLog { AI = new Nou(), ID = i });
+                log.Add(i, new TrainingLog { AI = (Nou)fac.CreateInstance(), ID = i });
             }
 
             // Check if there are saved nets on the hard drive
@@ -67,7 +82,7 @@ namespace NeuralNetTrainer
             genProgress = 0;
             maxGen = gen + gen2Go;
 
-
+            byte mutateFlags = 1; // Only train net1.
 
             // Cycle through all defined generations
             for (int it = 0; it < gen2Go; ++it)
@@ -80,42 +95,41 @@ namespace NeuralNetTrainer
                 #region NextGen Prep
                 if (it > 0)
                 {
-                    // Based on 50 AIs with 5 battles:
+                    // Based on 50 AIs:
                     // 1. Delete the 25 least scoring nets
-                    // 2. Keep the best 5 nets untouched
-                    // 3. Mutate the remaining 20 nets
-                    // 4. Create 4 copies of the 5 best nets and mutate them (gives 20 new nets)
-                    // 5. Add 5 nets so we have 50 nets again
+                    // 2. Keep the best 5 nets untouched    //  +5 ->  5
+                    // 3. Mutate the remaining 20 nets      // +20 -> 25
+                    // 4. Create 5 copies of the 5 best
+                    //    nets and mutate them              // +25 -> 50
+
+                    // We do not create new randoms AIs.
+                    // All our progress might get lost if a random ai accidentally scores high
 
                     // 1. + 2.
+                    // Sort by score
                     var sortedList = log.Select(o => o.Value).OrderByDescending(o => o.Score).ToList();
-                    log.Clear();
-                    for (int i = 0; i < aiCnt / 2; ++i)
+                    log.Clear(); // Clear list
+                    for (int i = 0; i < aiCnt / 2; ++i) // Add the 25 best nets
                     {
                         sortedList[i].ID = i; // Update ID
                         log.Add(i, sortedList[i]);
                     }
-                    // 3.
+                    // 3. Mutate the last 20 nets in the new list
                     for (int i = 5; i < aiCnt / 2; ++i)
                     {
-                        log[i].AI.Mutate(mutationDelta);
+                        log[i].AI.Mutate(mutationDelta, mutateFlags);
                     }
                     // 4.
-                    int fillerRatio = (aiCnt / 2 - 5)/5; // =4 when aiCnt=50
+                    int fillerRatio = (aiCnt / 2 - 5)/4; // =5 when aiCnt=50
                     int nId = aiCnt / 2;
                     for (int iAi = 0; iAi < 5; iAi++) // The first five AIs
                         for (int ii = 0; ii < fillerRatio; ++ii)
                         {
                             var nou = Nou.Copy(log[iAi].AI);
-                            nou.Mutate(mutationDelta);
+                            nou.Mutate(mutationDelta, mutateFlags);
                             log[nId] = new TrainingLog() { ID = nId, AI = nou};
                             ++nId;
                         }
-                    while (nId < aiCnt)
-                    {
-                        log.Add(nId, new TrainingLog { AI = new Nou(), ID = nId });
-                        ++nId;
-                    }
                 }
 
                 // Reset score at the start of each generation
@@ -316,6 +330,80 @@ namespace NeuralNetTrainer
             {
                 Console.Write(" Mia: " + miaWins + " wins");
             }
+        }
+
+        static void BackPropTraining()
+        {
+            var mia = new Mia();
+            Nou nou = (Nou)new NouFactory().CreateInstance();
+
+            mia.IsAiHost = true;
+            nou.IsAiHost = true;
+
+            var p1 = new PlayerState(1);
+            var p2 = new PlayerState(2);
+            var p1Sync = new PlayerState.Sync { PlayerNumber = 1 };
+            var p2Sync = new PlayerState.Sync { PlayerNumber = 2 };
+
+            // Generate random Board states and let Nou learn what Mia would do.
+
+            var rnd = new Random();
+
+            Console.Write("Training....");
+            var left = Console.CursorLeft;
+            var top = Console.CursorTop;
+            for (int i = 0; i < 10000; ++i)
+            {
+                Console.SetCursorPosition(left, top);
+                Console.Write(i+1);
+
+                var sync = new GameSync
+                {
+                    Player1 = p1Sync,
+                    Player2 = p2Sync
+                };
+                sync.Phase = GamePhase.Player1Turn;
+                sync.FieldsWithCards = new List<BoardField.Sync>();
+
+                // Random Board
+                // 8 Cards on each side, 4x Virus, 4x Link
+                List<OnlineCard> cards = new List<OnlineCard>();
+                for (int j = 0; j < 4; ++j)
+                {
+                    cards.Add(new OnlineCard { Owner = p1, Type = OnlineCardType.Link });
+                    cards.Add(new OnlineCard { Owner = p2, Type = OnlineCardType.Link });
+                    cards.Add(new OnlineCard { Owner = p1, Type = OnlineCardType.Virus });
+                    cards.Add(new OnlineCard { Owner = p2, Type = OnlineCardType.Virus });
+                }
+
+                var board = new List<BoardField>();
+                for (ushort y = 0; y < 11; ++y)
+                    for (ushort x = 0; x < 8; ++x)
+                        board.Add(new BoardField(x, y));
+
+                while (cards.Count > 0)
+                {
+                    // 90% propability of beeing on board ( y <= 7 )
+                    int ymax = rnd.NextDouble() <= .9 ? 7 : 9;
+
+                    int boardIndex = rnd.Next(board.Count);
+                    if (board[boardIndex].Y > ymax) continue;
+
+                    var field = board[boardIndex];
+                    board.RemoveAt(boardIndex);
+
+                    field.Card = cards[0];
+                    cards.RemoveAt(0);
+
+                    sync.FieldsWithCards.Add(field.GetSync());
+                }
+
+                mia.Synchronize(sync);
+                nou.Train(sync, mia.PlayTurn());
+
+            }
+            Console.WriteLine("\nFinished. Press any key to continue");
+            Console.ReadKey();
         }
     }
 }
