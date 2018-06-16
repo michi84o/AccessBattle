@@ -115,6 +115,18 @@ namespace AccessBattleAI
             {
                 scores.Add(new FieldScore(field));
             }
+
+            // Randomize list in case the scores are the same:
+            List<FieldScore> scoresx = new List<FieldScore>();
+            var rnd = new Random();
+            while (scores.Count > 0)
+            {
+                int index = rnd.Next(scores.Count);
+                scoresx.Add(scores[index]);
+                scores.RemoveAt(index);
+            }
+            scores = scoresx;
+
             foreach (var sc in scores)
             {
                 ApplyInputs(_net1, sc.Field);

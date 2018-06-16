@@ -341,6 +341,15 @@ namespace AccessBattleAI.Models
                     network._inputs = new double[network._numInput];
                     network._outputs = new double[network._numOutput];
                     network._hOutputs = new double[network._numHidden];
+
+                    // back-prop related arrays below
+                    network.hGrads = new double[network._numHidden];
+                    network.oGrads = new double[network._numOutput];
+                    network._ihPrevWeightsDelta = MakeMatrix(network._numInput, network._numHidden);
+                    network._hPrevBiasesDelta = new double[network._numHidden];
+                    network._hoPrevWeightsDelta = MakeMatrix(network._numHidden, network._numOutput);
+                    network._oPrevBiasesDelta = new double[network._numOutput];
+
                 }
                 catch (Exception e)
                 {

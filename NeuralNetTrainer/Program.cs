@@ -61,7 +61,7 @@ namespace NeuralNetTrainer
 
             // We have 50 AIs. All fight the same MIA instance.
             int aiCnt = 50; // Number of AIs per generation
-            double mutationDelta = Nou.MutateDelta/10;
+            double mutationDelta = Nou.MutateDelta/3;
             var log = new Dictionary<int, TrainingLog>();
             var fac = new NouFactory(); // Loads pretrained NouAi_0.txt
             for (int i = 0; i < aiCnt; ++i)
@@ -99,8 +99,9 @@ namespace NeuralNetTrainer
                     // 1. Delete the 25 least scoring nets
                     // 2. Keep the best 5 nets untouched    //  +5 ->  5
                     // 3. Mutate the remaining 20 nets      // +20 -> 25
-                    // 4. Create 5 copies of the 5 best
-                    //    nets and mutate them              // +25 -> 50
+                    // 4. Create 4 copies of the 5 best
+                    //    nets and mutate them              // +20 -> 45
+                    // 5. Add 5 ranom nets                  //  +5 -> 50
 
                     // We do not create new randoms AIs.
                     // All our progress might get lost if a random ai accidentally scores high
@@ -130,6 +131,11 @@ namespace NeuralNetTrainer
                             log[nId] = new TrainingLog() { ID = nId, AI = nou};
                             ++nId;
                         }
+                    // 5.
+                    while (log.Count < aiCnt)
+                    {
+                        log.Add(log.Count, new TrainingLog { ID = log.Count, AI = (Nou)fac.CreateInstance() });
+                    }
                 }
 
                 // Reset score at the start of each generation
