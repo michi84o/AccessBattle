@@ -12,12 +12,16 @@ AccessBattle is a private fan project and not affiliated with
 
 - Current status: Work in progress
   - Multiplayer is in alpha. There are some bugs and features are missing.
+    - Text and MySql/MariaDb based user databases are supported.
+	- Plugins for other database types are supported.
   - Singleplayer is in alpha. The AI plugin contains two stupid AI opponents.
+    - Plugins for more AIs are supported.
   - Singleplayer and AI vs AI is available as a console program.
   
 - Roadmap
   - ~~User Interface + Multiplayer finished: January 2018~~ (Postponed for now, the basics are working)
   - Singleplayer: Add more AI opponents. Next one is probably a neural network (WIP).
+    - Currently having problems training the network. Need to redesign.
   - Documentation: August 2018 (if I have some free time)
   - Sorry if this is taking so long. I have a full time job and not much free time.
   
@@ -28,7 +32,6 @@ AccessBattle is a private fan project and not affiliated with
   - Exit Game does not work in single player
   
 - TODO
-  - Interface for user database plugins
   - Ping Server, reconnect if required
   - Cleanup inactive games and logins, KeepAlive packets
   - Matchmaking for random matches
