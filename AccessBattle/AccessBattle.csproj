@@ -49,7 +49,7 @@
     <Compile Include="Game.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="IBoardGame.cs" />
-    <Compile Include="Networking\IUserDatabaseProvider.cs" />
+    <Compile Include="Networking\LoginHelper.cs" />
     <Compile Include="Networking\Packets\GameCommand.cs" />
     <Compile Include="Networking\Packets\GameSync.cs" />
     <Compile Include="IPlayer.cs" />
@@ -70,10 +70,13 @@
     <Compile Include="Networking\Packets\Rematch.cs" />
     <Compile Include="Networking\Packets\ServerInfo.cs" />
     <Compile Include="Networking\PasswordHasher.cs" />
+    <Compile Include="Networking\TextFileUserDatabaseProvider.cs" />
     <Compile Include="PlayerState.cs" />
     <Compile Include="Plugins\AiBase.cs" />
+    <Compile Include="Plugins\IArtificialIntelligence.cs" />
     <Compile Include="Plugins\IPlugin.cs" />
     <Compile Include="Plugins\ITrainableAI.cs" />
+    <Compile Include="Plugins\IUserDatabaseProvider.cs" />
     <Compile Include="Plugins\PluginHandler.cs" />
     <Compile Include="PropChangeNotifier.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

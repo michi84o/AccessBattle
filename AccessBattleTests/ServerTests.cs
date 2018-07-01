@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using AccessBattle.Networking;
 using AccessBattle.Networking.Packets;
 using System.Threading.Tasks;

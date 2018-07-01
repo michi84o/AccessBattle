@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 // Some of this code is based on the example code from a Microsoft keynote.
 // Here is an article based on it.

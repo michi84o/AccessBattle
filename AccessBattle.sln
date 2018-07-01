@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccessBattleConsole", "Acce
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeuralNetTrainer", "NeuralNetTrainer\NeuralNetTrainer.csproj", "{8518CDE3-907E-4C00-8C1F-1FF93ECB02C2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccessBattleMySql", "AccessBattleMySql\AccessBattleMySql.csproj", "{9C634F70-A089-4646-B477-A1C55B8A3881}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,10 @@ Global
 		{8518CDE3-907E-4C00-8C1F-1FF93ECB02C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8518CDE3-907E-4C00-8C1F-1FF93ECB02C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8518CDE3-907E-4C00-8C1F-1FF93ECB02C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C634F70-A089-4646-B477-A1C55B8A3881}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C634F70-A089-4646-B477-A1C55B8A3881}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C634F70-A089-4646-B477-A1C55B8A3881}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C634F70-A089-4646-B477-A1C55B8A3881}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -5,18 +5,17 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using AccessBattle.Networking.Packets;
 
 // The configuration of the neural network was created uding a genetic algorithm. (TODO)
 
 namespace AccessBattleAI
 {
-    [Export(typeof(IPlugin))]
-    [ExportMetadata("Name", "AccessBattle.AI.Nou")]
-    [ExportMetadata("Description", "Nou 脳 (Brain). A neural network.")]
-    [ExportMetadata("Version", "0.1")]
+    // Disabled. Not yet working
+    //[Export(typeof(IPlugin))]
+    //[ExportMetadata("Name", "AccessBattle.AI.Nou")]
+    //[ExportMetadata("Description", "Nou 脳 (Brain). A neural network.")]
+    //[ExportMetadata("Version", "0.1")]
     public class NouFactory : IArtificialIntelligenceFactory
     {
         public IPluginMetadata Metadata { get; set; }

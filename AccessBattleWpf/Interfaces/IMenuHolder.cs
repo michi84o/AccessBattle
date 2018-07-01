@@ -1,12 +1,7 @@
-﻿using AccessBattle.Networking;
-using AccessBattle.Networking.Packets;
+﻿using AccessBattle.Networking.Packets;
 using AccessBattle.Wpf.ViewModel;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AccessBattle.Wpf.Interfaces
 {

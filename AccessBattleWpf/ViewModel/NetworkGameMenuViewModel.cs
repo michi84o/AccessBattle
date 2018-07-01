@@ -11,7 +11,6 @@ using System.Runtime.CompilerServices;
 using System.Security;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -464,8 +463,8 @@ namespace AccessBattle.Wpf.ViewModel
             {
                 case nameof(LoginName):
                     errors.Clear();
-                    if (LoginName?.Length > 0 && !Regex.IsMatch(LoginName, @"^[\x20-\x7E]+$"))
-                        errors.Add("Invalid symbols");
+                    if (LoginName?.Length > 0 && !Regex.IsMatch(LoginName, @"^[\x21-\x7E]+$"))
+                        errors.Add("Invalid symbols (space is not allowed)");
                     if (LoginName?.Length > 32)
                         errors.Add("Max length is 32");
                     ErrorText = "";

@@ -1,14 +1,13 @@
 ﻿using AccessBattle.Networking.Packets;
+using AccessBattle.Plugins;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 /* Protocol:
  * 1. Client connects
@@ -407,7 +406,14 @@ namespace AccessBattle.Networking
                                 var loginResult = _userDatabase.CheckLoginAsync(login.Name, login.Password?.ConvertToSecureString()).GetAwaiter().GetResult(); // TODO: Change to async call later
                                 if (loginResult != 0)
                                 {
-                                    Send(new byte[] { loginResult }, NetworkPacketType.ClientLogin, player.Connection, player.ClientCrypto);
+                                    Send(new byte[] { (byte)(int)loginResult }, NetworkPacketType.ClientLogin, player.Connection, player.ClientCrypto);
+
+                                    if (loginResult == LoginCheckResult.LoginOK)
+                                    {
+                                        Log.WriteLine(LogPriority.Verbose, "GameServer: Player " + (player.Name ?? "?") + " (" + player.UID + ") logged in successfully!");
+                                        player.Name = login.Name.ToUpper();
+                                        player.IsLoggedIn = true;
+                                    }
 
                                     // Disabled this. Would be a dick move to disconnect when a user mistyped his login.
                                     //lock (Players)
@@ -418,14 +424,16 @@ namespace AccessBattle.Networking
                                     //}
                                 }
                             }
-
-                            player.Name = login.Name.ToUpper();
-                            player.IsLoggedIn = true;
-                            Log.WriteLine(LogPriority.Verbose, "GameServer: Player " + (player.Name ?? "?") + " (" + player.UID + ") logged in successfully!");
-                            Send(new byte[] { 0 }, NetworkPacketType.ClientLogin, player.Connection, player.ClientCrypto);
+                            else
+                            {
+                                Log.WriteLine(LogPriority.Verbose, "GameServer: Player " + (player.Name ?? "?") + " (" + player.UID + ") logged in successfully!");
+                                player.Name = login.Name.ToUpper();
+                                player.IsLoggedIn = true;
+                                Send(new byte[] { (byte)(int)LoginCheckResult.LoginOK }, NetworkPacketType.ClientLogin, player.Connection, player.ClientCrypto);
+                            }
                         }
                         else
-                            Send(new byte[] { 1 }, NetworkPacketType.ClientLogin, player.Connection, player.ClientCrypto);
+                            Send(new byte[] { (byte)(int)LoginCheckResult.InvalidUser }, NetworkPacketType.ClientLogin, player.Connection, player.ClientCrypto);
                     }
                     catch (Exception ex)
                     {

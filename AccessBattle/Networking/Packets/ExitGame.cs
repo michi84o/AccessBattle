@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AccessBattle.Networking.Packets
+﻿namespace AccessBattle.Networking.Packets
 {
     /// <summary>
     /// Packet sent when a game is about to be deleted from the server.

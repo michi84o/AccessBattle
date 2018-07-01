@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.Reflection;
+using System.IO;
 
 namespace AccessBattle.Plugins
 {
@@ -29,7 +28,7 @@ namespace AccessBattle.Plugins
                         var inst = new PluginHandler();
                         try
                         {
-                            inst.Compose();                            
+                            inst.Compose();
                         }
                         catch (Exception e)
                         {
@@ -55,8 +54,22 @@ namespace AccessBattle.Plugins
             var catalog = new AggregateCatalog();
             try
             {
-                catalog.Catalogs.Add(new DirectoryCatalog(
-                    System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)));
+                // Throws exception if one dll is bad
+                //catalog.Catalogs.Add(new DirectoryCatalog(
+                //    System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)));
+
+                // Workaround:
+                foreach (string dll in Directory.GetFiles(
+                    Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "*.dll"))
+                {
+                    try
+                    {
+                        var cat = new AssemblyCatalog(Assembly.LoadFile(dll));
+                        cat.Parts.ToArray(); // Boom
+                        catalog.Catalogs.Add(cat);
+                    }
+                    catch { }
+                }
 
                 var container = new CompositionContainer(catalog);
                 container.ComposeParts(this);

@@ -1,12 +1,11 @@
 ﻿using AccessBattle;
 using AccessBattle.Networking;
-using AccessBattle.Networking.Packets;
+using AccessBattle.Plugins;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 // Commands:
-// -usrdb=".\db\db.txt" 
+// -usrdb=".\db\db.txt"
 // -acceptany
 
 namespace AccessBattleServer
@@ -15,21 +14,13 @@ namespace AccessBattleServer
     {
         static GameServer _server;
 
+        // TODO: Execute main code in a async task.
         static void Main(string[] args)
         {
-            // Testcode
-            //string hash, salt;
-            //PasswordHasher.GetNewHash("passw0rd", out hash, out salt);
-            //Console.WriteLine(hash);
-            //Console.WriteLine(salt);
-            //Console.WriteLine(PasswordHasher.VerifyHash("passw0rd", hash, salt));
-            // ----------------
-
             bool acceptAny = false;
             ushort port = 3221;
-            string dbPath = "userdb.txt";
 
-            // Read command line params
+            #region Read command line params
             for (int i = 0; i<args.Length; ++i)
             {
                 var arg = args[i];
@@ -46,20 +37,6 @@ namespace AccessBattleServer
                     acceptAny = true;
                     continue;
                 }
-                else if (arg.StartsWith("usrdb=", StringComparison.Ordinal))
-                {
-                    var spl = arg.Split('=');
-                    if (spl.Length == 2)
-                    {
-                        dbPath = spl[1].Trim(new[] { '\"' });
-                        continue;
-                    }
-                    else
-                    {
-                        Console.WriteLine("Error in parameter 'usrdb'");
-                        return;
-                    }
-                }
                 else if (arg.StartsWith("port="))
                 {
                     var spl = arg.Split('=');
@@ -73,42 +50,87 @@ namespace AccessBattleServer
                 {
                     Console.WriteLine(
                         "Access Battle Server\r\n\r\n" +
-                        "Usage: AccessBattleServer [-acceptany] [-usrdb=path]\r\n" +
+                        "Usage: AccessBattleServer [-acceptany] [-port=3221]\r\n" +
                         "\r\nOptions:\r\n" +
                         "\t-port=3221    Define the port to use. Default: 3221\r\n" +
-                        "\t-acceptany    Accepts any client. Disables user database.\r\n" +
-                        "\t              Clients require no password.\r\n" +
-                        "\t-usrdb=path   Path to text file for user database.\r\n" +
-                        "\t              default path is '.\\userdb.txt'.\r\n" +
+                        "\t-acceptany    Accept any client. Disables user database.\r\n" +
+                        "\t              Clients will not require a password." +
                         "\r\nUsing '/' instead of '-' is allowed.\r\n"
                         );
                     return;
                 }
             }
+            #endregion
 
             Log.SetMode(LogMode.Console);
             Log.Priority = LogPriority.Information;
 
             // Create userdb folder if not existing
-            Console.WriteLine("Using user database file: " + dbPath);
-            try
+            IUserDatabaseProvider db = null;
+            if (!acceptAny)
             {
-                var dir = System.IO.Path.GetDirectoryName(dbPath);
-                if (!string.IsNullOrEmpty(dir) && !System.IO.Directory.Exists(dir))
+                Console.WriteLine("==============");
+                Console.WriteLine("Database Setup");
+                Console.WriteLine("==============");
+                var plugins = PluginHandler.Instance.GetPlugins<IUserDatabaseProviderFactory>();
+                if (plugins.Count == 0)
                 {
-                    System.IO.Directory.CreateDirectory(dir);
+                    Console.WriteLine("No database plugin found.");
+                }
+                Console.WriteLine("Please select an option:\r\n");
+                Console.WriteLine("\t1: Accept any client (no database)");
+                Console.WriteLine("\t2: Text based database");
+                for (int i = 0; i < plugins.Count; ++i)
+                {
+                    Console.WriteLine("\t"+(i+3)+": " + plugins[i].Metadata.Description);
+                }
+                Console.WriteLine("\r\nEnter the number of the option.");
+                if (int.TryParse(Console.ReadLine(), out int ichoice) && ichoice > 0 && ichoice <= plugins.Count + 2)
+                {
+                    if (ichoice == 1)
+                    {
+                        acceptAny = true;
+                    }
+                    else if (ichoice == 2)
+                    {
+                        db = new TextFileUserDatabaseProvider();
+                    }
+                    else
+                    {
+                        db = plugins[ichoice - 3].CreateInstance();
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Invalid choice! Server will exit.");
+                    return;
                 }
             }
-            catch (Exception)
-            {
-                Console.WriteLine("Could not create directory for user database!");
-            }
-
             try
             {
-                var userDb = new TextFileUserDatabaseProvider(dbPath);
+                if (!acceptAny) // Have to check again
+                {
+                    try
+                    {
+                        Console.WriteLine("\r\n" + db.ConnectStringHint);
+                        var connectString = Console.ReadLine();
+                        if (!db.Connect(connectString).GetAwaiter().GetResult())
+                        {
+                            Log.WriteLine(LogPriority.Error, "Connecting to database failed. Server will exit.");
+                            return;
+                        }
+                        Console.WriteLine();
+                    }
+                    catch (Exception e)
+                    {
+                        Log.WriteLine(LogPriority.Error, "Error setting up database: " + e.Message);
+                        Console.WriteLine("Server will exit.");
+                        return;
+                    }
+                }
 
-                _server = new GameServer(port, userDb)
+
+                _server = new GameServer(port, db)
                 {
                     AcceptAnyClient = acceptAny
                 };
@@ -143,7 +165,7 @@ namespace AccessBattleServer
                         {
                             Console.WriteLine("There are no games"); ;
                         }
-                        else 
+                        else
                         foreach (var game in games)
                             Console.WriteLine(game.Key + " - " + game.Value.Name);
                         ok = true;
@@ -181,7 +203,7 @@ namespace AccessBattleServer
                         {
                             var pw = new System.Security.SecureString();
                             foreach (var c in spl[3]) pw.AppendChar(c);
-                            if (userDb.AddUserAsync(spl[2], pw).GetAwaiter().GetResult())
+                            if (db.AddUserAsync(spl[2], pw).GetAwaiter().GetResult())
                                 Console.WriteLine("user added");
                             else Console.WriteLine("add failed");
                             ok = true;
@@ -198,6 +220,8 @@ namespace AccessBattleServer
             {
                 Log.WriteLine(LogPriority.Information, "Stopping Server...");
                 _server.Stop();
+
+                db?.Disconnect();
 #if DEBUG
                 Console.WriteLine("Press any key to exit...");
                 Console.ReadKey();

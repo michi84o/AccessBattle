@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AccessBattle.Networking
+﻿namespace AccessBattle.Networking
 {
     /// <summary>
     /// Extension of game that is used by the game server.

@@ -2,7 +2,6 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -714,7 +713,14 @@ namespace AccessBattle.Networking
                 case NetworkPacketType.ClientLogin:
                     try
                     {
-                        if (data.Length > 0 && data[0] == 0)
+
+                        if (data.Length != 1 || data[0] > 4)
+                        {
+                            Log.WriteLine(LogPriority.Information, "NetworkGameClient: Received login confirmation could not be read: No data!");
+                            break;
+                        }
+                        LoginCheckResult loginResult = (LoginCheckResult)(int)data[0];
+                        if (loginResult == LoginCheckResult.LoginOK)
                         {
                             IsLoggedIn = true;
                             Log.WriteLine(LogPriority.Information, "NetworkGameClient: Login to server successful!");
@@ -723,10 +729,22 @@ namespace AccessBattle.Networking
                         {
                             IsLoggedIn = false;
                             var error = "NetworkGameClient: Login to server failed! ";
-                            if (data[0] == 1) error += "Invalid user name";
-                            else if (data[0] == 2) error += "Invalid password";
-                            else if (data[0] == 3) error += "Database error";
-                            else error += "Unknown error";
+                            switch (loginResult)
+                            {
+                                case LoginCheckResult.InvalidUser:
+                                    error += "Invalid user name";
+                                    break;
+                                case LoginCheckResult.InvalidPassword:
+                                    error += "Invalid password";
+                                    break;
+                                case LoginCheckResult.DatabaseError:
+                                    error += "Database error";
+                                    break;
+                                default:
+                                    error += "Unknown error";
+                                    break;
+                            }
+                            Log.WriteLine(LogPriority.Information, error);
                         }
                         LoggedIn?.Invoke(this, new LoggedInEventArgs(IsLoggedIn == true));
                     }

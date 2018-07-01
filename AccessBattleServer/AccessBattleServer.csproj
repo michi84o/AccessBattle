@@ -51,6 +51,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AccessBattleMySql\AccessBattleMySql.csproj">
+      <Project>{9c634f70-a089-4646-b477-a1c55b8a3881}</Project>
+      <Name>AccessBattleMySql</Name>
+    </ProjectReference>
     <ProjectReference Include="..\AccessBattle\AccessBattle.csproj">
       <Project>{F17F07F0-81F9-4320-A0C0-E9BBE9F6869C}</Project>
       <Name>AccessBattle</Name>
