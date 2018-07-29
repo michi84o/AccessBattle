@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="BoardField.cs" />
     <Compile Include="Card.cs" />
+    <Compile Include="EloRating.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="IBoardGame.cs" />

@@ -45,7 +45,7 @@ namespace AccessBattle.Wpf.ViewModel
         public ICommand CancelCommand => new RelayCommand(async o =>
         {
             CanCancel = false;
-            await ParentViewModel.Game.Client.ExitGame(ParentViewModel.Game.UID);
+            await ParentViewModel.Game.Client.ExitGame(ParentViewModel.Game.UID, Networking.Packets.ExitGameReason.Cancelled);
             ParentViewModel.CurrentMenu = MenuType.NetworkGame;
             CanCancel = true;
         }, o => CanCancel);

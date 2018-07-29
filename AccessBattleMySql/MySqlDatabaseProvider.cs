@@ -22,7 +22,8 @@ namespace AccessBattle.MySqlProvider
     // |           users            |
     // +----------------------------+
     // | INT idUser                 |
-    // | VARCHAR(32) userName      |
+    // | VARCHAR(32) userName       |
+    // | INT elo                    |
     // | CHAR(64) passwordHash      |
     // | CHAR(64) passwordSalt      |
     // | TINYINT mustChangePassword |
@@ -48,7 +49,7 @@ namespace AccessBattle.MySqlProvider
 
         public string ConnectStringHint => "Enter a connection string or nothing for interactive mode.\r\nConnection strings look like this:\r\nServer=myServerAddress;Port=3306;Database=myDataBase;Uid=myUsername;Pwd=myPassword";
 
-        public async Task<bool> AddUserAsync(string user, SecureString password)
+        public async Task<bool> AddUserAsync(string user, SecureString password, int elo = 1000)
         {
             if (!IsConnected) return false;
             if (!LoginHelper.CheckUserName(user))
@@ -62,12 +63,12 @@ namespace AccessBattle.MySqlProvider
                 var usr = new User();
 
                 using (var cmd = new MySqlCommand(
-                    "SELECT idUser,userName,passwordHash,passwordSalt,mustChangePassword FROM users WHERE userName=@param1;", _connection))
+                    "SELECT idUser,userName,elo,passwordHash,passwordSalt,mustChangePassword FROM users WHERE userName=@param1;", _connection))
                 {
                     cmd.Parameters.Add(new MySqlParameter("@param1", user));
                     using (var reader = await cmd.ExecuteReaderAsync())
                     {
-                        if (reader == null || reader.VisibleFieldCount != 5)
+                        if (reader == null || reader.VisibleFieldCount != 6)
                         {
                             Log.WriteLine(LogPriority.Error, "Error: Reading user entry from database failed.");
                         }
@@ -75,9 +76,10 @@ namespace AccessBattle.MySqlProvider
                         {
                             usr.IdUser = Convert.ToInt32(reader.GetValue(0));
                             usr.UserName = Convert.ToString(reader.GetValue(1));
-                            usr.PasswordHash = Convert.ToString(reader.GetValue(2));
-                            usr.PasswordSalt = Convert.ToString(reader.GetValue(3));
-                            usr.MustChangePassword = Convert.ToBoolean(reader.GetValue(4));
+                            usr.ELO = Convert.ToInt32(reader.GetValue(2));
+                            usr.PasswordHash = Convert.ToString(reader.GetValue(3));
+                            usr.PasswordSalt = Convert.ToString(reader.GetValue(4));
+                            usr.MustChangePassword = Convert.ToBoolean(reader.GetValue(5));
                         }
                     }
                 }
@@ -103,17 +105,19 @@ namespace AccessBattle.MySqlProvider
                 usr.PasswordHash = hash;
                 usr.PasswordSalt = salt;
                 usr.MustChangePassword = false;
+                usr.ELO = elo;
 
                 // Insert
                 if (usr.IdUser == 0)
                 {
                     using (var cmd = new MySqlCommand(
-                        "INSERT INTO users (userName,passwordHash,passwordSalt,mustChangePassword) VALUES (@p1,@p2,@p3,@p4);", _connection))
+                        "INSERT INTO users (userName,elo,passwordHash,passwordSalt,mustChangePassword) VALUES (@p1,@p2,@p3,@p4,@p5);", _connection))
                     {
                         cmd.Parameters.Add(new MySqlParameter("@p1", usr.UserName));
-                        cmd.Parameters.Add(new MySqlParameter("@p2", usr.PasswordHash));
-                        cmd.Parameters.Add(new MySqlParameter("@p3", usr.PasswordSalt));
-                        cmd.Parameters.Add(new MySqlParameter("@p4", usr.MustChangePassword));
+                        cmd.Parameters.Add(new MySqlParameter("@p2", usr.ELO));
+                        cmd.Parameters.Add(new MySqlParameter("@p3", usr.PasswordHash));
+                        cmd.Parameters.Add(new MySqlParameter("@p4", usr.PasswordSalt));
+                        cmd.Parameters.Add(new MySqlParameter("@p5", usr.MustChangePassword));
                         if (await cmd.ExecuteNonQueryAsync() != 1)
                         {
                             Log.WriteLine(LogPriority.Error, "Error: Inserting user to database table failed.");
@@ -126,14 +130,15 @@ namespace AccessBattle.MySqlProvider
                 else
                 {
                     using (var cmd = new MySqlCommand(
-                        "UPDATE users SET userName=@p2, passwordHash=@p3, passwordSalt=@p4, mustChangePassword=@p5 " +
+                        "UPDATE users SET userName=@p2, elo=@p3, passwordHash=@p4, passwordSalt=@p5, mustChangePassword=@p6 " +
                         "WHERE idUser=@p1", _connection))
                     {
                         cmd.Parameters.Add(new MySqlParameter("@p1", usr.IdUser));
                         cmd.Parameters.Add(new MySqlParameter("@p2", usr.UserName));
-                        cmd.Parameters.Add(new MySqlParameter("@p3", usr.PasswordHash));
-                        cmd.Parameters.Add(new MySqlParameter("@p4", usr.PasswordSalt));
-                        cmd.Parameters.Add(new MySqlParameter("@p5", usr.MustChangePassword));
+                        cmd.Parameters.Add(new MySqlParameter("@p3", usr.ELO));
+                        cmd.Parameters.Add(new MySqlParameter("@p4", usr.PasswordHash));
+                        cmd.Parameters.Add(new MySqlParameter("@p5", usr.PasswordSalt));
+                        cmd.Parameters.Add(new MySqlParameter("@p6", usr.MustChangePassword));
                         if (await cmd.ExecuteNonQueryAsync() != 1)
                         {
                             Log.WriteLine(LogPriority.Error, "Error: Updating user in database table failed.");
@@ -474,6 +479,7 @@ namespace AccessBattle.MySqlProvider
                         "CREATE TABLE IF NOT EXISTS users (" +
                         "idUser int(11) NOT NULL AUTO_INCREMENT, " +
                         "userName VARCHAR(32) NOT NULL, " +
+                        "elo int(11) NOT NULL DEFAULT 1000, " +
                         "passwordHash CHAR(64) NOT NULL, " +
                         "passwordSalt CHAR(64) NOT NULL, " +
                         "mustChangePassword TINYINT NOT NULL, " +
@@ -559,6 +565,11 @@ namespace AccessBattle.MySqlProvider
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        public Task<int> GetELO(string user)
+        {
+            throw new NotImplementedException();
         }
 
         ~MySqlDatabaseProvider()

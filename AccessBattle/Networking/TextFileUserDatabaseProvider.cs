@@ -11,7 +11,7 @@ namespace AccessBattle.Networking
 {
     /// <summary>
     /// Simple text file based user database.
-    /// Format: "Username" "Password Hash" "Salt" "MustChangePassword(0/1)"
+    /// Format: "Username" "ELO" "Password Hash" "Salt" "MustChangePassword(0/1)"
     /// Usernames can not have space in it.
     /// </summary>
     /// <remarks>
@@ -30,8 +30,9 @@ namespace AccessBattle.Networking
         /// </summary>
         /// <param name="user"></param>
         /// <param name="password"></param>
+        /// <param name="elo">ELO rating. Default: 1000</param>
         /// <returns></returns>
-        public async Task<bool> AddUserAsync(string user, SecureString password)
+        public async Task<bool> AddUserAsync(string user, SecureString password, int elo = 1000)
         {
             if (_databaseFile == null) return false;
             user = user.Trim();
@@ -53,20 +54,40 @@ namespace AccessBattle.Networking
                 }
                 else allText = "";
 
-                // Check if there is a line that starts with username
                 allText = allText.Replace("\r", "").Replace("\t", "");
-                var lines = allText.Split('\n');
-                if (lines.Any(line => line.StartsWith(user + " ", StringComparison.Ordinal)))
+                var lines = allText.Split('\n').ToList();
+
+                // Check if there is a line that starts with username
+                if (lines.Count > 0)
                 {
-                    return false;
+                    int i = 0;
+                    string check = user + " ";
+                    while (true)
+                    {
+                        if (lines.Count >= i) break;
+                        if (lines[i].StartsWith(check))
+                            lines.RemoveAt(i);
+                        else ++i;
+                    }
                 }
+
+                StringBuilder sb = new StringBuilder();
+                foreach (var line in lines)
+                {
+                    if (line == "") continue;
+                    sb.Append(line + "\r\n");
+                }
+
                 string hash, salt;
                 if (!PasswordHasher.GetNewHash(password.ConvertToUnsecureString(), out hash, out salt)) return false;
 
-                allText += user + " " + hash + " " + salt + " 1\n";
+                if (elo < 0) elo = 0;
+                if (elo > 10000) elo = 10000;
 
-                allText.Replace("\n", "\r\n");
-                await Task.Run(() => { File.WriteAllText(_databaseFile, allText); });
+                var newLine = user + " "+ elo +" " + hash + " " + salt + " 1";
+                sb.Append(newLine + "\r\n");
+
+                await Task.Run(() => { File.WriteAllText(_databaseFile, sb.ToString()); });
 
                 return true;
             }
@@ -101,7 +122,7 @@ namespace AccessBattle.Networking
             try
             {
                 string allText = null;
-                await Task.Run(() =>
+                await Task.Run(() => // TODO: StreamReader async interface
                 {
                     allText = File.ReadAllText(_databaseFile);
                 });
@@ -113,9 +134,10 @@ namespace AccessBattle.Networking
                 var line = lines.FirstOrDefault(l => l.StartsWith(user + " ", StringComparison.Ordinal));
                 if (string.IsNullOrEmpty(line)) return LoginCheckResult.InvalidUser;
                 var linespl = line.Split(' ');
-                if (linespl.Length != 4) return LoginCheckResult.DatabaseError;
+                if (linespl.Length != 5) return LoginCheckResult.DatabaseError;
                 if (linespl[0] != user) return LoginCheckResult.DatabaseError;
-                if (PasswordHasher.VerifyHash(password.ConvertToUnsecureString(), linespl[1], linespl[2]))
+
+                if (PasswordHasher.VerifyHash(password.ConvertToUnsecureString(), linespl[2], linespl[3]))
                     return LoginCheckResult.LoginOK;
                 return LoginCheckResult.InvalidPassword;
             }
@@ -242,6 +264,43 @@ namespace AccessBattle.Networking
         public void Dispose()
         {
 
+        }
+
+        public async Task<int> GetELO(string user)
+        {
+            if (_databaseFile == null) return -1;
+            if (!File.Exists(_databaseFile))
+            {
+                Log.WriteLine(LogPriority.Error, "Error in text file user database: File does not exist!");
+                return -1;
+            }
+            await semaphoreSlim.WaitAsync();
+            try
+            {
+                string allText = null;
+                await Task.Run(() => // TODO: StreamReader async interface
+                {
+                    allText = File.ReadAllText(_databaseFile);
+                });
+                if (allText == null) return -1;
+
+                allText = allText.Replace("\r", "").Replace("\t", "");
+                var lines = allText.Split('\n');
+                var line = lines.FirstOrDefault(l => l.StartsWith(user + " ", StringComparison.Ordinal));
+
+                if (string.IsNullOrEmpty(line)) return -1;
+                var linespl = line.Split(' ');
+
+                int elo;
+                if (!int.TryParse(linespl[1], out elo)) elo = -1;
+
+                return elo;
+            }
+            catch (Exception e)
+            {
+                Log.WriteLine(LogPriority.Error, "Error in text file user database: " + e);
+                return -1;
+            }
         }
     }
 }

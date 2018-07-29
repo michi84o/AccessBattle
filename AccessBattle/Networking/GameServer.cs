@@ -215,7 +215,8 @@ namespace AccessBattle.Networking
                     }
                     catch (Exception e)
                     {
-                        Log.WriteLine(LogPriority.Error, "GameServer: Unknown exception while waiting for clients: " + e);
+                        if (!(e is OperationCanceledException)) // Expected when server is closed
+                            Log.WriteLine(LogPriority.Error, "GameServer: Unknown exception while waiting for clients: " + e);
                         continue;
                     }
                 }
@@ -332,6 +333,11 @@ namespace AccessBattle.Networking
             catch (Exception)  { return; }
         }
 
+        /// <summary>
+        /// Force one player to win the game. Can be used for debugging the server.
+        /// </summary>
+        /// <param name="player"></param>
+        /// <param name="key"></param>
         public void Win(int player, uint key)
         {
             NetworkGame game;

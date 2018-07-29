@@ -22,7 +22,7 @@ namespace AccessBattle.Wpf.ViewModel
 #pragma warning disable RECS0165 // Asynchronous methods should return a Task instead of void
         public ICommand LeaveCommand => new RelayCommand(async o =>
         {
-            await ParentViewModel.Game.Client.ExitGame(ParentViewModel.Game.UID);
+            await ParentViewModel.Game.Client.ExitGame(ParentViewModel.Game.UID, Networking.Packets.ExitGameReason.PlayerQuit);
             if (ParentViewModel.Game.IsInSinglePlayerMode)
                 ParentViewModel.CurrentMenu = MenuType.AISelect;
             else

@@ -1,5 +1,15 @@
 ﻿namespace AccessBattle.Networking.Packets
 {
+    public enum ExitGameReason
+    {
+        /// <summary>Player quit the game ('exit' during match or 'leave' after the match).</summary>
+        PlayerQuit,
+        /// <summary>Timeout due to inactivity.</summary>
+        Inactivity,
+        /// <summary>Player that created the game cancelled before another player could join.</summary>
+        Cancelled,
+    }
+
     /// <summary>
     /// Packet sent when a game is about to be deleted from the server.
     /// Also used by players to remove a game they just created.
@@ -10,5 +20,7 @@
         /// Unique id of the game.
         /// </summary>
         public uint UID { get; set; }
+
+        public ExitGameReason Reason { get; set; }
     }
 }

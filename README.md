@@ -10,9 +10,13 @@ AccessBattle is a private fan project and not affiliated with
 
 ## Status
 
+UPDATE July 2018: I'm about to lose interest in developing this game further.
+I don't even know if anyone is playing this.
+I will work on the game until version 1.0 is released. I think this will on August the 31rd 2018.
+
 - Current status: Work in progress
   - Multiplayer is in alpha. There are some bugs and features are missing.
-    - Text and MySql/MariaDb based user databases are supported.
+    - Text and MySql/MariaDB based user databases are supported.
 	- Plugins for other database types are supported.
   - Singleplayer is in alpha. The AI plugin contains two stupid AI opponents.
     - Plugins for more AIs are supported.
@@ -33,7 +37,7 @@ AccessBattle is a private fan project and not affiliated with
   
 - TODO
   - Ping Server, reconnect if required
-  - Cleanup inactive games and logins, KeepAlive packets
+  - Cleanup inactive games and logins, KeepAlive packets (WIP)
   - Matchmaking for random matches
   
 

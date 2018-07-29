@@ -17,8 +17,9 @@ namespace AccessBattle.Plugins
         /// </summary>
         /// <param name="user"></param>
         /// <param name="password"></param>
+        /// <param name="elo">ELO rating. Default: 1000, Min: 0, Max: 10000</param>
         /// <returns></returns>
-        Task<bool> AddUserAsync(string user, SecureString password);
+        Task<bool> AddUserAsync(string user, SecureString password, int elo);
         /// <summary>
         /// Delete user.
         /// </summary>
@@ -48,6 +49,12 @@ namespace AccessBattle.Plugins
         /// Disconnects from the database.
         /// </summary>
         void Disconnect();
+
+        /// <summary>
+        /// Gets the ELO rating.
+        /// </summary>
+        /// <returns></returns>
+        Task<int> GetELO(string user);
 
         /// <summary>
         /// A humand readable text that lets the user know what to use as connection string.

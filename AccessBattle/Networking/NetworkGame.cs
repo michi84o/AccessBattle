@@ -1,4 +1,7 @@
-﻿namespace AccessBattle.Networking
+﻿using System;
+using System.Diagnostics;
+
+namespace AccessBattle.Networking
 {
     /// <summary>
     /// Extension of game that is used by the game server.
@@ -12,6 +15,24 @@
         /// </summary>
         public bool[] RematchRequested { get; } = new bool[] { false, false };
 
+        /// <summary>Used to detect timeouts.</summary>
+        Stopwatch _inactivityClock = new Stopwatch();
+
+        /// <summary>
+        /// Resets the internal inactivity timer.
+        /// This is called automatically if game phase changes.
+        /// </summary>
+        public void ResetInactivityTimeout()
+        {
+            _inactivityClock.Restart();
+        }
+
+        /// <summary>Used to detect timeouts.</summary>
+        public bool CheckForInactivityTimeout(TimeSpan limit)
+        {
+            return _inactivityClock.Elapsed > limit;
+        }
+
         /// <summary>
         /// Constructor that applies a unique id to the game.
         /// </summary>
@@ -19,6 +40,14 @@
         public NetworkGame(uint uid)
         {
             _uid = uid;
+            _inactivityClock.Start();
+            PropertyChanged += (s, a) =>
+            {
+                if (a.PropertyName == nameof(GamePhase))
+                {
+                    ResetInactivityTimeout();
+                }
+            };
         }
 
         string _name;

@@ -563,7 +563,7 @@ namespace AccessBattle.Networking
         /// </summary>
         /// <param name="uid"></param>
         /// <returns>True if request was sent.</returns>
-        public async Task<bool> ExitGame(uint uid)
+        public async Task<bool> ExitGame(uint uid, ExitGameReason reason)
         {
             var result = false;
 
@@ -581,7 +581,7 @@ namespace AccessBattle.Networking
                 try
                 {
                     GameExitReceived += handler;
-                    var pak = new ExitGame { UID = uid };
+                    var pak = new ExitGame { UID = uid, Reason = reason };
                     if (Send(JsonConvert.SerializeObject(pak, _serializerSettings), NetworkPacketType.ExitGame))
                     {
                         result = await source.Task;

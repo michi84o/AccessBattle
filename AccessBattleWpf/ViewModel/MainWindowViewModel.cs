@@ -255,7 +255,7 @@ namespace AccessBattle.Wpf.ViewModel
                             _game.HandleActionItem(ActionItem.Error404);
                             break;
                         case "ExitGame":
-                            await _game.Client.ExitGame(_game.UID);
+                            await _game.Client.ExitGame(_game.UID, ExitGameReason.PlayerQuit);
                             break;
                         default:
                             break;

@@ -150,10 +150,10 @@ namespace AccessBattleServer
                     if (line == ("help"))
                     {
                         Console.WriteLine(
-                            "\texit          Close this program.\r\n" +
-                            "\tlist          List all games\r\n" +
-                            "\tadd user n p  Adds user 'u' with password 'p'\r\n"+
-                            "\tdebug         Debug command. Requires additional parameters:\r\n" +
+                            "\texit                  Close this program.\r\n" +
+                            "\tlist                  List all games\r\n" +
+                            "\tadd user n p elo      Adds user 'u' with password 'p'. elo is optional ELO rating (default:1000) \r\n"+
+                            "\tdebug                 Debug command. Requires additional parameters:\r\n" +
                             "\t  win key=1234   1    Let player 1 win. Uses game key.\r\n" +
                             "\t  win name=gameX 2    Let player 2 win. Uses game name.");
                         ok = true;
@@ -199,11 +199,18 @@ namespace AccessBattleServer
                     else if (line.StartsWith("add user ", StringComparison.Ordinal))
                     {
                         var spl = line.Split(' ');
-                        if (spl.Length == 4)
+                        if (spl.Length == 4 || spl.Length == 5)
                         {
+                            int elo = 1000;
+                            if (spl.Length == 5 && !int.TryParse(spl[4], out elo))
+                                elo = 1000;
+
+                            if (elo < 0) elo = 0;
+                            if (elo > 10000) elo = 10000;
+
                             var pw = new System.Security.SecureString();
                             foreach (var c in spl[3]) pw.AppendChar(c);
-                            if (db.AddUserAsync(spl[2], pw).GetAwaiter().GetResult())
+                            if (db.AddUserAsync(spl[2], pw, elo).GetAwaiter().GetResult())
                                 Console.WriteLine("user added");
                             else Console.WriteLine("add failed");
                             ok = true;
@@ -219,7 +226,7 @@ namespace AccessBattleServer
             finally
             {
                 Log.WriteLine(LogPriority.Information, "Stopping Server...");
-                _server.Stop();
+                _server?.Stop();
 
                 db?.Disconnect();
 #if DEBUG
