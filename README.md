@@ -12,7 +12,7 @@ AccessBattle is a private fan project and not affiliated with
 
 UPDATE July 2018: I'm about to lose interest in developing this game further.
 I don't even know if anyone is playing this.
-I will work on the game until version 1.0 is released. I think this will on August the 31th 2018.
+I will work on the game until version 1.0 is released. I think this will on August the 31st 2018.
 
 - Current status: Work in progress
   - Multiplayer is in alpha. There are some bugs and features are missing.
