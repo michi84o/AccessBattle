@@ -64,6 +64,7 @@ Here is an example of a console based UI:
 This program uses the following external sources.
 - Silkscreen font by Jason Kottke
 - Newtonsoft.Json by James Newton-King
+- MySqlConnector by Bradley Grainger (I also contributed some lines of code to this)
 
 Warning! This program uses encryption for the connection to the server. Please check if this is legal in your country before using this program.
 

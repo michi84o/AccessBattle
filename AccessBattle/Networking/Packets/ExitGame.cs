@@ -11,6 +11,26 @@
     }
 
     /// <summary>
+    /// Class for ExitGame events.
+    /// </summary>
+    public class ExitGameEventArgs
+    {
+        /// <summary>
+        /// Reason for exit.
+        /// </summary>
+        public ExitGameReason Reason { get; }
+
+        /// <summary>
+        /// ctor
+        /// </summary>
+        /// <param name="reason"></param>
+        public ExitGameEventArgs(ExitGameReason reason)
+        {
+            Reason = reason;
+        }
+    }
+
+    /// <summary>
     /// Packet sent when a game is about to be deleted from the server.
     /// Also used by players to remove a game they just created.
     /// </summary>

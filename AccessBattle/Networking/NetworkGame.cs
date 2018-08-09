@@ -43,7 +43,7 @@ namespace AccessBattle.Networking
             _inactivityClock.Start();
             PropertyChanged += (s, a) =>
             {
-                if (a.PropertyName == nameof(GamePhase))
+                if (a.PropertyName == nameof(Phase))
                 {
                     ResetInactivityTimeout();
                 }
@@ -126,6 +126,12 @@ namespace AccessBattle.Networking
         /// <param name="player"></param>
         public void ExitGame(IPlayer player)
         {
+            if (player == null)
+            {
+                Phase = GamePhase.Aborted;
+                return;
+            }
+
             if (Phase == GamePhase.Player1Turn || Phase == GamePhase.Player2Turn)
             {
                 if (Players[0]?.Player == player) Phase = GamePhase.Player2Win;

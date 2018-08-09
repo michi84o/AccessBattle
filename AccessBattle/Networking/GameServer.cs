@@ -69,6 +69,8 @@ namespace AccessBattle.Networking
         /// <summary>Network port to use for accepting connections.</summary>
         public ushort Port => _port;
 
+        TimeSpan _gameTimeout = TimeSpan.FromHours(1); // Games will timeout after 1 hour
+
         bool _acceptAnyClient;
         /// <summary>
         /// If true, any client is accepted. Else the database of registered users is used.
@@ -85,6 +87,7 @@ namespace AccessBattle.Networking
         Dictionary<uint, NetworkGame> _games = new Dictionary<uint, NetworkGame>();
         Dictionary<uint, NetworkPlayer> _players = new Dictionary<uint, NetworkPlayer>();
         TcpListener _server;
+        System.Timers.Timer _cleanupTimer = new System.Timers.Timer(300000) { AutoReset = false }; // Called every 5 minutes
         CancellationTokenSource _serverCts;
         IUserDatabaseProvider _userDatabase;
 
@@ -107,6 +110,76 @@ namespace AccessBattle.Networking
             if (port != 3221) Log.WriteLine(LogPriority.Warning, "The Organization has made its move! El Psy Congroo");
 
             _userDatabase = userDatabase;
+
+            _cleanupTimer.Elapsed += CleanupTimerEvent;
+        }
+
+        private void CleanupTimerEvent(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            var gamesToKill = new Dictionary<uint, NetworkGame>();
+
+            lock (Games)
+            {
+                foreach (var kv in Games)
+                {
+                    if (kv.Value.CheckForInactivityTimeout(_gameTimeout))
+                        gamesToKill.Add(kv.Key, kv.Value);
+                }
+            }
+
+            if (gamesToKill.Count == 0)
+            {
+                if (_server != null)
+                    _cleanupTimer.Start();
+                return;
+            }
+
+            foreach (var id in gamesToKill)
+            {
+                try
+                {
+                    NetworkPlayer p1, p2;
+                    NetworkGame game;
+                    if (GetGameAndPlayers(id.Key, out game, out p1, out p2))
+                    {
+                        game.ExitGame(null);
+
+                        var syncP1 = GameSync.FromGame(game, game.UID, 1);
+                        var syncP2 = GameSync.FromGame(game, game.UID, 2);
+                        if (p1 != null)
+                            Send(JsonConvert.SerializeObject(syncP1, _serializerSettings), NetworkPacketType.GameSync, p1.Connection, p1.ClientCrypto);
+                        if (p2 != null)
+                            Send(JsonConvert.SerializeObject(syncP2, _serializerSettings), NetworkPacketType.GameSync, p2.Connection, p2.ClientCrypto);
+
+                        // This will disable the rematch button in the WPF UI and close the game:
+                        var ans = new ExitGame { UID = game.UID, Reason = ExitGameReason.Inactivity };
+                        if (p1 != null)
+                            Send(JsonConvert.SerializeObject(ans, _serializerSettings), NetworkPacketType.ExitGame, p1.Connection, p1.ClientCrypto);
+                        if (p2 != null)
+                            Send(JsonConvert.SerializeObject(ans, _serializerSettings), NetworkPacketType.ExitGame, p2.Connection, p2.ClientCrypto);
+
+                        Log.WriteLine(LogPriority.Verbose, "Removed game with id {0}", id.Key);
+                        Games.Remove(id.Key);
+                    }
+                    else
+                    {
+                        // Something is not right. Just delete
+                        lock (Games)
+                        {
+                            Log.WriteLine(LogPriority.Verbose, "Removed game with id {0}", id.Key);
+                            Games.Remove(id.Key);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.WriteLine(LogPriority.Error, "Cleanup: Error while removing game with id {0}: ({1})", id.Key, ex.Message);
+                    Log.WriteLine(LogPriority.Verbose, "Removed game with id {0}", id.Key);
+                    Games.Remove(id.Key);
+                }
+            }
+            if (_server != null)
+                _cleanupTimer.Start();
         }
 
         /// <summary>
@@ -120,6 +193,8 @@ namespace AccessBattle.Networking
             _server.Start();
             _serverThread = new Thread(() => ListenForClients(_serverCts.Token)) { IsBackground = true };
             _serverThread.Start();
+
+            _cleanupTimer.Start();
         }
 
         /// <summary>
@@ -127,6 +202,8 @@ namespace AccessBattle.Networking
         /// </summary>
         public void Stop()
         {
+            _cleanupTimer.Stop();
+
             if (_server == null) return;
             _serverCts.Cancel();
             _server.Stop();
@@ -574,7 +651,10 @@ namespace AccessBattle.Networking
                             if (GetGameAndPlayers(eMsg.UID, out game, out p1, out p2) && (p1 == player || p2 == player))
                             {
                                 game.ExitGame(player);
-                                Games.Remove(game.UID);
+                                lock (Games)
+                                {
+                                    Games.Remove(game.UID);
+                                }
 
                                 // Notify who has won the game
                                 var syncP1 = GameSync.FromGame(game, game.UID, 1);

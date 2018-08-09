@@ -157,7 +157,7 @@ namespace AccessBattle.Networking
         /// <summary>Received game synchronization packet.</summary>
         public event EventHandler<GameSyncEventArgs> GameSyncReceived;
         /// <summary>Received game exit. The game on the server was closed.</summary>
-        public event EventHandler GameExitReceived;
+        public event EventHandler<ExitGameEventArgs> GameExitReceived;
 
         /// <summary>
         /// The method ConfirmJoin was called. Used for communication between view models.
@@ -569,7 +569,7 @@ namespace AccessBattle.Networking
 
             // Catch the event for game exit
             var source = new TaskCompletionSource<bool>();
-            EventHandler handler = (sender, args) =>
+            EventHandler<ExitGameEventArgs> handler = (sender, args) =>
             {
                 source.TrySetResult(true);
             };
@@ -817,7 +817,7 @@ namespace AccessBattle.Networking
                             {
                                 IsJoined = false;
                                 UID = 0;
-                                GameExitReceived?.Invoke(this, EventArgs.Empty);
+                                GameExitReceived?.Invoke(this, new ExitGameEventArgs(eMsg.Reason));
                             }
                         }
                     }
