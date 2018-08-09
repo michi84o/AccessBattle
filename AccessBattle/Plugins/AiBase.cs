@@ -10,17 +10,25 @@ namespace AccessBattle.Plugins
     /// </summary>
     public abstract class AiBase : IArtificialIntelligence, IBoardGame
     {
+        /// <summary>Game id. Is always 0.</summary>
         public uint UID => 0;
 
         // IBoardGame
+        /// <summary>List of players. Length is always 2.</summary>
         public PlayerState[] Players { get; }
+        /// <summary>List of board fields.</summary>
         public BoardField[,] Board { get; }
+        /// <summary>Current game phase.</summary>
         public GamePhase Phase { get; set; }
 
+        /// <summary>Sync object for the game.</summary>
         protected GameSync Sync { get; set; }
 
+        /// <summary>True if AI is the host of the game.</summary>
         public bool IsAiHost { get; set; }
+        /// <summary>Name of the AI.</summary>
         protected abstract string _name { get; }
+        /// <summary>Name of the AI.</summary>
         public string Name { get => _name; set { } }
 
         /// <summary>
@@ -52,6 +60,9 @@ namespace AccessBattle.Plugins
         BoardField myPlacedFirewall;
         BoardField theirPlacedFirewall;
 
+        /// <summary>
+        /// ctor
+        /// </summary>
         public AiBase()
         {
             Players = new PlayerState[2];
@@ -66,8 +77,18 @@ namespace AccessBattle.Plugins
             Phase = GamePhase.WaitingForPlayers;
         }
 
+        /// <summary>
+        /// Tell AI to create a game command string for its next move.
+        /// </summary>
+        /// <returns></returns>
         public abstract string PlayTurn();
 
+        /// <summary>
+        /// Play a move.
+        /// </summary>
+        /// <param name="from">Card position.</param>
+        /// <param name="to">Target position.</param>
+        /// <returns></returns>
         protected string PlayMove(BoardField from, BoardField to)
         {
             return PlayMove(from.X, from.Y, to.X, to.Y);
@@ -87,6 +108,12 @@ namespace AccessBattle.Plugins
             return string.Format("mv {0},{1},{2},{3}", x0+1,y0+1,x1+1,y1+1);
         }
 
+        /// <summary>
+        /// Play a boost card.
+        /// </summary>
+        /// <param name="field">Target field.</param>
+        /// <param name="place">True if boost should be placed. False if it should be removed.</param>
+        /// <returns></returns>
         protected string PlayBoost(BoardField field, bool place)
         {
             return PlayBoost(field.X, field.Y, place);
@@ -104,6 +131,12 @@ namespace AccessBattle.Plugins
             return string.Format("bs {0},{1},{2}", x+1, y+1, place ? 1 : 0);
         }
 
+        /// <summary>
+        /// Plays a firewall card.
+        /// </summary>
+        /// <param name="field">Target field.</param>
+        /// <param name="place">True if card should be placed. False if card should be removed.</param>
+        /// <returns></returns>
         protected string PlayFirewall(BoardField field, bool place)
         {
             return PlayFirewall(field.X, field.Y, place);
@@ -122,6 +155,11 @@ namespace AccessBattle.Plugins
             return string.Format("fw {0},{1},{2}", x+1, y+1, place ? 1 : 0);
         }
 
+        /// <summary>
+        /// Play virus check.
+        /// </summary>
+        /// <param name="field">Target field.</param>
+        /// <returns></returns>
         protected string PlayVirusCheck(BoardField field)
         {
             return PlayVirusCheck(field.X, field.Y);
@@ -139,6 +177,13 @@ namespace AccessBattle.Plugins
             return string.Format("vc {0},{1}", x+1, y+1);
         }
 
+        /// <summary>
+        /// Play 404 card.
+        /// </summary>
+        /// <param name="field1">Field of first card.</param>
+        /// <param name="field2">Field of secind card.</param>
+        /// <param name="switchPlaces">True if cards should be switched.</param>
+        /// <returns></returns>
         protected string PlayError404(BoardField field1, BoardField field2, bool switchPlaces)
         {
             return PlayError404(field1.X, field1.Y, field2.X, field2.Y, switchPlaces);

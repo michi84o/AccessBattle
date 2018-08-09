@@ -1,5 +1,6 @@
 ﻿namespace AccessBattle.Networking.Packets
 {
+    /// <summary>Reason for exiting a game.</summary>
     public enum ExitGameReason
     {
         /// <summary>Player quit the game ('exit' during match or 'leave' after the match).</summary>
@@ -41,6 +42,9 @@
         /// </summary>
         public uint UID { get; set; }
 
+        /// <summary>
+        /// Reason for exit.
+        /// </summary>
         public ExitGameReason Reason { get; set; }
     }
 }

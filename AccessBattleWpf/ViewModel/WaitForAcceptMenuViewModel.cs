@@ -5,8 +5,10 @@ namespace AccessBattle.Wpf.ViewModel
 {
     public class WaitForAcceptMenuViewModel : MenuViewModelBase
     {
-        NetworkGameMenuViewModel _networkGameMenu;
-
+        /// <summary>
+        /// ctor
+        /// </summary>
+        /// <param name="parent">Parent viewmodel.</param>
         public WaitForAcceptMenuViewModel(
             IMenuHolder parent) : base(parent)
         {

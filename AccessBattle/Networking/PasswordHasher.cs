@@ -95,6 +95,7 @@ namespace AccessBattle.Networking
             }
             catch (Exception e)
             {
+                Log.WriteLine(LogPriority.Error, "Verify password hash failed: " + e.Message);
                 return false;
             }
         }

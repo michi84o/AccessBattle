@@ -1,5 +1,6 @@
 ﻿namespace AccessBattle
 {
+    /// <summary>Helper class for coordinate conversion.</summary>
     public static class Helpers
     {
         /// <summary>

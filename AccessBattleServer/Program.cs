@@ -152,7 +152,8 @@ namespace AccessBattleServer
                         Console.WriteLine(
                             "\texit                  Close this program.\r\n" +
                             "\tlist                  List all games\r\n" +
-                            "\tadd user n p elo      Adds user 'u' with password 'p'. elo is optional ELO rating (default:1000) \r\n"+
+                            "\tadd user n p elo      Adds user 'u' with password 'p'. elo is optional ELO rating (default:1000) \r\n" +
+                            "\tmcpw user             Check if user must change password\r\n" +
                             "\tdebug                 Debug command. Requires additional parameters:\r\n" +
                             "\t  win key=1234   1    Let player 1 win. Uses game key.\r\n" +
                             "\t  win name=gameX 2    Let player 2 win. Uses game name.");
@@ -166,9 +167,29 @@ namespace AccessBattleServer
                             Console.WriteLine("There are no games"); ;
                         }
                         else
-                        foreach (var game in games)
-                            Console.WriteLine(game.Key + " - " + game.Value.Name);
+                            foreach (var game in games)
+                                Console.WriteLine(game.Key + " - " + game.Value.Name);
                         ok = true;
+                    }
+                    else if (line.StartsWith("mcpw"))
+                    {
+                        if (db == null) continue;
+                        var sp = line.Split(' ');
+                        if (sp.Length == 2)
+                        {
+                            bool? res = db.MustChangePasswordAsync(sp[1]).GetAwaiter().GetResult();
+
+                            if (res == true)
+                            {
+                                Console.WriteLine("User must change password");
+                                ok = true;
+                            }
+                            else if (res == false)
+                            {
+                                Console.WriteLine("User must not change password");
+                                ok = true;
+                            }
+                        }
                     }
                     else if (line.StartsWith("debug ", StringComparison.Ordinal))
                     {
@@ -198,6 +219,7 @@ namespace AccessBattleServer
                     }
                     else if (line.StartsWith("add user ", StringComparison.Ordinal))
                     {
+                        if (db == null) continue;
                         var spl = line.Split(' ');
                         if (spl.Length == 4 || spl.Length == 5)
                         {

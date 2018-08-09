@@ -1,5 +1,8 @@
 ﻿namespace AccessBattle.Networking.Packets
 {
+    /// <summary>
+    /// Container for sending a game command.
+    /// </summary>
     public class GameCommand
     {
         /// <summary>

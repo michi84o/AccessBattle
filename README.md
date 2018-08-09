@@ -36,9 +36,10 @@ I will work on the game until version 1.0 is released. I think this will on Augu
   - Exit Game does not work in single player
   
 - TODO
-  - Ping Server, reconnect if required
-  - Cleanup inactive games and logins, KeepAlive packets (WIP)
+  - Reconnects
+  - Prevent Login Spamming and Account Hacking
   - Matchmaking for random matches
+  - Some animations need to be added if opponent plays a card.
   
 
 ## Program Structure

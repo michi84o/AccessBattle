@@ -8,11 +8,14 @@ using System.IO;
 
 namespace AccessBattle.Plugins
 {
+    /// <summary>This class loads plugins.</summary>
     public class PluginHandler
     {
         //static bool _constructing;
         static readonly object InstanceLock = new object();
         static PluginHandler _instance;
+
+        /// <summary>Singleton instance of this class.</summary>
         public static PluginHandler Instance
         {
             get
@@ -88,6 +91,11 @@ namespace AccessBattle.Plugins
             }
         }
 
+        /// <summary>
+        /// Get plugins of the specified type.
+        /// </summary>
+        /// <typeparam name="T">Type to use.</typeparam>
+        /// <returns>List of plugins.</returns>
         public List<T> GetPlugins<T>() where T : IPlugin
         {
             if (_plugins == null)

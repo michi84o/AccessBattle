@@ -92,6 +92,10 @@ namespace AccessBattle
             }
         }
 
+        /// <summary>
+        /// Get a sync object for the player state.
+        /// </summary>
+        /// <returns></returns>
         public Sync GetSync()
         {
             return new Sync
@@ -103,6 +107,10 @@ namespace AccessBattle
             };
         }
 
+        /// <summary>
+        /// Update using a sync object.
+        /// </summary>
+        /// <param name="sync">Sync object to use.</param>
         public void Update(Sync sync)
         {
             Points = sync.Points;
@@ -112,6 +120,7 @@ namespace AccessBattle
             //PlayerNumber = sync.PlayerNumber;
         }
 
+        /// <summary>Subclass for sync objects.</summary>
         public class Sync : PropChangeNotifier
         {
             int _points;
@@ -119,9 +128,13 @@ namespace AccessBattle
             bool _did404NotFound;
             int _playerNumber;
 
+            /// <summary>Points this player has.</summary>
             public int Points { get { return _points; } set { SetProp(ref _points, value); } }
+            /// <summary>True if player already played the virus check.</summary>
             public bool DidVirusCheck { get { return _didVirusCheck; } set { SetProp(ref _didVirusCheck, value); } }
+            /// <summary>True if player already played the 404 card.</summary>
             public bool Did404NotFound { get { return _did404NotFound; } set { SetProp(ref _did404NotFound, value); } }
+            /// <summary>Player number.</summary>
             public int PlayerNumber { get { return _playerNumber; } set { SetProp(ref _playerNumber, value); } }
         }
     }

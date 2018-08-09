@@ -123,11 +123,15 @@ namespace AccessBattle.Networking
         }
     }
 
+    /// <summary>Event args for game command events.</summary>
     public class GameCommandEventArgs : EventArgs
     {
+        /// <summary>UID of the game.</summary>
         public uint UID { get; private set; }
+        /// <summary>Command string.</summary>
         public string Command { get; private set; }
 
+        /// <summary>ctor</summary>
         public GameCommandEventArgs(GameCommand cmd)
         {
             UID = cmd.UID;
@@ -561,7 +565,8 @@ namespace AccessBattle.Networking
         /// <summary>
         /// Exit a game. If game was active and had not finished, player will loose the game.
         /// </summary>
-        /// <param name="uid"></param>
+        /// <param name="uid">Game id.</param>
+        /// <param name="reason">Reason for exit.</param>
         /// <returns>True if request was sent.</returns>
         public async Task<bool> ExitGame(uint uid, ExitGameReason reason)
         {

@@ -23,6 +23,7 @@ namespace AccessBattle.Networking
         static SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
         string _databaseFile;
 
+        /// <summary>Hint for the connection string.</summary>
         public string ConnectStringHint => "Enter a file name for a text file";
 
         /// <summary>
@@ -202,12 +203,12 @@ namespace AccessBattle.Networking
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        public async Task<bool> MustChangePasswordAsync(string user)
+        public async Task<bool?> MustChangePasswordAsync(string user)
         {
             user = user.Trim();
             if (!LoginHelper.CheckUserName(user))
             {
-                return false;
+                return null;
             }
             if (!File.Exists(_databaseFile)) return false;
             await semaphoreSlim.WaitAsync();
@@ -218,29 +219,35 @@ namespace AccessBattle.Networking
                 {
                     allText = File.ReadAllText(_databaseFile);
                 });
-                if (allText == null) return false;
+                if (allText == null) return null;
 
                 // Check if there is a line that starts with username
                 allText = allText.Replace("\r", "").Replace("\t", "");
                 var lines = allText.Split('\n');
                 var line = lines.FirstOrDefault(l => l.StartsWith(user + " ", StringComparison.Ordinal));
-                if (string.IsNullOrEmpty(line)) return false;
+                if (string.IsNullOrEmpty(line)) return null;
                 var linespl = line.Split(' ');
-                if (linespl.Length != 4) return false;
-                if (linespl[0] != user) return false;
+                if (linespl.Length != 4) return null;
+                if (linespl[0] != user) return null;
                 return linespl[3].Trim() == "1";
             }
             catch (Exception)
             {
-                return false;
+                return null;
             }
             finally { semaphoreSlim.Release(); }
         }
 
+        /// <summary>
+        /// Opens a database file.
+        /// </summary>
+        /// <param name="connectstring">Database file to use.</param>
+        /// <returns></returns>
         public async Task<bool> Connect(string connectstring)
         {
             try
             {
+                await Task.Yield(); // Force async
                 var dir = System.IO.Path.GetDirectoryName(_databaseFile);
                 if (!string.IsNullOrEmpty(dir) && !System.IO.Directory.Exists(dir))
                 {
@@ -249,23 +256,34 @@ namespace AccessBattle.Networking
             }
             catch (Exception e)
             {
-                Log.WriteLine(LogPriority.Error, "Could not create target directory");
+                Log.WriteLine(LogPriority.Error, "Could not create target directory (" + e.Message + ")");
                 return false;
             }
             _databaseFile = connectstring;
             return true;
         }
 
+        /// <summary>
+        /// Does nothing.
+        /// </summary>
         public void Disconnect()
         {
 
         }
 
+        /// <summary>
+        /// Does nothing.
+        /// </summary>
         public void Dispose()
         {
 
         }
 
+        /// <summary>
+        /// Gets the ELO value for this player.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         public async Task<int> GetELO(string user)
         {
             if (_databaseFile == null) return -1;

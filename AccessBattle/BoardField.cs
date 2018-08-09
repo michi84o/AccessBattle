@@ -39,6 +39,11 @@
             Y = y;
         }
 
+        /// <summary>
+        /// Update the board field using a sync object.
+        /// </summary>
+        /// <param name="sync">Board sync object.</param>
+        /// <param name="players">List of players.</param>
         public void Update(Sync sync, PlayerState[] players)
         {
             // Do not check the coordinates! They might require transformation for player 2!
@@ -63,6 +68,10 @@
             Card = card;
         }
 
+        /// <summary>
+        /// Create a sync object that can be used to update a field.
+        /// </summary>
+        /// <returns></returns>
         public Sync GetSync()
         {
             return new Sync
@@ -73,10 +82,17 @@
             };
         }
 
+        /// <summary>
+        /// Subclass for sync objects.
+        /// </summary>
         public class Sync
         {
+            /// <summary>Sync object for the card.</summary>
             public Card.Sync Card;
-            public ushort X, Y;
+            /// <summary>X coordinate of the field.</summary>
+            public ushort X;
+            /// <summary>Y coordinate of the field.</summary>
+            public ushort Y;
         }
     }
 }

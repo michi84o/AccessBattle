@@ -19,8 +19,10 @@ namespace AccessBattle.Networking
         DatabaseError,
     }
 
+    /// <summary>Helper for login names.</summary>
     public static class LoginHelper
     {
+        /// <summary>Checks if a user name is valid.</summary>
         public static bool CheckUserName(string user)
         {
             if (user.Length > 32)

@@ -21,7 +21,13 @@ namespace AccessBattle.Networking.Packets
         /// <summary>State of the board.</summary>
         public List<BoardField.Sync> FieldsWithCards { get; set; }
 
-        // player: For which player this game sync should be. Hides cards. 1 = Player1, 2 = Player 2
+        /// <summary>
+        /// Get a sync object for a game.
+        /// </summary>
+        /// <param name="game">Game to get state from.</param>
+        /// <param name="id">Unique id of the game.</param>
+        /// <param name="player">For which player this game sync should be. Hides cards. 1 = Player1, 2 = Player 2.</param>
+        /// <returns></returns>
         public static GameSync FromGame(Game game, uint id, int player)
         {
             var board = game.Board;

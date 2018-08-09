@@ -17,19 +17,12 @@ namespace AccessBattle
         /// <param name="eloP1">ELO rating of player 1.</param>
         /// <param name="eloP2">ELO rating of player 2.</param>
         /// <param name="winner">Winner of the match: 0: Draw, 1: Player 1, 2: Player 2</param>
-        /// <param name="eloP1New"></param>
+        /// <param name="eloP1New">New ELO value for player 1.</param>
+        /// <param name="eloP2New">New ELO value for player 2.</param>
         /// <param name="k">K value. Default value is 32.</param>
         public static void Calculate(int eloP1, int eloP2, int winner, out int eloP1New, out int eloP2New, int k = 32)
         {
             if (winner < 0 || winner > 2) throw new ArgumentException("Invalid value for winner", nameof(winner));
-
-            //// transformed rating
-            //double r1 = Math.Pow(10.0, eloP1 / 400.0);
-            //double r2 = Math.Pow(10.0, eloP2 / 400.0);
-
-            //// expected score
-            //double e1 = r1 / (r1 + r2);
-            //double e2 = r2 / (r1 + r2);
 
             double e1 = 1.0 / (1 + Math.Pow(10, (eloP2 - eloP1)/400.0));
             double e2 = 1.0 / (1 + Math.Pow(10, (eloP1 - eloP2)/400.0));

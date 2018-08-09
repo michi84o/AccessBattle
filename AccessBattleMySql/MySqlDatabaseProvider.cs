@@ -238,9 +238,30 @@ namespace AccessBattle.MySqlProvider
             return true;
         }
 
-        public async Task<bool> MustChangePasswordAsync(string user)
+        public async Task<bool?> MustChangePasswordAsync(string user)
         {
-            throw new NotImplementedException();
+            if (!IsConnected) return null;
+            if (!LoginHelper.CheckUserName(user))
+            {
+                return null;
+            }
+            try
+            {
+                // Try to get user first. If user exists, only update password.
+                using (var cmd = new MySqlCommand(
+                    "SELECT mustChangePassword FROM users WHERE userName=@param1;", _connection))
+                {
+                    cmd.Parameters.Add(new MySqlParameter("@param1", user));
+                    var x = await cmd.ExecuteScalarAsync();
+                    if (x == null) return null;
+                    return (Convert.ToInt32(x) == 1);
+                }
+            }
+            catch (Exception e)
+            {
+                Log.WriteLine(LogPriority.Error, "Error: " + e.Message);
+                return null;
+            }
         }
 
         /// <summary>

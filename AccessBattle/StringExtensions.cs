@@ -4,6 +4,7 @@ using System.Security;
 
 namespace AccessBattle
 {
+    /// <summary>Extensions for using strings and secure strings.</summary>
     public static class StringExtensions
     {
         /// <summary>

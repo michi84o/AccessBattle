@@ -222,7 +222,7 @@ namespace AccessBattle
         }
 
         string ReplaceAltSyntax(string str)
-        {       
+        {
             // TODO: Performance and memory usage ???
             return str
                 .Replace("a1", "a,1").Replace("b1", "b,1").Replace("c1", "c,1").Replace("d1", "d,1").Replace("e1", "e,1").Replace("f1", "f,1").Replace("g1", "g,1").Replace("h1", "h,1")
@@ -240,19 +240,19 @@ namespace AccessBattle
         /// <summary>
         /// Command      Syntax             Example
         /// -------------------------------------------
-        /// Deply        dp VVVVLLLL    
+        /// Deply        dp VVVVLLLL
         /// Move         mv x1,y1,x2,y2     mv 1,1,2,1
         /// Boost        bs x1,y1,e         bs 1,1,1
         /// Firewall     fw x1,y1,e         fw 1,1,1
         /// Virus Check  vc x1,y1           vc 1,1
         /// Error 404    er x1,y1,x2,y2,s   er 1,1,2,2,1
-        /// 
+        ///
         /// All coordinates start at 1, not 0. Letters a-h are allowed for x.
-        /// 
+        ///
         /// </summary>
         /// <param name="command">Command to play.</param>
         /// <param name="player">Player number.</param>
-        /// <returns></returns>      
+        /// <returns></returns>
         public virtual async Task<bool> ExecuteCommand(string command, int player)
         {
             await _executeLock.WaitAsync();
@@ -823,11 +823,13 @@ namespace AccessBattle
         #endregion
     }
 
-    public class LocalGame : Game 
+    /// <summary>Class for local singleplayer games.</summary>
+    public class LocalGame : Game
     {
         IArtificialIntelligence _ai1;
         IArtificialIntelligence _ai2;
 
+        /// <summary>Fired if a synchronization is required.</summary>
         public event EventHandler SyncRequired;
 
         int _aiCommandDelay;
@@ -841,7 +843,7 @@ namespace AccessBattle
         }
 
         /// <summary>
-        /// Sets AI player. 
+        /// Sets AI player.
         /// </summary>
         /// <param name="ai"></param>
         /// <param name="playerNumber">1 or 2. 1 is host.</param>
@@ -886,7 +888,7 @@ namespace AccessBattle
             if (!result) return false;
 
             if (Phase != GamePhase.Player1Turn &&
-                Phase != GamePhase.Player2Turn && 
+                Phase != GamePhase.Player2Turn &&
                 Phase != GamePhase.Deployment)
                 return result; // Game has finished
 
@@ -927,7 +929,7 @@ namespace AccessBattle
         /// <returns></returns>
         public async Task <bool> AiPlayer1Move()
         {
-            if (_ai1 == null || 
+            if (_ai1 == null ||
                 (Phase != GamePhase.Player1Turn && Phase != GamePhase.Deployment))
                 return false;
             _ai1.Synchronize(GameSync.FromGame(this, 0, 1));

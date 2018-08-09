@@ -5,11 +5,14 @@ using System.Threading.Tasks;
 
 namespace AccessBattle.Plugins
 {
+    /// <summary>Interface for userdatabase provider factories.</summary>
     public interface IUserDatabaseProviderFactory : IPlugin
     {
+        /// <summary>Creates a new user database provider factory.</summary>
         IUserDatabaseProvider CreateInstance();
     }
 
+    /// <summary>Interface for user database providers.</summary>
     public interface IUserDatabaseProvider : IDisposable
     {
         /// <summary>
@@ -38,7 +41,7 @@ namespace AccessBattle.Plugins
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        Task<bool> MustChangePasswordAsync(string user);
+        Task<bool?> MustChangePasswordAsync(string user);
         /// <summary>
         /// Establishes the connection to the database if required.
         /// This might cause a promt for login information.

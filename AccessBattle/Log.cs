@@ -18,13 +18,20 @@ namespace AccessBattle
         File
     }
 
+    /// <summary>Priority for logs.</summary>
     public enum LogPriority
     {
+        /// <summary>Print all messages.</summary>
         Debug = 0,
+        /// <summary>Print all messages exceot debug</summary>
         Verbose,
+        /// <summary>No verbose or debug output.</summary>
         Information,
+        /// <summary>Only warnings and errors.</summary>
         Warning,
+        /// <summary>Only errors.</summary>
         Error,
+        /// <summary>Only critical errors.</summary>
         Critical
     }
 
@@ -36,6 +43,7 @@ namespace AccessBattle
     {
         private static LogMode Mode = LogMode.Debug;
 
+        /// <summary>Log priority.</summary>
         public static LogPriority Priority = LogPriority.Verbose;
 
         /// <summary>

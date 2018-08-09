@@ -16,14 +16,26 @@ namespace AccessBattle
             set { SetProp(ref _owner, value); }
         }
 
+        /// <summary>
+        /// Create a sync object that can be used to update a card.
+        /// </summary>
+        /// <returns></returns>
         public abstract Sync GetSync();
 
+        /// <summary>
+        /// Subclass for sync objects.
+        /// </summary>
         public class Sync
         {
+            /// <summary>Player number of owner.</summary>
             public int Owner;
+            /// <summary>True if card is visible to opponent.</summary>
             public bool IsFaceUp;
+            /// <summary>True if card has a boost.</summary>
             public bool HasBoost;
+            /// <summary>Type of the card if card is an online card.</summary>
             public OnlineCardType Type;
+            /// <summary>True if card is a firewall.</summary>
             public bool IsFirewall;
         }
 
@@ -109,6 +121,10 @@ namespace AccessBattle
             return c.Type;
         }
 
+        /// <summary>
+        /// Get sync object for this card.
+        /// </summary>
+        /// <returns>Sync object.</returns>
         public override Sync GetSync()
         {
             return new Sync
@@ -141,6 +157,10 @@ namespace AccessBattle
     /// </summary>
     public class FirewallCard : Card
     {
+        /// <summary>
+        /// Get sync object for this card.
+        /// </summary>
+        /// <returns>Sync object.</returns>
         public override Sync GetSync()
         {
             return new Sync
