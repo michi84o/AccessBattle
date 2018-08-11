@@ -32,7 +32,6 @@ I will work on the game until version 1.0 is released. I think this will on Augu
 - Known Issues:
   - Same user can login multiple times. Not sure if bug or feature.  
   - Game might screw up if one client disconnects
-  - Rematch does not work sometimes
   - Exit Game does not work in single player
   
 - TODO

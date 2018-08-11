@@ -9,6 +9,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using AccessBattle.Plugins;
 using System.ComponentModel.Composition;
+using System.Threading;
 
 namespace AccessBattle.MySqlProvider
 {
@@ -46,6 +47,7 @@ namespace AccessBattle.MySqlProvider
     public class MySqlDatabaseProvider : IUserDatabaseProvider
     {
         MySqlConnection _connection;
+        SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
 
         public string ConnectStringHint => "Enter a connection string or nothing for interactive mode.\r\nConnection strings look like this:\r\nServer=myServerAddress;Port=3306;Database=myDataBase;Uid=myUsername;Pwd=myPassword";
 
@@ -57,6 +59,7 @@ namespace AccessBattle.MySqlProvider
                 return false;
             }
 
+            await _semaphoreSlim.WaitAsync();
             try
             {
                 // Try to get user first. If user exists, only update password.
@@ -153,6 +156,7 @@ namespace AccessBattle.MySqlProvider
                 Log.WriteLine(LogPriority.Error, "Error: " + e.Message);
                 return false;
             }
+            finally { _semaphoreSlim.Release(); }
         }
 
         public async Task<LoginCheckResult> CheckLoginAsync(string user, SecureString password)
@@ -163,6 +167,7 @@ namespace AccessBattle.MySqlProvider
                 return LoginCheckResult.InvalidUser;
             }
 
+            await _semaphoreSlim.WaitAsync();
             try
             {
                 // Try to get user first. If user exists, only update password.
@@ -214,11 +219,13 @@ namespace AccessBattle.MySqlProvider
                 Log.WriteLine(LogPriority.Error, "Error: " + e.Message);
                 return LoginCheckResult.Unknown;
             }
+            finally { _semaphoreSlim.Release(); }
         }
 
         public async Task<bool> DeleteUserAsync(string user)
         {
             if (!IsConnected) return false;
+            await _semaphoreSlim.WaitAsync();
             try
             {
                 // Try to get user first. If user exists, only update password.
@@ -235,6 +242,7 @@ namespace AccessBattle.MySqlProvider
                 Log.WriteLine(LogPriority.Error, "Error: " + e.Message);
                 return false;
             }
+            finally { _semaphoreSlim.Release(); }
             return true;
         }
 
@@ -245,6 +253,7 @@ namespace AccessBattle.MySqlProvider
             {
                 return null;
             }
+            await _semaphoreSlim.WaitAsync();
             try
             {
                 // Try to get user first. If user exists, only update password.
@@ -262,6 +271,7 @@ namespace AccessBattle.MySqlProvider
                 Log.WriteLine(LogPriority.Error, "Error: " + e.Message);
                 return null;
             }
+            finally { _semaphoreSlim.Release(); }
         }
 
         /// <summary>
@@ -595,6 +605,7 @@ namespace AccessBattle.MySqlProvider
             {
                 return null;
             }
+            await _semaphoreSlim.WaitAsync();
             try
             {
                 // Try to get user first. If user exists, only update password.
@@ -612,6 +623,7 @@ namespace AccessBattle.MySqlProvider
                 Log.WriteLine(LogPriority.Error, "Error: " + e.Message);
                 return null;
             }
+            finally { _semaphoreSlim.Release(); }
         }
 
         public async Task<bool> SetELO(string user, int elo)
@@ -621,6 +633,7 @@ namespace AccessBattle.MySqlProvider
             {
                 return false;
             }
+            await _semaphoreSlim.WaitAsync();
             try
             {
                 // Try to get user first. If user exists, only update password.
@@ -637,6 +650,7 @@ namespace AccessBattle.MySqlProvider
                 Log.WriteLine(LogPriority.Error, "Error: " + e.Message);
                 return false;
             }
+            finally { _semaphoreSlim.Release(); }
         }
 
         ~MySqlDatabaseProvider()

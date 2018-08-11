@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AccessBattle.Networking;
+using System;
 
 namespace AccessBattle
 {
@@ -92,7 +93,19 @@ namespace AccessBattle
             {
                 if (SetProp(ref _player, value))
                 {
-                    if (value != null) Name = value.Name;
+                    if (value == null)
+                    {
+                        ELO = 0;
+                        Name = "";
+                    }
+                    else
+                    {
+                        Name = value.Name;
+                        if (value is NetworkPlayer)
+                            ELO = ((NetworkPlayer)value).ELO;
+                        else
+                            ELO = 0;
+                    }
                 }
             }
         }

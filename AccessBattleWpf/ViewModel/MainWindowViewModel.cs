@@ -208,12 +208,10 @@ namespace AccessBattle.Wpf.ViewModel
             else if (e.PropertyName == nameof(_game.Phase))
             {
                 // This updates the display of player names and ELO (TODO)
-                if (_game.Phase != GamePhase.Player1Turn &&
-                    _game.Phase != GamePhase.Player2Turn)
-                {
-                    OnPropertyChanged(nameof(Player1Name));
-                    OnPropertyChanged(nameof(Player2Name));
-                }
+                OnPropertyChanged(nameof(Player1Name));
+                OnPropertyChanged(nameof(Player2Name));
+                OnPropertyChanged(nameof(ELOP1));
+                OnPropertyChanged(nameof(ELOP2));
 
                 if (_game.IsPlayerHost && _game.Phase == GamePhase.Player2Turn)
                     CurrentMenu = MenuType.OpponentTurn;

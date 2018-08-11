@@ -484,7 +484,7 @@ namespace AccessBattle.Networking
                         var login = JsonConvert.DeserializeObject<Login>(Encoding.ASCII.GetString(data));
                         if (login?.Name?.Length > 0)
                         {
-                            if (!AcceptAnyClient)
+                            if (!AcceptAnyClient && _userDatabase != null)
                             {
                                 var loginResult = _userDatabase.CheckLoginAsync(login.Name, login.Password?.ConvertToSecureString()).GetAwaiter().GetResult(); // TODO: Change to async call later
                                 if (loginResult != 0)
@@ -494,7 +494,12 @@ namespace AccessBattle.Networking
                                     if (loginResult == LoginCheckResult.LoginOK)
                                     {
                                         Log.WriteLine(LogPriority.Verbose, "GameServer: Player " + (player.Name ?? "?") + " (" + player.UID + ") logged in successfully!");
-                                        player.Name = login.Name.ToUpper();
+                                        player.Name = login.Name;
+
+                                        var elo = _userDatabase.GetELO(player.Name).GetAwaiter().GetResult(); // TODO: async
+                                        if (elo != null)
+                                            player.ELO = elo.Value;
+
                                         player.IsLoggedIn = true;
                                     }
 
@@ -510,7 +515,8 @@ namespace AccessBattle.Networking
                             else
                             {
                                 Log.WriteLine(LogPriority.Verbose, "GameServer: Player " + (player.Name ?? "?") + " (" + player.UID + ") logged in successfully!");
-                                player.Name = login.Name.ToUpper();
+                                player.Name = login.Name;
+                                player.ELO = 0; // No ELO rating without user database
                                 player.IsLoggedIn = true;
                                 Send(new byte[] { (byte)(int)LoginCheckResult.LoginOK }, NetworkPacketType.ClientLogin, player.Connection, player.ClientCrypto);
                             }
@@ -529,7 +535,7 @@ namespace AccessBattle.Networking
                         var ginfo = JsonConvert.DeserializeObject<GameInfo>(Encoding.ASCII.GetString(data));
                         if (ginfo != null)
                         {
-                            Log.WriteLine(LogPriority.Debug, "GameServer: Received CreateGame packet from player " + player.UID + ": [" + ginfo.Name.ToUpper() + "/" + ginfo.UID + "/" + ginfo.Player1.ToUpper() + "]");
+                            Log.WriteLine(LogPriority.Debug, "GameServer: Received CreateGame packet from player " + player.UID + ": [" + ginfo.Name + "/" + ginfo.UID + "/" + ginfo.Player1 + "]");
                             uint uid;
                             lock (Games)
                             {
@@ -737,7 +743,7 @@ namespace AccessBattle.Networking
                                 {
                                     // Apply ELO
                                     if ((oldPhase == GamePhase.Player1Turn || oldPhase == GamePhase.Player2Turn) &&
-                                         (game.Phase == GamePhase.Player1Win || game.Phase == GamePhase.Player2Turn)
+                                         (game.Phase == GamePhase.Player1Win || game.Phase == GamePhase.Player2Win)
                                          && _userDatabase != null)
                                     {
                                         try
@@ -746,13 +752,16 @@ namespace AccessBattle.Networking
                                             var elop2 = game.Players[1].ELO;
                                             int winner = game.Phase == GamePhase.Player1Win ? 1 : 2;
                                             int elop1New, elop2New;
+
                                             if (elop1 > 0 && elop2 > 0)
                                             {
                                                 EloRating.Calculate(elop1, elop2, winner, out elop1New, out elop2New);
-                                                game.Players[0].ELO = elop1;
-                                                game.Players[1].ELO = elop2;
-                                                _userDatabase.SetELO(game.Players[0].Name, elop1);
-                                                _userDatabase.SetELO(game.Players[1].Name, elop2);
+                                                game.Players[0].ELO = elop1New;
+                                                game.Players[1].ELO = elop2New;
+                                                p1.ELO = elop1New;
+                                                p2.ELO = elop2New;
+                                                _userDatabase.SetELO(game.Players[0].Name, elop1New).GetAwaiter().GetResult(); // TODO async
+                                                _userDatabase.SetELO(game.Players[1].Name, elop2New).GetAwaiter().GetResult();
                                             }
                                         }
                                         catch (Exception ee)

@@ -496,7 +496,7 @@ namespace AccessBattle.Wpf.ViewModel
                         ClearHighlighting();
                         ClearFieldSelection();
                     }
-                    if (value == GamePhase.Deployment && (_phase == GamePhase.Player1Win || _phase == GamePhase.Player2Turn || _phase == GamePhase.Aborted))
+                    if (value == GamePhase.Deployment && (_phase == GamePhase.Player1Win || _phase == GamePhase.Player2Win || _phase == GamePhase.Aborted))
                     {
                         _parent.CurrentMenu = MenuType.Deployment;
                     }
