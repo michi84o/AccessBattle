@@ -19,6 +19,11 @@ namespace AccessBattle.Networking
         public string Name { get; set; }
 
         /// <summary>
+        /// ELO rating.
+        /// </summary>
+        public int ELO { get; set; }
+
+        /// <summary>
         /// Login status of the player.
         /// </summary>
         public bool IsLoggedIn { get; set; }

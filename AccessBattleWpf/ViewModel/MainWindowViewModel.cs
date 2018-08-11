@@ -109,6 +109,62 @@ namespace AccessBattle.Wpf.ViewModel
 
         #endregion
 
+        public string Player1Name
+        {
+            get
+            {
+                try
+                {
+                    return _game.Players[_game.IsPlayerHost?0:1]?.Name;
+                }
+                catch { }
+                return "";
+            }
+        }
+
+        public string Player2Name
+        {
+            get
+            {
+                try
+                {
+                    return _game.Players[_game.IsPlayerHost ? 1 : 0].Name;
+                }
+                catch { }
+                return "";
+            }
+        }
+
+        public string ELOP1
+        {
+            get
+            {
+                try
+                {
+                    int elo = _game.Players[_game.IsPlayerHost ? 0 : 1].ELO;
+                    if (elo <= 0) return "";
+                    return "ELO: " + elo;
+                }
+                catch { }
+                return "";
+            }
+        }
+
+        public string ELOP2
+        {
+            get
+            {
+                try
+                {
+                    int elo = _game.Players[_game.IsPlayerHost ? 1 : 0].ELO;
+                    if (elo <= 0) return "";
+                    return "ELO: " + elo;
+                }
+                catch { }
+                return "";
+            }
+        }
+
         public MainWindowViewModel()
         {
             UiGlobals.TrainAiInBackground = Environment.GetCommandLineArgs().Contains("-trainAI");
@@ -151,6 +207,14 @@ namespace AccessBattle.Wpf.ViewModel
             }
             else if (e.PropertyName == nameof(_game.Phase))
             {
+                // This updates the display of player names and ELO (TODO)
+                if (_game.Phase != GamePhase.Player1Turn &&
+                    _game.Phase != GamePhase.Player2Turn)
+                {
+                    OnPropertyChanged(nameof(Player1Name));
+                    OnPropertyChanged(nameof(Player2Name));
+                }
+
                 if (_game.IsPlayerHost && _game.Phase == GamePhase.Player2Turn)
                     CurrentMenu = MenuType.OpponentTurn;
                 else if (!_game.IsPlayerHost && _game.Phase == GamePhase.Player1Turn)

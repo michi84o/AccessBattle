@@ -48,9 +48,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\AccessBattleMySql\AccessBattleMySql.csproj">
       <Project>{9c634f70-a089-4646-b477-a1c55b8a3881}</Project>
       <Name>AccessBattleMySql</Name>

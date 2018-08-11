@@ -120,6 +120,39 @@
                 BorderThickness="{StaticResource BoardBorderThickness}" BorderBrush="White" CornerRadius="{DynamicResource BoardBorderCornerRadius}"
                 Grid.Row="2" Grid.RowSpan="12"
                 Grid.Column="1" Grid.ColumnSpan="10"/>
+
+            <Grid
+                Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="2" Margin="1">
+                <Viewbox Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Left" Height="18" Width="98"                         >
+                    <TextBlock Text="{Binding Player2Name}" MaxWidth="150" TextWrapping="Wrap" Foreground="#555555" FontFamily="../ExternalResources/#Silkscreen"  />
+                </Viewbox>
+            </Grid>
+            <Grid
+                Grid.Row="3" Grid.Column="8" Grid.ColumnSpan="2" Margin="1"  VerticalAlignment="Top">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Text="{Binding ELOP2}" MaxWidth="150" HorizontalAlignment="Right" Foreground="#555555" FontFamily="../ExternalResources/#Silkscreen"  />
+                <!--<TextBlock Grid.Row="1" Text="PTS: 100" MaxWidth="150" HorizontalAlignment="Right" VerticalAlignment="Top" Foreground="#555555" FontFamily="../ExternalResources/#Silkscreen"  />-->
+            </Grid>
+
+            <Grid
+                Grid.Row="12" Grid.Column="2" Grid.ColumnSpan="2" Margin="1">
+                <Viewbox Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Left" Height="18" Width="98"                         >
+                    <TextBlock Text="{Binding Player1Name}" MaxWidth="150" TextWrapping="Wrap" Foreground="#555555" FontFamily="../ExternalResources/#Silkscreen"  />
+                </Viewbox>
+            </Grid>
+            <Grid
+                Grid.Row="12" Grid.Column="8" Grid.ColumnSpan="2" Margin="1" VerticalAlignment="Bottom">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Text="{Binding ELOP1}" MaxWidth="150" HorizontalAlignment="Right" Foreground="#555555" FontFamily="../ExternalResources/#Silkscreen"  />
+                <!--<TextBlock Grid.Row="1" Text="PTS: 100" MaxWidth="150" HorizontalAlignment="Right" VerticalAlignment="Top" Foreground="#555555" FontFamily="../ExternalResources/#Silkscreen"  />-->
+            </Grid>
+
             <local:BoardFieldView
                 Grid.Row="3" Grid.Column="4" Grid.ColumnSpan="4"
                 Margin="0,3,0,14" x:Name="ServerFieldOrange"

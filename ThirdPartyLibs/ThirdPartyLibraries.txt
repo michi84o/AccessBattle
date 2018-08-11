@@ -4,3 +4,16 @@ List of third party libaries:
    - https://github.com/JamesNK/Newtonsoft.Json
    - License MIT, Copyright (c) 2007 James Newton-King
 
+- MySqlConnector 0.43
+   - https://github.com/mysql-net/MySqlConnector/
+   - License MIT, Copyright (c) 2016 Bradley Grainger
+
+- Libraries required for MySqlConnector:
+   - System.Buffers
+   - System.Memory
+   - System.Threading.Tasks.Extensions
+   - System.Runtime.CompilerServices.Unsafe
+   - License MIT, Copyright (c) .NET Foundation and Contributors
+
+
+   

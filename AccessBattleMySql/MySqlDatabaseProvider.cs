@@ -588,9 +588,55 @@ namespace AccessBattle.MySqlProvider
             GC.SuppressFinalize(this);
         }
 
-        public Task<int> GetELO(string user)
+        public async Task<int?> GetELO(string user)
         {
-            throw new NotImplementedException();
+            if (!IsConnected) return null;
+            if (!LoginHelper.CheckUserName(user))
+            {
+                return null;
+            }
+            try
+            {
+                // Try to get user first. If user exists, only update password.
+                using (var cmd = new MySqlCommand(
+                    "SELECT elo FROM users WHERE userName=@param1;", _connection))
+                {
+                    cmd.Parameters.Add(new MySqlParameter("@param1", user));
+                    var x = await cmd.ExecuteScalarAsync();
+                    if (x == null) return null;
+                    return Convert.ToInt32(x);
+                }
+            }
+            catch (Exception e)
+            {
+                Log.WriteLine(LogPriority.Error, "Error: " + e.Message);
+                return null;
+            }
+        }
+
+        public async Task<bool> SetELO(string user, int elo)
+        {
+            if (!IsConnected) return false;
+            if (!LoginHelper.CheckUserName(user))
+            {
+                return false;
+            }
+            try
+            {
+                // Try to get user first. If user exists, only update password.
+                using (var cmd = new MySqlCommand(
+                    "UPDATE users SET elo=@param1 WHERE userName=@param2;", _connection))
+                {
+                    cmd.Parameters.Add(new MySqlParameter("@param1", elo));
+                    cmd.Parameters.Add(new MySqlParameter("@param2", user));
+                    return await cmd.ExecuteNonQueryAsync() == 1;
+                }
+            }
+            catch (Exception e)
+            {
+                Log.WriteLine(LogPriority.Error, "Error: " + e.Message);
+                return false;
+            }
         }
 
         ~MySqlDatabaseProvider()

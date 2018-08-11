@@ -284,13 +284,13 @@ namespace AccessBattle.Networking
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        public async Task<int> GetELO(string user)
+        public async Task<int?> GetELO(string user)
         {
-            if (_databaseFile == null) return -1;
+            if (_databaseFile == null) return null;
             if (!File.Exists(_databaseFile))
             {
                 Log.WriteLine(LogPriority.Error, "Error in text file user database: File does not exist!");
-                return -1;
+                return null;
             }
             await semaphoreSlim.WaitAsync();
             try
@@ -300,17 +300,17 @@ namespace AccessBattle.Networking
                 {
                     allText = File.ReadAllText(_databaseFile);
                 });
-                if (allText == null) return -1;
+                if (allText == null) return null;
 
                 allText = allText.Replace("\r", "").Replace("\t", "");
                 var lines = allText.Split('\n');
                 var line = lines.FirstOrDefault(l => l.StartsWith(user + " ", StringComparison.Ordinal));
 
-                if (string.IsNullOrEmpty(line)) return -1;
+                if (string.IsNullOrEmpty(line)) return null;
                 var linespl = line.Split(' ');
 
                 int elo;
-                if (!int.TryParse(linespl[1], out elo)) elo = -1;
+                if (!int.TryParse(linespl[1], out elo))return null;
 
                 return elo;
             }
@@ -319,6 +319,69 @@ namespace AccessBattle.Networking
                 Log.WriteLine(LogPriority.Error, "Error in text file user database: " + e);
                 return -1;
             }
+            finally { semaphoreSlim.Release(); }
         }
+
+        public async Task<bool> SetELO(string user, int elo)
+        {
+            if (_databaseFile == null) return false;
+            user = user.Trim();
+            if (!LoginHelper.CheckUserName(user))
+            {
+                return false;
+            }
+            if (!File.Exists(_databaseFile)) return false;
+            await semaphoreSlim.WaitAsync();
+            try
+            {
+                string allText = null;
+                await Task.Run(() =>
+                {
+                    allText = File.ReadAllText(_databaseFile);
+                });
+                if (allText == null) return false;
+
+                // Check if there is a line that starts with username
+                allText = allText.Replace("\r", "").Replace("\t", "");
+                var lines = allText.Split('\n');
+
+                var sb = new StringBuilder();
+                foreach (var str in lines)
+                {
+                    if (str.StartsWith(user + " ", StringComparison.Ordinal))
+                    {
+                        // Found the line. Update ELO value
+                        // ELO is second column
+                        var spl = str.Split(' ');
+                        for (int i = 0; i < spl.Length; ++i)
+                        {
+                            if (i == 1)
+                                sb.Append(elo);
+                            else
+                                sb.Append(spl[i]);
+
+                            if (i < spl.Length - 1)
+                                sb.Append(" ");
+                        }
+                        sb.Append("\n");
+                    }
+                    else
+                        sb.Append(str + "\n");
+                }
+
+                allText.Replace("\n", "\r\n");
+
+                await Task.Run(() => { File.WriteAllText(_databaseFile, sb.ToString()); });
+
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            finally { semaphoreSlim.Release(); }
+        }
+
+
     }
 }

@@ -154,6 +154,8 @@ namespace AccessBattleServer
                             "\tlist                  List all games\r\n" +
                             "\tadd user n p elo      Adds user 'u' with password 'p'. elo is optional ELO rating (default:1000) \r\n" +
                             "\tmcpw user             Check if user must change password\r\n" +
+                            "\tset elo user elo      Set ELO rating for user\r\n" +
+                            "\tget elo user          Get ELO rating for user\r\n" +
                             "\tdebug                 Debug command. Requires additional parameters:\r\n" +
                             "\t  win key=1234   1    Let player 1 win. Uses game key.\r\n" +
                             "\t  win name=gameX 2    Let player 2 win. Uses game name.");
@@ -170,6 +172,40 @@ namespace AccessBattleServer
                             foreach (var game in games)
                                 Console.WriteLine(game.Key + " - " + game.Value.Name);
                         ok = true;
+                    }
+                    else if (line.StartsWith("set"))
+                    {
+                        if (line.StartsWith("set elo"))
+                        {
+                            if (db == null) continue;
+                            var sp = line.Split(' ');
+                            if (sp.Length == 4)
+                            {
+                                int elo;
+                                if (int.TryParse(sp[3], out elo))
+                                {
+                                    if (db.SetELO(sp[2], elo).GetAwaiter().GetResult())
+                                        ok = true;
+                                }
+                            }
+                        }
+                    }
+                    else if (line.StartsWith("get"))
+                    {
+                        if (line.StartsWith("get elo"))
+                        {
+                            if (db == null) continue;
+                            var sp = line.Split(' ');
+                            if (sp.Length == 3)
+                            {
+                                var elo = db.GetELO(sp[2]).GetAwaiter().GetResult();
+                                if (elo != null)
+                                {
+                                    Console.WriteLine("ELO: " + elo);
+                                    ok = true;
+                                }
+                            }
+                        }
                     }
                     else if (line.StartsWith("mcpw"))
                     {

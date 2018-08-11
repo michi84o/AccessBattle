@@ -45,6 +45,11 @@ namespace AccessBattle
         /// </summary>
         public int Points { get; set; }
 
+        /// <summary>
+        /// ELO rating.
+        /// </summary>
+        public int ELO { get; set; }
+
         bool _didVirusCheck;
         /// <summary>Player already did his virus check.</summary>
         public bool DidVirusCheck
@@ -100,10 +105,12 @@ namespace AccessBattle
         {
             return new Sync
             {
+                ELO = ELO,
                 Points = Points,
                 DidVirusCheck = DidVirusCheck,
                 Did404NotFound = Did404NotFound,
-                PlayerNumber = PlayerNumber
+                PlayerNumber = PlayerNumber,
+                Name = Name
             };
         }
 
@@ -116,6 +123,11 @@ namespace AccessBattle
             Points = sync.Points;
             DidVirusCheck = sync.DidVirusCheck;
             Did404NotFound = sync.Did404NotFound;
+
+            Name = sync.Name;
+            ELO = sync.ELO;
+            Points = sync.Points;
+
             // Dangerous!
             //PlayerNumber = sync.PlayerNumber;
         }
@@ -124,18 +136,24 @@ namespace AccessBattle
         public class Sync : PropChangeNotifier
         {
             int _points;
+            int _elo;
             bool _didVirusCheck;
             bool _did404NotFound;
             int _playerNumber;
+            string _name;
 
             /// <summary>Points this player has.</summary>
             public int Points { get { return _points; } set { SetProp(ref _points, value); } }
+            /// <summary>ELO rating this player has.</summary>
+            public int ELO { get { return _elo; } set { SetProp(ref _elo, value); } }
             /// <summary>True if player already played the virus check.</summary>
             public bool DidVirusCheck { get { return _didVirusCheck; } set { SetProp(ref _didVirusCheck, value); } }
             /// <summary>True if player already played the 404 card.</summary>
             public bool Did404NotFound { get { return _did404NotFound; } set { SetProp(ref _did404NotFound, value); } }
             /// <summary>Player number.</summary>
             public int PlayerNumber { get { return _playerNumber; } set { SetProp(ref _playerNumber, value); } }
+            /// <summary>Player name.</summary>
+            public string Name { get { return _name; } set { SetProp(ref _name, value); } }
         }
     }
 }

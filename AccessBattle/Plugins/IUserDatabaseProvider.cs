@@ -57,7 +57,15 @@ namespace AccessBattle.Plugins
         /// Gets the ELO rating.
         /// </summary>
         /// <returns></returns>
-        Task<int> GetELO(string user);
+        Task<int?> GetELO(string user);
+
+        /// <summary>
+        /// Sets the ELO rating.
+        /// </summary>
+        /// <param name="user">User.</param>
+        /// <param name="elo">ELO rating.</param>
+        /// <returns></returns>
+        Task<bool> SetELO(string user, int elo);
 
         /// <summary>
         /// A humand readable text that lets the user know what to use as connection string.

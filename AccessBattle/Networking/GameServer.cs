@@ -537,6 +537,7 @@ namespace AccessBattle.Networking
                                 var game = new NetworkGame(uid);
                                 game.Players[0].Player = player;
                                 game.Players[0].Name = player.Name; // Ignore name from packet or people start faking names
+                                game.Players[0].ELO = player.ELO;
                                 game.Name = ginfo.Name.ToUpper();
                                 Games.Add(uid, game);
                                 Log.WriteLine(LogPriority.Information, "GameServer: Player " + player.UID + " created game " + game.UID + " ("+ ginfo.Name +")");
@@ -734,6 +735,32 @@ namespace AccessBattle.Networking
 
                                 if (result)
                                 {
+                                    // Apply ELO
+                                    if ((oldPhase == GamePhase.Player1Turn || oldPhase == GamePhase.Player2Turn) &&
+                                         (game.Phase == GamePhase.Player1Win || game.Phase == GamePhase.Player2Turn)
+                                         && _userDatabase != null)
+                                    {
+                                        try
+                                        {
+                                            var elop1 = game.Players[0].ELO;
+                                            var elop2 = game.Players[1].ELO;
+                                            int winner = game.Phase == GamePhase.Player1Win ? 1 : 2;
+                                            int elop1New, elop2New;
+                                            if (elop1 > 0 && elop2 > 0)
+                                            {
+                                                EloRating.Calculate(elop1, elop2, winner, out elop1New, out elop2New);
+                                                game.Players[0].ELO = elop1;
+                                                game.Players[1].ELO = elop2;
+                                                _userDatabase.SetELO(game.Players[0].Name, elop1);
+                                                _userDatabase.SetELO(game.Players[1].Name, elop2);
+                                            }
+                                        }
+                                        catch (Exception ee)
+                                        {
+                                            Log.WriteLine(LogPriority.Error, "Error while updating ELO:" + ee.Message );
+                                        }
+                                    }
+
                                     var syncP1 = GameSync.FromGame(game, game.UID, 1);
                                     var syncP2 = GameSync.FromGame(game, game.UID, 2);
                                     Send(JsonConvert.SerializeObject(syncP1, _serializerSettings), NetworkPacketType.GameSync, p1.Connection, p1.ClientCrypto);
