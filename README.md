@@ -12,7 +12,8 @@ AccessBattle is a private fan project and not affiliated with
 
 UPDATE July 2018: I'm about to lose interest in developing this game further.
 I don't even know if anyone is playing this.
-I will work on the game until version 1.0 is released. I think this will on August the 31st 2018.
+I will work on the game until version 1.0 is released. ~~I think this will on August the 31st 2018~~.
+UPDATE August 2018: Had no time this month to finish the program. Guess we're going into overtime ;-)
 
 - Current status: Work in progress
   - Multiplayer is in alpha. There are some bugs and features are missing.
@@ -24,9 +25,9 @@ I will work on the game until version 1.0 is released. I think this will on Augu
   
 - Roadmap
   - ~~User Interface + Multiplayer finished: January 2018~~ (Postponed for now, the basics are working)
-  - Singleplayer: Add more AI opponents. Next one is probably a neural network (WIP).
+  - ~~Singleplayer: Add more AI opponents. Next one is probably a neural network.~~
     - Currently having problems training the network. Need to redesign.
-  - Documentation: August 2018 (if I have some free time)
+  - Documentation: August 2018 (if I have some free time) (WIP)
   - Sorry if this is taking so long. I have a full time job and not much free time.
   
 - Known Issues:
