@@ -82,6 +82,13 @@ namespace AccessBattle.Networking
             set { _acceptAnyClient = value; }
         }
 
+        bool _allowRegistration;
+        public bool AllowRegistration
+        {
+            get => _allowRegistration && _userDatabase != null;
+            set { _allowRegistration = value; }
+        }
+
         Thread _serverThread;
         ushort _port;
         Dictionary<uint, NetworkGame> _games = new Dictionary<uint, NetworkGame>();
@@ -259,7 +266,7 @@ namespace AccessBattle.Networking
                         {
                             // Send server info
                             Send(JsonConvert.SerializeObject(
-                                new ServerInfo(!AcceptAnyClient), _serializerSettings),
+                                new ServerInfo(!AcceptAnyClient, AllowRegistration), _serializerSettings),
                                 NetworkPacketType.ServerInfo, socket, null);
 
                             var serverCrypto = new CryptoHelper();

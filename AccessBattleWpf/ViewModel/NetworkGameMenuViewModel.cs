@@ -429,6 +429,17 @@ namespace AccessBattle.Wpf.ViewModel
             }
         }
 
+        public ICommand NewAccountCommand
+        {
+            get
+            {
+                return new RelayCommand(async o =>
+                {
+                    MessageBox.Show("Not implemented."); // TODO
+                },o => !string.IsNullOrEmpty(LoginName) && IsLoggingIn && ParentViewModel.Game.Client.IsConnected == true && !_sendingLogin && !HasPropError(nameof(LoginName)) && !HasPropError(nameof(LoginPassword)));
+            }
+        }
+
         public ICommand CancelLoginCommand
         {
             get
