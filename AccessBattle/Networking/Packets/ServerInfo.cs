@@ -13,12 +13,18 @@
         public bool RequiresLogin { get; private set; }
 
         /// <summary>
+        /// True if clients are allowed to create an account.
+        /// </summary>
+        public bool AllowsRegistration { get; private set; }
+
+        /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="requiresLogin"></param>
-        public ServerInfo(bool requiresLogin)
+        public ServerInfo(bool requiresLogin, bool allowsRegistration)
         {
             RequiresLogin = requiresLogin;
+            AllowsRegistration = allowsRegistration;
         }
     }
 }

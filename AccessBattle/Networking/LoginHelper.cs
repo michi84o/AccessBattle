@@ -17,6 +17,8 @@ namespace AccessBattle.Networking
         InvalidPassword,
         /// <summary>Database error.</summary>
         DatabaseError,
+        /// <summary>The server administrator has to authorize this login first.</summary>
+        AuthorizationRequired,
     }
 
     /// <summary>Helper for login names.</summary>

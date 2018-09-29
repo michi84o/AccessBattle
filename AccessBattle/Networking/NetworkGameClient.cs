@@ -745,6 +745,9 @@ namespace AccessBattle.Networking
                                 case LoginCheckResult.DatabaseError:
                                     error += "Database error";
                                     break;
+                                case LoginCheckResult.AuthorizationRequired:
+                                    error += "Authorization required";
+                                    break;
                                 default:
                                     error += "Unknown error";
                                     break;
