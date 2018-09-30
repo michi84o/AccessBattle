@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 
-// TODO: Include information about last player action so it can be animated
-
 namespace AccessBattle.Networking.Packets
 {
     /// <summary>
@@ -22,11 +20,21 @@ namespace AccessBattle.Networking.Packets
         public List<BoardField.Sync> FieldsWithCards { get; set; }
 
         /// <summary>
+        /// Last command that was played.
+        /// Can be used by clients to show animations.
+        /// Error 404 flip bit must not be included!
+        /// This should also contain a prefix with the player who played, followed by ':'.
+        /// Example: Player 1 played move: "1:mv 1,1,2,2"
+        /// </summary>
+        public string LastExecutedCommand { get; set; }
+
+        /// <summary>
         /// Get a sync object for a game.
         /// </summary>
         /// <param name="game">Game to get state from.</param>
         /// <param name="id">Unique id of the game.</param>
         /// <param name="player">For which player this game sync should be. Hides cards. 1 = Player1, 2 = Player 2.</param>
+        /// <param name="lastExecutedCommand">Last command that was executed. Optional, should not leak secret information!</param>
         /// <returns></returns>
         public static GameSync FromGame(Game game, uint id, int player)
         {

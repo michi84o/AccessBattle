@@ -205,7 +205,7 @@ namespace AccessBattle
         }
 
 
-        void ReplaceLettersWithNumbers(ref string[] array)
+        public static void ReplaceLettersWithNumbers(ref string[] array)
         {
             for (int i = 0; i < array.Length; ++i)
             {
@@ -221,7 +221,7 @@ namespace AccessBattle
             }
         }
 
-        string ReplaceAltSyntax(string str)
+        public static string ReplaceAltSyntax(string str)
         {
             // TODO: Performance and memory usage ???
             return str
@@ -240,7 +240,7 @@ namespace AccessBattle
         /// <summary>
         /// Command      Syntax             Example
         /// -------------------------------------------
-        /// Deply        dp VVVVLLLL
+        /// Deploy       dp VVVVLLLL
         /// Move         mv x1,y1,x2,y2     mv 1,1,2,1
         /// Boost        bs x1,y1,e         bs 1,1,1
         /// Firewall     fw x1,y1,e         fw 1,1,1
@@ -906,6 +906,8 @@ namespace AccessBattle
             {
                 Phase = GamePhase.Aborted;
             }
+
+            // TODO Set LastExecutedCommand in ViewModel of client to enable animation
 
             // Can happen after Deployment
             if (Phase == GamePhase.Player2Turn)

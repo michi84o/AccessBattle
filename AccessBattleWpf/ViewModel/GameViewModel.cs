@@ -321,7 +321,7 @@ namespace AccessBattle.Wpf.ViewModel
                 ClearHighlighting();
                 ClearFieldSelection();
                 OnPropertyChanged(nameof(CanConfirmDeploy));
-                CardMoved?.Invoke(this, EventArgs.Empty);
+                CardMoved?.Invoke(this, EventArgs.Empty); // TODO: This does nothing
                 CommandManager.InvalidateRequerySuggested();
                 return;
             }
@@ -479,6 +479,13 @@ namespace AccessBattle.Wpf.ViewModel
 
         #region Game
 
+        string _lastExecutedCommand = "";
+        public string LastExecutedCommand
+        {
+            get { return _lastExecutedCommand; }
+            set { SetProp(ref _lastExecutedCommand, value); }
+        }
+
         GamePhase _phase;
         /// <summary>
         /// Current game phase.
@@ -596,7 +603,7 @@ namespace AccessBattle.Wpf.ViewModel
 
         public void Synchronize(GameSync sync)
         {
-            lock (Board) // we don't want to call this while the board is being rotated
+            lock (Board) // We don't want to call this while the board is being rotated
             {
                 // Clear board
                 for (ushort y = 0; y < 11; ++y)
@@ -613,7 +620,11 @@ namespace AccessBattle.Wpf.ViewModel
                 }
             }
             // Cause access to UI controls. Must be within UI thread.
-            Application.Current.Dispatcher.Invoke(() => { Phase = sync.Phase; });
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                LastExecutedCommand = sync.LastExecutedCommand;
+                Phase = sync.Phase;
+            });
             CommandManager.InvalidateRequerySuggested(); // Confirm button on deployment field does not get enabled
         }
 

@@ -1,7 +1,10 @@
-﻿using System;
+﻿using AccessBattle.Wpf.ViewModel;
+using System;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Documents;
+using System.Windows.Media;
 
 namespace AccessBattle.Wpf.View
 {
@@ -14,26 +17,48 @@ namespace AccessBattle.Wpf.View
         {
             InitializeComponent();
             ViewModel.ShowError = ShowError;
-            //(new TextBox).Valoda
-
-            //Loaded += (s, a) => { Task.Delay(3000).ContinueWith(o => ShowError()); };
-            //ViewModel.CurrentMenu = MenuType.None;
-            //Loaded += (s, a) => {
+            ////Loaded += (s, a) => { Task.Delay(3000).ContinueWith(o => ShowError()); };
+            ////ViewModel.CurrentMenu = MenuType.None;
+            //Loaded += (s, a) =>
+            //{
             //    Task.Delay(3000).ContinueWith(o =>
             //    {
-            //        for (int i = 0; i < 80; ++i)
-            //        {
-            //            Application.Current.Dispatcher.Invoke(() =>
-            //            {
-            //                ViewModel.BoardFieldList[i].IsVisibleToOpponent = true;
-            //                if (i > 0)
-            //                    ViewModel.BoardFieldList[i - 1].IsVisibleToOpponent = false;
-            //            });
-            //            Task.Delay(250).Wait();
-            //        }
+
             //    });
             //};
+
+            ViewModel.Game.PropertyChanged += Game_PropertyChanged;
+
         }
+
+        private void Game_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName != nameof(ViewModel.Game.LastExecutedCommand)) return;
+
+            var cmd = ViewModel.Game.LastExecutedCommand;
+            if (string.IsNullOrEmpty(cmd)) return;
+            if (cmd.Length < 5) return;
+            var playernum = ViewModel.IsPlayerHost ? '1' : '2';
+            if (cmd[0] == playernum) return;
+            // Trigger animation here
+            var move = cmd.Substring(2);
+
+            // TODO - WIP
+            //Application.Current.Dispatcher.BeginInvoke((Action)(async () =>
+            //{
+            //    var tb = new TextBlock { Text = move, FontSize = 24, Visibility = Visibility.Visible };
+            //    Grid.SetColumn(tb, 0);
+            //    Grid.SetRow(tb, 0);
+            //    Grid.SetColumn(tb, 3);
+            //    Grid.SetRow(tb, 3);
+            //    Grid.SetColumnSpan(tb, 12);
+            //    Grid.SetRowSpan(tb, 8);
+            //    MainGrid.Children.Add(tb);
+            //    await Task.Delay(5000);
+            //    MainGrid.Children.Remove(tb);
+            //}));
+        }
+
 
         #region Error Adorner
 
