@@ -120,10 +120,10 @@
                             Grid.Row="4" Grid.Column="0" Content="Cancel" Margin="3" Grid.RowSpan="2" Command="{Binding CancelLoginCommand}" IsCancel="True"/>
                         <Button
                             x:Name="LoginButton"
-                            Grid.Row="4" Grid.Column="1" Content="Login" Margin="3" Command="{Binding LoginCommand}"/>
+                            Grid.Row="4" Grid.Column="1" Content="Login" Margin="3" Command="{Binding LoginCommand}" IsDefault="True"/>
                         <Button
                             x:Name="CreateAccountButton"
-                            Grid.Row="5" Grid.Column="1" Content="New Account" Margin="3,0,3,3" Command="{Binding NewAccountCommand}" IsDefault="True" />
+                            Grid.Row="5" Grid.Column="1" Content="New Account" Margin="3,0,3,3" Command="{Binding NewAccountCommand}"  />
                     </Grid>
                 </Border>
                 <Button Grid.Row="2" Content="Join Selected game" Margin="3" Command="{Binding JoinNetworkGameCommand}"/>

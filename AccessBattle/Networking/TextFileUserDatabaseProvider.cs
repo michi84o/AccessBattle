@@ -85,7 +85,7 @@ namespace AccessBattle.Networking
         async Task<List<UserDatabaseEntry>> ReadDatabaseAsync()
         {
             if (_databaseFile == null) return null;
-            if (!File.Exists(_databaseFile)) return null;
+            if (!File.Exists(_databaseFile)) return new List<UserDatabaseEntry>(); // OK when starting a fresh db
             try
             {
                 List<UserDatabaseEntry> list = new List<UserDatabaseEntry>();
@@ -209,13 +209,15 @@ namespace AccessBattle.Networking
 
             try
             {
-                UserDatabaseEntry entry = null;
-                entry.UserName = spl[0];
-                entry.ELO = int.Parse(spl[1]);
-                entry.PasswordHash = spl[2];
-                entry.PasswordSalt = spl[3];
-                entry.MustChangePassword = spl[4] == "1";
-                entry.IsAccountEnabled = spl[5] == "1";
+                UserDatabaseEntry entry = new UserDatabaseEntry
+                {
+                    UserName = spl[0],
+                    ELO = int.Parse(spl[1]),
+                    PasswordHash = spl[2],
+                    PasswordSalt = spl[3],
+                    MustChangePassword = spl[4] == "1",
+                    IsAccountEnabled = spl[5] == "1"
+                };
                 return entry;
             }
             catch { return null; }
