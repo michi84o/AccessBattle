@@ -38,7 +38,7 @@ namespace AccessBattle.Wpf.ViewModel
                 var lastVm = CurrentMenuViewModel;
                 var lastMenu = _currentMenu;
 
-                System.Diagnostics.Debug.WriteLine("Current Menu: " + lastMenu + " New Menu: " + value + "\r\nStackTrace: " + Environment.StackTrace);
+                //System.Diagnostics.Debug.WriteLine("Current Menu: " + lastMenu + " New Menu: " + value + "\r\nStackTrace: " + Environment.StackTrace);
 
                 if (SetProp(ref _currentMenu, value))
                 {
