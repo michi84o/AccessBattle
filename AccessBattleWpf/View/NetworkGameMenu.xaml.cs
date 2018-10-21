@@ -13,6 +13,28 @@ namespace AccessBattle.Wpf.View
         public NetworkGameMenu()
         {
             InitializeComponent();
+
+            var ctx = DataContext as NetworkGameMenuViewModel;
+            if (ctx == null) return;
+            ctx.PropertyChanged += Ctx_PropertyChanged;
+        }
+
+        private void Ctx_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(NetworkGameMenuViewModel.AllowsRegistration))
+            {
+                var ctx = sender as NetworkGameMenuViewModel;
+                if (ctx?.AllowsRegistration != true)
+                {
+                    CreateAccountButton.Visibility = Visibility.Collapsed;
+                    Grid.SetRowSpan(LoginButton, 2);
+                }
+                else
+                {
+                    CreateAccountButton.Visibility = Visibility.Visible;
+                    Grid.SetRowSpan(LoginButton, 1);
+                }
+            }
         }
 
         void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)

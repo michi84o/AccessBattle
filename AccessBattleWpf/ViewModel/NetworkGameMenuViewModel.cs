@@ -11,6 +11,7 @@ using System.Runtime.CompilerServices;
 using System.Security;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -149,6 +150,7 @@ namespace AccessBattle.Wpf.ViewModel
         void ServerInfoReceivedHandler(object sender, ServerInfoEventArgs args)
         {
             RequiresPassword = args.Info.RequiresLogin;
+            AllowsRegistration = args.Info.AllowsRegistration;
         }
 
         private void GamesView_Filter(object sender, FilterEventArgs e)
@@ -226,6 +228,17 @@ namespace AccessBattle.Wpf.ViewModel
             {
                 if (SetProp(ref _requiresPassword, value))
                     Validate();
+            }
+        }
+
+        bool _allowsRegistration;
+        public bool AllowsRegistration
+        {
+            get { return _allowsRegistration; }
+            set
+            {
+                if (SetProp(ref _allowsRegistration, value))
+                    Application.Current.Dispatcher.BeginInvoke((Action)(()=>CommandManager.InvalidateRequerySuggested()));
             }
         }
 
@@ -414,17 +427,7 @@ namespace AccessBattle.Wpf.ViewModel
             {
                 return new RelayCommand(async o =>
                 {
-                    _sendingLogin = true;
-                    CommandManager.InvalidateRequerySuggested();
-                    var result = await ParentViewModel.Game.Client.Login(LoginName, LoginPassword.ConvertToUnsecureString());
-                    _sendingLogin = false;
-                    if (result)
-                    {
-                        IsLoggingIn = false;
-                        _gameListUpdateTimer.Change(0, System.Threading.Timeout.Infinite);
-                    }
-                    CommandManager.InvalidateRequerySuggested();
-                    // TODO: We must check if the server is still connected. There is currently no feedback. This must be done directly on the socket.
+                    await CallLogin(false);
                 }, o => !string.IsNullOrEmpty(LoginName) && IsLoggingIn && ParentViewModel.Game.Client.IsConnected == true && !_sendingLogin && !HasPropError(nameof(LoginName)) && !HasPropError(nameof(LoginPassword)));
             }
         }
@@ -435,10 +438,39 @@ namespace AccessBattle.Wpf.ViewModel
             {
                 return new RelayCommand(async o =>
                 {
-                    MessageBox.Show("Not implemented."); // TODO
-                },o => !string.IsNullOrEmpty(LoginName) && IsLoggingIn && ParentViewModel.Game.Client.IsConnected == true && !_sendingLogin && !HasPropError(nameof(LoginName)) && !HasPropError(nameof(LoginPassword)));
+                    await CallLogin(true);
+                }, o => _allowsRegistration && _canCreateAccount && !string.IsNullOrEmpty(LoginName) && IsLoggingIn && ParentViewModel.Game.Client.IsConnected == true && !_sendingLogin && !HasPropError(nameof(LoginName)) && !HasPropError(nameof(LoginPassword)));
             }
         }
+
+        async Task CallLogin(bool createAccount)
+        {
+            _sendingLogin = true;
+            CommandManager.InvalidateRequerySuggested();
+            var result = await ParentViewModel.Game.Client.Login(LoginName, LoginPassword.ConvertToUnsecureString(), createAccount);
+            _sendingLogin = false;
+            if (result == LoginCheckResult.LoginOK)
+            {
+                IsLoggingIn = false;
+                _gameListUpdateTimer.Change(0, System.Threading.Timeout.Infinite);
+            }
+            else if (result == LoginCheckResult.AccountDisabled)
+            {
+                if (createAccount)
+                    MessageBox.Show("Account was requested.\r\nPlease wait until the administrator unlocks the account.");
+                else
+                    MessageBox.Show("Account is disabled.\r\nPlease wait until the administrator unlocks the account.");
+            }
+            else if (result == LoginCheckResult.CreateAccountDenied)
+            {
+                MessageBox.Show("Create account denied!");
+                _canCreateAccount = false;
+            }
+            CommandManager.InvalidateRequerySuggested();
+            // TODO: We must check if the server is still connected. There is currently no feedback. This must be done directly on the socket.
+        }
+
+        bool _canCreateAccount = true;
 
         public ICommand CancelLoginCommand
         {
@@ -446,6 +478,7 @@ namespace AccessBattle.Wpf.ViewModel
             {
                 return new RelayCommand(o =>
                 {
+                    _canCreateAccount = true;
                     IsLoggingIn = false;
                     ParentViewModel.Game.Client.Disconnect();
                     OnPropertyChanged(nameof(CanConnect));

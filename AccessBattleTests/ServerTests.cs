@@ -38,8 +38,8 @@ namespace AccessBattleTests
             Assert.IsTrue(client1.Connect("127.0.0.1", 3221).GetAwaiter().GetResult());
             Assert.IsTrue(client2.Connect("127.0.0.1", 3221).GetAwaiter().GetResult());
             // Login
-            Assert.IsTrue(client1.Login("P1", "").GetAwaiter().GetResult());
-            Assert.IsTrue(client2.Login("P2", "").GetAwaiter().GetResult());
+            Assert.AreEqual(LoginCheckResult.LoginOK, client1.Login("P1", "",false).GetAwaiter().GetResult());
+            Assert.AreEqual(LoginCheckResult.LoginOK, client2.Login("P2", "",false).GetAwaiter().GetResult());
             // Create Gamne
             GameInfo info;
             Assert.IsNotNull((info = client1.CreateGame("P1_Game").GetAwaiter().GetResult()));

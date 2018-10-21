@@ -18,6 +18,7 @@ namespace AccessBattleServer
         static void Main(string[] args)
         {
             bool acceptAny = false;
+            bool allowRegistration = false;
             ushort port = 3221;
 
             #region Read command line params
@@ -99,6 +100,24 @@ namespace AccessBattleServer
                     {
                         db = plugins[ichoice - 3].CreateInstance();
                     }
+                    if (!acceptAny)
+                    {
+                        Console.WriteLine("\r\nAre users allowed to create accounts?");
+                        Console.WriteLine("Please select an option:\r\n");
+                        Console.WriteLine("\t1: No");
+                        Console.WriteLine("\t2: Yes");
+                        if (int.TryParse(Console.ReadLine(), out int jchoice) && jchoice > 0 && jchoice < 3)
+                        {
+                            if (jchoice == 2)
+                            {
+                                allowRegistration = true;
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("Invalid choice! Selecting option 'No'.");
+                        }
+                    }
                 }
                 else
                 {
@@ -132,13 +151,25 @@ namespace AccessBattleServer
 
                 _server = new GameServer(port, db)
                 {
-                    AcceptAnyClient = acceptAny
+                    AcceptAnyClient = acceptAny,
+                    AllowRegistration = allowRegistration
                 };
-                _server.Start();
+                try
+                {
+                    _server.Start();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Error: " + e.Message);
+                    Console.WriteLine("Server will exit.");
+                    return;
+                }
 
                 Console.WriteLine("Game Server started");
                 if (acceptAny)
                     Console.WriteLine("! Any client is accepted");
+                if (allowRegistration)
+                    Console.WriteLine("! Any client can create an account");
 
                 Console.WriteLine("Type 'help' to show available commands");
 
@@ -268,7 +299,7 @@ namespace AccessBattleServer
 
                             var pw = new System.Security.SecureString();
                             foreach (var c in spl[3]) pw.AppendChar(c);
-                            if (db.AddUserAsync(spl[2], pw, elo).GetAwaiter().GetResult())
+                            if (db.AddUserAsync(spl[2], pw, elo, true).GetAwaiter().GetResult())
                                 Console.WriteLine("user added");
                             else Console.WriteLine("add failed");
                             ok = true;

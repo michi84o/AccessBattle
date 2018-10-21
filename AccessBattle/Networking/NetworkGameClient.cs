@@ -71,15 +71,16 @@ namespace AccessBattle.Networking
     /// </summary>
     public class LoggedInEventArgs : EventArgs
     {
-        /// <summary>Login success flag.</summary>
-        public bool LoggedIn { get; private set; }
+        /// <summary>Result of login</summary>
+        public LoginCheckResult Result { get; private set; }
+
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="loggedIn">Login status.</param>
-        public LoggedInEventArgs(bool loggedIn)
+        public LoggedInEventArgs(LoginCheckResult result)
         {
-            LoggedIn = loggedIn;
+            Result = result;
         }
     }
 
@@ -351,17 +352,18 @@ namespace AccessBattle.Networking
         /// </summary>
         /// <param name="name">Login name.</param>
         /// <param name="password">Login password.</param>
+        /// <param name="createAccount">Request creating a new account.</param>
         /// <returns>True if login was successful.</returns>
-        public async Task<bool> Login(string name, string password)
+        public async Task<LoginCheckResult> Login(string name, string password, bool createAccount)
         {
             if (string.IsNullOrEmpty(name))
             {
                 Log.WriteLine(LogPriority.Warning, "Game Client: Cannot login with empty user name!");
-                return false;
+                return LoginCheckResult.InvalidUser;
             }
             IsLoggedIn = null;
             LoginName = "";
-            var login = new Login { Name = name, Password = password };
+            var login = new Login { Name = name, Password = password, CreateAccount=createAccount };
 
             // Catch the event for receiving the list.
             LoggedInEventArgs result = null;
@@ -389,12 +391,19 @@ namespace AccessBattle.Networking
                 finally { LoggedIn -= handler; }
             }
 
-            if (result?.LoggedIn == true)
+            if (result != null)
             {
-                LoginName = name;
-                return true;
+                switch (result.Result)
+                {
+                    case LoginCheckResult.LoginOK:
+                        LoginName = name;
+                        break;
+                    default:
+                        break;
+                }
+                return result.Result;
             }
-            return false;
+            return LoginCheckResult.Unknown;
         }
 
         /// <summary>
@@ -748,13 +757,16 @@ namespace AccessBattle.Networking
                                 case LoginCheckResult.AuthorizationRequired:
                                     error += "Authorization required";
                                     break;
+                                case LoginCheckResult.CreateAccountDenied:
+                                    error += "Create account denied";
+                                    break;
                                 default:
                                     error += "Unknown error";
                                     break;
                             }
                             Log.WriteLine(LogPriority.Information, error);
                         }
-                        LoggedIn?.Invoke(this, new LoggedInEventArgs(IsLoggedIn == true));
+                        LoggedIn?.Invoke(this, new LoggedInEventArgs(loginResult));
                     }
                     catch (Exception e)
                     {

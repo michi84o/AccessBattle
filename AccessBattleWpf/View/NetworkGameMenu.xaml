@@ -117,10 +117,13 @@
                             />
                         <TextBlock Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="1" Text="{Binding ErrorText}" Foreground="Red" Visibility="{Binding ErrorText, Converter={StaticResource strVisConv}}" Margin="3,0,3,0" />
                         <Button
-                            Grid.Row="4" Grid.Column="0" Content="Cancel" Margin="3" Grid.RowSpan="2" Command="{Binding CancelLoginCommand}"/>
+                            Grid.Row="4" Grid.Column="0" Content="Cancel" Margin="3" Grid.RowSpan="2" Command="{Binding CancelLoginCommand}" IsCancel="True"/>
                         <Button
+                            x:Name="LoginButton"
                             Grid.Row="4" Grid.Column="1" Content="Login" Margin="3" Command="{Binding LoginCommand}"/>
-                        <Button Grid.Row="5" Grid.Column="1"   Content="New Account" Margin="3,0,3,3" Command="{Binding NewAccountCommand}" />
+                        <Button
+                            x:Name="CreateAccountButton"
+                            Grid.Row="5" Grid.Column="1" Content="New Account" Margin="3,0,3,3" Command="{Binding NewAccountCommand}" IsDefault="True" />
                     </Grid>
                 </Border>
                 <Button Grid.Row="2" Content="Join Selected game" Margin="3" Command="{Binding JoinNetworkGameCommand}"/>

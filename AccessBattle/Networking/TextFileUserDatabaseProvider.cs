@@ -1,5 +1,6 @@
 ﻿using AccessBattle.Plugins;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security;
@@ -11,7 +12,7 @@ namespace AccessBattle.Networking
 {
     /// <summary>
     /// Simple text file based user database.
-    /// Format: "Username" "ELO" "Password Hash" "Salt" "MustChangePassword(0/1)"
+    /// Format: "Username" "ELO" "Password Hash" "Salt" "MustChangePassword(0/1)" "IsAccountEnabled"
     /// Usernames can not have space in it.
     /// </summary>
     /// <remarks>
@@ -32,8 +33,9 @@ namespace AccessBattle.Networking
         /// <param name="user"></param>
         /// <param name="password"></param>
         /// <param name="elo">ELO rating. Default: 1000</param>
+        /// <param name="isAccountEnabled">Set true to activate the new account. Else an admin has to activate the account manually.</param>
         /// <returns></returns>
-        public async Task<bool> AddUserAsync(string user, SecureString password, int elo = 1000)
+        public async Task<bool> AddUserAsync(string user, SecureString password, int elo, bool isAccountEnabled)
         {
             if (_databaseFile == null) return false;
             user = user.Trim();
@@ -44,39 +46,13 @@ namespace AccessBattle.Networking
             await semaphoreSlim.WaitAsync();
             try
             {
-                string allText = null;
-                if (File.Exists(_databaseFile))
-                {
-                    await Task.Run(() =>
-                    {
-                        allText = File.ReadAllText(_databaseFile);
-                    });
-                    if (allText == null) return false;
-                }
-                else allText = "";
-
-                allText = allText.Replace("\r", "").Replace("\t", "");
-                var lines = allText.Split('\n').ToList();
+                var db = await ReadDatabaseAsync();
 
                 // Check if there is a line that starts with username
-                if (lines.Count > 0)
+                if (db.Exists(o => o.UserName == user))
                 {
-                    int i = 0;
-                    string check = user + " ";
-                    while (true)
-                    {
-                        if (lines.Count >= i) break;
-                        if (lines[i].StartsWith(check))
-                            lines.RemoveAt(i);
-                        else ++i;
-                    }
-                }
-
-                StringBuilder sb = new StringBuilder();
-                foreach (var line in lines)
-                {
-                    if (line == "") continue;
-                    sb.Append(line + "\r\n");
+                    Log.WriteLine(LogPriority.Error, "AddUser: A user with that name already exists.");
+                    return false;
                 }
 
                 string hash, salt;
@@ -85,18 +61,175 @@ namespace AccessBattle.Networking
                 if (elo < 0) elo = 0;
                 if (elo > 10000) elo = 10000;
 
-                var newLine = user + " "+ elo +" " + hash + " " + salt + " 1";
-                sb.Append(newLine + "\r\n");
+                var usr = new UserDatabaseEntry
+                {
+                    UserName = user,
+                    PasswordHash = hash,
+                    PasswordSalt = salt,
+                    MustChangePassword = false,
+                    ELO = elo,
+                    IsAccountEnabled = true
+                };
 
-                await Task.Run(() => { File.WriteAllText(_databaseFile, sb.ToString()); });
+                db.Add(usr);
 
-                return true;
+                return await WriteDatabaseAsync(db);
             }
             catch (Exception)
             {
                 return false;
             }
             finally { semaphoreSlim.Release(); }
+        }
+
+        async Task<List<UserDatabaseEntry>> ReadDatabaseAsync()
+        {
+            if (_databaseFile == null) return null;
+            if (!File.Exists(_databaseFile)) return null;
+            try
+            {
+                List<UserDatabaseEntry> list = new List<UserDatabaseEntry>();
+                using (var reader = File.OpenText(_databaseFile))
+                {
+                    UserDatabaseEntry user;
+                    while ((user = UserFromLine(await reader.ReadLineAsync())) != null)
+                    {
+                        if (user != null)
+                            list.Add(user);
+                    }
+                }
+                return list;
+            }
+            catch { return null; }
+        }
+
+        async Task<bool> WriteDatabaseAsync(List<UserDatabaseEntry> db)
+        {
+            try
+            {
+                using (var writer = File.CreateText(_databaseFile))
+                {
+                    foreach (var usr in db)
+                    {
+                        await writer.WriteLineAsync(UserToLine(usr));
+                    }
+                }
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdatePasswordAsync(string user, SecureString password)
+        {
+            user = user.Trim();
+            if (!LoginHelper.CheckUserName(user))
+            {
+                return false;
+            }
+            await semaphoreSlim.WaitAsync();
+            try
+            {
+                var db = await ReadDatabaseAsync();
+                if (db == null)
+                {
+                    Log.WriteLine(LogPriority.Error, "UpdatePassword: Database not found!");
+                    return false;
+                }
+
+                var usr = db.FirstOrDefault(o => o.UserName == user);
+                if (usr == null)
+                {
+                    Log.WriteLine(LogPriority.Error, "UpdatePassword: User not found!");
+                    return false;
+                }
+
+                string hash, salt;
+                if (!PasswordHasher.GetNewHash(password.ConvertToUnsecureString(), out hash, out salt)) return false;
+
+                usr.PasswordHash = hash;
+                usr.PasswordSalt = salt;
+
+                return await WriteDatabaseAsync(db);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            finally { semaphoreSlim.Release(); }
+        }
+
+        public async Task<bool> EnableAccountAsync(string user, bool isAccountEnabled)
+        {
+            user = user.Trim();
+            if (!LoginHelper.CheckUserName(user))
+            {
+                return false;
+            }
+            await semaphoreSlim.WaitAsync();
+            try
+            {
+                var db = await ReadDatabaseAsync();
+                if (db == null)
+                {
+                    Log.WriteLine(LogPriority.Error, "EnableAccount: Database not found!");
+                    return false;
+                }
+
+                var usr = db.FirstOrDefault(o => o.UserName == user);
+                if (usr == null)
+                {
+                    Log.WriteLine(LogPriority.Error, "EnableAccount: User not found!");
+                    return false;
+                }
+
+                if (usr.IsAccountEnabled == isAccountEnabled) return true; // No need to change db
+
+                usr.IsAccountEnabled = isAccountEnabled;
+
+                return await WriteDatabaseAsync(db);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            finally { semaphoreSlim.Release(); }
+        }
+
+        UserDatabaseEntry UserFromLine(string line)
+        {
+            if (string.IsNullOrEmpty(line)) return null;
+
+            line = line.Replace("\r", "").Replace("\t", "");
+
+            var spl = line.Split(' ');
+            if (spl.Length != 6) return null;
+
+            try
+            {
+                UserDatabaseEntry entry = null;
+                entry.UserName = spl[0];
+                entry.ELO = int.Parse(spl[1]);
+                entry.PasswordHash = spl[2];
+                entry.PasswordSalt = spl[3];
+                entry.MustChangePassword = spl[4] == "1";
+                entry.IsAccountEnabled = spl[5] == "1";
+                return entry;
+            }
+            catch { return null; }
+        }
+
+        string UserToLine(UserDatabaseEntry entry)
+        {
+            return
+                entry.UserName + " " +
+                entry.ELO + " " +
+                entry.PasswordHash + " " +
+                entry.PasswordSalt + " " +
+                (entry.MustChangePassword ? "1" : "0") + " " +
+                (entry.IsAccountEnabled ? "1" : "0");
         }
 
         /// <summary>
@@ -135,8 +268,10 @@ namespace AccessBattle.Networking
                 var line = lines.FirstOrDefault(l => l.StartsWith(user + " ", StringComparison.Ordinal));
                 if (string.IsNullOrEmpty(line)) return LoginCheckResult.InvalidUser;
                 var linespl = line.Split(' ');
-                if (linespl.Length != 5) return LoginCheckResult.DatabaseError;
+                if (linespl.Length != 6) return LoginCheckResult.DatabaseError;
                 if (linespl[0] != user) return LoginCheckResult.DatabaseError;
+
+                if (linespl[5] != "1") return LoginCheckResult.AccountDisabled;
 
                 if (PasswordHasher.VerifyHash(password.ConvertToUnsecureString(), linespl[2], linespl[3]))
                     return LoginCheckResult.LoginOK;

@@ -28,12 +28,13 @@ namespace AccessBattle.MySqlProvider
     // | CHAR(64) passwordHash      |
     // | CHAR(64) passwordSalt      |
     // | TINYINT mustChangePassword |
+    // | TINYINT isAccountEnabled   |
     // +----------------------------+
 
     [Export(typeof(IPlugin))]
     [ExportMetadata("Name", "AccessBattle.DatabaseProviders.MySql")]
     [ExportMetadata("Description", "Database provider for MySql and MariaDB")]
-    [ExportMetadata("Version", "0.1")]
+    [ExportMetadata("Version", "0.2")]
     public class MySqlDatabaseProviderFactory : IUserDatabaseProviderFactory
     {
         public IPluginMetadata Metadata { get; set; }
@@ -51,7 +52,103 @@ namespace AccessBattle.MySqlProvider
 
         public string ConnectStringHint => "Enter a connection string or nothing for interactive mode.\r\nConnection strings look like this:\r\nServer=myServerAddress;Port=3306;Database=myDataBase;Uid=myUsername;Pwd=myPassword";
 
-        public async Task<bool> AddUserAsync(string user, SecureString password, int elo = 1000)
+        async Task<bool> UpdateUserInDatabase(UserDatabaseEntry entry)
+        {
+            if (!IsConnected) return false;
+            using (var cmd = new MySqlCommand(
+                        "UPDATE users SET userName=@p2, elo=@p3, passwordHash=@p4, passwordSalt=@p5, mustChangePassword=@p6, isAccountEnabled=@p7 " +
+                        "WHERE idUser=@p1", _connection))
+            {
+                cmd.Parameters.Add(new MySqlParameter("@p1", entry.IdUser));
+                cmd.Parameters.Add(new MySqlParameter("@p2", entry.UserName));
+                cmd.Parameters.Add(new MySqlParameter("@p3", entry.ELO));
+                cmd.Parameters.Add(new MySqlParameter("@p4", entry.PasswordHash));
+                cmd.Parameters.Add(new MySqlParameter("@p5", entry.PasswordSalt));
+                cmd.Parameters.Add(new MySqlParameter("@p6", entry.MustChangePassword));
+                cmd.Parameters.Add(new MySqlParameter("@p7", entry.IsAccountEnabled));
+                if (await cmd.ExecuteNonQueryAsync() != 1)
+                {
+                    Log.WriteLine(LogPriority.Error, "Error: Updating user in database table failed.");
+                    return false;
+                }
+                return true;
+            }
+        }
+
+        async Task<bool> InsertUserToDatabase(UserDatabaseEntry entry)
+        {
+            if (!IsConnected) return false;
+            try
+            {
+                using (var cmd = new MySqlCommand(
+                            "INSERT INTO users (userName,elo,passwordHash,passwordSalt,mustChangePassword,isAccountEnabled) VALUES (@p1,@p2,@p3,@p4,@p5,@p6);", _connection))
+                {
+                    cmd.Parameters.Add(new MySqlParameter("@p1", entry.UserName));
+                    cmd.Parameters.Add(new MySqlParameter("@p2", entry.ELO));
+                    cmd.Parameters.Add(new MySqlParameter("@p3", entry.PasswordHash));
+                    cmd.Parameters.Add(new MySqlParameter("@p4", entry.PasswordSalt));
+                    cmd.Parameters.Add(new MySqlParameter("@p5", entry.MustChangePassword));
+                    cmd.Parameters.Add(new MySqlParameter("@p6", entry.IsAccountEnabled));
+                    if (await cmd.ExecuteNonQueryAsync() != 1)
+                    {
+                        Log.WriteLine(LogPriority.Error, "Error: Inserting user to database table failed.");
+                        return false;
+                    }
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                Log.WriteLine(LogPriority.Error, "InsertUserToDatabase: " + e.Message);
+                return false;
+            }
+        }
+
+        async Task<UserDatabaseEntry> ReadUserFromDatabaseAsync(string user)
+        {
+            if (!IsConnected) return null;
+            if (!LoginHelper.CheckUserName(user))
+            {
+                return null;
+            }
+            try
+            {
+                using (var cmd = new MySqlCommand(
+                    "SELECT idUser,userName,elo,passwordHash,passwordSalt,mustChangePassword,isAccountEnabled FROM users WHERE userName=@param1;", _connection))
+                {
+                    cmd.Parameters.Add(new MySqlParameter("@param1", user));
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        if (reader == null || reader.VisibleFieldCount != 6)
+                        {
+                            // Sometimes it is intended that this method fails, so don't spam this
+                            // Log.WriteLine(LogPriority.Error, "Error: Reading user entry from database failed.");
+                        }
+                        if (reader.HasRows && await reader.ReadAsync())
+                        {
+                            var usr = new UserDatabaseEntry
+                            {
+                                IdUser = Convert.ToInt32(reader.GetValue(0)),
+                                UserName = Convert.ToString(reader.GetValue(1)),
+                                ELO = Convert.ToInt32(reader.GetValue(2)),
+                                PasswordHash = Convert.ToString(reader.GetValue(3)),
+                                PasswordSalt = Convert.ToString(reader.GetValue(4)),
+                                MustChangePassword = Convert.ToBoolean(reader.GetValue(5)),
+                                IsAccountEnabled = Convert.ToBoolean(reader.GetValue(6))
+                            };
+                            return usr;
+                        }
+                    }
+                }
+                return null;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public async Task<bool> AddUserAsync(string user, SecureString password, int elo, bool isAccountEnabled)
         {
             if (!IsConnected) return false;
             if (!LoginHelper.CheckUserName(user))
@@ -62,29 +159,11 @@ namespace AccessBattle.MySqlProvider
             await _semaphoreSlim.WaitAsync();
             try
             {
-                // Try to get user first. If user exists, only update password.
-                var usr = new User();
-
-                using (var cmd = new MySqlCommand(
-                    "SELECT idUser,userName,elo,passwordHash,passwordSalt,mustChangePassword FROM users WHERE userName=@param1;", _connection))
+                var usr = await ReadUserFromDatabaseAsync(user);
+                if (usr != null)
                 {
-                    cmd.Parameters.Add(new MySqlParameter("@param1", user));
-                    using (var reader = await cmd.ExecuteReaderAsync())
-                    {
-                        if (reader == null || reader.VisibleFieldCount != 6)
-                        {
-                            Log.WriteLine(LogPriority.Error, "Error: Reading user entry from database failed.");
-                        }
-                        if (reader.HasRows && await reader.ReadAsync())
-                        {
-                            usr.IdUser = Convert.ToInt32(reader.GetValue(0));
-                            usr.UserName = Convert.ToString(reader.GetValue(1));
-                            usr.ELO = Convert.ToInt32(reader.GetValue(2));
-                            usr.PasswordHash = Convert.ToString(reader.GetValue(3));
-                            usr.PasswordSalt = Convert.ToString(reader.GetValue(4));
-                            usr.MustChangePassword = Convert.ToBoolean(reader.GetValue(5));
-                        }
-                    }
+                    Log.WriteLine(LogPriority.Error, "AddUser: A user with that name already exists.");
+                    return false;
                 }
 
                 // Build password string
@@ -92,68 +171,71 @@ namespace AccessBattle.MySqlProvider
                 string salt;
                 PasswordHasher.GetNewHash(password.ConvertToUnsecureString(), out hash, out salt);
 
-                // Add or update user
-                if (usr.IdUser == 0)
+                usr = new UserDatabaseEntry
                 {
-                    usr.UserName = user;
-                }
-                else
-                {
-                    if (usr.UserName != user)
-                    {
-                        Log.WriteLine(LogPriority.Error, "Error: Read user name from database does not match.");
-                        return false;
-                    }
-                }
-                usr.PasswordHash = hash;
-                usr.PasswordSalt = salt;
-                usr.MustChangePassword = false;
-                usr.ELO = elo;
+                    UserName = user,
+                    PasswordHash = hash,
+                    PasswordSalt = salt,
+                    MustChangePassword = false,
+                    ELO = elo,
+                    IsAccountEnabled = true
+                };
+                return await InsertUserToDatabase(usr);
 
-                // Insert
-                if (usr.IdUser == 0)
-                {
-                    using (var cmd = new MySqlCommand(
-                        "INSERT INTO users (userName,elo,passwordHash,passwordSalt,mustChangePassword) VALUES (@p1,@p2,@p3,@p4,@p5);", _connection))
-                    {
-                        cmd.Parameters.Add(new MySqlParameter("@p1", usr.UserName));
-                        cmd.Parameters.Add(new MySqlParameter("@p2", usr.ELO));
-                        cmd.Parameters.Add(new MySqlParameter("@p3", usr.PasswordHash));
-                        cmd.Parameters.Add(new MySqlParameter("@p4", usr.PasswordSalt));
-                        cmd.Parameters.Add(new MySqlParameter("@p5", usr.MustChangePassword));
-                        if (await cmd.ExecuteNonQueryAsync() != 1)
-                        {
-                            Log.WriteLine(LogPriority.Error, "Error: Inserting user to database table failed.");
-                            return false;
-                        }
-                        return true;
-                    }
-                }
-                // Update
-                else
-                {
-                    using (var cmd = new MySqlCommand(
-                        "UPDATE users SET userName=@p2, elo=@p3, passwordHash=@p4, passwordSalt=@p5, mustChangePassword=@p6 " +
-                        "WHERE idUser=@p1", _connection))
-                    {
-                        cmd.Parameters.Add(new MySqlParameter("@p1", usr.IdUser));
-                        cmd.Parameters.Add(new MySqlParameter("@p2", usr.UserName));
-                        cmd.Parameters.Add(new MySqlParameter("@p3", usr.ELO));
-                        cmd.Parameters.Add(new MySqlParameter("@p4", usr.PasswordHash));
-                        cmd.Parameters.Add(new MySqlParameter("@p5", usr.PasswordSalt));
-                        cmd.Parameters.Add(new MySqlParameter("@p6", usr.MustChangePassword));
-                        if (await cmd.ExecuteNonQueryAsync() != 1)
-                        {
-                            Log.WriteLine(LogPriority.Error, "Error: Updating user in database table failed.");
-                            return false;
-                        }
-                        return true;
-                    }
-                }
             }
             catch (Exception e)
             {
                 Log.WriteLine(LogPriority.Error, "Error: " + e.Message);
+                return false;
+            }
+            finally { _semaphoreSlim.Release(); }
+        }
+
+        public async Task<bool> EnableAccountAsync(string user, bool isAccountEnabled)
+        {
+            await _semaphoreSlim.WaitAsync();
+            try
+            {
+                var usr = await ReadUserFromDatabaseAsync(user);
+                if (usr == null)
+                {
+                    Log.WriteLine(LogPriority.Error, "EnableAccount: User not found!");
+                    return false;
+                }
+
+                usr.IsAccountEnabled = isAccountEnabled;
+
+                return await UpdateUserInDatabase(usr);
+            }
+            catch
+            {
+                return false;
+            }
+            finally { _semaphoreSlim.Release(); }
+        }
+
+        public async Task<bool> UpdatePasswordAsync(string user, SecureString password)
+        {
+            await _semaphoreSlim.WaitAsync();
+            try
+            {
+                var usr = await ReadUserFromDatabaseAsync(user);
+                if (usr == null)
+                {
+                    Log.WriteLine(LogPriority.Error, "UpdatePassword: User not found!");
+                    return false;
+                }
+
+                string hash, salt;
+                if (!PasswordHasher.GetNewHash(password.ConvertToUnsecureString(), out hash, out salt)) return false;
+
+                usr.PasswordHash = hash;
+                usr.PasswordSalt = salt;
+
+                return await UpdateUserInDatabase(usr);
+            }
+            catch (Exception)
+            {
                 return false;
             }
             finally { _semaphoreSlim.Release(); }
@@ -170,44 +252,10 @@ namespace AccessBattle.MySqlProvider
             await _semaphoreSlim.WaitAsync();
             try
             {
-                // Try to get user first. If user exists, only update password.
-                var usr = new User();
-
-                using (var cmd = new MySqlCommand(
-                    "SELECT idUser,userName,passwordHash,passwordSalt,mustChangePassword FROM users WHERE userName=@param1;", _connection))
-                {
-                    cmd.Parameters.Add(new MySqlParameter("@param1", user));
-                    using (var reader = await cmd.ExecuteReaderAsync())
-                    {
-                        if (reader == null || reader.VisibleFieldCount != 5)
-                        {
-                            Log.WriteLine(LogPriority.Error, "Error: Reading user entry from database failed.");
-                            return LoginCheckResult.DatabaseError;
-                        }
-                        if (reader.HasRows && await reader.ReadAsync())
-                        {
-                            usr.IdUser = Convert.ToInt32(reader.GetValue(0));
-                            usr.UserName = Convert.ToString(reader.GetValue(1));
-                            usr.PasswordHash = Convert.ToString(reader.GetValue(2));
-                            usr.PasswordSalt = Convert.ToString(reader.GetValue(3));
-                            usr.MustChangePassword = Convert.ToBoolean(reader.GetValue(4));
-                        }
-                        else
-                        {
-                            Log.WriteLine(LogPriority.Error, "Error: Reading user entry from database failed.");
-                            return LoginCheckResult.InvalidUser;
-                        }
-                    }
-                }
-
-                if (usr.UserName != user)
-                {
-                    Log.WriteLine(LogPriority.Error, "Error: Reading user entry from database failed.");
-                    return LoginCheckResult.DatabaseError;
-                }
+                var usr = await ReadUserFromDatabaseAsync(user);
+                if (usr == null) return LoginCheckResult.DatabaseError;
 
                 // Build password string
-
                 if (PasswordHasher.VerifyHash(password.ConvertToUnsecureString(), usr.PasswordHash, usr.PasswordSalt))
                 {
                     return LoginCheckResult.LoginOK;
@@ -256,15 +304,9 @@ namespace AccessBattle.MySqlProvider
             await _semaphoreSlim.WaitAsync();
             try
             {
-                // Try to get user first. If user exists, only update password.
-                using (var cmd = new MySqlCommand(
-                    "SELECT mustChangePassword FROM users WHERE userName=@param1;", _connection))
-                {
-                    cmd.Parameters.Add(new MySqlParameter("@param1", user));
-                    var x = await cmd.ExecuteScalarAsync();
-                    if (x == null) return null;
-                    return (Convert.ToInt32(x) == 1);
-                }
+                var usr = await ReadUserFromDatabaseAsync(user);
+                if (usr == null) return null;
+                return usr.MustChangePassword;
             }
             catch (Exception e)
             {
@@ -514,6 +556,7 @@ namespace AccessBattle.MySqlProvider
                         "passwordHash CHAR(64) NOT NULL, " +
                         "passwordSalt CHAR(64) NOT NULL, " +
                         "mustChangePassword TINYINT NOT NULL, " +
+                        "isAccountEnabled TINYINT NOT NULL, " +
                         "PRIMARY KEY (idUser), " +
                         "UNIQUE KEY userName (userName(32)) " +
                         ") ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci AUTO_INCREMENT=1; ", _connection))
@@ -608,15 +651,8 @@ namespace AccessBattle.MySqlProvider
             await _semaphoreSlim.WaitAsync();
             try
             {
-                // Try to get user first. If user exists, only update password.
-                using (var cmd = new MySqlCommand(
-                    "SELECT elo FROM users WHERE userName=@param1;", _connection))
-                {
-                    cmd.Parameters.Add(new MySqlParameter("@param1", user));
-                    var x = await cmd.ExecuteScalarAsync();
-                    if (x == null) return null;
-                    return Convert.ToInt32(x);
-                }
+                var usr = await ReadUserFromDatabaseAsync(user);
+                return usr?.ELO;
             }
             catch (Exception e)
             {
@@ -636,14 +672,27 @@ namespace AccessBattle.MySqlProvider
             await _semaphoreSlim.WaitAsync();
             try
             {
-                // Try to get user first. If user exists, only update password.
-                using (var cmd = new MySqlCommand(
-                    "UPDATE users SET elo=@param1 WHERE userName=@param2;", _connection))
+                // faster than getting entry and writing it back
+                // But it does not check if the user exists
+                //using (var cmd = new MySqlCommand(
+                //    "UPDATE users SET elo=@param1 WHERE userName=@param2;", _connection))
+                //{
+                //    cmd.Parameters.Add(new MySqlParameter("@param1", elo));
+                //    cmd.Parameters.Add(new MySqlParameter("@param2", user));
+                //    return await cmd.ExecuteNonQueryAsync() == 1;
+                //}
+
+                var usr = await ReadUserFromDatabaseAsync(user);
+                if (usr == null)
                 {
-                    cmd.Parameters.Add(new MySqlParameter("@param1", elo));
-                    cmd.Parameters.Add(new MySqlParameter("@param2", user));
-                    return await cmd.ExecuteNonQueryAsync() == 1;
+                    Log.WriteLine(LogPriority.Error, "SetELO: User not found!");
+                    return false;
                 }
+
+                usr.ELO = elo;
+
+                return await UpdateUserInDatabase(usr);
+
             }
             catch (Exception e)
             {

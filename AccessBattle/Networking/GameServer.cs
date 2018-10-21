@@ -197,7 +197,10 @@ namespace AccessBattle.Networking
             Stop();
             _server = new TcpListener(IPAddress.Any, _port);
             _serverCts = new CancellationTokenSource();
+
+            // This will throw exception if a server with the same port is already running
             _server.Start();
+
             _serverThread = new Thread(() => ListenForClients(_serverCts.Token)) { IsBackground = true };
             _serverThread.Start();
 
@@ -494,11 +497,25 @@ namespace AccessBattle.Networking
                             if (!AcceptAnyClient && _userDatabase != null)
                             {
                                 var loginResult = _userDatabase.CheckLoginAsync(login.Name, login.Password?.ConvertToSecureString()).GetAwaiter().GetResult(); // TODO: Change to async call later
+
                                 if (loginResult != 0)
                                 {
+
+                                    if (loginResult != LoginCheckResult.LoginOK &&
+                                        login.CreateAccount && _allowRegistration)
+                                    {
+                                        // At this point loginResult == DatabaseError
+
+                                        var pw = new System.Security.SecureString();
+                                        foreach (var c in login.Password) pw.AppendChar(c);
+                                        // TODO: Add option to create the accounts disabled.
+                                        if (_userDatabase.AddUserAsync(login.Name, pw, 1000, true).GetAwaiter().GetResult())
+                                            loginResult = LoginCheckResult.LoginOK;
+                                    }
+
                                     Send(new byte[] { (byte)(int)loginResult }, NetworkPacketType.ClientLogin, player.Connection, player.ClientCrypto);
 
-                                    if (loginResult == LoginCheckResult.LoginOK)
+                                    if (loginResult == LoginCheckResult.LoginOK) // Login OK, ignore if player tried to create account
                                     {
                                         Log.WriteLine(LogPriority.Verbose, "GameServer: Player " + (player.Name ?? "?") + " (" + player.UID + ") logged in successfully!");
                                         player.Name = login.Name;

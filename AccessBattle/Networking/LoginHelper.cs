@@ -19,6 +19,9 @@ namespace AccessBattle.Networking
         DatabaseError,
         /// <summary>The server administrator has to authorize this login first.</summary>
         AuthorizationRequired,
+
+        AccountDisabled,
+        CreateAccountDenied,
     }
 
     /// <summary>Helper for login names.</summary>

@@ -21,14 +21,21 @@ namespace AccessBattle.Plugins
         /// <param name="user"></param>
         /// <param name="password"></param>
         /// <param name="elo">ELO rating. Default: 1000, Min: 0, Max: 10000</param>
+        /// <param name="isAccountEnabled">Set true to activate the new account. Else an admin has to activate the account manually.</param>
         /// <returns></returns>
-        Task<bool> AddUserAsync(string user, SecureString password, int elo);
+        Task<bool> AddUserAsync(string user, SecureString password, int elo, bool isAccountEnabled);
+
+        Task<bool> UpdatePasswordAsync(string user, SecureString password);
+
+        Task<bool> EnableAccountAsync(string user, bool isAccountEnabled);
+
         /// <summary>
         /// Delete user.
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
         Task<bool> DeleteUserAsync(string user);
+
         /// <summary>
         /// Checks if password is correct.
         /// </summary>
@@ -36,6 +43,7 @@ namespace AccessBattle.Plugins
         /// <param name="password"></param>
         /// <returns>0: Login OK. 1: Invalid user name. 2: Invalid Password. 3: Database Error.</returns>
         Task<LoginCheckResult> CheckLoginAsync(string user, SecureString password);
+
         /// <summary>
         /// Checks if a user must change his password on next login.
         /// </summary>
