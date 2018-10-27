@@ -9,7 +9,9 @@
         Title="Access Battle"
         MinWidth="310" MinHeight="480"
         Width="424" Height="646"
-        Background="Black">
+        Background="Black"
+        SnapsToDevicePixels="True"
+        UseLayoutRounding="True">
     <Window.DataContext>
         <viewmodel:MainWindowViewModel x:Name="ViewModel"/>
     </Window.DataContext>
@@ -185,6 +187,7 @@
                 </Viewbox>
             </local:BoardFieldView>
 
+            <!--TODO: It is probably much easier to define bindings within BoardFieldView.xaml and just set the DataContext here-->
             <local:BoardFieldView
                 FieldVisualState="{Binding BoardFieldList[56].VisualState}" FieldCardVisualState="{Binding BoardFieldList[56].CardVisualState}"
                 Command="{Binding BoardFieldClickedCommand}" CommandParameter="56" IsHighlighted="{Binding BoardFieldList[56].IsHighlighted}"

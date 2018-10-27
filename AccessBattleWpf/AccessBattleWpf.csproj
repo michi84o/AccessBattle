@@ -86,8 +86,14 @@
     <Compile Include="View\ErrorNotification.xaml.cs">
       <DependentUpon>ErrorNotification.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\FirewallField.xaml.cs">
+      <DependentUpon>FirewallField.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\GameOverMenu.xaml.cs">
       <DependentUpon>GameOverMenu.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\BoostField.xaml.cs">
+      <DependentUpon>BoostField.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\NetworkGameMenu.xaml.cs">
       <DependentUpon>NetworkGameMenu.xaml</DependentUpon>
@@ -127,7 +133,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="View\FirewallField.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\GameOverMenu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\BoostField.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

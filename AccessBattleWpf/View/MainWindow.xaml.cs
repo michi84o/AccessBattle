@@ -1,6 +1,7 @@
 ﻿using AccessBattle.Wpf.ViewModel;
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -41,6 +42,7 @@ namespace AccessBattle.Wpf.View
             {
                 Task.Delay(500).ContinueWith(o =>
                 {
+                    //AnimatePlacement(1, 1, true, BoardFieldVisualState.Link);
                     //AnimateMovement(1, 1, 1, 9);
 
                     //        Application.Current.Dispatcher.BeginInvoke((Action)(async () =>
@@ -90,7 +92,9 @@ namespace AccessBattle.Wpf.View
             // Trigger animation here
             var move = cmd.Substring(2);
 
-            if (move.StartsWith("mv"))
+            // Move command
+            // mv 1,1,2,1
+            if (move.StartsWith("mv", StringComparison.InvariantCultureIgnoreCase))
             {
                 var command = move.Substring(3).Trim();
                 var split = command.Split(new[] { ',' });
@@ -126,7 +130,103 @@ namespace AccessBattle.Wpf.View
                 AnimateMovement(x1, y1, x2, y2);
 
             }
+            // Boost or firewall command
+            // bs 1,1,1  // fw 1,1,1
+            else if (move.StartsWith("bs", StringComparison.InvariantCultureIgnoreCase) ||
+                     move.StartsWith("fw", StringComparison.InvariantCultureIgnoreCase))
+            {
+                var boost = move.StartsWith("bs", StringComparison.InvariantCultureIgnoreCase);
 
+                move = move.Substring(3).Trim();
+                var split = move.Split(new[] { ',' });
+                if (split.Length != 3) return;
+
+                uint x1, y1, enabled;
+                if (!uint.TryParse(split[0], out x1) ||
+                    !uint.TryParse(split[1], out y1) ||
+                    !uint.TryParse(split[2], out enabled))
+                    return;
+
+                // Convert to zero based index:
+                --x1; --y1;
+
+                // Invert Y
+                if (ViewModel.IsPlayerHost)
+                {
+                    y1 = 7 - y1;
+                }
+                else // Invert X
+                {
+                    x1 = 7 - x1;
+                }
+
+                if (x1 > 7 || y1 > 7 || enabled > 1)
+                    return;
+
+                AnimatePlacement(
+                    (int)x1, (int)y1, enabled == 1,
+                    boost ? BoardFieldVisualState.LineBoost : BoardFieldVisualState.Firewall);
+            }
+
+        }
+
+        void AnimatePlacement(int x, int y, bool direction, BoardFieldVisualState card)
+        {
+            if (card != BoardFieldVisualState.LineBoost && card != BoardFieldVisualState.Firewall) return;
+
+            Application.Current.Dispatcher.BeginInvoke((Action)(async () =>
+            {
+                UserControl view;
+                if (card == BoardFieldVisualState.Firewall)
+                    view = new FirewallField();
+                else view = new BoostField();
+
+
+                Grid.SetColumnSpan(view, 12);
+                Grid.SetRowSpan(view, 16);
+                view.HorizontalAlignment = HorizontalAlignment.Left;
+                view.VerticalAlignment = VerticalAlignment.Top;
+
+                var dx = XOf(x);
+                var dy = YOf(y);
+
+                view.Margin = new Thickness(dx, dy, 0, 0);
+
+                double startScale = direction ? 2 : 1;
+                double endScale = direction ? 1 : 2;
+                double increment = direction ? -0.05 : 0.05;
+
+                // TODO: correct CenterX/Y at the edges of the board
+
+                ScaleTransform scaleT = new ScaleTransform
+                {
+                    ScaleY = startScale,
+                    ScaleX = startScale,
+                    CenterX = 24,
+                    CenterY = 24
+                };
+
+                view.RenderTransform = scaleT;
+
+                MainGrid.Children.Add(view);
+
+                for (double i = startScale; direction && i>endScale || !direction && i<endScale ; i += increment)
+                {
+                    scaleT.ScaleX = i;
+                    scaleT.ScaleY = i;
+                    await Task.Delay(50);
+                }
+
+                await Task.Delay(250);
+
+                for (double i = 1; i > 0; i -= 0.1)
+                {
+                    await Task.Delay(50);
+                    view.Opacity = i;
+                }
+
+                MainGrid.Children.Remove(view);
+            }));
         }
 
         // TODO: Handle Stack
@@ -171,6 +271,8 @@ namespace AccessBattle.Wpf.View
                     line.Opacity = i / 100.0;
                     await Task.Delay(50);
                 }
+
+
 
                 await Task.Delay(2500);
                 MainGrid.Children.Remove(line);
