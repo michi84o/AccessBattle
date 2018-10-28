@@ -141,6 +141,8 @@ namespace AccessBattle.Wpf.View
                 var split = move.Split(new[] { ',' });
                 if (split.Length != 3) return;
 
+                Game.ReplaceLettersWithNumbers(ref split);
+
                 uint x1, y1, enabled;
                 if (!uint.TryParse(split[0], out x1) ||
                     !uint.TryParse(split[1], out y1) ||
@@ -167,19 +169,98 @@ namespace AccessBattle.Wpf.View
                     (int)x1, (int)y1, enabled == 1,
                     boost ? BoardFieldVisualState.LineBoost : BoardFieldVisualState.Firewall);
             }
+            else if (move.StartsWith("vc", StringComparison.InvariantCultureIgnoreCase))
+            {
+                move = move.Substring(3).Trim();
+                var split = move.Split(new[] { ',' });
+                if (split.Length != 2) return;
+
+                Game.ReplaceLettersWithNumbers(ref split);
+
+                uint x1, y1;
+                if (!uint.TryParse(split[0], out x1) ||
+                    !uint.TryParse(split[1], out y1))
+                    return;
+
+                // Convert to zero based index:
+                --x1; --y1;
+
+                if (x1 > 7 || y1 > 7)
+                    return;
+
+                // Invert Y
+                if (ViewModel.IsPlayerHost)
+                {
+                    y1 = 7 - y1;
+                }
+                else // Invert X
+                {
+                    x1 = 7 - x1;
+                }
+
+                AnimatePlacement((int)x1, (int)y1, true, BoardFieldVisualState.VirusCheck);
+
+            }
+            else if (move.StartsWith("er", StringComparison.InvariantCultureIgnoreCase))
+            {
+                move = move.Substring(3).Trim();
+                var split = move.Split(new[] { ',' });
+                if (split.Length != 5) return; // Last field is '?'
+                Game.ReplaceLettersWithNumbers(ref split);
+                int x1, x2, y1, y2;
+                if (!int.TryParse(split[0], out x1) ||
+                    !int.TryParse(split[1], out y1) ||
+                    !int.TryParse(split[2], out x2) ||
+                    !int.TryParse(split[3], out y2))
+                    return;
+                // Convert to zero based index:
+                --x1; --x2; --y1; --y2;
+
+                // Invert Y
+                if (ViewModel.IsPlayerHost)
+                {
+                    y1 = 7 - y1;
+
+                    if (y2 == 10)
+                        y2 = 8;
+                    else
+                        y2 = 7 - y2;
+                }
+                else // Invert X
+                {
+                    x1 = 7 - x1;
+                    x2 = 7 - x2;
+
+                    if (y2 == 10) y2 = 8;
+                }
+
+                AnimateMovement(x1, y1, x2, y2);
+                AnimateMovement(x2, y2, x1, y1);
+                AnimatePlacement(x1, y1, false, BoardFieldVisualState.Error404);
+                AnimatePlacement(x2, y2, false, BoardFieldVisualState.Error404);
+
+            }
 
         }
 
         void AnimatePlacement(int x, int y, bool direction, BoardFieldVisualState card)
         {
-            if (card != BoardFieldVisualState.LineBoost && card != BoardFieldVisualState.Firewall) return;
+            if (card != BoardFieldVisualState.LineBoost &&
+                card != BoardFieldVisualState.Firewall &&
+                card != BoardFieldVisualState.VirusCheck &&
+                card != BoardFieldVisualState.Error404) return;
 
             Application.Current.Dispatcher.BeginInvoke((Action)(async () =>
             {
                 UserControl view;
                 if (card == BoardFieldVisualState.Firewall)
                     view = new FirewallField();
-                else view = new BoostField();
+                else if (card == BoardFieldVisualState.LineBoost)
+                    view = new BoostField();
+                else if (card == BoardFieldVisualState.Error404)
+                    view = new Error404Field();
+                else
+                    view = new VirusCheckField();
 
 
                 Grid.SetColumnSpan(view, 12);

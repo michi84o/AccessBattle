@@ -83,6 +83,9 @@
     <Compile Include="View\DeploymentView.xaml.cs">
       <DependentUpon>DeploymentView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\Error404Field.xaml.cs">
+      <DependentUpon>Error404Field.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\ErrorNotification.xaml.cs">
       <DependentUpon>ErrorNotification.xaml</DependentUpon>
     </Compile>
@@ -103,6 +106,9 @@
     </Compile>
     <Compile Include="View\SwitchCards404Menu.xaml.cs">
       <DependentUpon>SwitchCards404Menu.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\VirusCheckField.xaml.cs">
+      <DependentUpon>VirusCheckField.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\WaitForAcceptMenu.xaml.cs">
       <DependentUpon>WaitForAcceptMenu.xaml</DependentUpon>
@@ -126,6 +132,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\DeploymentView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Error404Field.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -180,6 +190,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\SwitchCards404Menu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\VirusCheckField.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
