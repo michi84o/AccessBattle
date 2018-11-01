@@ -46,6 +46,8 @@ namespace AccessBattle
         /// <summary>Log priority.</summary>
         public static LogPriority Priority = LogPriority.Verbose;
 
+
+
         /// <summary>
         /// Set logging mode.
         /// </summary>

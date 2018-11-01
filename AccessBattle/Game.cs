@@ -61,6 +61,13 @@ namespace AccessBattle
     /// </summary>
     public class Game : PropChangeNotifier, IBoardGame // TODO: IDisposeable
     {
+        string _lastExecutedCommand;
+        public string LastExecutedCommand
+        {
+            get => _lastExecutedCommand;
+            set => SetProp(ref _lastExecutedCommand, value);
+        }
+
         GamePhase _phase;
         /// <summary>
         /// Current game phase.
@@ -266,6 +273,7 @@ namespace AccessBattle
                 if (string.IsNullOrEmpty(command)) return false;
 
                 var cmd = command.Trim();
+                var cmdCpy = cmd;
 
                 #region Deploy Command "dp"
                 // Deployment command is a command that contains 4 'L' and 4 'V' characters.
@@ -315,15 +323,16 @@ namespace AccessBattle
                     _hasDeployed[player] = true;
                     if (_hasDeployed[0] && _hasDeployed[1])
                         BeginTurns();
+                    LastExecutedCommand = CreateLastExecutedCommand(cmdCpy, player);
                     return true;
                 }
                 #endregion
 
                 #region Move command "mv"
-                if (cmd.StartsWith("mv ", StringComparison.InvariantCultureIgnoreCase) && command.Length > 3)
+                if (cmd.StartsWith("mv ", StringComparison.InvariantCultureIgnoreCase) && cmd.Length > 3)
                 {
-                    command = command.Substring(3).Trim();
-                    var split = command.Split(new[] { ',' });
+                    cmd = cmd.Substring(3).Trim();
+                    var split = cmd.Split(new[] { ',' });
                     if (split.Length != 4) return false;
                     ReplaceLettersWithNumbers(ref split);
                     uint x1, x2, y1, y2;
@@ -360,6 +369,7 @@ namespace AccessBattle
                         {
                             // Could not move card, error!
                             Phase = GamePhase.Aborted;
+                            LastExecutedCommand = CreateLastExecutedCommand(cmdCpy, player);
                             return true;
                         }
                         if (card2.HasBoost)
@@ -371,6 +381,7 @@ namespace AccessBattle
                         if (field1.Card != null)
                         {
                             // Could not move card, error!
+                            LastExecutedCommand = CreateLastExecutedCommand(cmdCpy, player);
                             Phase = GamePhase.Aborted;
                             return true;
                         }
@@ -380,15 +391,16 @@ namespace AccessBattle
                     field2.Card = field1.Card;
                     field1.Card = null;
                     SwitchPlayerTurnPhase();
+                    LastExecutedCommand = CreateLastExecutedCommand(cmdCpy, player);
                     return true;
                 }
                 #endregion
 
                 #region Boost command "bs"
-                if (command.StartsWith("bs ", StringComparison.InvariantCultureIgnoreCase) && command.Length > 3)
+                if (cmd.StartsWith("bs ", StringComparison.InvariantCultureIgnoreCase) && cmd.Length > 3)
                 {
-                    command = command.Substring(3).Trim();
-                    var split = command.Split(new[] { ',' });
+                    cmd = cmd.Substring(3).Trim();
+                    var split = cmd.Split(new[] { ',' });
                     if (split.Length != 3) return false;
 
                     ReplaceLettersWithNumbers(ref split);
@@ -427,6 +439,7 @@ namespace AccessBattle
                             return false; // Boost already placed
                         card1.HasBoost = true;
                         SwitchPlayerTurnPhase();
+                        LastExecutedCommand = CreateLastExecutedCommand(cmdCpy, player);
                         return true;
                     }
 
@@ -436,15 +449,16 @@ namespace AccessBattle
 
                     card1.HasBoost = false;
                     SwitchPlayerTurnPhase();
+                    LastExecutedCommand = CreateLastExecutedCommand(cmdCpy, player);
                     return true;
                 }
                 #endregion
 
                 #region Firewall command "fw"
-                if (cmd.StartsWith("fw ", StringComparison.InvariantCulture) && command.Length > 3)
+                if (cmd.StartsWith("fw ", StringComparison.InvariantCulture) && cmdCpy.Length > 3)
                 {
-                    command = command.Substring(3).Trim();
-                    var split = command.Split(new[] { ',' });
+                    cmd = cmd.Substring(3).Trim();
+                    var split = cmd.Split(new[] { ',' });
                     if (split.Length != 3) return false;
 
                     ReplaceLettersWithNumbers(ref split);
@@ -479,6 +493,7 @@ namespace AccessBattle
 
                         field1.Card = PlayerFirewallCards[player - 1];
                         SwitchPlayerTurnPhase();
+                        LastExecutedCommand = CreateLastExecutedCommand(cmdCpy, player);
                         return true;
                     }
 
@@ -486,16 +501,17 @@ namespace AccessBattle
                     if (!(card1 is FirewallCard) || card1.Owner?.PlayerNumber != player) return false;
                     field1.Card = null;
                     SwitchPlayerTurnPhase();
+                    LastExecutedCommand = CreateLastExecutedCommand(cmdCpy, player);
                     return true;
                 }
                 #endregion
 
                 #region Virus Check command "vc"
 
-                if (command.StartsWith("vc ", StringComparison.InvariantCultureIgnoreCase) && command.Length > 3)
+                if (cmd.StartsWith("vc ", StringComparison.InvariantCultureIgnoreCase) && cmd.Length > 3)
                 {
-                    command = command.Substring(3).Trim();
-                    var split = command.Split(new[] { ',' });
+                    cmd = cmd.Substring(3).Trim();
+                    var split = cmd.Split(new[] { ',' });
                     if (split.Length != 2) return false;
 
                     ReplaceLettersWithNumbers(ref split);
@@ -523,6 +539,7 @@ namespace AccessBattle
                     card1.IsFaceUp = true;
                     Players[player - 1].DidVirusCheck = true;
                     SwitchPlayerTurnPhase();
+                    LastExecutedCommand = CreateLastExecutedCommand(cmdCpy, player);
                     return true;
                 }
 
@@ -530,10 +547,10 @@ namespace AccessBattle
 
                 #region Error 404 command "er"
 
-                if (command.StartsWith("er ", StringComparison.InvariantCultureIgnoreCase) && command.Length > 3)
+                if (cmd.StartsWith("er ", StringComparison.InvariantCultureIgnoreCase) && cmd.Length > 3)
                 {
-                    command = command.Substring(3).Trim();
-                    var split = command.Split(new[] { ',' });
+                    cmd = cmd.Substring(3).Trim();
+                    var split = cmd.Split(new[] { ',' });
                     if (split.Length != 5) return false;
 
                     ReplaceLettersWithNumbers(ref split);
@@ -584,6 +601,7 @@ namespace AccessBattle
 
                     Players[player - 1].Did404NotFound = true;
                     SwitchPlayerTurnPhase();
+                    LastExecutedCommand = CreateLastExecutedCommand(cmdCpy, player);
                     return true;
                 }
 
@@ -821,6 +839,38 @@ namespace AccessBattle
         }
 
         #endregion
+
+        public static string CreateLastExecutedCommand(string command, int currentPlayer)
+        {
+            string lastCommand = null;
+            // Send make last command visible to opponent of not secret
+            //var cmd = Game.ReplaceAltSyntax(cmdMsg.Command);
+            var cmd = command.Trim();
+            if (cmd.StartsWith("mv", StringComparison.InvariantCultureIgnoreCase) ||
+                cmd.StartsWith("bs", StringComparison.InvariantCultureIgnoreCase) ||
+                cmd.StartsWith("fw", StringComparison.InvariantCultureIgnoreCase) ||
+                cmd.StartsWith("vc", StringComparison.InvariantCultureIgnoreCase))
+            {
+                lastCommand = currentPlayer.ToString() + ":" + Game.ReplaceAltSyntax(cmd);
+            }
+            else if (cmd.StartsWith("er", StringComparison.InvariantCultureIgnoreCase))
+            {
+                // This command contains secret information
+                cmd = Game.ReplaceAltSyntax(cmd);
+                cmd = cmd.Substring(3).Trim();
+                var split = cmd.Split(new[] { ',' });
+                if (split.Length == 5) // The last split is the secret information
+                {
+                    cmd = "er ";
+                    for (int i = 0; i < 4; ++i)
+                        cmd += split[i] + ",";
+                    cmd += "?";
+                    lastCommand = currentPlayer.ToString() + ":" + cmd;
+                }
+            }
+            return lastCommand;
+        }
+
     }
 
     /// <summary>Class for local singleplayer games.</summary>
@@ -867,6 +917,7 @@ namespace AccessBattle
             Players[playerNumber - 1].Name = ai.Name;
         }
 
+        // TODO: SyncRequired might be invoked too often
         /// <summary>
         /// Executes the command and automatically tells the AI to make its move.
         /// </summary>
@@ -907,8 +958,6 @@ namespace AccessBattle
                 Phase = GamePhase.Aborted;
             }
 
-            // TODO Set LastExecutedCommand in ViewModel of client to enable animation
-
             // Can happen after Deployment
             if (Phase == GamePhase.Player2Turn)
             {
@@ -919,8 +968,8 @@ namespace AccessBattle
                     Phase = GamePhase.Aborted;
                 }
             }
-            SyncRequired?.Invoke(this, EventArgs.Empty);
 
+            SyncRequired?.Invoke(this, EventArgs.Empty);
             return true;
         }
 

@@ -55,6 +55,7 @@ namespace AccessBattle.Networking.Packets
                 Player1 = game.Players[0].GetSync(),
                 Player2 = game.Players[1].GetSync(),
                 FieldsWithCards = fieldsWithCard,
+                LastExecutedCommand = game.LastExecutedCommand
             };
 
             if (player != 1 && player != 2) return sync;

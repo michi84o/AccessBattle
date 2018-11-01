@@ -764,34 +764,10 @@ namespace AccessBattle.Networking
                                 if (oldPhase == GamePhase.Deployment && game.Phase == GamePhase.Deployment)
                                     return; // The following game sync would reset the cards of the player who hasn't deployed yet
 
-                                string lastCommand = null;
+                                //string lastCommand = null;
                                 if (result)
                                 {
-                                    // Send make last command visible to opponent of not secret
-                                    //var cmd = Game.ReplaceAltSyntax(cmdMsg.Command);
-                                    var cmd = cmdMsg.Command.Trim();
-                                    if (cmd.StartsWith("mv", StringComparison.InvariantCultureIgnoreCase) ||
-                                        cmd.StartsWith("bs", StringComparison.InvariantCultureIgnoreCase) ||
-                                        cmd.StartsWith("fw", StringComparison.InvariantCultureIgnoreCase) ||
-                                        cmd.StartsWith("vc", StringComparison.InvariantCultureIgnoreCase))
-                                    {
-                                        lastCommand = playerNum.ToString() + ":" + Game.ReplaceAltSyntax(cmd);
-                                    }
-                                    else if (cmd.StartsWith("er", StringComparison.InvariantCultureIgnoreCase))
-                                    {
-                                        // This command contains secret information
-                                        cmd = Game.ReplaceAltSyntax(cmd);
-                                        cmd = cmd.Substring(3).Trim();
-                                        var split = cmd.Split(new[] { ',' });
-                                        if (split.Length == 5) // The last split is the secret information
-                                        {
-                                            cmd = "er ";
-                                            for (int i = 0; i < 4; ++i)
-                                                cmd += split[i] + ",";
-                                            cmd += "?";
-                                            lastCommand = playerNum.ToString() + ":" + cmd;
-                                        }
-                                    }
+                                    //lastCommand = Game.CreateLastExecutedCommand(cmdMsg.Command, playerNum);
 
                                     // Apply ELO
                                     if ((oldPhase == GamePhase.Player1Turn || oldPhase == GamePhase.Player2Turn) &&
@@ -825,8 +801,8 @@ namespace AccessBattle.Networking
                                     var syncP1 = GameSync.FromGame(game, game.UID, 1);
                                     var syncP2 = GameSync.FromGame(game, game.UID, 2);
 
-                                    syncP1.LastExecutedCommand = lastCommand;
-                                    syncP2.LastExecutedCommand = lastCommand;
+                                    //syncP1.LastExecutedCommand = lastCommand;
+                                    //syncP2.LastExecutedCommand = lastCommand;
 
                                     Send(JsonConvert.SerializeObject(syncP1, _serializerSettings), NetworkPacketType.GameSync, p1.Connection, p1.ClientCrypto);
                                     Send(JsonConvert.SerializeObject(syncP2, _serializerSettings), NetworkPacketType.GameSync, p2.Connection, p2.ClientCrypto);
