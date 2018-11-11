@@ -368,7 +368,7 @@ namespace AccessBattle.Wpf.ViewModel
                         ParentViewModel.CurrentMenu = MenuType.WaitForJoin;
                         ParentViewModel.Game.IsPlayerHost = true;
                         ParentViewModel.Game.UID = result.UID;
-                        // TODO: Should be cancelled after 60s if no one joines
+                        // TODO: Should be cancelled after 60s if no one joins
                         // TODO: The timer for polling the game list is still running
                     }
                     IsCreatingGame = false;

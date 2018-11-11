@@ -10,34 +10,21 @@ AccessBattle is a private fan project and not affiliated with
 
 ## Status
 
-I will try to finish the core functionality until end of December 2018.
+- Development discontinued
 
-- Current status: Work in progress
-  - Multiplayer is in alpha. There are some bugs and features are missing.
-    - Text and MySql/MariaDB based user databases are supported.
-	- Plugins for other database types are supported.
-  - Singleplayer is in alpha. The AI plugin contains two stupid AI opponents.
-    - Plugins for more AIs are supported.
-  - Singleplayer and AI vs AI is available as a console program.
-  
-- Roadmap
-  - ~~User Interface + Multiplayer finished: January 2018~~ (Postponed for now, the basics are working)
-  - ~~Singleplayer: Add more AI opponents. Next one is probably a neural network.~~
-    - Currently having problems training the network. Need to redesign.
-  - ~~Documentation: August 2018 (if I have some free time) (WIP)~~
-  - Sorry if this is taking so long. I have a full time job and not much free time.
-  
+I started this project in Christmas 2016 after finishing the Steins;Gate visual novel. It took me nearly  two years to bring this to version 1.0. The basics are working but the functionality lacks polish. This project was used by me as a playground to try new stuff like client-server encryption, database access and AI. I don't have the motivation to continue this project anymore and want to move on. Feel free to fork this repository and improve it as you like. I hope my source code makes enough sense to other people.
+
 - Known Issues:
-  - Same user can login multiple times. Not sure if bug or feature.  
+  - Same user can login multiple times. Not sure if bug or feature.
   - Game might screw up if one client disconnects
   - Exit Game does not work in single player
+  - Even though the UI uses upper case letters only, login still differentiates between upper and lower case.
   
 - TODO
   - Reconnects
   - Prevent Login Spamming and Account Hacking
   - Matchmaking for random matches
-  - Some animations need to be added if opponent plays a card.
-  
+  - Replace font to support lower case and at least Hiragana and Katakana.
 
 ## Program Structure
   
@@ -48,10 +35,6 @@ be compatible with Mono and also run on Linux.
 The main user interface is implemented with WPF using .NET 4.5.
 You need at least Windows Vista SP2, Windows 7 SP1 or newer 
 to use it. I tested it on Windows 7.
-
-The code is currently a complete mess. I am focusing on
-making the game run. When it does I will clean it up
-and add some documentation.
 
 Here is an example of a console based UI:
 
@@ -70,7 +53,6 @@ Warning! This program uses encryption for the connection to the server. Please c
 
 **I'm NOT taking donations of any kind.**
 
-**I do not accept pull requests until I have released version 1.0.**
 
 ## Special thanks
 5pb. and Nitroplus for creating Steins;Gate

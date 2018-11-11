@@ -14,8 +14,6 @@ namespace AccessBattle
         Trace,
         /// <summary>Use console output.</summary>
         Console,
-        /// <summary>Use file output (NOT IMPLEMENTED).</summary>
-        File
     }
 
     /// <summary>Priority for logs.</summary>
@@ -23,7 +21,7 @@ namespace AccessBattle
     {
         /// <summary>Print all messages.</summary>
         Debug = 0,
-        /// <summary>Print all messages exceot debug</summary>
+        /// <summary>Print all messages except debug</summary>
         Verbose,
         /// <summary>No verbose or debug output.</summary>
         Information,
@@ -35,18 +33,15 @@ namespace AccessBattle
         Critical
     }
 
-    // TODO: Implement mode file, use TraceSource class
     /// <summary>
     /// Helper class for logging error and debug messages.
     /// </summary>
     public static class Log
     {
-        private static LogMode Mode = LogMode.Debug;
+        private static LogMode Mode = LogMode.Trace;
 
         /// <summary>Log priority.</summary>
         public static LogPriority Priority = LogPriority.Verbose;
-
-
 
         /// <summary>
         /// Set logging mode.
