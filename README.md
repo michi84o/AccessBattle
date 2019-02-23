@@ -10,7 +10,7 @@ AccessBattle is a private fan project and not affiliated with
 
 ## Status
 
-- Development discontinued
+- Development discontinued (perhaps I will add IPv6 support in March 2019)
 
 I started this project in Christmas 2016 after finishing the Steins;Gate visual novel. It took me nearly  two years to bring this to version 1.0. The basics are working but the functionality lacks polish. This project was used by me as a playground to try new stuff like client-server encryption, database access and AI. I don't have the motivation to continue this project anymore and want to move on. Feel free to fork this repository and improve it as you like. I hope my source code makes enough sense to other people.
 
@@ -21,6 +21,7 @@ I started this project in Christmas 2016 after finishing the Steins;Gate visual 
   - Even though the UI uses upper case letters only, login still differentiates between upper and lower case.
   
 - TODO
+  - IPv6 support
   - Reconnects
   - Prevent Login Spamming and Account Hacking
   - Matchmaking for random matches
